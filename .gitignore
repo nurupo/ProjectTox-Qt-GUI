@@ -1,0 +1,4 @@
+*.aps
+resources/*.aps
+projectfiles/build*/
+projectfiles/QtCreator/*.user*

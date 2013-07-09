@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/user_add.png</file>
+        <file>icons/status_offline.png</file>
+        <file>icons/status_online.png</file>
+        <file>icons/page_copy.png</file>
+        <file>icons/textfield_rename.png</file>
+        <file>icons/user_delete.png</file>
+    </qresource>
+</RCC>
