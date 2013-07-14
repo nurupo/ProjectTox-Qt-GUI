@@ -6,16 +6,24 @@ before_install:
   - yes | sudo add-apt-repository ppa:canonical-qt5-edgers/qt5-proper 
   - sudo apt-get update -qq
   - yes | sudo apt-get install qtdeclarative5-dev
+  - git clone git://github.com/jedisct1/libsodium.git
+  - cd libsodium
+  - git checkout tags/0.4.2
+  - ./autogen.sh
+  - ./configure && make -j3 check
+  - sudo make install
+  - sudo ldconfig
+  - cd ..
 
 script:
-  - qmake -qt=qt5 -Wall -Werror projectfiles/QtCreator/TOX-Qt-GUI.pro
+  - qmake -qt=qt5 -Wall projectfiles/QtCreator/TOX-Qt-GUI.pro
   - make -j3
 
 notifications:
   
   irc: 
     channels:
-      - "chat.freenode.net#InsertProjectNameHere"
+      - "chat.freenode.net#Tox-Qt-GUI"
     on_success: always
     on_failure: always
     

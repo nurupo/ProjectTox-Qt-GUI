@@ -13,10 +13,14 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../src/
+INCLUDEPATH += ../../src/ ../../src/core/
 win32:INCLUDEPATH += ../../src/sodium/include/
 
-win32:LIBS += -lWS2_32 ../../src/sodium/lib/libsodium.a
+win32 {
+    LIBS += -lWS2_32 ../../src/sodium/lib/libsodium.a
+} else {
+    LIBS += -lsodium
+}
 
 SOURCES += \
     ../../src/main.cpp \

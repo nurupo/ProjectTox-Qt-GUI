@@ -17,8 +17,13 @@
 #include "core.hpp"
 
 extern "C" {
-#include "../../core/Messenger.h"
+#include <Messenger.h>
 }
+
+#ifndef WIN32
+#include <arpa/inet.h>
+#endif
+
 
 #include <QThread>
 #include <QDebug>
