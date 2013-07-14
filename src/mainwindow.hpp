@@ -17,13 +17,17 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
-#include "dhtworker.hpp"
+#include "core.hpp"
+#include "friendswidget.hpp"
 
 #include <QLineEdit>
 #include <QListView>
 #include <QMainWindow>
 #include <QTextBrowser>
 #include <QThread>
+
+
+class OurUserItemWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -33,14 +37,20 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    static OurUserItemWidget* ourUserItem;
+
 private:
-    QTextBrowser* textBrowser;
-    QLineEdit* inputLine;
-    DhtWorker* worker;
-    QThread* workerThread;
+    Core* core;
+    QThread* coreThread;
+    FriendsWidget* friendsWidget;
 
 private slots:
     void sendMessage();
+    void onFriendRequestRecieved(const QString &userId, const QString &message);
+    void onFriendStatusChanged(const QString &userId, Core::FriendStatus status);
+
+signals:
+    void friendRequestAccepted(const QString &userId);
 
 };
 

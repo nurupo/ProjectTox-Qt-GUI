@@ -134,8 +134,10 @@ QStandardItem* FriendsWidget::findFriendItem(const QString& userId) const
 void FriendsWidget::onAddFriendButtonClicked()
 {
     AddFriendDialog dialog(this);
+
     if (dialog.exec() == QDialog::Accepted) {
         addFriend(dialog.getUserId(), dialog.getUsername());
+        emit friendRequested(dialog.getUserId(), dialog.getMessage());
     }
 }
 

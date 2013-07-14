@@ -18,6 +18,7 @@
 #define FRIENDITEMWIDGET_HPP
 
 #include "status.hpp"
+#include "elidelabel.hpp"
 
 #include <QLabel>
 #include <QWidget>
@@ -30,7 +31,7 @@ public:
 
 private:
     QLabel* statusLabel;
-    QLabel* usernameLabel;
+    ElideLabel* usernameLabel;
 
 public slots:
     void setStatus(Status status);

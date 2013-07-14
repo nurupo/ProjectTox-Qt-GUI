@@ -15,7 +15,9 @@
 */
 
 #include "chatpagewidget.hpp"
+#include "ouruseritemwidget.hpp"
 #include "status.hpp"
+#include "mainwindow.hpp"
 
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -28,7 +30,8 @@ ChatPageWidget::ChatPageWidget(const QString& userId, QWidget* parent) :
     display = new MessageDisplayWidget(this);
 
     input = new InputTextWidget(this);
-    connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::ourOwnMessage);
+    connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::messageSent);
+    connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::onMessageSent);
 
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
@@ -49,10 +52,15 @@ QString ChatPageWidget::getUserId() const
     return userId;
 }
 
-void ChatPageWidget::ourOwnMessage(const QString& message)
+void ChatPageWidget::onMessageSent(const QString& message)
 {
-    // FIXME: get our Username
-    display->showMessage("MyUsername", message);
+    // FIXME: get our Username when Settings will be implemented
+    display->showMessage(MainWindow::ourUserItem->getUsername(), message);
+}
+
+void ChatPageWidget::messageReceived(const QString& message)
+{
+    display->showMessage(username, message);
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
@@ -65,4 +73,5 @@ void ChatPageWidget::setStatus(Status newStatus)
 {
     status = newStatus;
     friendItem->setStatus(status);
+    input->setReadOnly(newStatus != Status::Online);
 }

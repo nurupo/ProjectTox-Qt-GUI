@@ -14,32 +14,21 @@
     See the COPYING file for more details.
 */
 
-#ifndef ADDFRIENDDIALOG_HPP
-#define ADDFRIENDDIALOG_HPP
+#ifndef FRIENDREQUESTDIALOG_HPP
+#define FRIENDREQUESTDIALOG_HPP
 
 #include <QDialog>
-#include <QLineEdit>
-#include <QPlainTextEdit>
 
-class AddFriendDialog : public QDialog
+class FriendRequestDialog : public QDialog
 {
     Q_OBJECT
 public:
-    AddFriendDialog(QWidget* parent);
-
-    QString getUserId() const;
-    QString getUsername() const;
-    QString getMessage() const;
-
-
-private:
-    QLineEdit* userIdEdit;
-    QLineEdit* usernameEdit;
-    QPlainTextEdit* messageEdit;
-
-private slots:
-    void accept();
-
+    explicit FriendRequestDialog(QWidget *parent, const QString &userId, const QString &message);
+    
+signals:
+    
+public slots:
+    
 };
 
-#endif // ADDFRIENDDIALOG_HPP
+#endif // FRIENDREQUESTDIALOG_HPP

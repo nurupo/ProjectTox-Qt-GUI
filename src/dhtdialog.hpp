@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
     
-    This file is part of NFK Lobby.
+    This file is part of Tox Qt GUI.
     
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,22 +14,27 @@
     See the COPYING file for more details.
 */
 
-#ifndef DHTWORKER_HPP
-#define DHTWORKER_HPP
+#ifndef DHTDIALOG_HPP
+#define DHTDIALOG_HPP
 
-#include <QObject>
+#include <QDialog>
+#include <QLineEdit>
+#include <QSpinBox>
 
-class DhtWorker : public QObject
+class DhtDialog : public QDialog
 {
-    Q_OBJECT
 public:
-    DhtWorker();
-    ~DhtWorker();
-    bool init(int bindPort);
+    explicit DhtDialog(QWidget *parent = 0);
 
-public slots:
-    void run();
-    //void sendMessage();
+    QString getUserId() const;
+    QString getIp() const;
+    int getPort() const;
+
+private:
+    QLineEdit *userIdEdit;
+    QLineEdit *addressEdit;
+    QSpinBox *portSpinBox;
+    
 };
 
-#endif // DHTWORKER_HPP
+#endif // DHTDIALOG_HPP

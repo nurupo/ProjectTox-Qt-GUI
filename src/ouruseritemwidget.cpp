@@ -19,17 +19,19 @@
 #include <QAction>
 #include <QHBoxLayout>
 #include <QMenu>
+#include <QGuiApplication>
+#include <QClipboard>
 
 OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     QWidget(parent)
 {
-    //FIXME: change the default icon for the release
-    statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Offline).iconPath), QSize(24, 24), "Change Status");
+    statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Online).iconPath), QSize(24, 24), "Change Status");
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
     QToolButton* renameUsernameButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Rename Username");
     QToolButton* copyUserIdButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy User Id");
     connect(renameUsernameButton, &QToolButton::clicked, this, &OurUserItemWidget::onRenameUsernameButtonClicked);
+    connect(copyUserIdButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyUserIdButtonClicked);
 
     QMenu* statusMenu = new QMenu(statusButton);
     QList<QAction*> statusActions;
@@ -94,6 +96,23 @@ void OurUserItemWidget::onStatusActionTriggered()
     QAction* statusAction = static_cast<QAction*>(sender());
     Status selectedStatus = static_cast<Status>(statusAction->data().toInt());
     statusButton->setIcon(QIcon(StatusHelper::getInfo(selectedStatus).iconPath));
-
+    if (selectedStatus == Status::Offline) {
+        qApp->quit();
+    }
     emit statusSelected(selectedStatus);
+}
+
+void OurUserItemWidget::onCopyUserIdButtonClicked()
+{
+    QGuiApplication::clipboard()->setText(userId);
+}
+
+void OurUserItemWidget::setUserId(const QString &userId)
+{
+    this->userId = userId;
+}
+
+QString OurUserItemWidget::getUsername() const
+{
+    return usernameLabel->text();
 }

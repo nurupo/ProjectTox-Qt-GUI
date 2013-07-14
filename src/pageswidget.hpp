@@ -30,6 +30,8 @@ public:
 private:
     ChatPageWidget* widget(const QString& userId) const;
 
+private slots:
+    void onMessageSent(const QString &message);
 
 public slots:
     void addPage(const QString& userId, const QString& username);
@@ -37,6 +39,10 @@ public slots:
     void removePage(const QString& userId);
     void statusChanged(const QString& userId, Status status);
     void usernameChanged(const QString& userId, const QString& username);
+    void messageReceived(const QString &userId, const QString &message);
+
+signals:
+    void messageSent(const QString &userId, const QString &message);
 
 };
 

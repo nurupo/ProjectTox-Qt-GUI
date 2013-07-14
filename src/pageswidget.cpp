@@ -29,9 +29,9 @@ PagesWidget::PagesWidget(QWidget* parent) :
 ChatPageWidget* PagesWidget::widget(const QString& userId) const
 {
     for (int i = 0; i < count(); i ++) {
-        ChatPageWidget* pageWidget = dynamic_cast<ChatPageWidget*>(QStackedWidget::widget(i));
-        if (pageWidget != nullptr && pageWidget->getUserId() == userId) {
-            return pageWidget;
+        ChatPageWidget* chatPage = dynamic_cast<ChatPageWidget*>(QStackedWidget::widget(i));
+        if (chatPage != nullptr && chatPage->getUserId() == userId) {
+            return chatPage;
         }
     }
     return nullptr;
@@ -39,9 +39,10 @@ ChatPageWidget* PagesWidget::widget(const QString& userId) const
 
 void PagesWidget::addPage(const QString& userId, const QString& username)
 {
-    ChatPageWidget* pageWidget = new ChatPageWidget(userId, this);
-    pageWidget->setUsername(username);
-    addWidget(pageWidget);
+    ChatPageWidget* chatPage = new ChatPageWidget(userId, this);
+    chatPage->setUsername(username);
+    connect(chatPage, &ChatPageWidget::messageSent, this, &PagesWidget::onMessageSent);
+    addWidget(chatPage);
     qDebug() << "page" << userId << "added" << count();
 }
 
@@ -52,9 +53,9 @@ void PagesWidget::activatePage(const QString& userId)
 
 void PagesWidget::removePage(const QString& userId)
 {
-    ChatPageWidget* pageWidget = widget(userId);
-    removeWidget(pageWidget);
-    delete pageWidget;
+    ChatPageWidget* chatPage = widget(userId);
+    removeWidget(chatPage);
+    delete chatPage;
     qDebug() << "page" << userId << "removed" << count();
 }
 
@@ -66,4 +67,15 @@ void PagesWidget::usernameChanged(const QString& userId, const QString& username
 void PagesWidget::statusChanged(const QString& userId, Status status)
 {
     widget(userId)->setStatus(status);
+}
+
+void PagesWidget::onMessageSent(const QString &message)
+{
+    ChatPageWidget* chatPage = static_cast<ChatPageWidget*>(sender());
+    emit messageSent(chatPage->getUserId(), message);
+}
+
+void PagesWidget::messageReceived(const QString &userId, const QString &message)
+{
+    widget(userId)->messageReceived(message);
 }

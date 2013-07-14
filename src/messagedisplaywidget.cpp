@@ -30,13 +30,16 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget* parent) :
     setTextInteractionFlags((textInteractionFlags() & ~Qt::TextEditable) | Qt::LinksAccessibleByMouse);
     setUndoRedoEnabled(false);
     setCursorWidth(0);
+    document()->setDefaultStyleSheet("p {text-indent:-10px; margin-left:10px; margin-top:5; margin-bottom:0; white-space:pre-wrap;}");
 }
 
 void MessageDisplayWidget::showMessage(const QString& senderUsername, const QString& message)
 {
-    QString text = QString("%1 (%2)\n%3\n").arg(senderUsername).arg(getTime()).arg(message);
-    text = text.toHtmlEscaped();
-    text.replace("\n", "<br>");
+    QString senderUsernameEscaped = senderUsername.toHtmlEscaped();
+    QString timeEscaped = QString(getTime()).toHtmlEscaped();
+    QString messageEscaped = message.toHtmlEscaped();
+
+    QString text = QString("<p>%1 (%2)<br><big>%3</big></p>").arg(senderUsernameEscaped).arg(timeEscaped).arg(messageEscaped);
     urlify(text);
     append(text);
 }

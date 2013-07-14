@@ -33,11 +33,14 @@ class OurUserItemWidget : public QWidget
 public:
     OurUserItemWidget(QWidget* parent);
 
+    QString getUsername() const;
+
 private:
     QToolButton* statusButton;
     QLabel* usernameLabel;
     RenameEditWidget* usernameEdit;
     QStackedWidget* usernameStackedWidget;
+    QString userId;
 
     QToolButton* createToolButton(const QIcon& icon, const QSize iconSize, const QString& toolTip);
 
@@ -45,6 +48,10 @@ private slots:
     void onUsernameChange();
     void onRenameUsernameButtonClicked();
     void onStatusActionTriggered();
+    void onCopyUserIdButtonClicked();
+
+public slots:
+    void setUserId(const QString &userId);
 
 signals:
     void usernameChanged(const QString& newUsername);

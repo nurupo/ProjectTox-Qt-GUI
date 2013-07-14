@@ -44,7 +44,13 @@ private:
     Status status;
 
 private slots:
-    void ourOwnMessage(const QString& message);
+    void onMessageSent(const QString& message);
+
+public slots:
+    void messageReceived(const QString& message);
+
+signals:
+    void messageSent(const QString& message);
 
 };
 

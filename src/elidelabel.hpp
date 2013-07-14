@@ -14,32 +14,29 @@
     See the COPYING file for more details.
 */
 
-#ifndef ADDFRIENDDIALOG_HPP
-#define ADDFRIENDDIALOG_HPP
+#ifndef ELIDELABEL_HPP
+#define ELIDELABEL_HPP
 
-#include <QDialog>
-#include <QLineEdit>
-#include <QPlainTextEdit>
+#include <QLabel>
 
-class AddFriendDialog : public QDialog
+class ElideLabel : public QLabel
 {
-    Q_OBJECT
 public:
-    AddFriendDialog(QWidget* parent);
+    explicit ElideLabel(QWidget *parent = 0);
 
-    QString getUserId() const;
-    QString getUsername() const;
-    QString getMessage() const;
+    void setTextElide(bool set);
+    bool textElide() const;
 
+    void setTextElideMode(Qt::TextElideMode mode);
+    Qt::TextElideMode textElideMode() const;
 
+protected:
+    void paintEvent(QPaintEvent *event);
+    
 private:
-    QLineEdit* userIdEdit;
-    QLineEdit* usernameEdit;
-    QPlainTextEdit* messageEdit;
-
-private slots:
-    void accept();
-
+    bool _textElide;
+    Qt::TextElideMode _textElideMode;
+    
 };
 
-#endif // ADDFRIENDDIALOG_HPP
+#endif // ELIDELABEL_HPP

@@ -14,32 +14,20 @@
     See the COPYING file for more details.
 */
 
-#ifndef ADDFRIENDDIALOG_HPP
-#define ADDFRIENDDIALOG_HPP
+#ifndef CUSTOMHINTTEXTEDIT_HPP
+#define CUSTOMHINTTEXTEDIT_HPP
 
-#include <QDialog>
-#include <QLineEdit>
-#include <QPlainTextEdit>
+#include <QTextEdit>
 
-class AddFriendDialog : public QDialog
+class CustomHintTextEdit : public QTextEdit
 {
-    Q_OBJECT
 public:
-    AddFriendDialog(QWidget* parent);
-
-    QString getUserId() const;
-    QString getUsername() const;
-    QString getMessage() const;
-
+    explicit CustomHintTextEdit(QWidget *parent, QSize startingSize);
+    QSize sizeHint() const;
 
 private:
-    QLineEdit* userIdEdit;
-    QLineEdit* usernameEdit;
-    QPlainTextEdit* messageEdit;
-
-private slots:
-    void accept();
-
+    QSize startingSize;
+    
 };
 
-#endif // ADDFRIENDDIALOG_HPP
+#endif // CUSTOMHINTTEXTEDIT_HPP

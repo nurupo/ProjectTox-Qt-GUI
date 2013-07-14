@@ -15,6 +15,7 @@
 */
 
 #include "addfrienddialog.hpp"
+#include "customhinttextedit.hpp"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -37,6 +38,10 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
     QLabel* usernameLabel = new QLabel("Username:", addFriendGroup);
     usernameEdit = new QLineEdit(addFriendGroup);
 
+    QLabel* messageLabel = new QLabel("Message:", addFriendGroup);
+    messageEdit = new QPlainTextEdit(addFriendGroup);
+    messageEdit->setPlainText("Hello, please add me in your friend list.");
+
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddFriendDialog::accept);
@@ -44,14 +49,18 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
 
     QGridLayout* groupLayout = new QGridLayout(addFriendGroup);
 
-    groupLayout->addWidget(userIdLabel,      0, 0, 1, 1);
-    groupLayout->addWidget(userIdEdit,       0, 1, 1, 1);
-    groupLayout->addWidget(usernameLabel,    1, 0, 1, 1);
-    groupLayout->addWidget(usernameEdit,     1, 1, 1, 1);
+    groupLayout->addWidget(userIdLabel,     0, 0, 1, 1);
+    groupLayout->addWidget(userIdEdit,      0, 1, 1, 1);
+    groupLayout->addWidget(usernameLabel,   1, 0, 1, 1);
+    groupLayout->addWidget(usernameEdit,    1, 1, 1, 1);
+    groupLayout->addWidget(messageLabel,    2, 0, 1, 1, Qt::AlignTop);
+    groupLayout->addWidget(messageEdit,     2, 1, 1, 1);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(addFriendGroup);
     layout->addWidget(buttonBox);
+
+    resize(300, 200);
 }
 
 QString AddFriendDialog::getUserId() const
@@ -64,9 +73,14 @@ QString AddFriendDialog::getUsername() const
     return usernameEdit->text();
 }
 
+QString AddFriendDialog::getMessage() const
+{
+    return messageEdit->toPlainText();
+}
+
 void AddFriendDialog::accept()
 {
-    if (userIdEdit->text().length() == 0 || usernameEdit->text().length() == 0) {
+    if (userIdEdit->text().length() == 0 || usernameEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
         QMessageBox warning(this);
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);

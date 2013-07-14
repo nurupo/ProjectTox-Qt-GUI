@@ -26,8 +26,12 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     statusLabel->setScaledContents(true);
     statusLabel->setFixedSize(24, 24);
 
-    usernameLabel = new QLabel(this);
+    usernameLabel = new ElideLabel(this);
     usernameLabel->setAlignment(Qt::AlignLeft);
+    usernameLabel->setTextElide(true);
+    usernameLabel->setTextElideMode(Qt::ElideRight);
+    usernameLabel->setMinimumSize(10, 10);
+    //usernameLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 2, 0, 2);
