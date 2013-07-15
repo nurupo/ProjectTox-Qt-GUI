@@ -1,5 +1,7 @@
 # Qt GUI for Tox
 
+[![Build Status](https://travis-ci.org/nurupo/ProjectTox-Qt-GUI.png?branch=master)](https://github.com/nurupo/ProjectTox-Qt-GUI)
+
 A front end for [ProjectTox Core](https://github.com/irungentoo/ProjectTox-Core) written in Qt5 and C++.
 
 Please note that developent is in very beginning and the project is not ready to use yet.
