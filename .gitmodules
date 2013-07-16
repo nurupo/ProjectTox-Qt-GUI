@@ -1,0 +1,3 @@
+[submodule "deps/ProjectTox-Core"]
+	path = deps/ProjectTox-Core
+	url = https://github.com/irungentoo/ProjectTox-Core

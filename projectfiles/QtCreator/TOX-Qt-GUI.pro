@@ -13,22 +13,17 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../src/ ../../src/core/
-win32:INCLUDEPATH += ../../src/sodium/include/
+INCLUDEPATH += ../../src/ ../../deps/ProjectTox-Core/core
+win32:INCLUDEPATH += ../../deps/sodium/include/
 
 win32 {
-    LIBS += -lWS2_32 ../../src/sodium/lib/libsodium.a
+    LIBS += -lWS2_32 ../../deps/sodium/lib/libsodium.a
 } else {
     LIBS += -lsodium
 }
 
 SOURCES += \
     ../../src/main.cpp \
-    ../../src/core/DHT.c \
-    ../../src/core/Lossless_UDP.c \
-    ../../src/core/Messenger.c \
-    ../../src/core/net_crypto.c \
-    ../../src/core/network.c \
     ../../src/mainwindow.cpp \
     ../../src/friendswidget.cpp \
     ../../src/addfrienddialog.cpp \
@@ -47,15 +42,15 @@ SOURCES += \
     ../../src/customhinttextedit.cpp \
     ../../src/elidelabel.cpp \
     ../../src/dhtdialog.cpp \
-    ../../src/core.cpp
+    ../../src/core.cpp \
+    ../../deps/ProjectTox-Core/core/network.c \
+    ../../deps/ProjectTox-Core/core/net_crypto.c \
+    ../../deps/ProjectTox-Core/core/Messenger.c \
+    ../../deps/ProjectTox-Core/core/Lossless_UDP.c \
+    ../../deps/ProjectTox-Core/core/DHT.c
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
-    ../../src/core/DHT.h \
-    ../../src/core/Lossless_UDP.h \
-    ../../src/core/Messenger.h \
-    ../../src/core/net_crypto.h \
-    ../../src/core/network.h \
     ../../src/friendswidget.hpp \
     ../../src/addfrienddialog.hpp \
     ../../src/friendproxymodel.hpp \
@@ -73,7 +68,12 @@ HEADERS  += \
     ../../src/customhinttextedit.hpp \
     ../../src/elidelabel.hpp \
     ../../src/dhtdialog.hpp \
-    ../../src/core.hpp
+    ../../src/core.hpp \
+    ../../deps/ProjectTox-Core/core/network.h \
+    ../../deps/ProjectTox-Core/core/net_crypto.h \
+    ../../deps/ProjectTox-Core/core/Messenger.h \
+    ../../deps/ProjectTox-Core/core/Lossless_UDP.h \
+    ../../deps/ProjectTox-Core/core/DHT.h
 
 RESOURCES += \
     ../../resources/icons.qrc
