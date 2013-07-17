@@ -34,16 +34,15 @@ class FriendsWidget : public QWidget
     Q_OBJECT
 public:
     FriendsWidget(QWidget* parent);
-    enum {UserIdRole = Qt::UserRole, StatusRole};
-    void addFriend(const QString& userId, const QString& username);
-    void setStatus(const QString& userId, Status status);
+    enum {UserIdRole = Qt::UserRole, FriendIdRole, StatusRole};
+    void setStatus(int friendId, Status status);
 
-    struct UserInfo {
+    /*struct UserInfo {
         QString username;
         Status status;
     };
 
-    UserInfo getUserInfo(const QString& userId) const;
+    UserInfo getUserInfo(const QString& userId) const;*/
 
 private:
     FilterWidget* filterEdit;
@@ -52,9 +51,9 @@ private:
     FriendProxyModel* friendProxyModel;
     QMenu* friendContextMenu;
     QPushButton* addFriendButton;
-    QHash<QString, UserInfo> userInfoHash;
+    //QHash<QString, UserInfo> userInfoHash;
 
-    QStandardItem* findFriendItem(const QString& userId) const;
+    QStandardItem* findFriendItem(int friendId) const;
     void setStatus(QStandardItem* friendItem, Status status);
 
 private slots:
@@ -68,13 +67,14 @@ private slots:
 
 public slots:
     //void addFriend(const QString& userId);
+    void addFriend(int friendId, const QString& userId);
 
 signals:
-    void friendAdded(const QString& userId, const QString& username);
-    void friendRenamed(const QString& userId, const QString& newUsername);
-    void friendStatusChanged(const QString& userId, Status status);
-    void friendRemoved(const QString& userId);
-    void friendSelectionChanged(const QString& userId);
+    void friendAdded(int friendId, const QString& userId);
+    void friendRenamed(int friendId, const QString& newUsername);
+    void friendStatusChanged(int friendId, Status status);
+    void friendRemoved(int friendId);
+    void friendSelectionChanged(int friendId);
     void friendRequested(const QString& userId, const QString& message);
 
 };

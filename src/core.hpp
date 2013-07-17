@@ -19,29 +19,20 @@
 
 #include <QObject>
 #include <QTimer>
-#include <QHash>
+#include <QList>
 
 class Core : public QObject
 {
     Q_OBJECT
 public:
-    explicit Core(const QString &dhtUserId, const QString &dhtIp, int dhtPort);
-    ~Core();
-    void run();
+    explicit Core(const QString& dhtUserId, const QString& dhtIp, int dhtPort);
+    void start();
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
 private:
-    static QString uint8ToString(uint8_t *data, uint16_t length);
-    static uint16_t uint8FromString(const QString &message, uint8_t *data);
-
-    static QString uint8ToHex(uint8_t *data, uint16_t length);
-    static uint16_t uint8FromHex(const QString &hex, uint8_t *data);
-
-    static QByteArray uint8ToByteArray(uint8_t *data, uint16_t length);
-
-    static void friend_request(uint8_t * public_key, uint8_t * data, uint16_t length);
-    static void friend_message(int friendnumber, uint8_t * message, uint16_t length);
+    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
+    static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
 
     void checkFriendsStatus();
 
@@ -52,20 +43,70 @@ private:
     int dhtPort;
 
     QTimer* timer;
-    QList<uint8_t*> userIds;
+    QList<int> friendIdList;
+
+    class CUserId
+    {
+    public:
+        explicit CUserId(const QString& userId);
+        ~CUserId();
+
+        uint8_t* data();
+        uint16_t size();
+
+        static QString toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/);
+
+    private:
+        uint8_t* cUserId;
+        uint16_t cUserIdSize;
+
+        static uint16_t fromString(const QString& userId, uint8_t* cUserId);
+    };
+
+    class CString
+    {
+    public:
+        explicit CString(const QString& string);
+        ~CString();
+
+        uint8_t* data();
+        uint16_t size();
+
+        static QString toString(uint8_t* cMessage, uint16_t cMessageSize);
+
+
+    private:
+        const static int MAX_SIZE_OF_UTF8_ENCODED_CHARACTER = 4;
+
+        uint8_t* cString;
+        uint16_t cStringSize;
+
+        static uint16_t fromString(const QString& message, uint8_t* cMessage);
+    };
 
 public slots:
-    void sendMessage(const QString &userId, const QString &message);
-    void acceptFirendRequest(const QString &userId);
-    void requestFriendship(const QString& userIdChanged, const QString& message);
-    void removeFriend(const QString &userId);
+    void acceptFirendRequest(const QString& userId);
+    void requestFriendship(const QString& userId, const QString& message);
+
+    void removeFriend(int friendId);
+
+    void sendMessage(int friendId, const QString& message);
+
     void process();
 
 signals:
     void friendRequestRecieved(const QString& userId, const QString& message);
-    void friendMessageRecieved(const QString& userId, const QString& message);
+    void friendMessageRecieved(int friendId, const QString& message);
+
+    void friendAdded(int friendId, const QString& userId);
+
+    void friendStatusChanged(int friendId, FriendStatus status);
+
     void userIdGererated(const QString& userId);
-    void friendStatusChanged(const QString& userId, FriendStatus status);
+
+    void failedToAddFriend(const QString& userId);
+    void failedToSendMessage(int friendId, const QString& message);
+    void failedToDeleteFriend(int friendId);
 
 };
 

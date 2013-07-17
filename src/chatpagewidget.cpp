@@ -22,8 +22,8 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 
-ChatPageWidget::ChatPageWidget(const QString& userId, QWidget* parent) :
-    QWidget(parent), userId(userId)
+ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
+    QWidget(parent), friendId(friendId)
 {
     friendItem = new FriendItemWidget(this);
 
@@ -47,9 +47,9 @@ ChatPageWidget::ChatPageWidget(const QString& userId, QWidget* parent) :
     layout->setContentsMargins(0, 3, 2, 3);
 }
 
-QString ChatPageWidget::getUserId() const
+int ChatPageWidget::getFriendId() const
 {
-    return userId;
+    return friendId;
 }
 
 void ChatPageWidget::onMessageSent(const QString& message)

@@ -29,8 +29,8 @@ class ChatPageWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ChatPageWidget(const QString& userId, QWidget* parent = 0);
-    QString getUserId() const;
+    ChatPageWidget(int friendId, QWidget* parent = 0);
+    int getFriendId() const;
     void setUsername(const QString& username);
     void setStatus(Status status);
 
@@ -39,7 +39,7 @@ private:
     MessageDisplayWidget* display;
     InputTextWidget* input;
 
-    QString userId;
+    int friendId;
     QString username;
     Status status;
 

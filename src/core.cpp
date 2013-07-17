@@ -24,16 +24,15 @@ extern "C" {
 #include <arpa/inet.h>
 #endif
 
-
-#include <QThread>
-#include <QDebug>
 #include <QMessageBox>
+#include <QThread>
 #include <QTime>
 
+//hack to emit signals from static methods
 Core* core;
 
-Core::Core(const QString &dhtUserId, const QString &dhtIp, int dhtPort) :
-    dhtUserId(dhtUserId), dhtIp(dhtIp), dhtPort(dhtPort)
+Core::Core(const QString& dhtUserId, const QString& dhtIp, int dhtPort) :
+    QObject(nullptr), dhtUserId(dhtUserId), dhtIp(dhtIp), dhtPort(dhtPort)
 {
     qRegisterMetaType<Core::FriendStatus>("FriendStatus");
     core = this;
@@ -41,143 +40,167 @@ Core::Core(const QString &dhtUserId, const QString &dhtIp, int dhtPort) :
     connect(timer, &QTimer::timeout, this, &Core::process);
 }
 
-Core::~Core()
+void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize)
 {
+    emit core->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
 
-void Core::friend_request(uint8_t * public_key, uint8_t * data, uint16_t length)
+void Core::onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
 {
-    qDebug() << "Friend request from" << uint8ToHex(public_key, 32) << "recieved";
-    emit core->friendRequestRecieved(uint8ToHex(public_key, 32), uint8ToString(data, length));
+    emit core->friendMessageRecieved(friendId, CString::toString(cMessage, cMessageSize));
 }
 
-void Core::friend_message(int friendnumber, uint8_t * message, uint16_t length)
+void Core::acceptFirendRequest(const QString& userId)
 {
-    uint8_t user_id[32];
-    if (getclient_id(friendnumber, user_id) == 0) {
-        emit core->friendMessageRecieved(uint8ToHex(user_id, 32), uint8ToString(message, length));
+    int friendId = m_addfriend_norequest(CUserId(userId).data());
+    if (friendId == -1) {
+        emit failedToAddFriend(userId);
+    } else {
+        emit friendAdded(friendId, userId);
+        friendIdList << friendId;
     }
-}
-
-void Core::acceptFirendRequest(const QString &userId)
-{
-    // deleted when removed from userId QList
-    uint8_t *user_id = new uint8_t[32];
-    uint8FromHex(userId, user_id);
-    
-    m_addfriend_norequest(user_id);
-    
-    userIds << user_id;
 }
 
 void Core::requestFriendship(const QString& userId, const QString& message)
 {
-    // deleted when removed from userId QList
-    uint8_t *user_id = new uint8_t[32];
-    uint8FromHex(userId, user_id);
+    CString cMessage(message);
 
-    uint8_t *msg = new uint8_t[message.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER];
-    uint16_t msg_size = uint8FromString(message, msg);
-
-    qDebug() << "checking message sizes" << msg_size << message.length();
-
-    qDebug() << "requesting friendship of" << uint8ToHex(user_id, 32);
-    qDebug() << "with message" << uint8ToString(msg, msg_size);
-
-    qDebug() << "friend added with id" << m_addfriend(user_id, msg, msg_size);
-    
-    userIds << user_id;
-
-    delete[] msg;
+    int friendId = m_addfriend(CUserId(userId).data(), cMessage.data(), cMessage.size());
+    if (friendId == -1) {
+        emit failedToAddFriend(userId);
+    } else {
+        emit friendAdded(friendId, userId);
+        friendIdList << friendId;
+    }
 }
 
-void Core::sendMessage(const QString &userId, const QString &message)
+void Core::sendMessage(int friendId, const QString& message)
 {
-    uint8_t user_id[32];
-    uint8FromHex(userId, user_id);
-    int friend_id = getfriend_id(user_id);
+    CString cMessage(message);
 
-    uint8_t *msg = new uint8_t[message.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER];
-    uint16_t msg_size = uint8FromString(message, msg);
-
-    m_sendmessage(friend_id, msg, msg_size);
-
-    delete[] msg;
+    if (!m_sendmessage(friendId, cMessage.data(), cMessage.size())) {
+        emit failedToSendMessage(friendId, message);
+    }
 }
 
 void Core::checkFriendsStatus()
 {
-    static QHash<uint8_t*, FriendStatus> old_status;
-    for (uint8_t *user_id : userIds) {
-        FriendStatus status = static_cast<FriendStatus>(m_friendstatus(getfriend_id(user_id)));
-        if ((old_status.contains(user_id) && old_status[user_id] != status) || (!old_status.contains(user_id))) {
-            QString userId = uint8ToHex(user_id, 32);
-            emit friendStatusChanged(userId, status);
-            old_status[user_id] = status;
+    static QHash<int, FriendStatus> oldStatus;
+
+    for (int friendId : friendIdList) {
+        FriendStatus status = static_cast<FriendStatus>(m_friendstatus(friendId));        
+
+        if ((oldStatus.contains(friendId) && oldStatus[friendId] != status) || (!oldStatus.contains(friendId))) {
+            emit friendStatusChanged(friendId, status);
+            oldStatus[friendId] = status;
         }
     }
 }
 
-void Core::removeFriend(const QString &userId)
+void Core::removeFriend(int friendId)
 {
-    uint8_t user_id[32];
-    uint8FromHex(userId, user_id);
-    qDebug() << "removed friend ?" << (m_delfriend(getfriend_id(user_id)) == 0);
+    if (m_delfriend(friendId) == -1) {
+        emit failedToDeleteFriend(friendId);
+    } else {
+        friendIdList.removeOne(friendId);
+    }
 }
 
 void Core::process()
 {
     doMessenger();
-    checkFriendsStatus();
+#ifdef DEBUG
+    //we want to see the debug messages immediately
     fflush(stdout);
+#endif
+    checkFriendsStatus();
 }
 
-void Core::run()
+void Core::start()
 {
     initMessenger();
-    m_callback_friendrequest(friend_request);
-    m_callback_friendmessage(friend_message);
 
-    qDebug() << "OUR ID:" << uint8ToHex(self_public_key, 32);
-    emit userIdGererated(uint8ToHex(self_public_key, 32));
+    m_callback_friendrequest(onFriendRequest);
+    m_callback_friendmessage(onFriendMessage);
 
-    perror("Initialization");
-    IP_Port bootstrap_ip_port;
-    bootstrap_ip_port.port = htons(dhtPort);
-    bootstrap_ip_port.ip.i = inet_addr(dhtIp.toLatin1().data());
-    uint8_t dht_user_id[32];
-    uint8FromHex(dhtUserId, dht_user_id);
-    DHT_bootstrap(bootstrap_ip_port, dht_user_id);
+    emit userIdGererated(CUserId::toString(self_public_key));
+
+    IP_Port bootstrapIpPort;
+    bootstrapIpPort.port = htons(dhtPort);
+    bootstrapIpPort.ip.i = inet_addr(dhtIp.toLatin1().data());
+
+    DHT_bootstrap(bootstrapIpPort, CUserId(dhtUserId).data());
 
     timer->setInterval(30);
     timer->start();
 }
 
-QString Core::uint8ToString(uint8_t *data, uint16_t length)
+// CUserId
+
+Core::CUserId::CUserId(const QString &userId)
 {
-    return QString::fromUtf8(reinterpret_cast<char*>(data), length);
+    cUserId = new uint8_t[CLIENT_ID_SIZE];
+    cUserIdSize = fromString(userId, cUserId);
 }
 
-uint16_t Core::uint8FromString(const QString &message, uint8_t *data)
+Core::CUserId::~CUserId()
 {
-    QByteArray arr = QByteArray(message.toUtf8());
-    memcpy(data, reinterpret_cast<uint8_t*>(arr.data()), arr.size());
+    delete[] cUserId;
+}
+
+uint8_t* Core::CUserId::data()
+{
+    return cUserId;
+}
+
+uint16_t Core::CUserId::size()
+{
+    return cUserIdSize;
+}
+
+QString Core::CUserId::toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/)
+{
+    return QString(QByteArray(reinterpret_cast<char*>(cUserId), CLIENT_ID_SIZE).toHex()).toUpper();
+}
+
+uint16_t Core::CUserId::fromString(const QString& userId, uint8_t* cUserId)
+{
+    QByteArray arr = QByteArray::fromHex(userId.toLower().toLatin1());
+    memcpy(cUserId, reinterpret_cast<uint8_t*>(arr.data()), arr.size());
     return arr.size();
 }
 
-QString Core::uint8ToHex(uint8_t *data, uint16_t length)
+// CString
+
+Core::CString::CString(const QString& string)
 {
-    return QString(uint8ToByteArray(data, length).toHex()).toUpper();
+    cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER];
+    cStringSize = fromString(string, cString);
 }
 
-uint16_t Core::uint8FromHex(const QString &hex, uint8_t *data)
+Core::CString::~CString()
 {
-    QByteArray arr = QByteArray::fromHex(hex.toLower().toLatin1());
-    memcpy(data, reinterpret_cast<uint8_t*>(arr.data()), arr.size());
-    return arr.size();
+    delete[] cString;
 }
 
-QByteArray Core::uint8ToByteArray(uint8_t *data, uint16_t length)
+uint8_t* Core::CString::data()
 {
-    return QByteArray(reinterpret_cast<char*>(data), length);
+    return cString;
+}
+
+uint16_t Core::CString::size()
+{
+    return cStringSize;
+}
+
+QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
+{
+    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize);
+}
+
+uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
+{
+    QByteArray byteArray = QByteArray(string.toUtf8());
+    memcpy(cString, reinterpret_cast<uint8_t*>(byteArray.data()), byteArray.size());
+    return byteArray.size();
 }

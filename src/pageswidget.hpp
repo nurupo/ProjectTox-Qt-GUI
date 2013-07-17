@@ -28,21 +28,21 @@ public:
     PagesWidget(QWidget* parent);
 
 private:
-    ChatPageWidget* widget(const QString& userId) const;
+    ChatPageWidget* widget(int friendId) const;
 
 private slots:
-    void onMessageSent(const QString &message);
+    void onMessageSent(const QString& message);
 
 public slots:
-    void addPage(const QString& userId, const QString& username);
-    void activatePage(const QString& userId);
-    void removePage(const QString& userId);
-    void statusChanged(const QString& userId, Status status);
-    void usernameChanged(const QString& userId, const QString& username);
-    void messageReceived(const QString &userId, const QString &message);
+    void addPage(int friendId, const QString& username);
+    void removePage(int friendId);
+    void activatePage(int friendId);
+    void statusChanged(int friendId, Status status);
+    void usernameChanged(int friendId, const QString& username);
+    void messageReceived(int friendId, const QString& message);
 
 signals:
-    void messageSent(const QString &userId, const QString &message);
+    void messageSent(int friendId, const QString& message);
 
 };
 

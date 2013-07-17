@@ -45,9 +45,8 @@ private:
     FriendsWidget* friendsWidget;
 
 private slots:
-    void sendMessage();
     void onFriendRequestRecieved(const QString &userId, const QString &message);
-    void onFriendStatusChanged(const QString &userId, Core::FriendStatus status);
+    void onFriendStatusChanged(int friendId, Core::FriendStatus status);
 
 signals:
     void friendRequestAccepted(const QString &userId);
