@@ -26,11 +26,6 @@ win32:DEFINES += WIN32
 
 SOURCES += \
     ../../src/main.cpp \
-    ../../submodules/ProjectTox-Core/core/DHT.c \
-    ../../submodules/ProjectTox-Core/core/Lossless_UDP.c \
-    ../../submodules/ProjectTox-Core/core/Messenger.c \
-    ../../submodules/ProjectTox-Core/core/net_crypto.c \
-    ../../submodules/ProjectTox-Core/core/network.c \
     ../../src/mainwindow.cpp \
     ../../src/friendswidget.cpp \
     ../../src/addfrienddialog.cpp \
@@ -76,6 +71,20 @@ HEADERS  += \
     ../../src/elidelabel.hpp \
     ../../src/dhtdialog.hpp \
     ../../src/core.hpp
+
+SOURCES += \
+    ../../submodules/ProjectTox-Core/core/DHT.c \
+    ../../submodules/ProjectTox-Core/core/Lossless_UDP.c \
+    ../../submodules/ProjectTox-Core/core/Messenger.c \
+    ../../submodules/ProjectTox-Core/core/net_crypto.c \
+    ../../submodules/ProjectTox-Core/core/network.c
+
+HEADERS  += \
+    ../../submodules/ProjectTox-Core/core/DHT.h \
+    ../../submodules/ProjectTox-Core/core/Lossless_UDP.h \
+    ../../submodules/ProjectTox-Core/core/Messenger.h \
+    ../../submodules/ProjectTox-Core/core/net_crypto.h \
+    ../../submodules/ProjectTox-Core/core/network.h
 
 RESOURCES += \
     ../../resources/icons.qrc
