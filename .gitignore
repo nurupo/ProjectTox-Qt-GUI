@@ -2,3 +2,4 @@
 resources/*.aps
 projectfiles/build*/
 projectfiles/QtCreator/*.user*
+deps/sodium
