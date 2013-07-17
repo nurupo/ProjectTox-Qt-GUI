@@ -87,7 +87,7 @@ void Core::checkFriendsStatus()
     static QHash<int, FriendStatus> oldStatus;
 
     for (int friendId : friendIdList) {
-        FriendStatus status = static_cast<FriendStatus>(m_friendstatus(friendId));        
+        FriendStatus status = static_cast<FriendStatus>(m_friendstatus(friendId));
 
         if ((oldStatus.contains(friendId) && oldStatus[friendId] != status) || (!oldStatus.contains(friendId))) {
             emit friendStatusChanged(friendId, status);
