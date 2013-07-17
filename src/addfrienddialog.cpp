@@ -55,7 +55,7 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
     layout->addWidget(addFriendGroup);
     layout->addWidget(buttonBox);
 
-    resize(300, 200);
+    resize(300, 100);
 }
 
 QString AddFriendDialog::getUserId() const
