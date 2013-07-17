@@ -35,9 +35,6 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
     QLabel* userIdLabel = new QLabel("User ID:", addFriendGroup);
     userIdEdit = new QLineEdit(addFriendGroup);
 
-    QLabel* usernameLabel = new QLabel("Username:", addFriendGroup);
-    usernameEdit = new QLineEdit(addFriendGroup);
-
     QLabel* messageLabel = new QLabel("Message:", addFriendGroup);
     messageEdit = new QPlainTextEdit(addFriendGroup);
     messageEdit->setPlainText("Hello, please add me in your friend list.");
@@ -51,10 +48,8 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
 
     groupLayout->addWidget(userIdLabel,     0, 0, 1, 1);
     groupLayout->addWidget(userIdEdit,      0, 1, 1, 1);
-    groupLayout->addWidget(usernameLabel,   1, 0, 1, 1);
-    groupLayout->addWidget(usernameEdit,    1, 1, 1, 1);
-    groupLayout->addWidget(messageLabel,    2, 0, 1, 1, Qt::AlignTop);
-    groupLayout->addWidget(messageEdit,     2, 1, 1, 1);
+    groupLayout->addWidget(messageLabel,    1, 0, 1, 1, Qt::AlignTop);
+    groupLayout->addWidget(messageEdit,     1, 1, 1, 1);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(addFriendGroup);
@@ -68,11 +63,6 @@ QString AddFriendDialog::getUserId() const
     return userIdEdit->text();
 }
 
-QString AddFriendDialog::getUsername() const
-{
-    return usernameEdit->text();
-}
-
 QString AddFriendDialog::getMessage() const
 {
     return messageEdit->toPlainText();
@@ -80,7 +70,7 @@ QString AddFriendDialog::getMessage() const
 
 void AddFriendDialog::accept()
 {
-    if (userIdEdit->text().length() == 0 || usernameEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
+    if (userIdEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
         QMessageBox warning(this);
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);

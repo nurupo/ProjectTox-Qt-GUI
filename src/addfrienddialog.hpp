@@ -28,13 +28,11 @@ public:
     AddFriendDialog(QWidget* parent);
 
     QString getUserId() const;
-    QString getUsername() const;
     QString getMessage() const;
 
 
 private:
     QLineEdit* userIdEdit;
-    QLineEdit* usernameEdit;
     QPlainTextEdit* messageEdit;
 
 private slots:
