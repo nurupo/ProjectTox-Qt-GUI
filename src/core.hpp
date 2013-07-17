@@ -36,8 +36,6 @@ private:
 
     void checkFriendsStatus();
 
-    const static int MAX_SIZE_OF_UTF8_ENCODED_CHARACTER = 4;
-
     QString dhtUserId;
     QString dhtIp;
     int dhtPort;

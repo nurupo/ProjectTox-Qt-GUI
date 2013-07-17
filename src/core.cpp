@@ -24,7 +24,6 @@ extern "C" {
 #include <arpa/inet.h>
 #endif
 
-#include <QMessageBox>
 #include <QThread>
 #include <QTime>
 
