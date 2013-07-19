@@ -14,40 +14,20 @@
     See the COPYING file for more details.
 */
 
-#ifndef DHTDIALOG_HPP
-#define DHTDIALOG_HPP
-
-#include "Settings/settings.hpp"
+#ifndef CLOSEAPPLICATIONDIALOG_HPP
+#define CLOSEAPPLICATIONDIALOG_HPP
 
 #include <QDialog>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QStandardItemModel>
 
-class DhtDialog : public QDialog
+class CloseApplicationDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit DhtDialog(QWidget* parent = 0);
-
-private:
-    QComboBox* serverComboBox;
-    QCheckBox* dontShowCheckBox;
-    QStandardItemModel* serverModel;
-
-    QList<Settings::DhtServer> modifiedServerList;
-    
-signals:
+    explicit CloseApplicationDialog(QWidget *parent = 0);
     
 public slots:
     void accept();
-    void reject();
-
-private slots:
-    void addButtonClicked();
-    void editButtonClicked();
-    void removeButtonClicked();
     
 };
 
-#endif // DHTDIALOG_HPP
+#endif // CLOSEAPPLICATIONDIALOG_HPP

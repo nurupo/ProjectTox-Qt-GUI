@@ -43,16 +43,17 @@ SOURCES += \
     ../../src/friendrequestdialog.cpp \
     ../../src/customhinttextedit.cpp \
     ../../src/elidelabel.cpp \
+    ../../src/core.cpp \
+    ../../src/Settings/abstractsettingspage.cpp \
+    ../../src/Settings/basicsettingsdialog.cpp \
+    ../../src/Settings/settings.cpp \
+    ../../src/dhteditdialog.cpp \
     ../../src/dhtdialog.cpp \
-    ../../src/core.cpp
+    ../../src/closeapplicationdialog.cpp \
+    ../../src/starter.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
-    ../../submodules/ProjectTox-Core/core/DHT.h \
-    ../../submodules/ProjectTox-Core/core/Lossless_UDP.h \
-    ../../submodules/ProjectTox-Core/core/Messenger.h \
-    ../../submodules/ProjectTox-Core/core/net_crypto.h \
-    ../../submodules/ProjectTox-Core/core/network.h \
     ../../src/friendswidget.hpp \
     ../../src/addfrienddialog.hpp \
     ../../src/friendproxymodel.hpp \
@@ -69,8 +70,14 @@ HEADERS  += \
     ../../src/friendrequestdialog.hpp \
     ../../src/customhinttextedit.hpp \
     ../../src/elidelabel.hpp \
+    ../../src/core.hpp \
+    ../../src/Settings/abstractsettingspage.hpp \
+    ../../src/Settings/basicsettingsdialog.hpp \
+    ../../src/Settings/settings.hpp \
+    ../../src/dhteditdialog.hpp \
     ../../src/dhtdialog.hpp \
-    ../../src/core.hpp
+    ../../src/closeapplicationdialog.hpp \
+    ../../src/starter.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \

@@ -69,14 +69,14 @@ MainWindow::MainWindow(QWidget* parent)
     connect(friendsWidget, &FriendsWidget::friendStatusChanged, pages, &PagesWidget::statusChanged);
 
     //FIXME: execute dhtDialog before MainWindow in main.cpp
-    DhtDialog dhtDialog(this);
+    /*DhtDialog dhtDialog(this);
     if (dhtDialog.exec() != QDialog::Accepted) {
         QTimer::singleShot(250, qApp, SLOT(quit()));
-    }
+    }*/
 
     //FIXME: start core in a separate function
     //all connections to `core` should be done after its creation because it registers some types
-    core = new Core(dhtDialog.getUserId(), dhtDialog.getIp(), dhtDialog.getPort());
+    core = new Core("t", "t", 1234);
 
     coreThread = new QThread(this);
     core->moveToThread(coreThread);

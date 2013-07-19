@@ -14,40 +14,31 @@
     See the COPYING file for more details.
 */
 
-#ifndef DHTDIALOG_HPP
-#define DHTDIALOG_HPP
-
+#include "starter.hpp"
 #include "Settings/settings.hpp"
 
-#include <QDialog>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QStandardItemModel>
-
-class DhtDialog : public QDialog
+Starter::Starter(QObject* parent) :
+    QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit DhtDialog(QWidget* parent = 0);
+    if (Settings::getInstance().getDontShowDhtDialog())
+    {
+        createMainWindow();
+    } else {
+        dhtDialog = new DhtDialog();
+        connect(dhtDialog, &DhtDialog::accepted, this, &Starter::onDhtDialogAccepted);
+        dhtDialog->show();
+    }
+}
 
-private:
-    QComboBox* serverComboBox;
-    QCheckBox* dontShowCheckBox;
-    QStandardItemModel* serverModel;
+void Starter::onDhtDialogAccepted()
+{
+    createMainWindow();
 
-    QList<Settings::DhtServer> modifiedServerList;
-    
-signals:
-    
-public slots:
-    void accept();
-    void reject();
+    dhtDialog->deleteLater();
+}
 
-private slots:
-    void addButtonClicked();
-    void editButtonClicked();
-    void removeButtonClicked();
-    
-};
-
-#endif // DHTDIALOG_HPP
+void Starter::createMainWindow()
+{
+    MainWindow* mainWindow = new MainWindow();
+    mainWindow->show();
+}

@@ -35,7 +35,7 @@ private:
     QLineEdit* userIdEdit;
     QPlainTextEdit* messageEdit;
 
-private slots:
+public slots:
     void accept();
 
 };

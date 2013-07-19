@@ -15,6 +15,8 @@
 */
 
 #include "ouruseritemwidget.hpp"
+#include "Settings/settings.hpp"
+#include "closeapplicationdialog.hpp"
 
 #include <QAction>
 #include <QHBoxLayout>
@@ -28,7 +30,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Online).iconPath), QSize(24, 24), "Change Status");
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
-    QToolButton* renameUsernameButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Rename Username");
+    QToolButton* renameUsernameButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change Username");
     QToolButton* copyUserIdButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy User Id");
     connect(renameUsernameButton, &QToolButton::clicked, this, &OurUserItemWidget::onRenameUsernameButtonClicked);
     connect(copyUserIdButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyUserIdButtonClicked);
@@ -47,7 +49,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
 
     usernameStackedWidget = new QStackedWidget(this);
 
-    usernameLabel = new QLabel("Your name", usernameStackedWidget);
+    usernameLabel = new QLabel(Settings::getInstance().getUsername(), usernameStackedWidget);
 
     usernameEdit = new RenameEditWidget(usernameStackedWidget, QSize(10, 10));
     connect(usernameEdit, &QLineEdit::editingFinished, this, &OurUserItemWidget::onUsernameChange);
@@ -81,7 +83,7 @@ void OurUserItemWidget::onUsernameChange()
 {
     usernameLabel->setText(usernameEdit->text());
     usernameStackedWidget->setCurrentWidget(usernameLabel);
-    emit usernameChanged(usernameEdit->text());
+    Settings::getInstance().setUsername(usernameEdit->text());
 }
 
 void OurUserItemWidget::onRenameUsernameButtonClicked()
@@ -95,10 +97,16 @@ void OurUserItemWidget::onStatusActionTriggered()
 {
     QAction* statusAction = static_cast<QAction*>(sender());
     Status selectedStatus = static_cast<Status>(statusAction->data().toInt());
-    statusButton->setIcon(QIcon(StatusHelper::getInfo(selectedStatus).iconPath));
+
+    //close application on going offline, since core doesn't implement going offline functionality
+    //TODO: when core implements it
     if (selectedStatus == Status::Offline) {
-        qApp->quit();
+        CloseApplicationDialog dialog(this);
+        dialog.exec();
+    } else {
+        statusButton->setIcon(QIcon(StatusHelper::getInfo(selectedStatus).iconPath));
     }
+
     emit statusSelected(selectedStatus);
 }
 
@@ -112,7 +120,3 @@ void OurUserItemWidget::setUserId(const QString &userId)
     this->userId = userId;
 }
 
-QString OurUserItemWidget::getUsername() const
-{
-    return usernameLabel->text();
-}

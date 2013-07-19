@@ -15,6 +15,9 @@
 */
 
 #include "dhtdialog.hpp"
+#include "dhteditdialog.hpp"
+#include "Settings/settings.hpp"
+#include "closeapplicationdialog.hpp"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -23,57 +26,114 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-DhtDialog::DhtDialog(QWidget *parent) :
+DhtDialog::DhtDialog(QWidget* parent) :
     QDialog(parent)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowTitle("DHT Settings");
+    setWindowTitle("Select DHT Server");
 
     QGroupBox* group = new QGroupBox("DHT Settings", this);
 
-    QLabel* userIdLabel = new QLabel("User Id:", group);
-    userIdEdit = new QLineEdit(group);
+    serverComboBox = new QComboBox(this);
 
-    QLabel* addressLabel = new QLabel("IP:", group);
-    addressEdit = new QLineEdit(group);
+    serverModel = new QStandardItemModel(this);
 
-    QLabel* portLabel = new QLabel("Port:", group);
-    portSpinBox = new QSpinBox(group);
-    portSpinBox->setMaximum(65535);
-    portSpinBox->setMinimum(1);
-    portSpinBox->setValue(33445);
-    portSpinBox->setMinimumWidth(64);
+    const Settings& settings = Settings::getInstance();
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok , Qt::Horizontal, this);
+    const QList<Settings::DhtServer>& serverList = settings.getDhtServerList();
+    modifiedServerList = serverList;
+    for (const Settings::DhtServer& server : serverList) {
+        serverModel->appendRow(new QStandardItem(server.name));
+    }
+
+    serverComboBox->setModel(serverModel);
+    serverComboBox->setCurrentIndex(settings.getDhtServerId());
+
+    QPushButton* addButton = new QPushButton("Add", this);
+    QPushButton* editButton = new QPushButton("Edit", this);
+    QPushButton* removeButton = new QPushButton("Remove", this);
+
+    connect(addButton,    &QPushButton::clicked, this, &DhtDialog::addButtonClicked);
+    connect(editButton,   &QPushButton::clicked, this, &DhtDialog::editButtonClicked);
+    connect(removeButton, &QPushButton::clicked, this, &DhtDialog::removeButtonClicked);
+
+    dontShowCheckBox = new QCheckBox("Don't show this dialog");
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, this);
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DhtDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DhtDialog::reject);
 
     QGridLayout* groupLayout = new QGridLayout(group);
 
-    groupLayout->addWidget(userIdLabel,     0, 0, 1, 1);
-    groupLayout->addWidget(userIdEdit,      0, 1, 1, 3);
-    groupLayout->addWidget(addressLabel,    1, 0, 1, 1);
-    groupLayout->addWidget(addressEdit,     1, 1, 1, 1);
-    groupLayout->addWidget(portLabel,       1, 2, 1, 1);
-    groupLayout->addWidget(portSpinBox,     1, 3, 1, 1);
+    groupLayout->addWidget(serverComboBox,  0, 0, 1, 3);
+    groupLayout->addWidget(addButton,       1, 0, 1, 1);
+    groupLayout->addWidget(editButton,      1, 1, 1, 1);
+    groupLayout->addWidget(removeButton,    1, 2, 1, 1);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
+
     layout->addWidget(group);
+    layout->addWidget(dontShowCheckBox);
     layout->addWidget(buttonBox);
 }
 
-QString DhtDialog::getUserId() const
+void DhtDialog::accept()
 {
-    return userIdEdit->text();
+    if (serverComboBox->currentIndex() == -1) {
+        QMessageBox warning(this);
+        warning.setText("You haven't selected any DHT server.");
+        warning.setIcon(QMessageBox::Warning);
+        warning.exec();
+    } else {
+        Settings& settings = Settings::getInstance();
+        settings.setDhtServerList(modifiedServerList);
+        settings.setDhtServerId(serverComboBox->currentIndex());
+        settings.setDontShowDhtDialog(dontShowCheckBox->isChecked());
+
+        QDialog::accept();
+    }
 }
 
-QString DhtDialog::getIp() const
+void DhtDialog::reject()
 {
-    return addressEdit->text();
+    CloseApplicationDialog dialog;
+    dialog.exec();
 }
 
-int DhtDialog::getPort() const
+void DhtDialog::addButtonClicked()
 {
-    return portSpinBox->value();
+    DhtEditDialog editDialog(this);
+    if (editDialog.exec() == QDialog::Accepted) {
+        Settings::DhtServer serverInfo = editDialog.getServerInformation();
+        serverModel->appendRow(new QStandardItem(serverInfo.name));
+        serverComboBox->setCurrentIndex(serverModel->rowCount() - 1);
+        modifiedServerList << serverInfo;
+    }
+}
+
+void DhtDialog::editButtonClicked()
+{
+    int currentIndex = serverComboBox->currentIndex();
+    if (currentIndex == -1) {
+        return;
+    }
+
+    DhtEditDialog editDialog(this);
+    Settings::DhtServer oldServerInfo = modifiedServerList.at(currentIndex);
+    editDialog.setServerInformation(oldServerInfo);
+    if (editDialog.exec() == QDialog::Accepted) {
+        Settings::DhtServer newServerInfo = editDialog.getServerInformation();
+        serverModel->setData(serverModel->index(currentIndex, 0), newServerInfo.name);
+        modifiedServerList[currentIndex] = newServerInfo;
+    }
+}
+
+void DhtDialog::removeButtonClicked()
+{
+    int currentIndex = serverComboBox->currentIndex();
+    if (currentIndex != -1) {
+        serverModel->removeRow(currentIndex);
+        modifiedServerList.removeAt(currentIndex);
+    }
 }

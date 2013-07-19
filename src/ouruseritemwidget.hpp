@@ -33,8 +33,6 @@ class OurUserItemWidget : public QWidget
 public:
     OurUserItemWidget(QWidget* parent);
 
-    QString getUsername() const;
-
 private:
     QToolButton* statusButton;
     QLabel* usernameLabel;
@@ -54,7 +52,6 @@ public slots:
     void setUserId(const QString &userId);
 
 signals:
-    void usernameChanged(const QString& newUsername);
     void statusSelected(Status status);
 
 };

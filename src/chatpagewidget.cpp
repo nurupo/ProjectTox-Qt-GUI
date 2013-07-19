@@ -18,6 +18,7 @@
 #include "ouruseritemwidget.hpp"
 #include "status.hpp"
 #include "mainwindow.hpp"
+#include "Settings/settings.hpp"
 
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -54,8 +55,7 @@ int ChatPageWidget::getFriendId() const
 
 void ChatPageWidget::onMessageSent(const QString& message)
 {
-    // FIXME: get our Username when Settings will be implemented
-    display->showMessage(MainWindow::ourUserItem->getUsername(), message);
+    display->showMessage(Settings::getInstance().getUsername(), message);
 }
 
 void ChatPageWidget::messageReceived(const QString& message)

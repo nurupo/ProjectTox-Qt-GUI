@@ -14,40 +14,33 @@
     See the COPYING file for more details.
 */
 
-#ifndef DHTDIALOG_HPP
+#ifndef DHTEDITDIALOG_HPP
 #define DHTDIALOG_HPP
 
 #include "Settings/settings.hpp"
 
 #include <QDialog>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QStandardItemModel>
+#include <QLineEdit>
+#include <QSpinBox>
 
-class DhtDialog : public QDialog
+class DhtEditDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit DhtDialog(QWidget* parent = 0);
+    explicit DhtEditDialog(QWidget *parent = 0);
+
+    void setServerInformation(const Settings::DhtServer& server);
+    Settings::DhtServer getServerInformation() const;
 
 private:
-    QComboBox* serverComboBox;
-    QCheckBox* dontShowCheckBox;
-    QStandardItemModel* serverModel;
+    QLineEdit *nameEdit;
+    QLineEdit *userIdEdit;
+    QLineEdit *addressEdit;
+    QSpinBox *portSpinBox;
 
-    QList<Settings::DhtServer> modifiedServerList;
-    
-signals:
-    
 public slots:
     void accept();
-    void reject();
-
-private slots:
-    void addButtonClicked();
-    void editButtonClicked();
-    void removeButtonClicked();
     
 };
 
-#endif // DHTDIALOG_HPP
+#endif // DHTEDITDIALOG_HPP
