@@ -78,7 +78,7 @@ void Settings::load()
         s.endArray();
     s.endGroup();
 
-    s.beginGroup("5General");
+    s.beginGroup("General");
         username = s.value("username", "My name").toString();
     s.endGroup();
 
