@@ -25,7 +25,7 @@ class Core : public QObject
 {
     Q_OBJECT
 public:
-    explicit Core(const QString& dhtUserId, const QString& dhtIp, int dhtPort);
+    explicit Core();
     void start();
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
@@ -35,10 +35,6 @@ private:
     static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
 
     void checkFriendsStatus();
-
-    QString dhtUserId;
-    QString dhtIp;
-    int dhtPort;
 
     QTimer* timer;
     QList<int> friendIdList;

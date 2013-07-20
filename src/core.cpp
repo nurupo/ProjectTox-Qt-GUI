@@ -15,6 +15,7 @@
 */
 
 #include "core.hpp"
+#include "Settings/settings.hpp"
 
 extern "C" {
 #include <Messenger.h>
@@ -30,8 +31,8 @@ extern "C" {
 //hack to emit signals from static methods
 Core* core;
 
-Core::Core(const QString& dhtUserId, const QString& dhtIp, int dhtPort) :
-    QObject(nullptr), dhtUserId(dhtUserId), dhtIp(dhtIp), dhtPort(dhtPort)
+Core::Core() :
+    QObject(nullptr)
 {
     qRegisterMetaType<Core::FriendStatus>("FriendStatus");
     core = this;
@@ -124,11 +125,14 @@ void Core::start()
 
     emit userIdGererated(CUserId::toString(self_public_key));
 
-    IP_Port bootstrapIpPort;
-    bootstrapIpPort.port = htons(dhtPort);
-    bootstrapIpPort.ip.i = inet_addr(dhtIp.toLatin1().data());
+    const Settings& s = Settings::getInstance();
+    Settings::DhtServer dhtServer = s.getDhtServerList().at(s.getDhtServerId());
 
-    DHT_bootstrap(bootstrapIpPort, CUserId(dhtUserId).data());
+    IP_Port bootstrapIpPort;
+    bootstrapIpPort.port = htons(dhtServer.port);
+    bootstrapIpPort.ip.i = inet_addr(dhtServer.address.toLatin1().data());
+
+    DHT_bootstrap(bootstrapIpPort, CUserId(dhtServer.userId).data());
 
     timer->setInterval(30);
     timer->start();
