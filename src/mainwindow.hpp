@@ -26,9 +26,6 @@
 #include <QTextBrowser>
 #include <QThread>
 
-
-class OurUserItemWidget;
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -36,8 +33,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-    static OurUserItemWidget* ourUserItem;
 
 private:
     Core* core;

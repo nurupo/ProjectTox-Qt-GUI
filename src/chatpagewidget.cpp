@@ -17,7 +17,6 @@
 #include "chatpagewidget.hpp"
 #include "ouruseritemwidget.hpp"
 #include "status.hpp"
-#include "mainwindow.hpp"
 #include "Settings/settings.hpp"
 
 #include <QSplitter>

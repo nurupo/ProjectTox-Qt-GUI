@@ -28,8 +28,6 @@
 
 #include <QDebug>
 
-OurUserItemWidget* MainWindow::ourUserItem = nullptr;
-
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
@@ -53,7 +51,7 @@ MainWindow::MainWindow(QWidget* parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    ourUserItem = new OurUserItemWidget(this);
+    OurUserItemWidget* ourUserItem = new OurUserItemWidget(this);
     friendsWidget = new FriendsWidget(friendDockWidget);
 
     layout->addWidget(ourUserItem);
