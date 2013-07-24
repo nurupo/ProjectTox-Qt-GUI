@@ -68,6 +68,7 @@ private slots:
 public slots:
     //void addFriend(const QString& userId);
     void addFriend(int friendId, const QString& userId);
+    void setUsername(int friendId, const QString& username);
 
 signals:
     void friendAdded(int friendId, const QString& userId);

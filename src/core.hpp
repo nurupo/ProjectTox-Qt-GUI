@@ -33,6 +33,7 @@ public:
 private:
     static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
     static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
+    static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
 
     void checkFriendsStatus();
 
@@ -67,6 +68,7 @@ private:
         uint16_t size();
 
         static QString toString(uint8_t* cMessage, uint16_t cMessageSize);
+        static QString toString(uint8_t* cMessage);
 
 
     private:
@@ -86,6 +88,8 @@ public slots:
 
     void sendMessage(int friendId, const QString& message);
 
+    void setUsername(const QString& username);
+
     void process();
 
 signals:
@@ -95,6 +99,8 @@ signals:
     void friendAdded(int friendId, const QString& userId);
 
     void friendStatusChanged(int friendId, FriendStatus status);
+
+    void friendUsernameChanged(int friendId, const QString& username);
 
     void userIdGererated(const QString& userId);
 

@@ -63,7 +63,6 @@ MainWindow::MainWindow(QWidget* parent)
     connect(friendsWidget, &FriendsWidget::friendAdded, pages, &PagesWidget::addPage);
     connect(friendsWidget, &FriendsWidget::friendRemoved, pages, &PagesWidget::removePage);
     connect(friendsWidget, &FriendsWidget::friendSelectionChanged, pages, &PagesWidget::activatePage);
-    connect(friendsWidget, &FriendsWidget::friendRenamed, pages, &PagesWidget::usernameChanged);
     connect(friendsWidget, &FriendsWidget::friendStatusChanged, pages, &PagesWidget::statusChanged);
 
     //FIXME: start core in a separate function
@@ -80,8 +79,12 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::userIdGererated, ourUserItem, &OurUserItemWidget::setUserId);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
+    connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
+    connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::usernameChanged);
 
     connect(this, &MainWindow::friendRequestAccepted, core, &Core::acceptFirendRequest);
+
+    connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
 
     connect(pages, &PagesWidget::messageSent, core, &Core::sendMessage);
 

@@ -122,6 +122,17 @@ void FriendsWidget::setStatus(QStandardItem* friendItem, Status status)
     emit friendStatusChanged(friendId, status);
 }
 
+void FriendsWidget::setUsername(int friendId, const QString& username)
+{
+    QStandardItem* friendItem = findFriendItem(friendId);
+
+    if (friendItem == nullptr) {
+        return;
+    }
+
+    friendItem->setText(username);
+}
+
 QStandardItem* FriendsWidget::findFriendItem(int friendId) const
 {
     QModelIndexList indexList = friendModel->match(friendModel->index(0, 0), FriendIdRole, friendId);

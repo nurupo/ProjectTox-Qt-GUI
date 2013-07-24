@@ -53,6 +53,7 @@ public slots:
 
 signals:
     void statusSelected(Status status);
+    void usernameChanged(const QString& newUsername);
 
 };
 

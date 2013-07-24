@@ -50,6 +50,11 @@ void Core::onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSiz
     emit core->friendMessageRecieved(friendId, CString::toString(cMessage, cMessageSize));
 }
 
+void Core::onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize)
+{
+    emit core->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
+}
+
 void Core::acceptFirendRequest(const QString& userId)
 {
     int friendId = m_addfriend_norequest(CUserId(userId).data());
@@ -106,6 +111,12 @@ void Core::removeFriend(int friendId)
     }
 }
 
+void Core::setUsername(const QString& username)
+{
+    CString cUsername(username);
+    setname(cUsername.data(), cUsername.size());
+}
+
 void Core::process()
 {
     doMessenger();
@@ -122,6 +133,7 @@ void Core::start()
 
     m_callback_friendrequest(onFriendRequest);
     m_callback_friendmessage(onFriendMessage);
+    m_callback_namechange(onFriendNameChange);
 
     emit userIdGererated(CUserId::toString(self_public_key));
 
@@ -133,6 +145,9 @@ void Core::start()
     bootstrapIpPort.ip.i = inet_addr(dhtServer.address.toLatin1().data());
 
     DHT_bootstrap(bootstrapIpPort, CUserId(dhtServer.userId).data());
+
+    CString cUsername(Settings::getInstance().getUsername());
+    setname(cUsername.data(), cUsername.size());
 
     timer->setInterval(30);
     timer->start();
@@ -199,6 +214,11 @@ uint16_t Core::CString::size()
 QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
 {
     return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize);
+}
+
+QString Core::CString::toString(uint8_t* cString)
+{
+    return QString::fromUtf8(reinterpret_cast<char*>(cString), -1);
 }
 
 uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
