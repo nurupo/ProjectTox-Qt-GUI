@@ -84,14 +84,16 @@ SOURCES += \
     ../../submodules/ProjectTox-Core/core/Lossless_UDP.c \
     ../../submodules/ProjectTox-Core/core/Messenger.c \
     ../../submodules/ProjectTox-Core/core/net_crypto.c \
-    ../../submodules/ProjectTox-Core/core/network.c
+    ../../submodules/ProjectTox-Core/core/network.c \
+    ../../submodules/ProjectTox-Core/core/friend_requests.c
 
 HEADERS  += \
     ../../submodules/ProjectTox-Core/core/DHT.h \
     ../../submodules/ProjectTox-Core/core/Lossless_UDP.h \
     ../../submodules/ProjectTox-Core/core/Messenger.h \
     ../../submodules/ProjectTox-Core/core/net_crypto.h \
-    ../../submodules/ProjectTox-Core/core/network.h
+    ../../submodules/ProjectTox-Core/core/network.h \
+    ../../submodules/ProjectTox-Core/core/friend_requests.h
 
 RESOURCES += \
     ../../resources/icons.qrc

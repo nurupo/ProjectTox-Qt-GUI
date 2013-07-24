@@ -17,9 +17,7 @@
 #include "core.hpp"
 #include "Settings/settings.hpp"
 
-extern "C" {
 #include <Messenger.h>
-}
 
 #ifndef WIN32
 #include <arpa/inet.h>
