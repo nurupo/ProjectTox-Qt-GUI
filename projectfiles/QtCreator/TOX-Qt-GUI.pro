@@ -85,7 +85,8 @@ SOURCES += \
     ../../submodules/ProjectTox-Core/core/Messenger.c \
     ../../submodules/ProjectTox-Core/core/net_crypto.c \
     ../../submodules/ProjectTox-Core/core/network.c \
-    ../../submodules/ProjectTox-Core/core/friend_requests.c
+    ../../submodules/ProjectTox-Core/core/friend_requests.c \
+    ../../submodules/ProjectTox-Core/core/LAN_discovery.c
 
 HEADERS  += \
     ../../submodules/ProjectTox-Core/core/DHT.h \
@@ -93,7 +94,8 @@ HEADERS  += \
     ../../submodules/ProjectTox-Core/core/Messenger.h \
     ../../submodules/ProjectTox-Core/core/net_crypto.h \
     ../../submodules/ProjectTox-Core/core/network.h \
-    ../../submodules/ProjectTox-Core/core/friend_requests.h
+    ../../submodules/ProjectTox-Core/core/friend_requests.h \
+    ../../submodules/ProjectTox-Core/core/LAN_discovery.h
 
 RESOURCES += \
     ../../resources/icons.qrc
