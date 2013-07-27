@@ -35,14 +35,11 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     QAction* copyUserIdAction = new QAction(QIcon(":/icons/page_copy.png"), "Copy User ID", this);
     connect(copyUserIdAction, &QAction::triggered, this, &FriendsWidget::onCopyUserIdActionTriggered);
 
-    QAction* renameFriendAction = new QAction(QIcon(":/icons/textfield_rename.png"), "Rename", this);
-    connect(renameFriendAction, &QAction::triggered, this, &FriendsWidget::onRenameFriendActionTriggered);
-
     QAction* removeFriendAction = new QAction(QIcon(":/icons/user_delete.png"), "Remove", this);
     connect(removeFriendAction, &QAction::triggered, this, &FriendsWidget::onRemoveFriendActionTriggered);
 
     friendContextMenu = new QMenu(this);
-    friendContextMenu->addActions(QList<QAction*>() << copyUserIdAction << renameFriendAction << removeFriendAction);
+    friendContextMenu->addActions(QList<QAction*>() << copyUserIdAction << removeFriendAction);
 
     friendView = new CustomHintTreeView(this, QSize(100, 100));
     friendView->setIconSize(QSize(24, 24));
@@ -54,7 +51,6 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     connect(friendView, &QTreeView::customContextMenuRequested, this, &FriendsWidget::onFriendContextMenuRequested);
 
     friendModel = new QStandardItemModel(this);
-    connect(friendModel, &QStandardItemModel::itemChanged, this, &FriendsWidget::onFriendModified);
 
     friendProxyModel = new FriendProxyModel(this);
     friendProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -178,32 +174,6 @@ void FriendsWidget::onCopyUserIdActionTriggered()
     // friendContextMenuRequested already made sure that there is only one index selected
     QModelIndex selectedIndex = friendView->selectionModel()->selectedIndexes().at(0);
     QGuiApplication::clipboard()->setText(friendProxyModel->mapToSource(selectedIndex).data(UserIdRole).toString());
-}
-
-void FriendsWidget::onRenameFriendActionTriggered()
-{
-    // friendContextMenuRequested already made sure that there is only one index selected
-    QModelIndex selectedIndex = friendView->selectionModel()->selectedIndexes().at(0);
-    QStandardItem* selectedItem = friendModel->itemFromIndex(friendProxyModel->mapToSource(selectedIndex));
-    selectedItem->setFlags(selectedItem->flags() | Qt::ItemIsEditable);
-    friendView->edit(selectedIndex);
-    selectedItem->setFlags(selectedItem->flags() & ~Qt::ItemIsEditable);
-}
-
-// called on any edit of data(...) in the model. status change, username change, etc.
-void FriendsWidget::onFriendModified(QStandardItem* item)
-{
-    int friendId = item->data(FriendIdRole).toInt();
-    QString newUsername = item->text();
-
-    emit friendRenamed(friendId, newUsername);
-
-    /*UserInfo info = userInfoHash[userId];
-    if (newUsername != info.username) {
-        info.username = newUsername;
-        userInfoHash[userId] = info;
-
-    }*/
 }
 
 void FriendsWidget::onRemoveFriendActionTriggered()

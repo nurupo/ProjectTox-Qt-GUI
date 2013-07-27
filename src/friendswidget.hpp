@@ -60,9 +60,7 @@ private slots:
     void onAddFriendButtonClicked();
     void onFriendContextMenuRequested(const QPoint& pos);
     void onCopyUserIdActionTriggered();
-    void onRenameFriendActionTriggered();
     void onRemoveFriendActionTriggered();
-    void onFriendModified(QStandardItem* item);
     void onFriendSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
 
 public slots:
@@ -72,7 +70,6 @@ public slots:
 
 signals:
     void friendAdded(int friendId, const QString& userId);
-    void friendRenamed(int friendId, const QString& newUsername);
     void friendStatusChanged(int friendId, Status status);
     void friendRemoved(int friendId);
     void friendSelectionChanged(int friendId);
