@@ -26,19 +26,19 @@ To compile this project, you need to install Qt 5 development libraries.
 
 Then run
 
-_git clone https://github.com/nurupo/ProjectTox-Qt-GUI_
+`git clone https://github.com/nurupo/ProjectTox-Qt-GUI`
 
-_cd ProjectTox-Qt-GUI_
+`cd ProjectTox-Qt-GUI`
 
 this project is only a Qt GUI, and does not contain the core libraries. To install them, you need to run
 
-_git submodules init && git submodules update_
+`git submodules init && git submodules update`
 
 now compile everything:
 
-_cd projectfiles/QtCreator; qmake && make -j3_
+`cd projectfiles/QtCreator; qmake && make -j3`
 
-You should get an executable called Tox-Qt-GUI. You can run it by typing _./TOX-Qt-GUI_ in the terminal.
+You should get an executable called Tox-Qt-GUI. You can run it by typing `./TOX-Qt-GUI` in the terminal.
 
 ### OS X
 
