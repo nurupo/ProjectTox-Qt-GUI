@@ -85,6 +85,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendRemoved, friendsWidget, &FriendsWidget::removeFriend);
     connect(core, &Core::friendRemoved, pages, &PagesWidget::removePage);
     connect(core, &Core::failedToRemoveFriend, this, &MainWindow::onFailedToRemoveFriend);
+    connect(core, &Core::failedToAddFriend, this, &MainWindow::onFailedToAddFriend);
 
     coreThread->start(/*QThread::IdlePriority*/);
 
@@ -157,6 +158,14 @@ void MainWindow::onFailedToRemoveFriend(int friendId)
 {
     QMessageBox critical(this);
     critical.setText(QString("Couldn't remove friend \"%1\"").arg(friendsWidget->getUsername(friendId)));
+    critical.setIcon(QMessageBox::Critical);
+    critical.exec();
+}
+
+void MainWindow::onFailedToAddFriend(const QString& userId)
+{
+    QMessageBox critical(this);
+    critical.setText(QString("Couldn't add friend with User Id\n\"%1\"").arg(userId));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
 }
