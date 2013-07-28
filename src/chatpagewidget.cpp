@@ -74,3 +74,8 @@ void ChatPageWidget::setStatus(Status newStatus)
     friendItem->setStatus(status);
     input->setReadOnly(newStatus != Status::Online);
 }
+
+void ChatPageWidget::failedToSendMessage(const QString& message)
+{
+    display->showFailedToSendMessage(message);
+}

@@ -25,6 +25,7 @@ class MessageDisplayWidget : public QTextBrowser
 public:
     MessageDisplayWidget(QWidget* parent);
     void showMessage(const QString& senderUsername, const QString& message);
+    void showFailedToSendMessage(const QString& message);
 
 private:
     void urlify(QString& string);

@@ -86,6 +86,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendRemoved, pages, &PagesWidget::removePage);
     connect(core, &Core::failedToRemoveFriend, this, &MainWindow::onFailedToRemoveFriend);
     connect(core, &Core::failedToAddFriend, this, &MainWindow::onFailedToAddFriend);
+    connect(core, &Core::failedToSendMessage, pages, &PagesWidget::failedToSendMessage);
 
     coreThread->start(/*QThread::IdlePriority*/);
 

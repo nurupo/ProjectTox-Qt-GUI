@@ -79,3 +79,8 @@ void PagesWidget::messageReceived(int friendId, const QString &message)
 {
     widget(friendId)->messageReceived(message);
 }
+
+void PagesWidget::failedToSendMessage(int friendId, const QString &message)
+{
+    widget(friendId)->failedToSendMessage(message);
+}

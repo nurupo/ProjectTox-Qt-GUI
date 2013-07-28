@@ -44,6 +44,14 @@ void MessageDisplayWidget::showMessage(const QString& senderUsername, const QStr
     append(text);
 }
 
+void MessageDisplayWidget::showFailedToSendMessage(const QString& message)
+{
+    QString messageEscaped = message.toHtmlEscaped();
+    QString text = QString("<p><font color=\"red\">Couldn't send following message:</font><br><big>%1</big></p>").arg(messageEscaped);
+    urlify(text);
+    append(text);
+}
+
 void MessageDisplayWidget::urlify(QString& string)
 {
     string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");

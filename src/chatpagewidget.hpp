@@ -48,6 +48,7 @@ private slots:
 
 public slots:
     void messageReceived(const QString& message);
+    void failedToSendMessage(const QString& message);
 
 signals:
     void messageSent(const QString& message);

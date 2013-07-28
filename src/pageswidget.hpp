@@ -40,6 +40,7 @@ public slots:
     void statusChanged(int friendId, Status status);
     void usernameChanged(int friendId, const QString& username);
     void messageReceived(int friendId, const QString& message);
+    void failedToSendMessage(int friendId, const QString& message);
 
 signals:
     void messageSent(int friendId, const QString& message);
