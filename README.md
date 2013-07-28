@@ -40,6 +40,8 @@ _cd projectfiles/QtCreator; qmake && make -j3_
 
 You should get an executable called Tox-Qt-GUI. You can run it by typing _./TOX-Qt-GUI_ in the terminal.
 
+(Note: you may also need to install NaCl encryption library for [ProjectTox Core](https://github.com/irungentoo/ProjectTox-Core).)
+
 ### OS X
 
 Installation should be similar to other Unix systems, but it is not tested yet.
