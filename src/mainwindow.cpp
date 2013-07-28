@@ -88,6 +88,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(this, &MainWindow::friendRequestAccepted, core, &Core::acceptFirendRequest);
 
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
+    connect(core, &Core::usernameSet, ourUserItem, &OurUserItemWidget::setUsername);
 
     connect(pages, &PagesWidget::messageSent, core, &Core::sendMessage);
 

@@ -51,10 +51,11 @@ private slots:
 public slots:
     void setUserId(const QString &userId);
     void setStatus(Status status);
+    void setUsername(const QString& username);
 
 signals:
     void statusSelected(Status status);
-    void usernameChanged(const QString& newUsername);
+    void usernameChanged(const QString& username);
 
 };
 

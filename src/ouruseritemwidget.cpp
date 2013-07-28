@@ -82,10 +82,17 @@ QToolButton* OurUserItemWidget::createToolButton(const QIcon& icon, const QSize 
 void OurUserItemWidget::onUsernameChange()
 {
     QString newUsername = usernameEdit->text();
-    usernameLabel->setText(newUsername);
+    //restore old username, usernameLabel still contains it
+    usernameEdit->setText(usernameLabel->text());
     usernameStackedWidget->setCurrentWidget(usernameLabel);
-    Settings::getInstance().setUsername(newUsername);
     emit usernameChanged(newUsername);
+}
+
+void OurUserItemWidget::setUsername(const QString& username)
+{
+    usernameEdit->setText(username);
+    usernameLabel->setText(username);
+    Settings::getInstance().setUsername(username);
 }
 
 void OurUserItemWidget::onRenameUsernameButtonClicked()
