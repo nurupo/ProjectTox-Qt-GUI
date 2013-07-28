@@ -24,6 +24,7 @@
 #include <QDesktopWidget>
 #include <QDockWidget>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QStackedWidget>
 
 #include <QDebug>
@@ -61,7 +62,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     PagesWidget* pages = new PagesWidget(this);
     connect(friendsWidget, &FriendsWidget::friendAdded, pages, &PagesWidget::addPage);
-    connect(friendsWidget, &FriendsWidget::friendRemoved, pages, &PagesWidget::removePage);
     connect(friendsWidget, &FriendsWidget::friendSelectionChanged, pages, &PagesWidget::activatePage);
     connect(friendsWidget, &FriendsWidget::friendStatusChanged, pages, &PagesWidget::statusChanged);
 
@@ -82,6 +82,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::usernameChanged);
+    connect(core, &Core::friendRemoved, friendsWidget, &FriendsWidget::removeFriend);
+    connect(core, &Core::friendRemoved, pages, &PagesWidget::removePage);
+    connect(core, &Core::failedToRemoveFriend, this, &MainWindow::onFailedToRemoveFriend);
 
     coreThread->start(/*QThread::IdlePriority*/);
 
@@ -148,4 +151,12 @@ void MainWindow::onConnected()
 void MainWindow::onDisconnected()
 {
     ourUserItem->setStatus(Status::Offline);
+}
+
+void MainWindow::onFailedToRemoveFriend(int friendId)
+{
+    QMessageBox critical(this);
+    critical.setText(QString("Couldn't remove friend \"%1\"").arg(friendsWidget->getUsername(friendId)));
+    critical.setIcon(QMessageBox::Critical);
+    critical.exec();
 }

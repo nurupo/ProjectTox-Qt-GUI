@@ -179,18 +179,40 @@ void FriendsWidget::onCopyUserIdActionTriggered()
 void FriendsWidget::onRemoveFriendActionTriggered()
 {
     QModelIndex selectedIndex = friendView->selectionModel()->selectedIndexes().at(0);
-    QList<QStandardItem*> selectedItems = friendModel->takeRow(friendProxyModel->mapToSource(selectedIndex).row());
 
-    int friendId = selectedItems.at(0)->data(FriendIdRole).toInt();
+    int friendId = friendProxyModel->mapToSource(selectedIndex).data(FriendIdRole).toInt();
+
     //userInfoHash.remove(userId);
     emit friendRemoved(friendId);
-
-    qDeleteAll(selectedItems);
 }
+
+void FriendsWidget::removeFriend(int friendId)
+{
+    QStandardItem* friendItem = findFriendItem(friendId);
+
+    if (friendItem == nullptr) {
+        return;
+    }
+
+    qDeleteAll(friendModel->takeRow(friendItem->row()));
+
+}
+
 void FriendsWidget::onFriendSelectionChanged(const QModelIndex& current, const QModelIndex& /*previous*/)
 {
     QStandardItem* item = friendModel->itemFromIndex(friendProxyModel->mapToSource(current));
     if (item != nullptr) {
         emit friendSelectionChanged(item->data(FriendIdRole).toInt());
     }
+}
+
+QString FriendsWidget::getUsername(int friendId)
+{
+    QStandardItem* friendItem = findFriendItem(friendId);
+
+    if (friendItem == nullptr) {
+        return QString();
+    }
+
+    return friendItem->text();
 }
