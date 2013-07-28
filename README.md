@@ -40,6 +40,8 @@ now compile everything:
 
 You should get an executable called Tox-Qt-GUI. You can run it by typing `./TOX-Qt-GUI` in the terminal.
 
+(Note: you may also need to install NaCl encryption library for [ProjectTox Core](https://github.com/irungentoo/ProjectTox-Core).)
+
 ### OS X
 
 Installation should be similar to other Unix systems, but it is not tested yet.
