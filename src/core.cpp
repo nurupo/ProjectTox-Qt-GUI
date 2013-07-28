@@ -103,8 +103,9 @@ void Core::checkFriendsStatus()
 void Core::removeFriend(int friendId)
 {
     if (m_delfriend(friendId) == -1) {
-        emit failedToDeleteFriend(friendId);
+        emit failedToRemoveFriend(friendId);
     } else {
+        emit friendRemoved(friendId);
         friendIdList.removeOne(friendId);
     }
 }
@@ -112,7 +113,11 @@ void Core::removeFriend(int friendId)
 void Core::setUsername(const QString& username)
 {
     CString cUsername(username);
-    setname(cUsername.data(), cUsername.size());
+    if (setname(cUsername.data(), cUsername.size()) == -1) {
+        emit failedToSetUsername(username);
+    } else {
+        emit usernameSet(username);
+    }
 }
 
 void Core::process()
@@ -126,7 +131,7 @@ void Core::process()
     checkFriendsStatus();
 }
 
-void Core::bootstrapDHT()
+void Core::bootstrapDht()
 {
     const Settings& s = Settings::getInstance();
     QList<Settings::DhtServer> dhtServerList = s.getDhtServerList();
@@ -140,7 +145,6 @@ void Core::bootstrapDHT()
     }
 }
 
-// called only on application start
 void Core::checkConnection()
 {
     static bool isConnected = false;
@@ -167,7 +171,7 @@ void Core::start()
     CString cUsername(Settings::getInstance().getUsername());
     setname(cUsername.data(), cUsername.size());
 
-    bootstrapDHT();
+    bootstrapDht();
 
     timer->setInterval(30);
     timer->start();

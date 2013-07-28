@@ -37,7 +37,7 @@ private:
 
     void checkFriendsStatus();
     void checkConnection();
-    void bootstrapDHT();
+    void bootstrapDht();
 
     QTimer* timer;
     QList<int> friendIdList;
@@ -109,9 +109,14 @@ signals:
 
     void userIdGererated(const QString& userId);
 
+    void friendRemoved(int friendId);
+
+    void usernameSet(const QString& username);
+
     void failedToAddFriend(const QString& userId);
     void failedToSendMessage(int friendId, const QString& message);
-    void failedToDeleteFriend(int friendId);
+    void failedToRemoveFriend(int friendId);
+    void failedToSetUsername(const QString& username);
 
 };
 
