@@ -31,7 +31,7 @@ class OurUserItemWidget : public QWidget
 {
     Q_OBJECT
 public:
-    OurUserItemWidget(QWidget* parent);
+    explicit OurUserItemWidget(QWidget* parent = 0);
 
 private:
     QToolButton* statusButton;
@@ -50,6 +50,7 @@ private slots:
 
 public slots:
     void setUserId(const QString &userId);
+    void setStatus(Status status);
 
 signals:
     void statusSelected(Status status);

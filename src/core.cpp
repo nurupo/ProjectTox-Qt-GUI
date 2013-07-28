@@ -122,7 +122,36 @@ void Core::process()
     //we want to see the debug messages immediately
     fflush(stdout);
 #endif
+    checkConnection();
     checkFriendsStatus();
+}
+
+void Core::bootstrapDHT()
+{
+    const Settings& s = Settings::getInstance();
+    QList<Settings::DhtServer> dhtServerList = s.getDhtServerList();
+
+    IP_Port bootstrapIpPort;
+    for (const Settings::DhtServer& dhtServer : dhtServerList) {
+        bootstrapIpPort.port = htons(dhtServer.port);
+        bootstrapIpPort.ip.i = resolve_addr(dhtServer.address.toLatin1().data());
+
+        DHT_bootstrap(bootstrapIpPort, CUserId(dhtServer.userId).data());
+    }
+}
+
+// called only on application start
+void Core::checkConnection()
+{
+    static bool isConnected = false;
+
+    if (DHT_isconnected() && !isConnected) {
+        emit connected();
+        isConnected = true;
+    } else if (!DHT_isconnected() && isConnected) {
+        emit disconnected();
+        isConnected = false;
+    }
 }
 
 void Core::start()
@@ -135,17 +164,10 @@ void Core::start()
 
     emit userIdGererated(CUserId::toString(self_public_key));
 
-    const Settings& s = Settings::getInstance();
-    Settings::DhtServer dhtServer = s.getDhtServerList().at(s.getDhtServerId());
-
-    IP_Port bootstrapIpPort;
-    bootstrapIpPort.port = htons(dhtServer.port);
-    bootstrapIpPort.ip.i = inet_addr(dhtServer.address.toLatin1().data());
-
-    DHT_bootstrap(bootstrapIpPort, CUserId(dhtServer.userId).data());
-
     CString cUsername(Settings::getInstance().getUsername());
     setname(cUsername.data(), cUsername.size());
+
+    bootstrapDHT();
 
     timer->setInterval(30);
     timer->start();

@@ -16,7 +16,7 @@
 
 #include "mainwindow.hpp"
 #include "pageswidget.hpp"
-#include "ouruseritemwidget.hpp"
+
 #include "friendrequestdialog.hpp"
 #include "dhtdialog.hpp"
 
@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget* parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    OurUserItemWidget* ourUserItem = new OurUserItemWidget(this);
+    ourUserItem = new OurUserItemWidget(this);
     friendsWidget = new FriendsWidget(friendDockWidget);
 
     layout->addWidget(ourUserItem);
@@ -72,8 +72,9 @@ MainWindow::MainWindow(QWidget* parent)
     coreThread = new QThread(this);
     core->moveToThread(coreThread);
     connect(coreThread, &QThread::started, core, &Core::start);
-    coreThread->start(/*QThread::IdlePriority*/);
 
+    connect(core, &Core::connected, this, &MainWindow::onConnected);
+    connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
     connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
     connect(core, &Core::friendStatusChanged, this, &MainWindow::onFriendStatusChanged);
     connect(core, &Core::userIdGererated, ourUserItem, &OurUserItemWidget::setUserId);
@@ -81,6 +82,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::usernameChanged);
+
+    coreThread->start(/*QThread::IdlePriority*/);
 
     connect(this, &MainWindow::friendRequestAccepted, core, &Core::acceptFirendRequest);
 
@@ -106,7 +109,6 @@ void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& m
     FriendRequestDialog dialog(this, userId, message);
 
     if (dialog.exec() == QDialog::Accepted) {
-        //friendsWidget->addFriend(userId, userId.mid(0, 7));
         emit friendRequestAccepted(userId);
     }
 }
@@ -135,4 +137,14 @@ void MainWindow::onFriendStatusChanged(int friendId, Core::FriendStatus status)
             friendsWidget->setStatus(friendId, Status::Online);
             break;
     }
+}
+
+void MainWindow::onConnected()
+{
+    ourUserItem->setStatus(Status::Online);
+}
+
+void MainWindow::onDisconnected()
+{
+    ourUserItem->setStatus(Status::Offline);
 }

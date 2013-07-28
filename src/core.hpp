@@ -36,6 +36,8 @@ private:
     static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
 
     void checkFriendsStatus();
+    void checkConnection();
+    void bootstrapDHT();
 
     QTimer* timer;
     QList<int> friendIdList;
@@ -93,6 +95,9 @@ public slots:
     void process();
 
 signals:
+    void connected();
+    void disconnected();
+
     void friendRequestRecieved(const QString& userId, const QString& message);
     void friendMessageRecieved(int friendId, const QString& message);
 

@@ -19,6 +19,7 @@
 
 #include "core.hpp"
 #include "friendswidget.hpp"
+#include "ouruseritemwidget.hpp"
 
 #include <QLineEdit>
 #include <QListView>
@@ -38,8 +39,11 @@ private:
     Core* core;
     QThread* coreThread;
     FriendsWidget* friendsWidget;
+    OurUserItemWidget* ourUserItem;
 
 private slots:
+    void onConnected();
+    void onDisconnected();
     void onFriendRequestRecieved(const QString &userId, const QString &message);
     void onFriendStatusChanged(int friendId, Core::FriendStatus status);
 

@@ -27,7 +27,7 @@
 OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     QWidget(parent)
 {
-    statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Online).iconPath), QSize(24, 24), "Change Status");
+    statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Offline).iconPath), QSize(24, 24), "Change Status");
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
     QToolButton* renameUsernameButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change Username");
@@ -105,11 +105,14 @@ void OurUserItemWidget::onStatusActionTriggered()
     if (selectedStatus == Status::Offline) {
         CloseApplicationDialog dialog(this);
         dialog.exec();
-    } else {
+    }
+    /*
+     else {
         statusButton->setIcon(QIcon(StatusHelper::getInfo(selectedStatus).iconPath));
     }
 
     emit statusSelected(selectedStatus);
+    */
 }
 
 void OurUserItemWidget::onCopyUserIdButtonClicked()
@@ -120,5 +123,10 @@ void OurUserItemWidget::onCopyUserIdButtonClicked()
 void OurUserItemWidget::setUserId(const QString &userId)
 {
     this->userId = userId;
+}
+
+void OurUserItemWidget::setStatus(Status status)
+{
+    statusButton->setIcon(QIcon(StatusHelper::getInfo(status).iconPath));
 }
 
