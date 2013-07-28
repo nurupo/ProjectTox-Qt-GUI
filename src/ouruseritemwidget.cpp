@@ -108,18 +108,11 @@ void OurUserItemWidget::onStatusActionTriggered()
     Status selectedStatus = static_cast<Status>(statusAction->data().toInt());
 
     //close application on going offline, since core doesn't implement going offline functionality
-    //TODO: when core implements it
+    //TODO: when core implements it, go offline instead of closing the application
     if (selectedStatus == Status::Offline) {
         CloseApplicationDialog dialog(this);
         dialog.exec();
     }
-    /*
-     else {
-        statusButton->setIcon(QIcon(StatusHelper::getInfo(selectedStatus).iconPath));
-    }
-
-    emit statusSelected(selectedStatus);
-    */
 }
 
 void OurUserItemWidget::onCopyUserIdButtonClicked()
@@ -136,4 +129,3 @@ void OurUserItemWidget::setStatus(Status status)
 {
     statusButton->setIcon(QIcon(StatusHelper::getInfo(status).iconPath));
 }
-
