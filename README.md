@@ -18,6 +18,36 @@ Please note that developent is in very beginning and the project is not ready to
 
 * [Submit a pull request](https://help.github.com/articles/using-pull-requests)
 
+## Compiling
+
+### Linux/Unix with X11
+
+To compile this project, you need to install Qt 5 development libraries.
+
+Then run
+
+`git clone https://github.com/nurupo/ProjectTox-Qt-GUI`
+
+`cd ProjectTox-Qt-GUI`
+
+this project is only a Qt GUI, and does not contain the core libraries. To install them, you need to run
+
+`git submodules init && git submodules update`
+
+now compile everything:
+
+`cd projectfiles/QtCreator; qmake && make -j3`
+
+You should get an executable called Tox-Qt-GUI. You can run it by typing `./TOX-Qt-GUI` in the terminal.
+
+(Note: you may also need to install NaCl encryption library for [ProjectTox Core](https://github.com/irungentoo/ProjectTox-Core).)
+
+### OS X
+
+Installation should be similar to other Unix systems, but it is not tested yet.
+
+### Windows
+
 ## Contact
 
 You can usually find me at Tox channel [irc://chat.freenode.net:6667/InsertProjectNameHere](irc://chat.freenode.net:6667/InsertProjectNameHere).
