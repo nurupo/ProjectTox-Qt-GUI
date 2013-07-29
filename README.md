@@ -8,7 +8,7 @@ Please note that developent is in very beginning and the project is not ready to
 
 ## Screenshot
 
-![Hi There](https://raw.github.com/nurupo/ProjectTox-Qt-GUI/master/screenshot.png "Version 0.1.0 running on Windows 7")
+![Hi There](http://i.imgur.com/Wv3lrO7.png "Version 0.1.0 running on Windows 7")
 
 ## Contributing
 
