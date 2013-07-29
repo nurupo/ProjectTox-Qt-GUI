@@ -53,12 +53,6 @@ public:
     const QList<DhtServer>& getDhtServerList() const;
     void setDhtServerList(const QList<DhtServer>& newDhtServerList);
 
-    int getDhtServerId() const;
-    void setDhtServerId(int value);
-
-    bool getDontShowDhtDialog() const;
-    void setDontShowDhtDialog(bool value);
-
     QString getUsername() const;
     void setUsername(const QString& newUsername);
 

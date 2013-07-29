@@ -63,8 +63,6 @@ void Settings::load()
 
     QSettings s(FILENAME, QSettings::IniFormat);
     s.beginGroup("DHT Server");
-        dhtServerId = s.value("dhtServerId", 0).toInt();
-        dontShowDhtDialog = s.value("dontShowDhtDialog", false).toBool();
         int serverListSize = s.beginReadArray("dhtServerList");
         for (int i = 0; i < serverListSize; i ++) {
             s.setArrayIndex(i);
@@ -89,8 +87,6 @@ void Settings::save()
 {
     QSettings s(FILENAME, QSettings::IniFormat);
     s.beginGroup("DHT Server");
-        s.setValue("dhtServerId", dhtServerId);
-        s.setValue("dontShowDhtDialog", dontShowDhtDialog);
         s.beginWriteArray("dhtServerList");
         for (int i = 0; i < dhtServerList.size(); i ++) {
             s.setArrayIndex(i);
@@ -124,26 +120,6 @@ const QList<Settings::DhtServer>& Settings::getDhtServerList() const
 void Settings::setDhtServerList(const QList<DhtServer>& newDhtServerList)
 {
     dhtServerList = newDhtServerList;
-}
-
-int Settings::getDhtServerId() const
-{
-    return dhtServerId;
-}
-
-void Settings::setDhtServerId(int value)
-{
-   dhtServerId = value;
-}
-
-bool Settings::getDontShowDhtDialog() const
-{
-    return dontShowDhtDialog;
-}
-
-void Settings::setDontShowDhtDialog(bool value)
-{
-    dontShowDhtDialog = value;
 }
 
 QString Settings::getUsername() const

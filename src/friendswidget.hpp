@@ -38,13 +38,6 @@ public:
     void setStatus(int friendId, Status status);
     QString getUsername(int friendId);
 
-    /*struct UserInfo {
-        QString username;
-        Status status;
-    };
-
-    UserInfo getUserInfo(const QString& userId) const;*/
-
 private:
     FilterWidget* filterEdit;
     CustomHintTreeView* friendView;
@@ -52,7 +45,6 @@ private:
     FriendProxyModel* friendProxyModel;
     QMenu* friendContextMenu;
     QPushButton* addFriendButton;
-    //QHash<QString, UserInfo> userInfoHash;
 
     QStandardItem* findFriendItem(int friendId) const;
     void setStatus(QStandardItem* friendItem, Status status);
@@ -65,7 +57,6 @@ private slots:
     void onFriendSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
 
 public slots:
-    //void addFriend(const QString& userId);
     void addFriend(int friendId, const QString& userId);
     void removeFriend(int friendId);
     void setUsername(int friendId, const QString& username);

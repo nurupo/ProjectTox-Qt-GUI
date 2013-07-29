@@ -48,7 +48,6 @@ SOURCES += \
     ../../src/Settings/basicsettingsdialog.cpp \
     ../../src/Settings/settings.cpp \
     ../../src/dhteditdialog.cpp \
-    ../../src/dhtdialog.cpp \
     ../../src/closeapplicationdialog.cpp \
     ../../src/starter.cpp
 
@@ -75,7 +74,6 @@ HEADERS  += \
     ../../src/Settings/basicsettingsdialog.hpp \
     ../../src/Settings/settings.hpp \
     ../../src/dhteditdialog.hpp \
-    ../../src/dhtdialog.hpp \
     ../../src/closeapplicationdialog.hpp \
     ../../src/starter.hpp
 
