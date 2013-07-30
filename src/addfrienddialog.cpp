@@ -23,6 +23,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegExp>
 
 AddFriendDialog::AddFriendDialog(QWidget* parent) :
     QDialog(parent)
@@ -70,9 +71,17 @@ QString AddFriendDialog::getMessage() const
 
 void AddFriendDialog::accept()
 {
+    const QRegExp regExp("\\W+");
+
     if (userIdEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
         QMessageBox warning(this);
         warning.setText("Please fill all the fields in.");
+        warning.setIcon(QMessageBox::Warning);
+        warning.exec();
+    } else if (userIdEdit->text().length() != 64 || userIdEdit->text().contains(regExp)
+               || userIdEdit->text().contains("_")) {
+        QMessageBox warning(this);
+        warning.setText("UserID must be 64 HEX chars.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
     } else {
