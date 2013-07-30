@@ -84,6 +84,7 @@ void OurUserItemWidget::onUsernameChange()
     QString newUsername = usernameEdit->text();
     //restore old username, usernameLabel still contains it
     usernameEdit->setText(usernameLabel->text());
+    usernameEdit->clearFocus();
     usernameStackedWidget->setCurrentWidget(usernameLabel);
     emit usernameChanged(newUsername);
 }
@@ -99,7 +100,11 @@ void OurUserItemWidget::onRenameUsernameButtonClicked()
 {
     usernameEdit->setText(usernameLabel->text());
     usernameStackedWidget->setCurrentWidget(usernameEdit);
-    usernameEdit->setFocus();
+    if (usernameEdit->hasFocus()) {
+        usernameEdit->clearFocus();
+    } else {
+        usernameEdit->setFocus();
+    }
 }
 
 void OurUserItemWidget::onStatusActionTriggered()
