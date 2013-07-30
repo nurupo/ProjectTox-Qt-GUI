@@ -20,9 +20,8 @@ sudo ldconfig
 
 Then get this repo and build the GUI:
 ```bash
-git clone git://github.com/nurupo/ProjectTox-Qt-GUI.git
+git clone --recursive git://github.com/nurupo/ProjectTox-Qt-GUI.git
 cd ProjectTox-Qt-GUI
-git submodule init && git submodule update
 mkdir build && cd build
 qmake -Wall ../projectfiles/QtCreator/TOX-Qt-GUI.pro
 make
@@ -47,9 +46,8 @@ If you don't already have a git shell installed, you can use one that comes with
 
 Open the git shell and run:
 ```cmd
-git clone git://github.com/nurupo/ProjectTox-Qt-GUI.git
+git clone --recursive git://github.com/nurupo/ProjectTox-Qt-GUI.git
 cd ProjectTox-Qt-GUI
-git submodule init && git submodule update
 ```
 
 Then download and extract [this archive containing precompiled binaries of libsodium 0.4.2 for Windows](https://download.libsodium.org/libsodium/releases/libsodium-win32-0.4.2.tar.gz) at `ProjectTox-Qt-GUI\libs\`, so that `TOX-Qt-GUI\libs\sodium\include` becomes a valid path. Note that tThere is no `libs` folder, you should create one.
