@@ -20,9 +20,8 @@ sudo ldconfig
 
 Then get this repo and build the GUI:
 ```bash
-git clone git://github.com/nurupo/ProjectTox-Qt-GUI.git
+git clone --recursive git://github.com/nurupo/ProjectTox-Qt-GUI.git
 cd ProjectTox-Qt-GUI
-git submodule init && git submodule update
 mkdir build && cd build
 qmake -Wall ../projectfiles/QtCreator/TOX-Qt-GUI.pro
 make
