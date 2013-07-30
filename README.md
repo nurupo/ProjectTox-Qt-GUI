@@ -20,7 +20,7 @@ Please note that developent is in very beginning and the project is not ready to
 
 ## Contact
 
-You can usually find me at Tox channel [irc://chat.freenode.net:6667/InsertProjectNameHere](irc://chat.freenode.net:6667/InsertProjectNameHere).
+You can usually find me at the following IRC channel channel: [irc://chat.freenode.net:6667/tox-dev](http://webchat.freenode.net/?channels=#tox-dev).
 
 ## License
 
