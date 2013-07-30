@@ -22,6 +22,8 @@
 
 #include <QObject>
 
+class DhtDialog;
+
 class Starter : public QObject
 {
     Q_OBJECT
