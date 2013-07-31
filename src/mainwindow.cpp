@@ -166,7 +166,7 @@ void MainWindow::onFailedToRemoveFriend(int friendId)
 void MainWindow::onFailedToAddFriend(const QString& userId)
 {
     QMessageBox critical(this);
-    critical.setText(QString("Couldn't add friend with User Id\n\"%1\"").arg(userId));
+    critical.setText(QString("Couldn't add friend with User ID\n\"%1\"").arg(userId));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
 }

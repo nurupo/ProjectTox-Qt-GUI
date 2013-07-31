@@ -30,7 +30,7 @@ FriendRequestDialog::FriendRequestDialog(QWidget *parent, const QString &userId,
     setWindowTitle("Friend request");
 
     QLabel *friendsLabel = new QLabel("Someone wants to make friends with you.", this);
-    QLabel *userIdLabel = new QLabel("User Id:", this);
+    QLabel *userIdLabel = new QLabel("User ID:", this);
     QLineEdit *userIdEdit = new QLineEdit(userId, this);
     userIdEdit->setReadOnly(true);
     QLabel *messageLabel = new QLabel("Friend request message:", this);
