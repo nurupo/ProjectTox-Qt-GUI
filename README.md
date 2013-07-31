@@ -4,7 +4,7 @@
 
 A front end for [ProjectTox Core](https://github.com/irungentoo/ProjectTox-Core) written in Qt5 and C++.
 
-Please note that developent is in very beginning and the project is not ready to use yet.
+Please note that development is very early on and the project is not ready to use yet.
 
 ## Screenshot
 
