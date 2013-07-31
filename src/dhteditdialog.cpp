@@ -34,7 +34,7 @@ DhtEditDialog::DhtEditDialog(QWidget *parent) :
     QLabel* nameLabel = new QLabel("Name:", group);
     nameEdit = new QLineEdit(group);
 
-    QLabel* userIdLabel = new QLabel("User Id:", group);
+    QLabel* userIdLabel = new QLabel("User ID:", group);
     userIdEdit = new QLineEdit(group);
 
     QLabel* addressLabel = new QLabel("IP:", group);
