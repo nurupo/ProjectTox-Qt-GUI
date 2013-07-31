@@ -38,7 +38,7 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
 
     QLabel* messageLabel = new QLabel("Message:", addFriendGroup);
     messageEdit = new QPlainTextEdit(addFriendGroup);
-    messageEdit->setPlainText("Hello, please add me in your friend list.");
+    messageEdit->setPlainText("Hello, please add me to your friend list.");
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
