@@ -1,4 +1,7 @@
 *.aps
 resources/*.aps
-projectfiles/build*/
-projectfiles/QtCreator/*.user*
+
+projectfiles/*
+!projectfiles/QtCreator/TOX-Qt-GUI.pro
+
+submodules/*
