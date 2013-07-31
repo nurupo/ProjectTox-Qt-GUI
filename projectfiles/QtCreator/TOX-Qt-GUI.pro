@@ -15,9 +15,12 @@ CONFIG += c++11
 
 INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/core/
 win32:INCLUDEPATH += ../../libs/sodium/include/
+macx:INCLUDEPATH += /usr/local/include
 
 win32 {
     LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a
+} macx{
+    LIBS += -L/usr/local/lib -lsodium
 } else {
     LIBS += -lsodium
 }
