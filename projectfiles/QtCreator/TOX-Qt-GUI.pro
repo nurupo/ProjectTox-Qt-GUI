@@ -19,10 +19,12 @@ macx:INCLUDEPATH += /usr/local/include
 
 win32 {
     LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a
-} macx{
-    LIBS += -L/usr/local/lib -lsodium
 } else {
-    LIBS += -lsodium
+    macx {
+        LIBS += -L/usr/local/lib -lsodium
+    } else {
+        LIBS += -lsodium
+    }
 }
 
 win32:DEFINES += WIN32
