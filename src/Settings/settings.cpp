@@ -16,6 +16,7 @@
 
 #include "settings.hpp"
 
+#include <QFile>
 #include <QSettings>
 
 const QString Settings::FILENAME = "settings.ini";
@@ -61,7 +62,15 @@ void Settings::load()
         return;
     }
 
-    QSettings s(FILENAME, QSettings::IniFormat);
+    QString sFilename = FILENAME;
+
+    //if no settings file exist -- use the default one
+    QFile sFile(FILENAME);
+    if (!sFile.exists()) {
+        sFilename = ":/texts/" + FILENAME;
+    }
+
+    QSettings s(sFilename, QSettings::IniFormat);
     s.beginGroup("DHT Server");
         int serverListSize = s.beginReadArray("dhtServerList");
         for (int i = 0; i < serverListSize; i ++) {

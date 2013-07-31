@@ -6,5 +6,6 @@
         <file>icons/page_copy.png</file>
         <file>icons/textfield_rename.png</file>
         <file>icons/user_delete.png</file>
+        <file>texts/settings.ini</file>
     </qresource>
 </RCC>

@@ -101,4 +101,4 @@ HEADERS  += \
     ../../submodules/ProjectTox-Core/core/LAN_discovery.h
 
 RESOURCES += \
-    ../../resources/icons.qrc
+    ../../resources/resources.qrc
