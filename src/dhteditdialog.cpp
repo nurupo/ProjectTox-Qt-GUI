@@ -27,20 +27,20 @@ DhtEditDialog::DhtEditDialog(QWidget *parent) :
     QDialog(parent)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowTitle("DHT Settings");
+    setWindowTitle(tr("DHT Settings"));
 
-    QGroupBox* group = new QGroupBox("DHT Settings", this);
+    QGroupBox* group = new QGroupBox(tr("DHT Settings"), this);
 
-    QLabel* nameLabel = new QLabel("Name:", group);
+    QLabel* nameLabel = new QLabel(tr("Name:"), group);
     nameEdit = new QLineEdit(group);
 
-    QLabel* userIdLabel = new QLabel("User ID:", group);
+    QLabel* userIdLabel = new QLabel(tr("User ID:"), group);
     userIdEdit = new QLineEdit(group);
 
-    QLabel* addressLabel = new QLabel("IP:", group);
+    QLabel* addressLabel = new QLabel(tr("IP:"), group);
     addressEdit = new QLineEdit(group);
 
-    QLabel* portLabel = new QLabel("Port:", group);
+    QLabel* portLabel = new QLabel(tr("Port:"), group);
     portSpinBox = new QSpinBox(group);
     portSpinBox->setMaximum(65535);
     portSpinBox->setMinimum(1);
@@ -92,7 +92,7 @@ void DhtEditDialog::accept()
 {
     if (nameEdit->text().length() == 0 || userIdEdit->text().length() == 0 || addressEdit->text().length() == 0) {
         QMessageBox warning(this);
-        warning.setText("Please fill all the fields in.");
+        warning.setText(tr("Please fill all the fields in."));
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
     } else {

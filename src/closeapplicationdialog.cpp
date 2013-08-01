@@ -27,9 +27,9 @@ CloseApplicationDialog::CloseApplicationDialog(QWidget *parent) :
     QDialog(parent)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowTitle("Closing the application");
+    setWindowTitle(tr("Closing the application"));
 
-    QLabel* closeLabel = new QLabel("Do you really want to close the application?");
+    QLabel* closeLabel = new QLabel(tr("Do you really want to close the application?"));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No, Qt::Horizontal, this);
     buttonBox->button(QDialogButtonBox::No)->setDefault(true);

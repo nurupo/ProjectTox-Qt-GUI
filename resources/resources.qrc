@@ -7,5 +7,7 @@
         <file>icons/textfield_rename.png</file>
         <file>icons/user_delete.png</file>
         <file>texts/settings.ini</file>
+        <file>lang/de_DE.qm</file>
+        <file>lang/en_GB.qm</file>
     </qresource>
 </RCC>

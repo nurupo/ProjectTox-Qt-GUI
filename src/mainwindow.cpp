@@ -39,7 +39,11 @@ MainWindow::MainWindow(QWidget* parent)
 
     setGeometry((screenWidth - appWidth) / 2, (screenHeight - appHeight) / 2, appWidth, appHeight);
 
-    setWindowTitle("developers' test version, not for public use");
+    // Translate application
+    appTranslator.load("de_DE", ":/lang/");
+    qApp->installTranslator(&appTranslator);
+
+    setWindowTitle(tr("developers' test version, not for public use"));
 
     QDockWidget* friendDock = new QDockWidget(this);
     friendDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -158,7 +162,7 @@ void MainWindow::onDisconnected()
 void MainWindow::onFailedToRemoveFriend(int friendId)
 {
     QMessageBox critical(this);
-    critical.setText(QString("Couldn't remove friend \"%1\"").arg(friendsWidget->getUsername(friendId)));
+    critical.setText(tr("Couldn't remove friend \"%1\"").arg(friendsWidget->getUsername(friendId)));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
 }
@@ -166,7 +170,7 @@ void MainWindow::onFailedToRemoveFriend(int friendId)
 void MainWindow::onFailedToAddFriend(const QString& userId)
 {
     QMessageBox critical(this);
-    critical.setText(QString("Couldn't add friend with User ID\n\"%1\"").arg(userId));
+    critical.setText(tr("Couldn't add friend with User ID\n\"%1\"").arg(userId));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
 }

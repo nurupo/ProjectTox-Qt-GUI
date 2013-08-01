@@ -102,3 +102,7 @@ HEADERS  += \
 
 RESOURCES += \
     ../../resources/resources.qrc
+
+TRANSLATIONS += \
+    ../../resources/lang/de_DE.ts \
+    ../../resources/lang/en_GB.ts
