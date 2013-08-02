@@ -50,7 +50,7 @@ git clone --recursive git://github.com/nurupo/ProjectTox-Qt-GUI.git
 cd ProjectTox-Qt-GUI
 ```
 
-Then download and extract [this archive containing precompiled binaries of libsodium 0.4.2 for Windows](https://download.libsodium.org/libsodium/releases/libsodium-win32-0.4.2.tar.gz) at `ProjectTox-Qt-GUI\libs\`, so that `TOX-Qt-GUI\libs\sodium\include` becomes a valid path. Note that tThere is no `libs` folder, you should create one.
+Then download and extract [this archive containing precompiled binaries of libsodium 0.4.2 for Windows](https://download.libsodium.org/libsodium/releases/libsodium-win32-0.4.2.tar.gz) at `ProjectTox-Qt-GUI\libs\`, so that `TOX-Qt-GUI\libs\sodium\include` becomes a valid path. Note that there is no `libs` folder, you should create one.
 
 Then open the Qt Creator, which should have been installed with Qt, select `File -> Open File or Project...` and open the project file at `ProjectTox-Qt-GUI\projectfiles\QtCreator\TOX-Qt-GUI.pro`, click on `Configure Project`.
 After that find `Debug` on **bottom** left and switch it to `Release`.
