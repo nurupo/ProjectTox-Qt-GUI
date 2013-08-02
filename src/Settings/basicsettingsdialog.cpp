@@ -15,11 +15,13 @@
 */
 
 #include "basicsettingsdialog.hpp"
+#include "customhintlistwidget.hpp"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QListWidgetItem>
 #include <QPushButton>
+#include <QSplitter>
 
 BasicSettingsDialog::BasicSettingsDialog(QWidget *parent) :
     QDialog(parent)
@@ -28,7 +30,8 @@ BasicSettingsDialog::BasicSettingsDialog(QWidget *parent) :
 
     QGridLayout* dialogLayout = new QGridLayout(this);
 
-    listWidget = new QListWidget(this);
+    listWidget = new CustomHintListWidget(this, QSize(10, 10));
+    listWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     listWidget->setIconSize(QSize(24, 24));
 
     stackedWidget = new QStackedWidget(this);
@@ -39,9 +42,12 @@ BasicSettingsDialog::BasicSettingsDialog(QWidget *parent) :
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-    dialogLayout->addWidget(listWidget,     0, 0, 1, 1);
-    dialogLayout->addWidget(stackedWidget,  0, 1, 1, 1);
-    dialogLayout->addWidget(buttonBox,      1, 0, 1, 2);
+    QSplitter* splitter = new QSplitter(this);
+    splitter->addWidget(listWidget);
+    splitter->addWidget(stackedWidget);
+
+    dialogLayout->addWidget(splitter,   0, 0, 1, 1);
+    dialogLayout->addWidget(buttonBox,  1, 0, 1, 1);
 
     connect(listWidget, &QListWidget::currentRowChanged, stackedWidget, &QStackedWidget::setCurrentIndex);
 }

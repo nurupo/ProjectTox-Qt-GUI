@@ -24,6 +24,7 @@
 #include <QDesktopWidget>
 #include <QDockWidget>
 #include <QHBoxLayout>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QStackedWidget>
 
@@ -40,6 +41,17 @@ MainWindow::MainWindow(QWidget* parent)
     setGeometry((screenWidth - appWidth) / 2, (screenHeight - appHeight) / 2, appWidth, appHeight);
 
     setWindowTitle("developers' test version, not for public use");
+
+    QMenuBar* menu = new QMenuBar(this);
+    setMenuBar(menu);
+    setContextMenuPolicy(Qt::PreventContextMenu);
+
+    QMenu* toolsMenu = menu->addMenu("Tools");
+
+    QAction* settingsAction = new QAction(QIcon(":/icons/setting_tools.png"), "Settings", this);
+    connect(settingsAction, &QAction::triggered, this, &MainWindow::onSettingsActionTriggered);
+
+    toolsMenu->addActions(QList<QAction*>() << settingsAction);
 
     QDockWidget* friendDock = new QDockWidget(this);
     friendDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -169,4 +181,9 @@ void MainWindow::onFailedToAddFriend(const QString& userId)
     critical.setText(QString("Couldn't add friend with User ID\n\"%1\"").arg(userId));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
+}
+
+void MainWindow::onSettingsActionTriggered()
+{
+    Settings::getInstance().executeSettingsDialog(this);
 }

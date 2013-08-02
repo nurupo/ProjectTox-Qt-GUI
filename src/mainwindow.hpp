@@ -48,6 +48,7 @@ private slots:
     void onFriendStatusChanged(int friendId, Core::FriendStatus status);
     void onFailedToRemoveFriend(int friendId);
     void onFailedToAddFriend(const QString& userId);
+    void onSettingsActionTriggered();
 
 signals:
     void friendRequestAccepted(const QString &userId);

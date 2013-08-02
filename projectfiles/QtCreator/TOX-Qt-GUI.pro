@@ -52,9 +52,12 @@ SOURCES += \
     ../../src/Settings/abstractsettingspage.cpp \
     ../../src/Settings/basicsettingsdialog.cpp \
     ../../src/Settings/settings.cpp \
-    ../../src/dhteditdialog.cpp \
     ../../src/closeapplicationdialog.cpp \
-    ../../src/starter.cpp
+    ../../src/starter.cpp \
+    ../../src/Settings/settingsdialog.cpp \
+    ../../src/Settings/dhtbootstrapsettingspage.cpp \
+    ../../src/Settings/dhtserverdialog.cpp \
+    ../../src/Settings/customhintlistwidget.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -78,9 +81,12 @@ HEADERS  += \
     ../../src/Settings/abstractsettingspage.hpp \
     ../../src/Settings/basicsettingsdialog.hpp \
     ../../src/Settings/settings.hpp \
-    ../../src/dhteditdialog.hpp \
     ../../src/closeapplicationdialog.hpp \
-    ../../src/starter.hpp
+    ../../src/starter.hpp \
+    ../../src/Settings/settingsdialog.hpp \
+    ../../src/Settings/dhtbootstrapsettingspage.hpp \
+    ../../src/Settings/dhtserverdialog.hpp \
+    ../../src/Settings/customhintlistwidget.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \

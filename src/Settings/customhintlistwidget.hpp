@@ -14,33 +14,20 @@
     See the COPYING file for more details.
 */
 
-#ifndef DHTEDITDIALOG_HPP
-#define DHTDIALOG_HPP
+#ifndef CUSTOMHINTLISTWIDGET_HPP
+#define CUSTOMHINTLISTWIDGET_HPP
 
-#include "Settings/settings.hpp"
+#include <QListWidget>
 
-#include <QDialog>
-#include <QLineEdit>
-#include <QSpinBox>
-
-class DhtEditDialog : public QDialog
+class CustomHintListWidget : public QListWidget
 {
-    Q_OBJECT
 public:
-    explicit DhtEditDialog(QWidget *parent = 0);
-
-    void setServerInformation(const Settings::DhtServer& server);
-    Settings::DhtServer getServerInformation() const;
+    CustomHintListWidget(QWidget* parent, QSize startingSize);
+    QSize sizeHint() const;
 
 private:
-    QLineEdit *nameEdit;
-    QLineEdit *userIdEdit;
-    QLineEdit *addressEdit;
-    QSpinBox *portSpinBox;
-
-public slots:
-    void accept();
+    QSize startingSize;
     
 };
 
-#endif // DHTEDITDIALOG_HPP
+#endif // CUSTOMHINTLISTWIDGET_HPP
