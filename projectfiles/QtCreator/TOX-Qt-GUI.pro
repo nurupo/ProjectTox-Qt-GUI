@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui quick
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -52,7 +52,8 @@ SOURCES += \
     ../../src/Settings/settings.cpp \
     ../../src/dhteditdialog.cpp \
     ../../src/closeapplicationdialog.cpp \
-    ../../src/starter.cpp
+    ../../src/starter.cpp \
+    ../../src/coreqml.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -78,7 +79,8 @@ HEADERS  += \
     ../../src/Settings/settings.hpp \
     ../../src/dhteditdialog.hpp \
     ../../src/closeapplicationdialog.hpp \
-    ../../src/starter.hpp
+    ../../src/starter.hpp \
+    ../../src/coreqml.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \
@@ -99,4 +101,8 @@ HEADERS  += \
     ../../submodules/ProjectTox-Core/core/LAN_discovery.h
 
 RESOURCES += \
-    ../../resources/icons.qrc
+    ../../resources/icons.qrc \
+    ../../resources/qml.qrc
+
+OTHER_FILES += \
+    ../../resources/qml/window/main.qml

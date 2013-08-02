@@ -26,7 +26,6 @@ class Core : public QObject
     Q_OBJECT
 public:
     explicit Core();
-    void start();
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
@@ -83,6 +82,8 @@ private:
     };
 
 public slots:
+    void start();
+
     void acceptFirendRequest(const QString& userId);
     void requestFriendship(const QString& userId, const QString& message);
 

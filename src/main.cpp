@@ -14,12 +14,27 @@
     See the COPYING file for more details.
 */
 
-#include "starter.hpp"
+//#define USEQML
 #include <QApplication>
+#ifdef USEQML
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include "coreqml.hpp"
+#elif
+#include "starter.hpp"
+#endif
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+#ifdef USEQML
+    CoreQml coreQml;
+    QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("coreQml", &coreQml);
+    engine.load(QUrl("qrc:/qml/window/main.qml"));
+
+#elif
     Starter s;
+#endif
     return a.exec();
 }
