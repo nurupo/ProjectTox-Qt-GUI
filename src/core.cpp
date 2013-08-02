@@ -167,7 +167,7 @@ void Core::start()
     m_callback_friendmessage(onFriendMessage);
     m_callback_namechange(onFriendNameChange);
 
-    emit userIdGererated(CUserId::toString(self_public_key));
+    emit userIdGenerated(CUserId::toString(self_public_key));
 
     CString cUsername(Settings::getInstance().getUsername());
     setname(cUsername.data(), cUsername.size());
