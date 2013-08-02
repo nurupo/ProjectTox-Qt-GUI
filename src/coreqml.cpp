@@ -20,7 +20,7 @@ CoreQml::CoreQml(QObject *parent) :
 
     //connect(core, &Core::connected, this, &CoreQml::m_connected);
     //connect(core, &Core::disconnected, this, &CoreQml::m_disconnected);
-    connect(core, &Core::userIdGererated, this, &CoreQml::m_useridgenerated);
+    connect(core, &Core::userIdGenerated, this, &CoreQml::m_useridgenerated);
     connect(core, &Core::friendAdded, this, &CoreQml::m_friendadded);
     connect(core, &Core::friendRemoved, this, &CoreQml::m_friendremoved);
 }

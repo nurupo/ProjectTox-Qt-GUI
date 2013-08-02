@@ -20,7 +20,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "coreqml.hpp"
-#elif
+#else
 #include "starter.hpp"
 #endif
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("coreQml", &coreQml);
     engine.load(QUrl("qrc:/qml/window/main.qml"));
 
-#elif
+#else
     Starter s;
 #endif
     return a.exec();

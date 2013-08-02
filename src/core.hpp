@@ -108,7 +108,7 @@ signals:
 
     void friendUsernameChanged(int friendId, const QString& username);
 
-    void userIdGererated(const QString& userId);
+    void userIdGenerated(const QString& userId);
 
     void friendRemoved(int friendId);
 
