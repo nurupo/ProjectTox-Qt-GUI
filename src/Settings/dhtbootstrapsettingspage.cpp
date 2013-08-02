@@ -23,7 +23,7 @@
 #include <QVBoxLayout>
 
 DhtBootstrapSettingsPage::DhtBootstrapSettingsPage(QWidget* parent) :
-     AbstractSettingsPage(parent)
+    AbstractSettingsPage(parent), serverListIsDirty(false)
 {
 }
 
@@ -84,6 +84,10 @@ void DhtBootstrapSettingsPage::setGui()
 
 void DhtBootstrapSettingsPage::applyChanges()
 {
+    if (!serverListIsDirty) {
+        return;
+    }
+
     Settings& settings = Settings::getInstance();
     QList<Settings::DhtServer> serverList;
 
@@ -109,6 +113,7 @@ void DhtBootstrapSettingsPage::serverAddButtonClicked()
         serverListModel->appendRow(name);
         serverListView->setCurrentIndex(serverListModel->indexFromItem(name));
         serverListModel->sort(0, Qt::AscendingOrder);
+        serverListIsDirty = true;
     }
 }
 
@@ -119,6 +124,7 @@ void DhtBootstrapSettingsPage::serverRemoveButtonClicked()
         QList<QStandardItem*> removedRow = serverListModel->takeRow(currentIndex.row());
         serverHash.remove(removedRow.at(0)->data().toInt());
         qDeleteAll(removedRow);
+        serverListIsDirty = true;
     }
 }
 
@@ -138,5 +144,6 @@ void DhtBootstrapSettingsPage::serverEditButtonClicked()
         serverListModel->setData(currentIndex, newServerInfo.name);
         serverHash[id] = newServerInfo;
         serverListModel->sort(0, Qt::AscendingOrder);
+        serverListIsDirty = true;
     }
 }

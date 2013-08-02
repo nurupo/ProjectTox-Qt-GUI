@@ -36,6 +36,7 @@ Core::Core() :
     core = this;
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Core::process);
+    connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
 }
 
 void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize)

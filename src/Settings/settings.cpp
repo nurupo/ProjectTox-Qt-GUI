@@ -121,7 +121,7 @@ void Settings::executeSettingsDialog(QWidget* parent)
     SettingsDialog dialog(parent);
     if (dialog.exec() == QDialog::Accepted) {
         save();
-        emit dataChanged();
+        //emit dataChanged();
     }
 }
 
@@ -133,6 +133,7 @@ const QList<Settings::DhtServer>& Settings::getDhtServerList() const
 void Settings::setDhtServerList(const QList<DhtServer>& newDhtServerList)
 {
     dhtServerList = newDhtServerList;
+    emit dhtServerListChanged();
 }
 
 QString Settings::getUsername() const

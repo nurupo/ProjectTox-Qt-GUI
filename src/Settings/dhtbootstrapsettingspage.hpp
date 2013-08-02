@@ -40,6 +40,7 @@ private:
     QStandardItemModel* serverListModel;
     QSortFilterProxyModel* serverListProxyModel;
     QTreeView* serverListView;
+    bool serverListIsDirty;
 
 private slots:
     void serverAddButtonClicked();

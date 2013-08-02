@@ -37,7 +37,6 @@ private:
 
     void checkFriendsStatus();
     void checkConnection();
-    void bootstrapDht();
 
     QTimer* timer;
     QList<int> friendIdList;
@@ -93,6 +92,8 @@ public slots:
     void setUsername(const QString& username);
 
     void process();
+
+    void bootstrapDht();
 
 signals:
     void connected();

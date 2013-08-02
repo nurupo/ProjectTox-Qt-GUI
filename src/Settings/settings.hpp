@@ -63,7 +63,8 @@ public:
     QString username;
 
 signals:
-    void dataChanged();
+    //void dataChanged();
+    void dhtServerListChanged();
 
 };
 
