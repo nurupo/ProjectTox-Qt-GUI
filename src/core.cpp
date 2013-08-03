@@ -141,6 +141,9 @@ void Core::bootstrapDht()
     for (const Settings::DhtServer& dhtServer : dhtServerList) {
         bootstrapIpPort.port = htons(dhtServer.port);
         bootstrapIpPort.ip.i = resolve_addr(dhtServer.address.toLatin1().data());
+        if (bootstrapIpPort.ip.i == 0) {
+            continue;
+        }
 
         DHT_bootstrap(bootstrapIpPort, CUserId(dhtServer.userId).data());
     }
