@@ -1,7 +1,10 @@
 #ifndef GUISETTINGSPAGE_H
 #define GUISETTINGSPAGE_H
 
+#include "settings.hpp"
 #include "abstractsettingspage.hpp"
+
+class QComboBox;
 
 class GuiSettingsPage : public AbstractSettingsPage
 {
@@ -17,6 +20,8 @@ signals:
     
 public slots:
     
+private:
+    QComboBox *langCombo;
 };
 
 #endif // GUISETTINGSPAGE_H

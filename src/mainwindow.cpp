@@ -20,6 +20,8 @@
 #include "friendrequestdialog.hpp"
 #include "dhtdialog.hpp"
 
+#include "Settings/settings.hpp"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QDockWidget>
@@ -41,7 +43,8 @@ MainWindow::MainWindow(QWidget* parent)
     setGeometry((screenWidth - appWidth) / 2, (screenHeight - appHeight) / 2, appWidth, appHeight);
 
     // Translate application
-    appTranslator.load("de_DE", ":/lang/");
+    const Settings& settings = Settings::getInstance();
+    appTranslator.load(settings.getGuiLanguage().toString(), ":/lang/");
     qApp->installTranslator(&appTranslator);
 
     setWindowTitle(tr("developers' test version, not for public use"));

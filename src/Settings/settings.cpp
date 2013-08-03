@@ -19,6 +19,7 @@
 
 #include <QFile>
 #include <QSettings>
+#include <QVariant>
 
 const QString Settings::FILENAME = "settings.ini";
 
@@ -90,6 +91,10 @@ void Settings::load()
         username = s.value("username", "My name").toString();
     s.endGroup();
 
+    s.beginGroup("GUI");
+        guiLanguage = s.value("language", QVariant("en_GB"));
+    s.endGroup();
+
     loaded = true;
 }
 
@@ -113,6 +118,10 @@ void Settings::save()
 
     s.beginGroup("General");
         s.setValue("username", username);
+    s.endGroup();
+
+    s.beginGroup("GUI");
+        s.setValue("language", guiLanguage);
     s.endGroup();
 }
 
@@ -144,4 +153,15 @@ QString Settings::getUsername() const
 void Settings::setUsername(const QString& newUsername)
 {
     username = newUsername;
+}
+
+QVariant Settings::getGuiLanguage() const
+{
+    return guiLanguage;
+}
+
+void Settings::setGUILanguage(const QVariant &language)
+{
+    guiLanguage = language;
+    emit guiLanguageChanged();
 }

@@ -11,5 +11,8 @@
         <file>lang/en_GB.qm</file>
         <file>icons/server.png</file>
         <file>icons/setting_tools.png</file>
+        <file>icons/application_side_list.png</file>
+        <file>icons/flag_germany.png</file>
+        <file>icons/flag_great_britain.png</file>
     </qresource>
 </RCC>

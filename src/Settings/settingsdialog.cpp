@@ -15,6 +15,8 @@
 */
 
 #include "dhtbootstrapsettingspage.hpp"
+#include "guisettingspage.h"
+
 #include "settingsdialog.hpp"
 
 SettingsDialog::SettingsDialog(QWidget* parent) :
@@ -23,6 +25,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     setWindowTitle("Settings");
 
     addPage(":/icons/server.png", "DHT Bootstrap", new DhtBootstrapSettingsPage(this));
+    addPage(":/icons/application_side_list.png", "GUI", new GuiSettingsPage(this));
 
     listWidget->setMinimumWidth(130);
     setMinimumSize(450, 325);

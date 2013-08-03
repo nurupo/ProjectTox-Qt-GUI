@@ -19,6 +19,8 @@
 
 #include <QMainWindow>
 
+#include <QVariant>
+
 class Settings : public QObject
 {
     Q_OBJECT
@@ -56,6 +58,9 @@ public:
     QString getUsername() const;
     void setUsername(const QString& newUsername);
 
+    QVariant getGuiLanguage() const;
+    void setGUILanguage(const QVariant &language);
+
     QList<DhtServer> dhtServerList;
     int dhtServerId;
     bool dontShowDhtDialog;
@@ -65,7 +70,10 @@ public:
 signals:
     //void dataChanged();
     void dhtServerListChanged();
+    void guiLanguageChanged();
 
+private:
+    QVariant guiLanguage;
 };
 
 #endif // SETTINGS_HPP
