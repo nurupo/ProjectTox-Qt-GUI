@@ -21,6 +21,11 @@
 #include <QSettings>
 
 const QString Settings::FILENAME = "settings.ini";
+// Loading info about logs should be changed to deal with having more languages
+// possibly stored in other files.
+const QString Settings::ABOUTLOGS = ":/texts/logging1.txt";
+const optKeyCode Settings::STORE_LOGS_OPT = 1;
+const optKeyCode Settings::ENCRYPT_LOGS_OPT = 2;
 
 Settings::Settings() :
     loaded(false)
@@ -86,6 +91,11 @@ void Settings::load()
         s.endArray();
     s.endGroup();
 
+    s.beginGroup("Log Storage");
+        logOpts[Settings::STORE_LOGS_OPT] = s.value("storeLogs").toBool();
+        logOpts[Settings::ENCRYPT_LOGS_OPT] = s.value("encryptLogs").toBool();
+    s.endGroup();
+
     s.beginGroup("General");
         username = s.value("username", "My name").toString();
     s.endGroup();
@@ -109,6 +119,11 @@ void Settings::save()
             s.setValue("port", dhtServerList[i].port);
         }
         s.endArray();
+    s.endGroup();
+
+    s.beginGroup("Log Storage");
+        s.setValue("storeLogs", logOpts[Settings::STORE_LOGS_OPT]);
+        s.setValue("encryptLogs", logOpts[Settings::ENCRYPT_LOGS_OPT]);
     s.endGroup();
 
     s.beginGroup("General");
@@ -144,4 +159,24 @@ QString Settings::getUsername() const
 void Settings::setUsername(const QString& newUsername)
 {
     username = newUsername;
+}
+
+void Settings::setStoreLogsSetting(bool newValue)
+{
+    logOpts[Settings::STORE_LOGS_OPT] = newValue;
+}
+
+void Settings::setEncryptLogsSetting(bool newValue)
+{
+    logOpts[Settings::ENCRYPT_LOGS_OPT] = newValue;
+}
+
+bool Settings::getStoreLogsSetting() const
+{
+    return logOpts[Settings::STORE_LOGS_OPT];
+}
+
+bool Settings::getEncryptLogsSetting() const
+{
+    return logOpts[Settings::ENCRYPT_LOGS_OPT];
 }
