@@ -54,7 +54,8 @@ SOURCES += \
     ../../src/Settings/settings.cpp \
     ../../src/dhteditdialog.cpp \
     ../../src/closeapplicationdialog.cpp \
-    ../../src/starter.cpp
+    ../../src/starter.cpp \
+    ../../src/Settings/guisettingspage.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -80,7 +81,8 @@ HEADERS  += \
     ../../src/Settings/settings.hpp \
     ../../src/dhteditdialog.hpp \
     ../../src/closeapplicationdialog.hpp \
-    ../../src/starter.hpp
+    ../../src/starter.hpp \
+    ../../src/Settings/guisettingspage.h
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \
