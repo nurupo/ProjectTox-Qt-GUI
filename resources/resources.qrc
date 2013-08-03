@@ -11,5 +11,6 @@
         <file>icons/setting_tools.png</file>
         <file>icons/database_gear.png</file>
         <file>texts/logging1.txt</file>
+        <file>icons/help.png</file>
     </qresource>
 </RCC>

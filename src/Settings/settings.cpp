@@ -21,6 +21,9 @@
 #include <QSettings>
 
 const QString Settings::FILENAME = "settings.ini";
+// Loading info about logs should be changed to deal with having more languages
+// possibly stored in other files.
+const QString Settings::ABOUTLOGS = ":/texts/logging1.txt";
 const optKeyCode Settings::STORE_LOGS_OPT = 1;
 const optKeyCode Settings::ENCRYPT_LOGS_OPT = 2;
 
@@ -88,14 +91,9 @@ void Settings::load()
         s.endArray();
     s.endGroup();
 
-    // Order is important.
     s.beginGroup("Log Storage");
-    s.beginReadArray("logOpts");
-        s.setArrayIndex(0);
-        logOpts[Settings::STORE_LOGS_OPT] = s.value("value").toBool();
-        s.setArrayIndex(1);
-        logOpts[Settings::ENCRYPT_LOGS_OPT] = s.value("value").toBool();
-        s.endArray();
+        logOpts[Settings::STORE_LOGS_OPT] = s.value("storeLogs").toBool();
+        logOpts[Settings::ENCRYPT_LOGS_OPT] = s.value("encryptLogs").toBool();
     s.endGroup();
 
     s.beginGroup("General");
@@ -123,14 +121,9 @@ void Settings::save()
         s.endArray();
     s.endGroup();
 
-    // Order is important.
     s.beginGroup("Log Storage");
-        s.beginWriteArray("logOpts", logOpts.size());
-        s.setArrayIndex(0);
-        s.setValue("value", logOpts[Settings::STORE_LOGS_OPT]);
-        s.setArrayIndex(1);
-        s.setValue("value", logOpts[Settings::ENCRYPT_LOGS_OPT]);
-        s.endArray();
+        s.setValue("storeLogs", logOpts[Settings::STORE_LOGS_OPT]);
+        s.setValue("encryptLogs", logOpts[Settings::ENCRYPT_LOGS_OPT]);
     s.endGroup();
 
     s.beginGroup("General");
@@ -168,26 +161,22 @@ void Settings::setUsername(const QString& newUsername)
     username = newUsername;
 }
 
-bool Settings::storeLogsSetting(bool newValue)
+void Settings::setStoreLogsSetting(bool newValue)
 {
-    bool oldValue = logOpts[Settings::STORE_LOGS_OPT];
     logOpts[Settings::STORE_LOGS_OPT] = newValue;
-    return oldValue;
 }
 
-bool Settings::encryptLogsSetting(bool newValue)
+void Settings::setEncryptLogsSetting(bool newValue)
 {
-    bool oldValue = logOpts[Settings::ENCRYPT_LOGS_OPT];
     logOpts[Settings::ENCRYPT_LOGS_OPT] = newValue;
-    return oldValue;
 }
 
-bool Settings::storeLogsSetting() const
+bool Settings::getStoreLogsSetting() const
 {
     return logOpts[Settings::STORE_LOGS_OPT];
 }
 
-bool Settings::encryptLogsSetting() const
+bool Settings::getEncryptLogsSetting() const
 {
     return logOpts[Settings::ENCRYPT_LOGS_OPT];
 }

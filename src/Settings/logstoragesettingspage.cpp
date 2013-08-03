@@ -36,40 +36,42 @@ void LogStorageSettingsPage::buildGui()
 
 void LogStorageSettingsPage::setGui()
 {
+    const Settings& settings = Settings::getInstance();
+    QFile storing(Settings::ABOUTLOGS);
+    QString storeLogMsg;
+
+    storeLogsBox->setChecked(settings.getStoreLogsSetting());
+    encryptLogsBox->setChecked(settings.getEncryptLogsSetting());
+
+    if (!storing.open(QIODevice::ReadOnly)) {
+        storeLogMsg = "No information about log storage and encryption available.";
+    } else {
+        storeLogMsg = QString(storing.readAll());
+    }
+    storing.close();
+    this->layout()->addWidget(new QLabel(storeLogMsg));
 }
 
 void LogStorageSettingsPage::applyChanges()
 {
     Settings& settings = Settings::getInstance();
-    settings.storeLogsSetting(storeLogsBox->isChecked());
-    settings.encryptLogsSetting(encryptLogsBox->isChecked());
+    settings.setStoreLogsSetting(storeLogsBox->isChecked());
+    settings.setEncryptLogsSetting(encryptLogsBox->isChecked());
 }
 
 QGroupBox* LogStorageSettingsPage::buildLogSettingsGroup()
 {
     QGroupBox* checkBoxGroup = new QGroupBox("Log Storage/Encryption", this);
     QVBoxLayout* layout = new QVBoxLayout(checkBoxGroup);
-    QString storeLogMsg;
-    Settings& settings = Settings::getInstance();
-
-    QFile storing(":/texts/logging1.txt");
-    if (!storing.open(QIODevice::ReadOnly))
-        storeLogMsg = "No information about log storage and encryption available.";
-    else
-        storeLogMsg = QString(storing.readAll());
-    storing.close();
 
     storeLogsBox = new QCheckBox("Store logs", checkBoxGroup);
     encryptLogsBox = new QCheckBox("Encrypt logs", checkBoxGroup);
-    storeLogsBox->setChecked(settings.storeLogsSetting());
-    encryptLogsBox->setChecked(settings.encryptLogsSetting());
 
     connect(storeLogsBox,   &QCheckBox::clicked, this, &LogStorageSettingsPage::storeLogsBoxClicked);
     connect(encryptLogsBox, &QCheckBox::clicked, this, &LogStorageSettingsPage::encryptLogsBoxClicked);
 
     layout->addWidget(storeLogsBox);
     layout->addWidget(encryptLogsBox);
-    layout->addWidget(new QLabel(storeLogMsg));
 
     return checkBoxGroup;
 }
@@ -86,6 +88,7 @@ void LogStorageSettingsPage::storeLogsBoxClicked()
 
 void LogStorageSettingsPage::encryptLogsBoxClicked()
 {
-    if (!storeLogsBox->isChecked())
+    if (!storeLogsBox->isChecked()) {
         encryptLogsBox->setChecked(false);
+    }
 }
