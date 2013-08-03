@@ -15,6 +15,7 @@
 */
 
 #include "dhtbootstrapsettingspage.hpp"
+#include "logstoragesettingspage.hpp"
 #include "settingsdialog.hpp"
 
 SettingsDialog::SettingsDialog(QWidget* parent) :
@@ -23,6 +24,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     setWindowTitle("Settings");
 
     addPage(":/icons/server.png", "DHT Bootstrap", new DhtBootstrapSettingsPage(this));
+    addPage(":/icons/database_gear.png", "Log Storage", new LogStorageSettingsPage(this));
 
     listWidget->setMinimumWidth(130);
     setMinimumSize(450, 325);
