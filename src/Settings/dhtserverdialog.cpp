@@ -14,7 +14,7 @@
     See the COPYING file for more details.
 */
 
-#include "dhteditdialog.hpp"
+#include "dhtserverdialog.hpp"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -22,8 +22,9 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegularExpression>
 
-DhtEditDialog::DhtEditDialog(QWidget *parent) :
+DhtServerDialog::DhtServerDialog(QWidget* parent) :
     QDialog(parent)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -49,8 +50,8 @@ DhtEditDialog::DhtEditDialog(QWidget *parent) :
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok , Qt::Horizontal, this);
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &DhtEditDialog::accept);
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &DhtEditDialog::reject);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DhtServerDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DhtServerDialog::reject);
 
     QGridLayout* groupLayout = new QGridLayout(group);
 
@@ -68,15 +69,17 @@ DhtEditDialog::DhtEditDialog(QWidget *parent) :
     layout->addWidget(buttonBox);
 }
 
-void DhtEditDialog::setServerInformation(const Settings::DhtServer& server)
+void DhtServerDialog::setServerInformation(const Settings::DhtServer& server)
 {
     nameEdit->setText(server.name);
     userIdEdit->setText(server.userId);
     addressEdit->setText(server.address);
     portSpinBox->setValue(server.port);
+
+    userIdEdit->setCursorPosition(0);
 }
 
-Settings::DhtServer DhtEditDialog::getServerInformation() const
+Settings::DhtServer DhtServerDialog::getServerInformation() const
 {
     Settings::DhtServer server;
 
@@ -88,11 +91,18 @@ Settings::DhtServer DhtEditDialog::getServerInformation() const
     return server;
 }
 
-void DhtEditDialog::accept()
+void DhtServerDialog::accept()
 {
+    const QRegularExpression hexRegExp("^[A-Fa-f0-9]+$");
+
     if (nameEdit->text().length() == 0 || userIdEdit->text().length() == 0 || addressEdit->text().length() == 0) {
         QMessageBox warning(this);
         warning.setText(tr("Please fill all the fields in."));
+        warning.setIcon(QMessageBox::Warning);
+        warning.exec();
+    } else if (userIdEdit->text().length() != 64 || !userIdEdit->text().contains(hexRegExp)) {
+        QMessageBox warning(this);
+        warning.setText("Please enter a valid User ID.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
     } else {

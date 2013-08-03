@@ -24,6 +24,7 @@
 #include <QDesktopWidget>
 #include <QDockWidget>
 #include <QHBoxLayout>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QStackedWidget>
 
@@ -44,6 +45,17 @@ MainWindow::MainWindow(QWidget* parent)
     qApp->installTranslator(&appTranslator);
 
     setWindowTitle(tr("developers' test version, not for public use"));
+
+    QMenuBar* menu = new QMenuBar(this);
+    setMenuBar(menu);
+    setContextMenuPolicy(Qt::PreventContextMenu);
+
+    QMenu* toolsMenu = menu->addMenu("Tools");
+
+    QAction* settingsAction = new QAction(QIcon(":/icons/setting_tools.png"), "Settings", this);
+    connect(settingsAction, &QAction::triggered, this, &MainWindow::onSettingsActionTriggered);
+
+    toolsMenu->addActions(QList<QAction*>() << settingsAction);
 
     QDockWidget* friendDock = new QDockWidget(this);
     friendDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -81,7 +93,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
     connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
     connect(core, &Core::friendStatusChanged, this, &MainWindow::onFriendStatusChanged);
-    connect(core, &Core::userIdGererated, ourUserItem, &OurUserItemWidget::setUserId);
+    connect(core, &Core::userIdGenerated, ourUserItem, &OurUserItemWidget::setUserId);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
@@ -173,4 +185,9 @@ void MainWindow::onFailedToAddFriend(const QString& userId)
     critical.setText(tr("Couldn't add friend with User ID\n\"%1\"").arg(userId));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
+}
+
+void MainWindow::onSettingsActionTriggered()
+{
+    Settings::getInstance().executeSettingsDialog(this);
 }

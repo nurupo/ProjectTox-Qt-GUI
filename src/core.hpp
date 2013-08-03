@@ -37,7 +37,6 @@ private:
 
     void checkFriendsStatus();
     void checkConnection();
-    void bootstrapDht();
 
     QTimer* timer;
     QList<int> friendIdList;
@@ -94,6 +93,8 @@ public slots:
 
     void process();
 
+    void bootstrapDht();
+
 signals:
     void connected();
     void disconnected();
@@ -107,7 +108,7 @@ signals:
 
     void friendUsernameChanged(int friendId, const QString& username);
 
-    void userIdGererated(const QString& userId);
+    void userIdGenerated(const QString& userId);
 
     void friendRemoved(int friendId);
 

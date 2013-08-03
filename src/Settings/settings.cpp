@@ -15,6 +15,7 @@
 */
 
 #include "settings.hpp"
+#include "settingsdialog.hpp"
 
 #include <QFile>
 #include <QSettings>
@@ -95,8 +96,11 @@ void Settings::load()
 void Settings::save()
 {
     QSettings s(FILENAME, QSettings::IniFormat);
+
+    s.clear();
+
     s.beginGroup("DHT Server");
-        s.beginWriteArray("dhtServerList");
+        s.beginWriteArray("dhtServerList", dhtServerList.size());
         for (int i = 0; i < dhtServerList.size(); i ++) {
             s.setArrayIndex(i);
             s.setValue("name", dhtServerList[i].name);
@@ -114,11 +118,11 @@ void Settings::save()
 
 void Settings::executeSettingsDialog(QWidget* parent)
 {
-    /*SettingsDialog dialog(parent);
+    SettingsDialog dialog(parent);
     if (dialog.exec() == QDialog::Accepted) {
         save();
-        emit dataChanged();
-    }*/
+        //emit dataChanged();
+    }
 }
 
 const QList<Settings::DhtServer>& Settings::getDhtServerList() const
@@ -129,6 +133,7 @@ const QList<Settings::DhtServer>& Settings::getDhtServerList() const
 void Settings::setDhtServerList(const QList<DhtServer>& newDhtServerList)
 {
     dhtServerList = newDhtServerList;
+    emit dhtServerListChanged();
 }
 
 QString Settings::getUsername() const

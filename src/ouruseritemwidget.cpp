@@ -52,7 +52,8 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameLabel = new QLabel(Settings::getInstance().getUsername(), usernameStackedWidget);
 
     usernameEdit = new RenameEditWidget(usernameStackedWidget, QSize(10, 10));
-    connect(usernameEdit, &QLineEdit::editingFinished, this, &OurUserItemWidget::onUsernameChange);
+    connect(usernameEdit, &QLineEdit::editingFinished,      this, &OurUserItemWidget::onUsernameChange);
+    connect(usernameEdit, &RenameEditWidget::escPressed,    this, &OurUserItemWidget::onUsernameChange);
 
     usernameStackedWidget->addWidget(usernameLabel);
     usernameStackedWidget->addWidget(usernameEdit);

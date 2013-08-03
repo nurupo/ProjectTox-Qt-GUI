@@ -9,5 +9,7 @@
         <file>texts/settings.ini</file>
         <file>lang/de_DE.qm</file>
         <file>lang/en_GB.qm</file>
+        <file>icons/server.png</file>
+        <file>icons/setting_tools.png</file>
     </qresource>
 </RCC>

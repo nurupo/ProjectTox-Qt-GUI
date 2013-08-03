@@ -10,6 +10,10 @@ Please note that development is very early on and the project is not ready to us
 
 ![Hi There](http://i.imgur.com/Wv3lrO7.png "Version 0.1.0 running on Windows 7")
 
+## Building
+
+See [INSTALL.md](INSTALL.md)
+
 ## Contributing
 
 * [Fork the repo](https://help.github.com/articles/fork-a-repo)
