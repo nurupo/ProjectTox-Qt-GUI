@@ -21,6 +21,8 @@
 #include <QSettings>
 
 const QString Settings::FILENAME = "settings.ini";
+const optKeyCode Settings::STORE_LOGS_OPT = 1;
+const optKeyCode Settings::ENCRYPT_LOGS_OPT = 2;
 
 Settings::Settings() :
     loaded(false)
@@ -86,6 +88,16 @@ void Settings::load()
         s.endArray();
     s.endGroup();
 
+    // Order is important.
+    s.beginGroup("Log Storage");
+    s.beginReadArray("logOpts");
+        s.setArrayIndex(0);
+        logOpts[Settings::STORE_LOGS_OPT] = s.value("value").toBool();
+        s.setArrayIndex(1);
+        logOpts[Settings::ENCRYPT_LOGS_OPT] = s.value("value").toBool();
+        s.endArray();
+    s.endGroup();
+
     s.beginGroup("General");
         username = s.value("username", "My name").toString();
     s.endGroup();
@@ -108,6 +120,16 @@ void Settings::save()
             s.setValue("address", dhtServerList[i].address);
             s.setValue("port", dhtServerList[i].port);
         }
+        s.endArray();
+    s.endGroup();
+
+    // Order is important.
+    s.beginGroup("Log Storage");
+        s.beginWriteArray("logOpts", logOpts.size());
+        s.setArrayIndex(0);
+        s.setValue("value", logOpts[Settings::STORE_LOGS_OPT]);
+        s.setArrayIndex(1);
+        s.setValue("value", logOpts[Settings::ENCRYPT_LOGS_OPT]);
         s.endArray();
     s.endGroup();
 
@@ -144,4 +166,28 @@ QString Settings::getUsername() const
 void Settings::setUsername(const QString& newUsername)
 {
     username = newUsername;
+}
+
+bool Settings::storeLogsSetting(bool newValue)
+{
+    bool oldValue = logOpts[Settings::STORE_LOGS_OPT];
+    logOpts[Settings::STORE_LOGS_OPT] = newValue;
+    return oldValue;
+}
+
+bool Settings::encryptLogsSetting(bool newValue)
+{
+    bool oldValue = logOpts[Settings::ENCRYPT_LOGS_OPT];
+    logOpts[Settings::ENCRYPT_LOGS_OPT] = newValue;
+    return oldValue;
+}
+
+bool Settings::storeLogsSetting() const
+{
+    return logOpts[Settings::STORE_LOGS_OPT];
+}
+
+bool Settings::encryptLogsSetting() const
+{
+    return logOpts[Settings::ENCRYPT_LOGS_OPT];
 }

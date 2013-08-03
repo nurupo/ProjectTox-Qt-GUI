@@ -19,6 +19,8 @@
 
 #include <QMainWindow>
 
+typedef char optKeyCode;
+
 class Settings : public QObject
 {
     Q_OBJECT
@@ -35,6 +37,8 @@ public:
     static void loadWindow(QMainWindow* window);
 
     static const QString FILENAME;
+    static const optKeyCode STORE_LOGS_OPT;
+    static const optKeyCode ENCRYPT_LOGS_OPT;
 
     bool loaded;
 
@@ -56,15 +60,22 @@ public:
     QString getUsername() const;
     void setUsername(const QString& newUsername);
 
+    bool storeLogsSetting(bool newValue);
+    bool encryptLogsSetting(bool newValue);
+    bool storeLogsSetting() const;
+    bool encryptLogsSetting() const;
+
     QList<DhtServer> dhtServerList;
     int dhtServerId;
     bool dontShowDhtDialog;
 
     QString username;
+    QHash<optKeyCode, bool> logOpts;
 
 signals:
     //void dataChanged();
     void dhtServerListChanged();
+    void logStorageOptsChanged();
 
 };
 

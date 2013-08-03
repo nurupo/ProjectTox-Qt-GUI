@@ -1,0 +1,7 @@
+If you would like Tox to save your chat history, it is encouraged that you also
+instruct it to encrypt the files it saves.  Not doing so presents a security
+risk as any party with access to these files will be able to read them otherwise.
+Encrypting your logs will not guarantee security against directed attacks or
+from having authorities demand you decrypt your history for them, but it will
+protect you from many other risks such as having a virus steal your log files
+to be read by an attacker.
