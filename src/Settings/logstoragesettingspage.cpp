@@ -30,6 +30,7 @@ void LogStorageSettingsPage::buildGui()
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     QGroupBox* checkBoxGroup = buildLogSettingsGroup();
+
     layout->addWidget(checkBoxGroup);
 }
 
@@ -40,12 +41,8 @@ void LogStorageSettingsPage::setGui()
 void LogStorageSettingsPage::applyChanges()
 {
     Settings& settings = Settings::getInstance();
-    if (settings.storeLogsSetting()) {
-        storeLogsBox->setCheckable(true);
-    } else {
-        encryptLogsBox->setCheckable(false);
-        encryptLogsBox->setChecked(false);
-    }
+    settings.storeLogsSetting(storeLogsBox->isChecked());
+    settings.encryptLogsSetting(encryptLogsBox->isChecked());
 }
 
 QGroupBox* LogStorageSettingsPage::buildLogSettingsGroup()
@@ -53,6 +50,7 @@ QGroupBox* LogStorageSettingsPage::buildLogSettingsGroup()
     QGroupBox* checkBoxGroup = new QGroupBox("Log Storage/Encryption", this);
     QVBoxLayout* layout = new QVBoxLayout(checkBoxGroup);
     QString storeLogMsg;
+    Settings& settings = Settings::getInstance();
 
     QFile storing(":/texts/logging1.txt");
     if (!storing.open(QIODevice::ReadOnly))
@@ -63,6 +61,8 @@ QGroupBox* LogStorageSettingsPage::buildLogSettingsGroup()
 
     storeLogsBox = new QCheckBox("Store logs", checkBoxGroup);
     encryptLogsBox = new QCheckBox("Encrypt logs", checkBoxGroup);
+    storeLogsBox->setChecked(settings.storeLogsSetting());
+    encryptLogsBox->setChecked(settings.encryptLogsSetting());
 
     connect(storeLogsBox,   &QCheckBox::clicked, this, &LogStorageSettingsPage::storeLogsBoxClicked);
     connect(encryptLogsBox, &QCheckBox::clicked, this, &LogStorageSettingsPage::encryptLogsBoxClicked);
@@ -76,26 +76,16 @@ QGroupBox* LogStorageSettingsPage::buildLogSettingsGroup()
 
 void LogStorageSettingsPage::storeLogsBoxClicked()
 {
-    Settings& settings = Settings::getInstance();
-    bool newStoreSetting = !settings.storeLogsSetting();
-
-    settings.storeLogsSetting(newStoreSetting);
-    storeLogsBox->setChecked(newStoreSetting);
-    encryptLogsBox->setCheckable(newStoreSetting);
-    encryptLogsBox->setChecked(false);
+    if (!storeLogsBox->isChecked()) {
+        encryptLogsBox->setChecked(false);
+        encryptLogsBox->setCheckable(false);
+    } else {
+        encryptLogsBox->setCheckable(true);
+    }
 }
 
 void LogStorageSettingsPage::encryptLogsBoxClicked()
 {
-    if (!encryptLogsBox->isCheckable())
-        return;
-
-    Settings& settings = Settings::getInstance();
-    bool newEncryptSetting = !settings.encryptLogsSetting();
-
-    settings.encryptLogsSetting(newEncryptSetting);
-    if (newEncryptSetting) {
-        settings.storeLogsSetting(true);
-        storeLogsBox->setChecked(true);
-    }
+    if (!storeLogsBox->isChecked())
+        encryptLogsBox->setChecked(false);
 }
