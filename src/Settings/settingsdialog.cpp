@@ -22,10 +22,10 @@
 SettingsDialog::SettingsDialog(QWidget* parent) :
     BasicSettingsDialog(parent)
 {
-    setWindowTitle("Settings");
+    setWindowTitle(tr("Settings"));
 
-    addPage(":/icons/server.png", "DHT Bootstrap", new DhtBootstrapSettingsPage(this));
-    addPage(":/icons/application_side_list.png", "GUI", new GuiSettingsPage(this));
+    addPage(":/icons/server.png", tr("DHT Bootstrap"), new DhtBootstrapSettingsPage(this));
+    addPage(":/icons/application_side_list.png", tr("GUI"), new GuiSettingsPage(this));
 
     listWidget->setMinimumWidth(130);
     setMinimumSize(450, 325);

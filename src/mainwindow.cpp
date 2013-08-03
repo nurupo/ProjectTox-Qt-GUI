@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     QMenu* toolsMenu = menu->addMenu("Tools");
 
-    QAction* settingsAction = new QAction(QIcon(":/icons/setting_tools.png"), "Settings", this);
+    QAction* settingsAction = new QAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this);
     connect(settingsAction, &QAction::triggered, this, &MainWindow::onSettingsActionTriggered);
 
     toolsMenu->addActions(QList<QAction*>() << settingsAction);

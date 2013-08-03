@@ -53,37 +53,92 @@
     </message>
 </context>
 <context>
+    <name>DhtBootstrapSettingsPage</name>
+    <message>
+        <location filename="../../src/Settings/dhtbootstrapsettingspage.cpp" line="41"/>
+        <source>DHT Bootstrap Servers</source>
+        <translation>DHT Bootstrap Server</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/dhtbootstrapsettingspage.cpp" line="53"/>
+        <source>Add</source>
+        <translation>Hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/dhtbootstrapsettingspage.cpp" line="54"/>
+        <source>Remove</source>
+        <translation>Entfernen</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/dhtbootstrapsettingspage.cpp" line="55"/>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+</context>
+<context>
     <name>DhtEditDialog</name>
     <message>
-        <location filename="../../src/dhteditdialog.cpp" line="30"/>
-        <location filename="../../src/dhteditdialog.cpp" line="32"/>
+        <source>DHT Settings</source>
+        <translation type="obsolete">DHT Einstellungen</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="obsolete">Name:</translation>
+    </message>
+    <message>
+        <source>User ID:</source>
+        <translation type="obsolete">Benutzer ID:</translation>
+    </message>
+    <message>
+        <source>IP:</source>
+        <translation type="obsolete">IP:</translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="obsolete">Port:</translation>
+    </message>
+    <message>
+        <source>Please fill all the fields in.</source>
+        <translation type="obsolete">Bitte alle Felder ausfüllen.</translation>
+    </message>
+</context>
+<context>
+    <name>DhtServerDialog</name>
+    <message>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="31"/>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="33"/>
         <source>DHT Settings</source>
         <translation>DHT Einstellungen</translation>
     </message>
     <message>
-        <location filename="../../src/dhteditdialog.cpp" line="34"/>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="35"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="../../src/dhteditdialog.cpp" line="37"/>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="38"/>
         <source>User ID:</source>
         <translation>Benutzer ID:</translation>
     </message>
     <message>
-        <location filename="../../src/dhteditdialog.cpp" line="40"/>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="41"/>
         <source>IP:</source>
         <translation>IP:</translation>
     </message>
     <message>
-        <location filename="../../src/dhteditdialog.cpp" line="43"/>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="44"/>
         <source>Port:</source>
         <translation>Port:</translation>
     </message>
     <message>
-        <location filename="../../src/dhteditdialog.cpp" line="95"/>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="100"/>
         <source>Please fill all the fields in.</source>
         <translation>Bitte alle Felder ausfüllen.</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/dhtserverdialog.cpp" line="105"/>
+        <source>Please enter a valid User ID.</source>
+        <translation>Bitte eine gültige User ID eingeben.</translation>
     </message>
 </context>
 <context>
@@ -148,24 +203,78 @@
     </message>
 </context>
 <context>
+    <name>GuiSettingsPage</name>
+    <message>
+        <location filename="../../src/Settings/guisettingspage.cpp" line="26"/>
+        <source>Language</source>
+        <translation>Sprache</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/guisettingspage.cpp" line="28"/>
+        <source>GUI language</source>
+        <translation>GUI Sprache</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../src/mainwindow.cpp" line="42"/>
+        <location filename="../../src/mainwindow.cpp" line="50"/>
         <source>developers&apos; test version, not for public use</source>
         <translation>Entwicklerversion, nicht für öffentliche Nutzung bestimmt</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cpp" line="161"/>
+        <location filename="../../src/mainwindow.cpp" line="58"/>
+        <source>Settings</source>
+        <translation>Einstellungen</translation>
+    </message>
+    <message>
+        <location filename="../../src/mainwindow.cpp" line="180"/>
         <source>Couldn&apos;t remove friend &quot;%1&quot;</source>
         <translation>Konnte Freund &quot;%1&quot; nicht entfernen</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cpp" line="169"/>
+        <location filename="../../src/mainwindow.cpp" line="188"/>
         <source>Couldn&apos;t add friend with User ID
 &quot;%1&quot;</source>
         <translation>Konnte Freund mit Benutzer ID
 &quot;%1&quot;
 nicht hinzufügen</translation>
+    </message>
+</context>
+<context>
+    <name>OurUserItemWidget</name>
+    <message>
+        <location filename="../../src/ouruseritemwidget.cpp" line="30"/>
+        <source>Change Status</source>
+        <translation>Status ändern</translation>
+    </message>
+    <message>
+        <location filename="../../src/ouruseritemwidget.cpp" line="33"/>
+        <source>Change Username</source>
+        <translation>Benutzernamen ändern</translation>
+    </message>
+    <message>
+        <location filename="../../src/ouruseritemwidget.cpp" line="34"/>
+        <source>Copy User ID</source>
+        <translation>Benutzer ID kopieren</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="25"/>
+        <source>Settings</source>
+        <translation>Einstellungen</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="27"/>
+        <source>DHT Bootstrap</source>
+        <translation>DHT Bootstrap</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="28"/>
+        <source>GUI</source>
+        <translation>Benutzeroberfläche</translation>
     </message>
 </context>
 </TS>
