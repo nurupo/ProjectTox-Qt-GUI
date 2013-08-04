@@ -29,12 +29,14 @@ class DhtBootstrapSettingsPage : public AbstractSettingsPage
 {
 public:
     DhtBootstrapSettingsPage(QWidget* parent);
+
     void applyChanges();
     void buildGui();
     void setGui();
 
 private:
     QGroupBox* buildServerGroup();
+
     QHash<int, Settings::DhtServer> serverHash;
     int uniqueKey;
     QStandardItemModel* serverListModel;

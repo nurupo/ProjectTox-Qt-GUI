@@ -37,9 +37,6 @@ public:
     static void loadWindow(QMainWindow* window);
 
     static const QString FILENAME;
-    static const QString ABOUTLOGS;
-    static const optKeyCode STORE_LOGS_OPT;
-    static const optKeyCode ENCRYPT_LOGS_OPT;
 
     bool loaded;
 
@@ -61,17 +58,20 @@ public:
     QString getUsername() const;
     void setUsername(const QString& newUsername);
 
-    void setStoreLogsSetting(bool newValue);
-    void setEncryptLogsSetting(bool newValue);
-    bool getStoreLogsSetting() const;
-    bool getEncryptLogsSetting() const;
+    bool getEnableLogging() const;
+    void setEnableLogging(bool newValue);
+
+    bool getEncryptLogs() const;
+    void setEncryptLogs(bool newValue);
 
     QList<DhtServer> dhtServerList;
     int dhtServerId;
     bool dontShowDhtDialog;
 
     QString username;
-    QHash<optKeyCode, bool> logOpts;
+
+    bool enableLogging;
+    bool encryptLogs;
 
 signals:
     //void dataChanged();

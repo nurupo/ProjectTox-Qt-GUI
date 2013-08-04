@@ -21,11 +21,6 @@
 #include <QSettings>
 
 const QString Settings::FILENAME = "settings.ini";
-// Loading info about logs should be changed to deal with having more languages
-// possibly stored in other files.
-const QString Settings::ABOUTLOGS = ":/texts/logging1.txt";
-const optKeyCode Settings::STORE_LOGS_OPT = 1;
-const optKeyCode Settings::ENCRYPT_LOGS_OPT = 2;
 
 Settings::Settings() :
     loaded(false)
@@ -91,9 +86,9 @@ void Settings::load()
         s.endArray();
     s.endGroup();
 
-    s.beginGroup("Log Storage");
-        logOpts[Settings::STORE_LOGS_OPT] = s.value("storeLogs").toBool();
-        logOpts[Settings::ENCRYPT_LOGS_OPT] = s.value("encryptLogs").toBool();
+    s.beginGroup("Logging");
+       enableLogging = s.value("enableLogging", false).toBool();
+       encryptLogs = s.value("encryptLogs", true).toBool();
     s.endGroup();
 
     s.beginGroup("General");
@@ -121,9 +116,9 @@ void Settings::save()
         s.endArray();
     s.endGroup();
 
-    s.beginGroup("Log Storage");
-        s.setValue("storeLogs", logOpts[Settings::STORE_LOGS_OPT]);
-        s.setValue("encryptLogs", logOpts[Settings::ENCRYPT_LOGS_OPT]);
+    s.beginGroup("Logging");
+        s.setValue("storeLogs", enableLogging);
+        s.setValue("encryptLogs", encryptLogs);
     s.endGroup();
 
     s.beginGroup("General");
@@ -161,22 +156,22 @@ void Settings::setUsername(const QString& newUsername)
     username = newUsername;
 }
 
-void Settings::setStoreLogsSetting(bool newValue)
+bool Settings::getEnableLogging() const
 {
-    logOpts[Settings::STORE_LOGS_OPT] = newValue;
+    return enableLogging;
 }
 
-void Settings::setEncryptLogsSetting(bool newValue)
+void Settings::setEnableLogging(bool newValue)
 {
-    logOpts[Settings::ENCRYPT_LOGS_OPT] = newValue;
+    enableLogging = newValue;
 }
 
-bool Settings::getStoreLogsSetting() const
+bool Settings::getEncryptLogs() const
 {
-    return logOpts[Settings::STORE_LOGS_OPT];
+    return encryptLogs;
 }
 
-bool Settings::getEncryptLogsSetting() const
+void Settings::setEncryptLogs(bool newValue)
 {
-    return logOpts[Settings::ENCRYPT_LOGS_OPT];
+    encryptLogs = newValue;
 }

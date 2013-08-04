@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Zack Mullay <redwire@riseup.net>
+    Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
 
     This file is part of Tox Qt GUI.
 
@@ -14,8 +14,8 @@
     See the COPYING file for more details.
 */
 
-#ifndef LOGSTORAGESETTINGSPAGE_HPP
-#define LOGSTORAGESETTINGSPAGE_HPP
+#ifndef LOGGINGSETTINGSPAGE_HPP
+#define LOGGINGSETTINGSPAGE_HPP
 
 #include "abstractsettingspage.hpp"
 #include "settings.hpp"
@@ -23,22 +23,21 @@
 #include <QGroupBox>
 #include <QCheckBox>
 
-class LogStorageSettingsPage : public AbstractSettingsPage
+class LoggingSettingsPage : public AbstractSettingsPage
 {
 public:
-    LogStorageSettingsPage(QWidget* parent);
+    LoggingSettingsPage(QWidget* parent);
+
     void applyChanges();
     void buildGui();
     void setGui();
 
 private:
-    QGroupBox* buildLogSettingsGroup();
-    QCheckBox* storeLogsBox;
-    QCheckBox* encryptLogsBox;
+    QGroupBox* buildLoggingGroup();
 
-private slots:
-    void storeLogsBoxClicked();
-    void encryptLogsBoxClicked();
+    QGroupBox* loggingGroup;
+    QCheckBox* encryptLogsCheckBox;
+
 };
 
-#endif // LOGSTORAGESETTINGSPAGE_HPP
+#endif // LOGGINGSETTINGSPAGE_HPP

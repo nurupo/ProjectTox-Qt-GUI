@@ -1,2 +1,0 @@
-Tox can save your chat history, but it is encouraged that you also encrypt them
-to protect yourself against having these files stolen.
