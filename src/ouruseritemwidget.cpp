@@ -52,8 +52,8 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameLabel = new QLabel(Settings::getInstance().getUsername(), usernameStackedWidget);
 
     usernameEdit = new RenameEditWidget(usernameStackedWidget, QSize(10, 10));
-    connect(usernameEdit, &QLineEdit::editingFinished,      this, &OurUserItemWidget::onUsernameChange);
-    connect(usernameEdit, &RenameEditWidget::escPressed,    this, &OurUserItemWidget::onUsernameChange);
+    connect(usernameEdit, &QLineEdit::editingFinished,      this, &OurUserItemWidget::onUsernameChangeSubmited);
+    connect(usernameEdit, &RenameEditWidget::escPressed,    this, &OurUserItemWidget::onUsernameChangeCancelled);
 
     usernameStackedWidget->addWidget(usernameLabel);
     usernameStackedWidget->addWidget(usernameEdit);
@@ -80,7 +80,7 @@ QToolButton* OurUserItemWidget::createToolButton(const QIcon& icon, const QSize 
     return toolButton;
 }
 
-void OurUserItemWidget::onUsernameChange()
+void OurUserItemWidget::onUsernameChangeSubmited()
 {
     QString newUsername = usernameEdit->text();
     //restore old username, usernameLabel still contains it
@@ -88,6 +88,14 @@ void OurUserItemWidget::onUsernameChange()
     usernameEdit->clearFocus();
     usernameStackedWidget->setCurrentWidget(usernameLabel);
     emit usernameChanged(newUsername);
+}
+
+void OurUserItemWidget::onUsernameChangeCancelled()
+{
+    //restore old username, usernameLabel still contains it
+    usernameEdit->setText(usernameLabel->text());
+    usernameEdit->clearFocus();
+    usernameStackedWidget->setCurrentWidget(usernameLabel);
 }
 
 void OurUserItemWidget::setUsername(const QString& username)
