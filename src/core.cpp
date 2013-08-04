@@ -55,7 +55,7 @@ void Core::onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize)
 }
 
 void Core::onUserStatusChanged(int friendId, uint8_t *cMessage, uint16_t cMessageSize){
-    emit core->friendStatusMessageChanged(CString::toString(cMessage,cMessageSize));
+    emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage,cMessageSize));
 }
 
 void Core::acceptFirendRequest(const QString& userId)
