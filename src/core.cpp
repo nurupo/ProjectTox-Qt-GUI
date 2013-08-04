@@ -54,6 +54,10 @@ void Core::onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize)
     emit core->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
 }
 
+void Core::onUserStatusChanged(int friendId, uint8_t *cMessage, uint16_t cMessageSize){
+    emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage,cMessageSize));
+}
+
 void Core::acceptFirendRequest(const QString& userId)
 {
     int friendId = m_addfriend_norequest(CUserId(userId).data());
@@ -121,6 +125,17 @@ void Core::setUsername(const QString& username)
     }
 }
 
+void Core::setStatusMessage(const QString &message){
+    CString cMessage(message);
+    if(m_set_userstatus(cMessage.data(), cMessage.size()) == -1)
+    {
+        emit failedToSetStatusMessage(message);
+    } else {
+        emit statusMessageSet(message);
+    }
+
+}
+
 void Core::process()
 {
     doMessenger();
@@ -169,7 +184,7 @@ void Core::start()
     m_callback_friendrequest(onFriendRequest);
     m_callback_friendmessage(onFriendMessage);
     m_callback_namechange(onFriendNameChange);
-
+    m_callback_userstatus(onUserStatusChanged);
     emit userIdGenerated(CUserId::toString(self_public_key));
 
     CString cUsername(Settings::getInstance().getUsername());
@@ -212,6 +227,8 @@ QString Core::CUserId::toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/)
 uint16_t Core::CUserId::fromString(const QString& userId, uint8_t* cUserId)
 {
     QByteArray arr = QByteArray::fromHex(userId.toLower().toLatin1());
+
+    //nullify
     memcpy(cUserId, reinterpret_cast<uint8_t*>(arr.data()), arr.size());
     return arr.size();
 }
@@ -220,6 +237,7 @@ uint16_t Core::CUserId::fromString(const QString& userId, uint8_t* cUserId)
 
 Core::CString::CString(const QString& string)
 {
+
     cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER];
     cStringSize = fromString(string, cString);
 }
