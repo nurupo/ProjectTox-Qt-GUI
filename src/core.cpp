@@ -54,8 +54,9 @@ void Core::onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize)
     emit core->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
 }
 
-void Core::onUserStatusChanged(int friendId, uint8_t *cMessage, uint16_t cMessageSize){
-    emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage,cMessageSize));
+void Core::onUserStatusChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
+{
+    emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
 }
 
 void Core::acceptFriendRequest(const QString& userId)
@@ -118,6 +119,7 @@ void Core::removeFriend(int friendId)
 void Core::setUsername(const QString& username)
 {
     CString cUsername(username);
+
     if (setname(cUsername.data(), cUsername.size()) == -1) {
         emit failedToSetUsername(username);
     } else {
@@ -125,15 +127,15 @@ void Core::setUsername(const QString& username)
     }
 }
 
-void Core::setStatusMessage(const QString &message){
+void Core::setStatusMessage(const QString &message)
+{
     CString cMessage(message);
-    if(m_set_userstatus(cMessage.data(), cMessage.size()) == -1)
-    {
+
+    if (m_set_userstatus(cMessage.data(), cMessage.size()) == -1) {
         emit failedToSetStatusMessage(message);
     } else {
         emit statusMessageSet(message);
     }
-
 }
 
 void Core::process()
@@ -185,6 +187,7 @@ void Core::start()
     m_callback_friendmessage(onFriendMessage);
     m_callback_namechange(onFriendNameChange);
     m_callback_userstatus(onUserStatusChanged);
+
     emit userIdGenerated(CUserId::toString(self_public_key));
 
     CString cUsername(Settings::getInstance().getUsername());

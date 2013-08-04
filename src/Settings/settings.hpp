@@ -58,20 +58,21 @@ public:
     QString getUsername() const;
     void setUsername(const QString& newUsername);
 
+    QString getStatusMessage() const;
+    void setStatusMessage(const QString& newMessage);
+
     bool getEnableLogging() const;
     void setEnableLogging(bool newValue);
 
     bool getEncryptLogs() const;
     void setEncryptLogs(bool newValue);
-    QString getStatusMessage() const;
-    void setStatusMessage(const QString& newMessage);
 
     QList<DhtServer> dhtServerList;
     int dhtServerId;
     bool dontShowDhtDialog;
 
     QString username;
-    QString statusmessage;
+    QString statusMessage;
 
     bool enableLogging;
     bool encryptLogs;

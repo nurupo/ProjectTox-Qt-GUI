@@ -96,6 +96,7 @@ void Settings::load()
 
     s.beginGroup("General");
         username = s.value("username", "My name").toString();
+        //statusMessage = s.setValue("statusMessage", statusMessage);
     s.endGroup();
 
     loaded = true;
@@ -129,7 +130,7 @@ void Settings::save()
 
     s.beginGroup("General");
         s.setValue("username", username);
-        s.setValue("statusmessage", statusmessage);
+        //s.setValue("statusMessage", statusMessage);
     s.endGroup();
 }
 
@@ -163,6 +164,16 @@ void Settings::setUsername(const QString& newUsername)
     username = newUsername;
 }
 
+QString Settings::getStatusMessage() const
+{
+    return statusMessage;
+}
+
+void Settings::setStatusMessage(const QString& newMessage)
+{
+    statusMessage = newMessage;
+}
+
 bool Settings::getEnableLogging() const
 {
     return enableLogging;
@@ -181,14 +192,4 @@ bool Settings::getEncryptLogs() const
 void Settings::setEncryptLogs(bool newValue)
 {
     encryptLogs = newValue;
-}
-
-QString Settings::getStatusMessage() const
-{
-    return statusmessage;
-}
-
-void Settings::setStatusMessage(const QString &newMessage)
-{
-    statusmessage = newMessage;
 }
