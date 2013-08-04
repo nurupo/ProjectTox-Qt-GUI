@@ -129,6 +129,7 @@ void Settings::save()
 
     s.beginGroup("General");
         s.setValue("username", username);
+        s.setValue("statusmessage", statusmessage);
     s.endGroup();
 }
 
@@ -180,4 +181,14 @@ bool Settings::getEncryptLogs() const
 void Settings::setEncryptLogs(bool newValue)
 {
     encryptLogs = newValue;
+}
+
+QString Settings::getStatusMessage() const
+{
+    return statusmessage;
+}
+
+void Settings::setStatusMessage(const QString &newMessage)
+{
+    statusmessage = newMessage;
 }
