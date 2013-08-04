@@ -86,10 +86,13 @@ void Settings::load()
         s.endArray();
     s.endGroup();
 
+    //NOTE: uncomment when logging will be implemented
+/*
     s.beginGroup("Logging");
        enableLogging = s.value("enableLogging", false).toBool();
        encryptLogs = s.value("encryptLogs", true).toBool();
     s.endGroup();
+*/
 
     s.beginGroup("General");
         username = s.value("username", "My name").toString();
@@ -116,10 +119,13 @@ void Settings::save()
         s.endArray();
     s.endGroup();
 
+    //NOTE: uncomment when logging will be implemented
+/*
     s.beginGroup("Logging");
         s.setValue("storeLogs", enableLogging);
         s.setValue("encryptLogs", encryptLogs);
     s.endGroup();
+*/
 
     s.beginGroup("General");
         s.setValue("username", username);

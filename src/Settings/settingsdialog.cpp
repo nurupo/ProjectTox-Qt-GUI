@@ -24,7 +24,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     setWindowTitle("Settings");
 
     addPage(":/icons/server.png", "DHT Bootstrap", new DhtBootstrapSettingsPage(this));
-    addPage(":/icons/database.png", "Logging", new LoggingSettingsPage(this));
+    //NOTE: make use of when logging will be implemented
+    //addPage(":/icons/database.png", "Logging", new LoggingSettingsPage(this));
 
     listWidget->setMinimumWidth(130);
     setMinimumSize(450, 325);
