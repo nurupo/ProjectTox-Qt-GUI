@@ -63,12 +63,15 @@ public:
 
     bool getEncryptLogs() const;
     void setEncryptLogs(bool newValue);
+    QString getStatusMessage() const;
+    void setStatusMessage(const QString& newMessage);
 
     QList<DhtServer> dhtServerList;
     int dhtServerId;
     bool dontShowDhtDialog;
 
     QString username;
+    QString statusmessage;
 
     bool enableLogging;
     bool encryptLogs;

@@ -24,9 +24,10 @@
 class Core : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(FriendStatus)
+
 public:
     explicit Core();
-    void start();
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
@@ -34,6 +35,7 @@ private:
     static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
     static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
     static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
+    static void onUserStatusChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
 
     void checkFriendsStatus();
     void checkConnection();
@@ -82,6 +84,8 @@ private:
     };
 
 public slots:
+    void start();
+
     void acceptFirendRequest(const QString& userId);
     void requestFriendship(const QString& userId, const QString& message);
 
@@ -90,6 +94,7 @@ public slots:
     void sendMessage(int friendId, const QString& message);
 
     void setUsername(const QString& username);
+    void setStatusMessage(const QString& message);
 
     void process();
 
@@ -105,7 +110,7 @@ signals:
     void friendAdded(int friendId, const QString& userId);
 
     void friendStatusChanged(int friendId, FriendStatus status);
-
+    void friendStatusMessageChanged(int friendId, const QString& message);
     void friendUsernameChanged(int friendId, const QString& username);
 
     void userIdGenerated(const QString& userId);
@@ -113,11 +118,13 @@ signals:
     void friendRemoved(int friendId);
 
     void usernameSet(const QString& username);
+    void statusMessageSet(const QString& message);
 
     void failedToAddFriend(const QString& userId);
     void failedToSendMessage(int friendId, const QString& message);
     void failedToRemoveFriend(int friendId);
     void failedToSetUsername(const QString& username);
+    void failedToSetStatusMessage(const QString& message);
 
 };
 
