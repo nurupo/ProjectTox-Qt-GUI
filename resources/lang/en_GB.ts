@@ -216,6 +216,19 @@
     </message>
 </context>
 <context>
+    <name>LoggingSettingsPage</name>
+    <message>
+        <location filename="../../src/Settings/loggingsettingspage.cpp" line="40"/>
+        <source>Logging</source>
+        <translation>Logging</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/loggingsettingspage.cpp" line="44"/>
+        <source>Encrypt logs</source>
+        <translation>Encrypt logs</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../../src/mainwindow.cpp" line="50"/>
@@ -261,17 +274,17 @@
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../../src/Settings/settingsdialog.cpp" line="25"/>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="26"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../../src/Settings/settingsdialog.cpp" line="27"/>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="28"/>
         <source>DHT Bootstrap</source>
         <translation>DHT Bootstrap</translation>
     </message>
     <message>
-        <location filename="../../src/Settings/settingsdialog.cpp" line="28"/>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="29"/>
         <source>GUI</source>
         <translation>GUI</translation>
     </message>

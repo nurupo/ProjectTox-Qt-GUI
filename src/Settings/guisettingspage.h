@@ -5,6 +5,7 @@
 #include "abstractsettingspage.hpp"
 
 class QComboBox;
+class QLabel;
 
 class GuiSettingsPage : public AbstractSettingsPage
 {
@@ -15,13 +16,13 @@ public:
     void applyChanges();
     void buildGui();
     void setGui();
-    
-signals:
-    
-public slots:
+
+private slots:
+    void showRestartInfo(int i);
     
 private:
     QComboBox *langCombo;
+    QLabel    *restartLabel;
 };
 
 #endif // GUISETTINGSPAGE_H

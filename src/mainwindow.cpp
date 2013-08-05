@@ -44,8 +44,10 @@ MainWindow::MainWindow(QWidget* parent)
 
     // Translate application
     const Settings& settings = Settings::getInstance();
-    appTranslator.load(settings.getGuiLanguage().toString(), ":/lang/");
-    qApp->installTranslator(&appTranslator);
+    if(appTranslator.load(settings.getGuiLanguage().toString(), ":/lang/"))
+        qApp->installTranslator(&appTranslator);
+    else
+        qCritical() << "Couldn't load translation file!";
 
     setWindowTitle(tr("developers' test version, not for public use"));
 

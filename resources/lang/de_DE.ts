@@ -216,6 +216,19 @@
     </message>
 </context>
 <context>
+    <name>LoggingSettingsPage</name>
+    <message>
+        <location filename="../../src/Settings/loggingsettingspage.cpp" line="40"/>
+        <source>Logging</source>
+        <translation>Logging</translation>
+    </message>
+    <message>
+        <location filename="../../src/Settings/loggingsettingspage.cpp" line="44"/>
+        <source>Encrypt logs</source>
+        <translation>Logs verschlüsseln</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../../src/mainwindow.cpp" line="50"/>
@@ -262,17 +275,17 @@ nicht hinzufügen</translation>
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../../src/Settings/settingsdialog.cpp" line="25"/>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="26"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../../src/Settings/settingsdialog.cpp" line="27"/>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="28"/>
         <source>DHT Bootstrap</source>
         <translation>DHT Bootstrap</translation>
     </message>
     <message>
-        <location filename="../../src/Settings/settingsdialog.cpp" line="28"/>
+        <location filename="../../src/Settings/settingsdialog.cpp" line="29"/>
         <source>GUI</source>
         <translation>Benutzeroberfläche</translation>
     </message>
