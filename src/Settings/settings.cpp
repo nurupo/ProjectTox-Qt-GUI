@@ -87,8 +87,17 @@ void Settings::load()
         s.endArray();
     s.endGroup();
 
+    //NOTE: uncomment when logging will be implemented
+/*
+    s.beginGroup("Logging");
+       enableLogging = s.value("enableLogging", false).toBool();
+       encryptLogs = s.value("encryptLogs", true).toBool();
+    s.endGroup();
+*/
+
     s.beginGroup("General");
         username = s.value("username", "My name").toString();
+        //statusMessage = s.setValue("statusMessage", statusMessage);
     s.endGroup();
 
     s.beginGroup("GUI");
@@ -116,8 +125,17 @@ void Settings::save()
         s.endArray();
     s.endGroup();
 
+    //NOTE: uncomment when logging will be implemented
+/*
+    s.beginGroup("Logging");
+        s.setValue("storeLogs", enableLogging);
+        s.setValue("encryptLogs", encryptLogs);
+    s.endGroup();
+*/
+
     s.beginGroup("General");
         s.setValue("username", username);
+        //s.setValue("statusMessage", statusMessage);
     s.endGroup();
 
     s.beginGroup("GUI");
@@ -164,4 +182,34 @@ void Settings::setGUILanguage(const QVariant &language)
 {
     guiLanguage = language;
     emit guiLanguageChanged();
+}
+
+QString Settings::getStatusMessage() const
+{
+    return statusMessage;
+}
+
+void Settings::setStatusMessage(const QString& newMessage)
+{
+    statusMessage = newMessage;
+}
+
+bool Settings::getEnableLogging() const
+{
+    return enableLogging;
+}
+
+void Settings::setEnableLogging(bool newValue)
+{
+    enableLogging = newValue;
+}
+
+bool Settings::getEncryptLogs() const
+{
+    return encryptLogs;
+}
+
+void Settings::setEncryptLogs(bool newValue)
+{
+    encryptLogs = newValue;
 }

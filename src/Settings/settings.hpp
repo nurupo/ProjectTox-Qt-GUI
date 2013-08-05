@@ -20,6 +20,7 @@
 #include <QMainWindow>
 
 #include <QVariant>
+typedef char optKeyCode;
 
 class Settings : public QObject
 {
@@ -61,16 +62,30 @@ public:
     QVariant getGuiLanguage() const;
     void setGUILanguage(const QVariant &language);
 
+    QString getStatusMessage() const;
+    void setStatusMessage(const QString& newMessage);
+
+    bool getEnableLogging() const;
+    void setEnableLogging(bool newValue);
+
+    bool getEncryptLogs() const;
+    void setEncryptLogs(bool newValue);
+
     QList<DhtServer> dhtServerList;
     int dhtServerId;
     bool dontShowDhtDialog;
 
     QString username;
+    QString statusMessage;
+
+    bool enableLogging;
+    bool encryptLogs;
 
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void guiLanguageChanged();
+    void logStorageOptsChanged();
 
 private:
     QVariant guiLanguage;

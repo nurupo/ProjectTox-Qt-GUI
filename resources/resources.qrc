@@ -14,5 +14,7 @@
         <file>icons/application_side_list.png</file>
         <file>icons/flag_germany.png</file>
         <file>icons/flag_great_britain.png</file>
+        <file>icons/information.png</file>
+        <file>icons/database.png</file>
     </qresource>
 </RCC>

@@ -43,7 +43,8 @@ private:
     QToolButton* createToolButton(const QIcon& icon, const QSize iconSize, const QString& toolTip);
 
 private slots:
-    void onUsernameChange();
+    void onUsernameChangeSubmited();
+    void onUsernameChangeCancelled();
     void onRenameUsernameButtonClicked();
     void onStatusActionTriggered();
     void onCopyUserIdButtonClicked();
