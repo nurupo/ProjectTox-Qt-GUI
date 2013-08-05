@@ -26,6 +26,7 @@
 #include <QMainWindow>
 #include <QTextBrowser>
 #include <QThread>
+#include <QTranslator>
 
 class MainWindow : public QMainWindow
 {
@@ -40,6 +41,7 @@ private:
     QThread* coreThread;
     FriendsWidget* friendsWidget;
     OurUserItemWidget* ourUserItem;
+    QTranslator appTranslator;
 
 private slots:
     void onConnected();

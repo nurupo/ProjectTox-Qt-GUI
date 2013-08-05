@@ -54,6 +54,7 @@ SOURCES += \
     ../../src/Settings/settings.cpp \
     ../../src/closeapplicationdialog.cpp \
     ../../src/starter.cpp \
+    ../../src/Settings/guisettingspage.cpp \
     ../../src/Settings/settingsdialog.cpp \
     ../../src/Settings/dhtbootstrapsettingspage.cpp \
     ../../src/Settings/dhtserverdialog.cpp \
@@ -84,6 +85,7 @@ HEADERS  += \
     ../../src/Settings/settings.hpp \
     ../../src/closeapplicationdialog.hpp \
     ../../src/starter.hpp \
+    ../../src/Settings/guisettingspage.h \
     ../../src/Settings/settingsdialog.hpp \
     ../../src/Settings/dhtbootstrapsettingspage.hpp \
     ../../src/Settings/dhtserverdialog.hpp \
@@ -110,5 +112,9 @@ HEADERS  += \
 
 RESOURCES += \
     ../../resources/resources.qrc
+
+TRANSLATIONS += \
+    ../../resources/lang/de_DE.ts \
+    ../../resources/lang/en_GB.ts
 
 win32:RC_FILE = ../../resources/win32_appicon.rc

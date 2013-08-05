@@ -37,11 +37,11 @@ void LoggingSettingsPage::buildGui()
 
 QGroupBox* LoggingSettingsPage::buildLoggingGroup()
 {
-    QGroupBox* group = new QGroupBox("Logging", this);
+    QGroupBox* group = new QGroupBox(tr("Logging"), this);
     group->setCheckable(true);
     QVBoxLayout* layout = new QVBoxLayout(group);
 
-    encryptLogsCheckBox = new QCheckBox("Encrypt logs", group);
+    encryptLogsCheckBox = new QCheckBox(tr("Encrypt logs"), group);
 
     QLabel* encryptLogsInfoLabel = new QLabel(group);
     encryptLogsInfoLabel->setPixmap(QPixmap(":/icons/information.png"));

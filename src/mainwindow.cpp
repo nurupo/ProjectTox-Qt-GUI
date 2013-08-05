@@ -20,6 +20,8 @@
 #include "friendrequestdialog.hpp"
 #include "dhtdialog.hpp"
 
+#include "Settings/settings.hpp"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QDockWidget>
@@ -40,7 +42,14 @@ MainWindow::MainWindow(QWidget* parent)
 
     setGeometry((screenWidth - appWidth) / 2, (screenHeight - appHeight) / 2, appWidth, appHeight);
 
-    setWindowTitle("developers' test version, not for public use");
+    // Translate application
+    const Settings& settings = Settings::getInstance();
+    if(appTranslator.load(settings.getGuiLanguage().toString(), ":/lang/"))
+        qApp->installTranslator(&appTranslator);
+    else
+        qCritical() << "Couldn't load translation file!";
+
+    setWindowTitle(tr("developers' test version, not for public use"));
 
     QMenuBar* menu = new QMenuBar(this);
     setMenuBar(menu);
@@ -48,7 +57,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     QMenu* toolsMenu = menu->addMenu("Tools");
 
-    QAction* settingsAction = new QAction(QIcon(":/icons/setting_tools.png"), "Settings", this);
+    QAction* settingsAction = new QAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this);
     connect(settingsAction, &QAction::triggered, this, &MainWindow::onSettingsActionTriggered);
 
     toolsMenu->addActions(QList<QAction*>() << settingsAction);
@@ -170,7 +179,7 @@ void MainWindow::onDisconnected()
 void MainWindow::onFailedToRemoveFriend(int friendId)
 {
     QMessageBox critical(this);
-    critical.setText(QString("Couldn't remove friend \"%1\"").arg(friendsWidget->getUsername(friendId)));
+    critical.setText(tr("Couldn't remove friend \"%1\"").arg(friendsWidget->getUsername(friendId)));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
 }
@@ -178,7 +187,7 @@ void MainWindow::onFailedToRemoveFriend(int friendId)
 void MainWindow::onFailedToAddFriend(const QString& userId)
 {
     QMessageBox critical(this);
-    critical.setText(QString("Couldn't add friend with User ID\n\"%1\"").arg(userId));
+    critical.setText(tr("Couldn't add friend with User ID\n\"%1\"").arg(userId));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
 }

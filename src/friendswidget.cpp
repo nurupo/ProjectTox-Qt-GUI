@@ -32,10 +32,10 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     layout->setSpacing(2);
     layout->setContentsMargins(2, 2, 0, 2);
 
-    QAction* copyUserIdAction = new QAction(QIcon(":/icons/page_copy.png"), "Copy User ID", this);
+    QAction* copyUserIdAction = new QAction(QIcon(":/icons/page_copy.png"), tr("Copy User ID"), this);
     connect(copyUserIdAction, &QAction::triggered, this, &FriendsWidget::onCopyUserIdActionTriggered);
 
-    QAction* removeFriendAction = new QAction(QIcon(":/icons/user_delete.png"), "Remove", this);
+    QAction* removeFriendAction = new QAction(QIcon(":/icons/user_delete.png"), tr("Remove"), this);
     connect(removeFriendAction, &QAction::triggered, this, &FriendsWidget::onRemoveFriendActionTriggered);
 
     friendContextMenu = new QMenu(this);
@@ -61,10 +61,10 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
 
 
     filterEdit = new FilterWidget(this);
-    filterEdit->setPlaceholderText("Search");
+    filterEdit->setPlaceholderText(tr("Search"));
     connect(filterEdit, &FilterWidget::textChanged, friendProxyModel, &FriendProxyModel::setFilterFixedString);
 
-    addFriendButton = new QPushButton(QIcon(":/icons/user_add.png"), "Add Friend", this);
+    addFriendButton = new QPushButton(QIcon(":/icons/user_add.png"), tr("Add Friend"), this);
     connect(addFriendButton, &QPushButton::clicked, this, &FriendsWidget::onAddFriendButtonClicked);
 
     layout->addWidget(filterEdit);
@@ -76,7 +76,7 @@ void FriendsWidget::addFriend(int friendId, const QString& userId)
 {
     QStandardItem* item = new QStandardItem(userId);
     item->setData(userId, UserIdRole);
-    item->setData(QString("User ID: %1").arg(userId), Qt::ToolTipRole);
+    item->setData(tr("User ID: %1").arg(userId), Qt::ToolTipRole);
     item->setData(friendId, FriendIdRole);
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 

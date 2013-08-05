@@ -38,7 +38,7 @@ void DhtBootstrapSettingsPage::buildGui()
 
 QGroupBox* DhtBootstrapSettingsPage::buildServerGroup()
 {
-    QGroupBox* group = new QGroupBox("DHT Bootstrap Servers", this);
+    QGroupBox* group = new QGroupBox(tr("DHT Bootstrap Servers"), this);
     QGridLayout* layout = new QGridLayout(group);
 
     serverListModel = new QStandardItemModel(group);
@@ -50,9 +50,9 @@ QGroupBox* DhtBootstrapSettingsPage::buildServerGroup()
     serverListView->setSortingEnabled(true);
     serverListView->header()->setSortIndicator(0, Qt::AscendingOrder);
 
-    QPushButton* serverAddButton = new QPushButton("Add", group);
-    QPushButton* serverRemoveButton = new QPushButton("Remove", group);
-    QPushButton* serverEditButton = new QPushButton("Edit", group);
+    QPushButton* serverAddButton = new QPushButton(tr("Add"), group);
+    QPushButton* serverRemoveButton = new QPushButton(tr("Remove"), group);
+    QPushButton* serverEditButton = new QPushButton(tr("Edit"), group);
 
     connect(serverAddButton,    &QPushButton::clicked, this, &DhtBootstrapSettingsPage::serverAddButtonClicked);
     connect(serverRemoveButton, &QPushButton::clicked, this, &DhtBootstrapSettingsPage::serverRemoveButtonClicked);

@@ -29,16 +29,16 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
     QDialog(parent)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowTitle("Add Friend");
+    setWindowTitle(tr("Add Friend"));
 
-    QGroupBox* addFriendGroup = new QGroupBox("Add friend", this);
+    QGroupBox* addFriendGroup = new QGroupBox(tr("Add friend"), this);
 
-    QLabel* userIdLabel = new QLabel("User ID:", addFriendGroup);
+    QLabel* userIdLabel = new QLabel(tr("User ID:"), addFriendGroup);
     userIdEdit = new QLineEdit(addFriendGroup);
 
-    QLabel* messageLabel = new QLabel("Message:", addFriendGroup);
+    QLabel* messageLabel = new QLabel(tr("Message:"), addFriendGroup);
     messageEdit = new QPlainTextEdit(addFriendGroup);
-    messageEdit->setPlainText("Hello, please add me to your friend list.");
+    messageEdit->setPlainText(tr("Hello, please add me to your friend list."));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
@@ -75,12 +75,12 @@ void AddFriendDialog::accept()
 
     if (userIdEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
         QMessageBox warning(this);
-        warning.setText("Please fill all the fields in.");
+        warning.setText(tr("Please fill all the fields in."));
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
     } else if (userIdEdit->text().length() != 64 || !userIdEdit->text().contains(regExp)) {
         QMessageBox warning(this);
-        warning.setText("UserID must be 64 HEX chars.");
+        warning.setText(tr("UserID must be 64 HEX chars."));
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
     } else {

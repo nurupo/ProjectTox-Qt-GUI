@@ -19,6 +19,7 @@
 
 #include <QMainWindow>
 
+#include <QVariant>
 typedef char optKeyCode;
 
 class Settings : public QObject
@@ -58,6 +59,9 @@ public:
     QString getUsername() const;
     void setUsername(const QString& newUsername);
 
+    QVariant getGuiLanguage() const;
+    void setGUILanguage(const QVariant &language);
+
     QString getStatusMessage() const;
     void setStatusMessage(const QString& newMessage);
 
@@ -80,8 +84,11 @@ public:
 signals:
     //void dataChanged();
     void dhtServerListChanged();
+    void guiLanguageChanged();
     void logStorageOptsChanged();
 
+private:
+    QVariant guiLanguage;
 };
 
 #endif // SETTINGS_HPP
