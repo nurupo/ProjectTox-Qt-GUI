@@ -203,7 +203,7 @@ void Core::start()
 
 Core::CUserId::CUserId(const QString &userId)
 {
-    cUserId = new uint8_t[CLIENT_ID_SIZE + 1]();
+    cUserId = new uint8_t[CLIENT_ID_SIZE];
     cUserIdSize = fromString(userId, cUserId);
 }
 
@@ -231,14 +231,13 @@ uint16_t Core::CUserId::fromString(const QString& userId, uint8_t* cUserId)
 {
     QByteArray arr = QByteArray::fromHex(userId.toLower().toLatin1());
     memcpy(cUserId, reinterpret_cast<uint8_t*>(arr.data()), arr.size());
-    return arr.size() + 1;
+    return arr.size();
 }
 
 // CString
 
 Core::CString::CString(const QString& string)
 {
-
     cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER + 1]();
     cStringSize = fromString(string, cString);
 }
@@ -260,7 +259,7 @@ uint16_t Core::CString::size()
 
 QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
 {
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize);
+    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize - 1);
 }
 
 QString Core::CString::toString(uint8_t* cString)
