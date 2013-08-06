@@ -17,7 +17,6 @@
 #ifndef OURUSERITEMWIDGET_HPP
 #define OURUSERITEMWIDGET_HPP
 
-#include "imagecombobox.hpp"
 #include "renameeditwidget.hpp"
 #include "status.hpp"
 

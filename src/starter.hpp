@@ -17,12 +17,9 @@
 #ifndef STARTER_HPP
 #define STARTER_HPP
 
-#include "dhtdialog.hpp"
 #include "mainwindow.hpp"
 
 #include <QObject>
-
-class DhtDialog;
 
 class Starter : public QObject
 {
@@ -31,7 +28,6 @@ public:
     Starter(QObject* parent = 0);
 
 private:
-    DhtDialog* dhtDialog;
     MainWindow* mainWindow;
 
     void createMainWindow();

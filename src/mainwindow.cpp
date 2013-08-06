@@ -15,10 +15,10 @@
 */
 
 #include "mainwindow.hpp"
-#include "pageswidget.hpp"
 
 #include "friendrequestdialog.hpp"
-#include "dhtdialog.hpp"
+#include "pageswidget.hpp"
+#include "Settings/settings.hpp"
 
 #include <QApplication>
 #include <QDesktopWidget>

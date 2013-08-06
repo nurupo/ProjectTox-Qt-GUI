@@ -21,24 +21,11 @@ Starter::Starter(QObject* parent) :
     QObject(parent)
 {
     createMainWindow();
-
-/*
-    if (Settings::getInstance().getDontShowDhtDialog())
-    {
-        createMainWindow();
-    } else {
-        dhtDialog = new DhtDialog();
-        connect(dhtDialog, &DhtDialog::accepted, this, &Starter::onDhtDialogAccepted);
-        dhtDialog->show();
-    }
-*/
 }
 
 void Starter::onDhtDialogAccepted()
 {
     createMainWindow();
-
-    dhtDialog->deleteLater();
 }
 
 void Starter::createMainWindow()
