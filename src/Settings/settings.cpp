@@ -20,7 +20,15 @@
 #include <QFile>
 #include <QSettings>
 
-const QString Settings::FILENAME = "settings.ini";
+#ifdef Q_OS_LINUX
+    QString configDir = qgetenv("XDG_CONFIG_HOME");
+    const QString Settings::FILENAME = configDir + "/settings.ini";
+#elif Q_OS_WIN32
+    QString configDir = qgetenv("APPDATA");
+    const QString Settings::FILENAME = configDir + "/settings.ini";
+#else
+    const QString Settings::FILENAME = "settings.ini";
+#endif
 
 Settings::Settings() :
     loaded(false)
