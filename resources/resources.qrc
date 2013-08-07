@@ -11,5 +11,6 @@
         <file>icons/setting_tools.png</file>
         <file>icons/information.png</file>
         <file>icons/database.png</file>
+        <file>icons/icon64.png</file>
     </qresource>
 </RCC>
