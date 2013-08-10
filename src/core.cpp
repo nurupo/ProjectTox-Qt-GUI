@@ -54,9 +54,14 @@ void Core::onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize)
     emit core->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
 }
 
-void Core::onUserStatusChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
+void Core::onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
 {
     emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
+}
+
+void Core::onFriendStatusChanged(int friendId, uint8_t status)
+{
+    emit core->friendStatusChanged(friendId, static_cast<FriendStatus>(status));
 }
 
 void Core::acceptFriendRequest(const QString& userId)
@@ -92,20 +97,6 @@ void Core::sendMessage(int friendId, const QString& message)
     }
 }
 
-void Core::checkFriendsStatus()
-{
-    static QHash<int, FriendStatus> oldStatus;
-
-    for (int friendId : friendIdList) {
-        FriendStatus status = static_cast<FriendStatus>(m_friendstatus(friendId));
-
-        if ((oldStatus.contains(friendId) && oldStatus[friendId] != status) || (!oldStatus.contains(friendId))) {
-            emit friendStatusChanged(friendId, status);
-            oldStatus[friendId] = status;
-        }
-    }
-}
-
 void Core::removeFriend(int friendId)
 {
     if (m_delfriend(friendId) == -1) {
@@ -131,7 +122,7 @@ void Core::setStatusMessage(const QString &message)
 {
     CString cMessage(message);
 
-    if (m_set_userstatus(cMessage.data(), cMessage.size()) == -1) {
+    if (m_set_statusmessage(cMessage.data(), cMessage.size()) == -1) {
         emit failedToSetStatusMessage(message);
     } else {
         emit statusMessageSet(message);
@@ -146,7 +137,6 @@ void Core::process()
     fflush(stdout);
 #endif
     checkConnection();
-    checkFriendsStatus();
 }
 
 void Core::bootstrapDht()
@@ -186,7 +176,8 @@ void Core::start()
     m_callback_friendrequest(onFriendRequest);
     m_callback_friendmessage(onFriendMessage);
     m_callback_namechange(onFriendNameChange);
-    m_callback_userstatus(onUserStatusChanged);
+    m_callback_statusmessage(onStatusMessageChanged);
+    m_callback_friendstatus(onFriendStatusChanged);
 
     emit userIdGenerated(CUserId::toString(self_public_key));
 

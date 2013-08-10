@@ -35,9 +35,9 @@ private:
     static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
     static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
     static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
-    static void onUserStatusChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
+    static void onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
+    static void onFriendStatusChanged(int friendId, uint8_t status);
 
-    void checkFriendsStatus();
     void checkConnection();
 
     QTimer* timer;
