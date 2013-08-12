@@ -8,6 +8,8 @@ You should get and install Qt5.
 You can get Qt5 precompiled binaries and source code to compile them yourself from [here](http://qt-project.org/downloads).
 
 You should get and install [libsodium](https://github.com/jedisct1/libsodium):
+
+(requires `automake` and `libtool` being installed)
 ```bash
 git clone git://github.com/jedisct1/libsodium.git
 cd libsodium
