@@ -14,6 +14,7 @@
     See the COPYING file for more details.
 */
 
+#include "Messenger.h"
 #include "settings.hpp"
 #include "settingsdialog.hpp"
 
@@ -21,6 +22,7 @@
 #include <QSettings>
 
 const QString Settings::FILENAME = "settings.ini";
+const QString Settings::TOXFILENAME = "tox.cfg";
 
 Settings::Settings() :
     loaded(false)
@@ -102,8 +104,36 @@ void Settings::load()
     loaded = true;
 }
 
+bool Settings::tryLoadToxSettings()
+{
+    QFile toxFile(TOXFILENAME);
+    if(toxFile.exists() && toxFile.open(QIODevice::OpenModeFlag::ReadOnly))
+    {
+        QByteArray content = toxFile.readAll();
+        int ret = Messenger_load((u_int8_t*)content.data(), content.size());
+        toxFile.close();
+
+        return ret != 0;
+    }
+
+    return false;
+}
+
 void Settings::save()
 {
+    QFile toxFile(TOXFILENAME);
+    toxFile.remove();
+    if(toxFile.open(QIODevice::OpenModeFlag::WriteOnly))
+    {
+        u_int32_t size = Messenger_size();
+        u_int8_t* content = new u_int8_t[size];
+        Messenger_save(content);
+        toxFile.write((char*)content, size);
+        delete[] content;
+        toxFile.close();
+    }
+
+
     QSettings s(FILENAME, QSettings::IniFormat);
 
     s.clear();

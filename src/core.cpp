@@ -173,6 +173,8 @@ void Core::start()
 {
     initMessenger();
 
+    Settings::getInstance().tryLoadToxSettings();
+
     m_callback_friendrequest(onFriendRequest);
     m_callback_friendmessage(onFriendMessage);
     m_callback_namechange(onFriendNameChange);

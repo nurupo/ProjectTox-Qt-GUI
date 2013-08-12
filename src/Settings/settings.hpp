@@ -29,6 +29,7 @@ public:
     ~Settings();
 
     void load();
+    bool tryLoadToxSettings();
     void save();
 
     void executeSettingsDialog(QWidget* parent);
@@ -37,6 +38,8 @@ public:
     static void loadWindow(QMainWindow* window);
 
     static const QString FILENAME;
+    // Stores Tox-internal settings
+    static const QString TOXFILENAME;
 
     bool loaded;
 
