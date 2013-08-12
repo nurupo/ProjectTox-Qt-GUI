@@ -122,6 +122,7 @@ bool Settings::tryLoadToxSettings()
 void Settings::save()
 {
     QFile toxFile(TOXFILENAME);
+    toxFile.remove();
     if(toxFile.open(QIODevice::OpenModeFlag::WriteOnly))
     {
         u_int32_t size = Messenger_size();
