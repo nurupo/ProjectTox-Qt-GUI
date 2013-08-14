@@ -71,16 +71,16 @@ QString AddFriendDialog::getMessage() const
 
 void AddFriendDialog::accept()
 {
-    const QRegularExpression regExp("^[A-Fa-f0-9]+$");
+    const QRegularExpression hexRegExp("^[A-Fa-f0-9]+$");
 
     if (userIdEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
         QMessageBox warning(this);
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
-    } else if (userIdEdit->text().length() != 64 || !userIdEdit->text().contains(regExp)) {
+    } else if (userIdEdit->text().length() != 64 || !userIdEdit->text().contains(hexRegExp)) {
         QMessageBox warning(this);
-        warning.setText("UserID must be 64 HEX chars.");
+        warning.setText("Please enter a valid User ID.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
     } else {
