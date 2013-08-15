@@ -27,6 +27,7 @@
 
 class DhtBootstrapSettingsPage : public AbstractSettingsPage
 {
+    Q_OBJECT
 public:
     DhtBootstrapSettingsPage(QWidget* parent);
 

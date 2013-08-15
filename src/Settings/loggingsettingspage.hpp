@@ -25,6 +25,7 @@
 
 class LoggingSettingsPage : public AbstractSettingsPage
 {
+    Q_OBJECT
 public:
     LoggingSettingsPage(QWidget* parent);
 

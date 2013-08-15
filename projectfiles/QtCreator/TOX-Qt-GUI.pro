@@ -59,7 +59,9 @@ SOURCES += \
     ../../src/Settings/dhtserverdialog.cpp \
     ../../src/Settings/customhintlistwidget.cpp \
     ../../src/Settings/loggingsettingspage.cpp \
-    ../../src/aboutdialog.cpp
+    ../../src/aboutdialog.cpp \
+    ../../src/Settings/guisettingspage.cpp \
+    ../../src/Settings/messagestyleinterface.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -91,7 +93,9 @@ HEADERS  += \
     ../../src/Settings/customhintlistwidget.hpp \
     ../../src/Settings/loggingsettingspage.hpp \
     ../../src/aboutdialog.hpp \
-    ../../src/appinfo.hpp
+    ../../src/appinfo.hpp \
+    ../../src/Settings/guisettingspage.h \
+    ../../src/Settings/messagestyleinterface.h
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \

@@ -21,6 +21,7 @@
 
 class SettingsDialog: public BasicSettingsDialog
 {
+    Q_OBJECT
 public:
     SettingsDialog(QWidget* parent);
 
