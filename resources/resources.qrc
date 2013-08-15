@@ -12,5 +12,6 @@
         <file>icons/information.png</file>
         <file>icons/database.png</file>
         <file>icons/icon64.png</file>
+        <file>icons/application_side_list.png</file>
     </qresource>
 </RCC>

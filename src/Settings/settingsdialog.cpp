@@ -15,6 +15,7 @@
 */
 
 #include "dhtbootstrapsettingspage.hpp"
+#include "guisettingspage.h"
 #include "loggingsettingspage.hpp"
 #include "settingsdialog.hpp"
 
@@ -24,6 +25,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     setWindowTitle("Settings");
 
     addPage(":/icons/server.png", "DHT Bootstrap", new DhtBootstrapSettingsPage(this));
+    addPage(":/icons/application_side_list.png", tr("GUI"), new GuiSettingsPage(this));
     //NOTE: make use of when logging will be implemented
     //addPage(":/icons/database.png", "Logging", new LoggingSettingsPage(this));
 

@@ -67,6 +67,9 @@ public:
     bool getEncryptLogs() const;
     void setEncryptLogs(bool newValue);
 
+    QString getMessageStyle() const;
+    void     setMessageStyle(const QString &style);
+
     QList<DhtServer> dhtServerList;
     int dhtServerId;
     bool dontShowDhtDialog;
@@ -77,11 +80,14 @@ public:
     bool enableLogging;
     bool encryptLogs;
 
+private:
+    QString messageStyle;
+
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
-
+    void messageStyleChanged();
 };
 
 #endif // SETTINGS_HPP

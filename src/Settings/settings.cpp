@@ -99,6 +99,10 @@ void Settings::load()
         //statusMessage = s.setValue("statusMessage", statusMessage);
     s.endGroup();
 
+    s.beginGroup("GUI");
+        messageStyle = s.value("messageSyle", "default").toString();
+    s.endGroup();
+
     loaded = true;
 }
 
@@ -131,6 +135,10 @@ void Settings::save()
     s.beginGroup("General");
         s.setValue("username", username);
         //s.setValue("statusMessage", statusMessage);
+    s.endGroup();
+
+    s.beginGroup("GUI");
+        s.setValue("messageSyle", messageStyle);
     s.endGroup();
 }
 
@@ -192,4 +200,15 @@ bool Settings::getEncryptLogs() const
 void Settings::setEncryptLogs(bool newValue)
 {
     encryptLogs = newValue;
+}
+
+QString Settings::getMessageStyle() const
+{
+    return messageStyle;
+}
+
+void Settings::setMessageStyle(const QString &style)
+{
+    messageStyle = style;
+    emit messageStyleChanged();
 }

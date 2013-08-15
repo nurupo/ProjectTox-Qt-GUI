@@ -15,10 +15,7 @@
 */
 
 #include "messagedisplaywidget.hpp"
-
-#include <QDebug>
-#include <QRegularExpression>
-#include <QTime>
+#include "Settings/settings.hpp"
 
 MessageDisplayWidget::MessageDisplayWidget(QWidget* parent) :
     QTextBrowser(parent)
@@ -30,34 +27,22 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget* parent) :
     setTextInteractionFlags((textInteractionFlags() & ~Qt::TextEditable) | Qt::LinksAccessibleByMouse);
     setUndoRedoEnabled(false);
     setCursorWidth(0);
-    document()->setDefaultStyleSheet("p {text-indent:-10px; margin-left:10px; margin-top:5; margin-bottom:0; white-space:pre-wrap;}");
+
+    // Set messagestyle
+    const Settings& settings = Settings::getInstance();
+    if(settings.getMessageStyle() == "irc")
+        messageStyle = new MessageIrcStyle();
+    else
+        messageStyle = new MessageDefaultStyle();
+    messageStyle->setWidget(this);
 }
 
 void MessageDisplayWidget::showMessage(const QString& senderUsername, const QString& message)
 {
-    QString senderUsernameEscaped = senderUsername.toHtmlEscaped();
-    QString timeEscaped = QString(getTime()).toHtmlEscaped();
-    QString messageEscaped = message.toHtmlEscaped();
-
-    QString text = QString("<p><b>%1</b> [%2]<br>%3</p>").arg(senderUsernameEscaped).arg(timeEscaped).arg(messageEscaped);
-    urlify(text);
-    append(text);
+    messageStyle->addMessage(senderUsername, message);
 }
 
 void MessageDisplayWidget::showFailedToSendMessage(const QString& message)
 {
-    QString messageEscaped = message.toHtmlEscaped();
-    QString text = QString("<p><font color=\"red\" style=\"font-weight:bold\">Couldn't send following message:</font><br>%1</p>").arg(messageEscaped);
-    urlify(text);
-    append(text);
-}
-
-void MessageDisplayWidget::urlify(QString& string)
-{
-    string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
-}
-
-QString MessageDisplayWidget::getTime() const
-{
-    return QTime::currentTime().toString("hh:mm:ss");
+    messageStyle->addErrorMessage(tr("Couldn't send following message: %1").arg(message));
 }

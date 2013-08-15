@@ -19,6 +19,7 @@
 
 #include <QDateTime>
 #include <QTextBrowser>
+#include "Settings/messagestyleinterface.h"
 
 class MessageDisplayWidget : public QTextBrowser
 {
@@ -28,8 +29,7 @@ public:
     void showFailedToSendMessage(const QString& message);
 
 private:
-    void urlify(QString& string);
-    QString getTime() const;
+    MessageStyleInterface *messageStyle;
 
 };
 
