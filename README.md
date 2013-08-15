@@ -29,3 +29,4 @@ You can usually find me at the following IRC channel channel: [irc://chat.freeno
 ## License
 
 Qt GUI for Tox is licensed under [GPLv3](COPYING).
+Note that icons are licensed [differently](/resources/icons/LICENSE).
