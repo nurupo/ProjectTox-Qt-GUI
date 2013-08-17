@@ -19,6 +19,8 @@
 #include "status.hpp"
 #include "Settings/settings.hpp"
 
+#include "messagedisplaywidget2.h"
+
 #include <QSplitter>
 #include <QVBoxLayout>
 
@@ -27,7 +29,8 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 {
     friendItem = new FriendItemWidget(this);
 
-    display = new MessageDisplayWidget(this);
+    //display = new MessageDisplayWidget(this);
+    display2 = new MessageDisplayWidget2(this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::messageSent);
@@ -36,7 +39,8 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
     splitter->setChildrenCollapsible(false);
-    splitter->addWidget(display);
+    //splitter->addWidget(display);
+    splitter->addWidget(display2);
     splitter->addWidget(input);
     splitter->setStretchFactor(1, 3);
 
@@ -54,12 +58,14 @@ int ChatPageWidget::getFriendId() const
 
 void ChatPageWidget::onMessageSent(const QString& message)
 {
-    display->showMessage(Settings::getInstance().getUsername(), message);
+    //display->showMessage(Settings::getInstance().getUsername(), message);
+    display2->appendMessage(Settings::getInstance().getUsername(), message);
 }
 
 void ChatPageWidget::messageReceived(const QString& message)
 {
-    display->showMessage(username, message);
+    //display->showMessage(username, message);
+    display2->appendMessage(username, message);
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
@@ -77,5 +83,6 @@ void ChatPageWidget::setStatus(Status newStatus)
 
 void ChatPageWidget::failedToSendMessage(const QString& message)
 {
-    display->showFailedToSendMessage(message);
+   // display->showFailedToSendMessage(message);
+    display2->appendErrorMessage(tr("Failed to send message: '%1'").arg(message));
 }

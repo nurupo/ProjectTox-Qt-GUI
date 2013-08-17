@@ -19,11 +19,13 @@
 
 #include "frienditemwidget.hpp"
 #include "inputtextwidget.hpp"
-#include "messagedisplaywidget.hpp"
+//#include "messagedisplaywidget.hpp"
 
 #include <QTextBrowser>
 #include <QTextEdit>
 #include <QWidget>
+
+class MessageDisplayWidget2;
 
 class ChatPageWidget : public QWidget
 {
@@ -36,7 +38,9 @@ public:
 
 private:
     FriendItemWidget* friendItem;
-    MessageDisplayWidget* display;
+    //MessageDisplayWidget* display;
+    MessageDisplayWidget2 *display2;
+
     InputTextWidget* input;
 
     int friendId;
