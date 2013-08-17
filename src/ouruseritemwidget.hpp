@@ -17,6 +17,7 @@
 #ifndef OURUSERITEMWIDGET_HPP
 #define OURUSERITEMWIDGET_HPP
 
+#include "elidelabel.hpp"
 #include "renameeditwidget.hpp"
 #include "status.hpp"
 
@@ -34,7 +35,7 @@ public:
 
 private:
     QToolButton* statusButton;
-    QLabel* usernameLabel;
+    ElideLabel* usernameLabel;
     RenameEditWidget* usernameEdit;
     QStackedWidget* usernameStackedWidget;
     QString userId;

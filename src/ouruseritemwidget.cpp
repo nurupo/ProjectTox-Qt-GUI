@@ -49,9 +49,14 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
 
     usernameStackedWidget = new QStackedWidget(this);
 
-    usernameLabel = new QLabel(Settings::getInstance().getUsername(), usernameStackedWidget);
+    usernameLabel = new ElideLabel(usernameStackedWidget);
+    usernameLabel->setMinimumWidth(10);
+    usernameLabel->setTextElide(true);
+    usernameLabel->setTextElideMode(Qt::ElideRight);
+    usernameLabel->setText(Settings::getInstance().getUsername());
 
     usernameEdit = new RenameEditWidget(usernameStackedWidget, QSize(10, 10));
+    usernameEdit->setMinimumWidth(10);
     connect(usernameEdit, &QLineEdit::editingFinished,      this, &OurUserItemWidget::onUsernameChangeSubmited);
     connect(usernameEdit, &RenameEditWidget::escPressed,    this, &OurUserItemWidget::onUsernameChangeCancelled);
 
