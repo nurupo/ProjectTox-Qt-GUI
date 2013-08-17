@@ -11,13 +11,14 @@ class QVBoxLayout;
  * CSS classes for styling
  * -----------------------
  *
- * Object         | Qt class   | CSS class
- * ---------------| -----------|--------------
- * Timestamp      | QLabel     | msgTimestamp
- * Username       | ElideLabel | msgUserName
- * Friendname     | ElideLabel | msgFriendName
- * Message        | QLabel     | msgMessage
- * Seperator line | QFrame     | msgLine
+ * Object         | Qt class           | CSS class
+ * ---------------| -------------------|--------------
+ * Timestamp      | QLabel             | msgTimestamp
+ * Username       | ElideLabel         | msgUserName
+ * Friendname     | ElideLabel         | msgFriendName
+ * Message        | QLabel             | msgMessage
+ * Seperator line | QFrame             | msgLine
+ * Error message  | ElideLabel, QLabel | msgError
  */
 class MessageDisplayWidget2 : public QScrollArea
 {
@@ -27,7 +28,7 @@ public:
 
     void appendMessage(const QString &name, const QString &message);
     void appendErrorMessage(const QString &message);
-    
+
 signals:
     
 public slots:

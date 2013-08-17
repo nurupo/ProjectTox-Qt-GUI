@@ -38,6 +38,7 @@ void MessageDisplayWidget2::appendMessage(const QString &name, const QString &me
     nameLabel->setTextElide(true);
     nameLabel->setTextElideMode(Qt::ElideRight);
     nameLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    nameLabel->setToolTip(name);
     nameLabel->setAlignment(Qt::AlignLeading |
                             Qt::AlignLeft    |
                             Qt::AlignTop);
