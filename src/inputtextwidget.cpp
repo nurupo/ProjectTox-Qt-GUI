@@ -18,6 +18,8 @@
 
 #include <QKeyEvent>
 #include <QDebug>
+#include <QRegularExpression>
+#include <QTextDocument>
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
@@ -26,13 +28,41 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
+void InputTextWidget::setSmileyList(const EmoticonMenu::SmileyList &list)
+{
+    smileyList = list;
+}
+
 void InputTextWidget::keyPressEvent(QKeyEvent* event)
 {
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-            && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
-        emit messageSent(toPlainText());
+            && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier))
+    {
+
+        emit messageSent(desmile(toHtml()));
         clear();
     } else {
        QTextEdit::keyPressEvent(event);
     }
+}
+
+QString InputTextWidget::desmile(QString htmlText)
+{
+    // Replace smileys by their textual representation
+    int i=0;
+    QRegularExpression re("<img[\\s]+[^>]*?((alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?)|(src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?))((src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|(alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|>)");
+    QRegularExpressionMatch match = re.match(htmlText, i);
+    while(match.hasMatch()){
+
+        // Replace smiley
+        htmlText.replace(match.captured(0), smileyList.value(match.captured(5)).first());
+
+        // next match
+        match = re.match(htmlText, ++i);
+    }
+
+    // convert to plain text
+    QTextDocument doc;
+    doc.setHtml(htmlText);
+    return doc.toPlainText();
 }

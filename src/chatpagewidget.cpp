@@ -20,28 +20,43 @@
 #include "Settings/settings.hpp"
 
 #include "messagedisplaywidget2.h"
+#include "emoticonmenu.h"
 
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QDebug>
 
 ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)
 {
     friendItem = new FriendItemWidget(this);
-
-    //display = new MessageDisplayWidget(this);
     display2 = new MessageDisplayWidget2(this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::messageSent);
     connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::onMessageSent);
 
+    // Create emoticon menu :)
+    QWidget *inputPanel = new QWidget(this);
+    EmoticonMenu *menu = new EmoticonMenu(this);
+    QToolButton *emoticonButton = new QToolButton(inputPanel);
+    emoticonButton->setPopupMode(QToolButton::InstantPopup);
+    emoticonButton->setIcon(QIcon(":/icons/emoticons/emotion_smile.png"));
+    emoticonButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    emoticonButton->setMenu(menu);
+    connect(menu, &EmoticonMenu::insertEmoticon, input, &InputTextWidget::insertHtml);
+
+    QHBoxLayout *inputLayout = new QHBoxLayout(inputPanel);
+    inputLayout->setContentsMargins(0,0,0,0);
+    inputLayout->addWidget(input);
+    inputLayout->addWidget(emoticonButton);
+
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
     splitter->setChildrenCollapsible(false);
-    //splitter->addWidget(display);
     splitter->addWidget(display2);
-    splitter->addWidget(input);
+    splitter->addWidget(inputPanel);
     splitter->setStretchFactor(1, 3);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -49,6 +64,10 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->addWidget(splitter);
     layout->setSpacing(2);
     layout->setContentsMargins(0, 3, 2, 3);
+
+    // give all smileys whith their textual representations to the input dialog for desmiling
+    input->setSmileyList(menu->getSmileyList());
+    display2->setSmileyList(menu->getSmileyList());
 }
 
 int ChatPageWidget::getFriendId() const
@@ -58,13 +77,11 @@ int ChatPageWidget::getFriendId() const
 
 void ChatPageWidget::onMessageSent(const QString& message)
 {
-    //display->showMessage(Settings::getInstance().getUsername(), message);
     display2->appendMessage(Settings::getInstance().getUsername(), message);
 }
 
 void ChatPageWidget::messageReceived(const QString& message)
 {
-    //display->showMessage(username, message);
     display2->appendMessage(username, message);
 }
 
@@ -78,11 +95,10 @@ void ChatPageWidget::setStatus(Status newStatus)
 {
     status = newStatus;
     friendItem->setStatus(status);
-    input->setReadOnly(newStatus != Status::Online);
+    //input->setReadOnly(newStatus != Status::Online);
 }
 
 void ChatPageWidget::failedToSendMessage(const QString& message)
 {
-   // display->showFailedToSendMessage(message);
     display2->appendErrorMessage(tr("Failed to send message: '%1'").arg(message));
 }

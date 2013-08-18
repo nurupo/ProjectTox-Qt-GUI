@@ -3,6 +3,8 @@
 
 #include <QScrollArea>
 
+#include "emoticonmenu.h"
+
 class QHBoxLayout;
 class QVBoxLayout;
 
@@ -26,6 +28,8 @@ class MessageDisplayWidget2 : public QScrollArea
 public:
     explicit MessageDisplayWidget2(QWidget *parent = 0);
 
+    void setSmileyList(const EmoticonMenu::SmileyList &list);
+
     void appendMessage(const QString &name, const QString &message);
     void appendErrorMessage(const QString &message);
 
@@ -38,10 +42,12 @@ private slots:
     
 private:
     QVBoxLayout *mainlayout;
-
+    EmoticonMenu::SmileyList smileyList;
     QString lastName;
 
-    QString urlify(const QString &string);
+
+    QString urlify(QString string);
+    QString smile(QString text);
 };
 
 #endif // MESSAGEDISPLAYWIDGET2_H

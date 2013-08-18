@@ -7,6 +7,7 @@
 #include <QScrollBar>
 #include <QRegularExpression>
 #include <QFrame>
+#include <QDebug>
 
 #include "Settings/settings.hpp"
 #include "elidelabel.hpp"
@@ -28,6 +29,11 @@ MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
 
     mainlayout = new QVBoxLayout(widget);
     mainlayout->setSpacing(1);
+}
+
+void MessageDisplayWidget2::setSmileyList(const EmoticonMenu::SmileyList &list)
+{
+    smileyList = list;
 }
 
 void MessageDisplayWidget2::appendMessage(const QString &name, const QString &message/*, const QString &timestamp, const QString &messageId*/)
@@ -92,7 +98,8 @@ void MessageDisplayWidget2::appendMessage(const QString &name, const QString &me
         }
     }
 
-    messageLabel->setText(urlify(message));
+    messageLabel->setText(smile(urlify(message)));
+    qDebug() << messageLabel->text();
     timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
 
     // Add row
@@ -171,8 +178,19 @@ void MessageDisplayWidget2::moveScrollBarToBottom(int min, int max)
     this->verticalScrollBar()->setValue(max);
 }
 
-QString MessageDisplayWidget2::urlify(const QString &string)
+QString MessageDisplayWidget2::urlify(QString string)
 {
-    QString text = string;
-    return text.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
+    return string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
+}
+
+QString MessageDisplayWidget2::smile(QString text)
+{
+    QHashIterator<QString, QStringList> i(smileyList);
+    while(i.hasNext())
+    {
+        i.next();
+        foreach (QString smileytext, i.value())
+            text.replace(smileytext, QString("<img src=\"%1\" />").arg(i.key()));
+    }
+    return text;
 }

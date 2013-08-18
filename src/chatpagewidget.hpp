@@ -19,7 +19,6 @@
 
 #include "frienditemwidget.hpp"
 #include "inputtextwidget.hpp"
-//#include "messagedisplaywidget.hpp"
 
 #include <QTextBrowser>
 #include <QTextEdit>
@@ -38,7 +37,6 @@ public:
 
 private:
     FriendItemWidget* friendItem;
-    //MessageDisplayWidget* display;
     MessageDisplayWidget2 *display2;
 
     InputTextWidget* input;

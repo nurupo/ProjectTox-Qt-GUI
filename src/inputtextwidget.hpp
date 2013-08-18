@@ -19,17 +19,25 @@
 
 #include <QTextEdit>
 
+#include "emoticonmenu.h"
+
 class InputTextWidget : public QTextEdit
 {
     Q_OBJECT
 public:
     InputTextWidget(QWidget* parent);
 
+    void setSmileyList(const EmoticonMenu::SmileyList &list);
+
 protected:
     void keyPressEvent(QKeyEvent* event);
 
 signals:
     void messageSent(const QString& message);
+
+private:
+    EmoticonMenu::SmileyList smileyList;
+    QString desmile(QString htmlText);
 
 };
 

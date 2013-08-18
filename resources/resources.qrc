@@ -12,5 +12,19 @@
         <file>icons/information.png</file>
         <file>icons/database.png</file>
         <file>icons/icon64.png</file>
+        <file>icons/emoticons/emotion_angel.png</file>
+        <file>icons/emoticons/emotion_kiss.png</file>
+        <file>icons/emoticons/emotion_smile.png</file>
+        <file>icons/emoticons/emotion_wink.png</file>
+        <file>icons/emoticons/emotion_love.png</file>
+        <file>icons/emoticons/emotion_grin.png</file>
+        <file>icons/emoticons/emotion_cool.png</file>
+        <file>icons/emoticons/emotion_suprised.png</file>
+        <file>icons/emoticons/emotion_cry.png</file>
+        <file>icons/emoticons/emotion_sweat.png</file>
+        <file>icons/emoticons/emotion_sad.png</file>
+        <file>icons/emoticons/emotion_tongue.png</file>
+        <file>icons/emoticons/emotion_doubt.png</file>
+        <file>icons/emoticons/emotion_evilgrin.png</file>
     </qresource>
 </RCC>
