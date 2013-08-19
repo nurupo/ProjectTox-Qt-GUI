@@ -29,6 +29,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStackedWidget>
+#include <QSettings>
 
 #include <QDebug>
 
@@ -66,6 +67,7 @@ MainWindow::MainWindow(QWidget* parent)
     aboutMenu->addActions(QList<QAction*>() << aboutQtAction << aboutAppAction);
 
     QDockWidget* friendDock = new QDockWidget(this);
+    friendDock->setObjectName("FriendDock");
     friendDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     friendDock->setTitleBarWidget(new QWidget(friendDock));
     friendDock->setContextMenuPolicy(Qt::PreventContextMenu);
@@ -125,6 +127,11 @@ MainWindow::MainWindow(QWidget* parent)
     connect(friendsWidget, &FriendsWidget::friendRemoved, core, &Core::removeFriend);
 
     setCentralWidget(pages);
+
+
+    QSettings settings;
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("windowState").toByteArray());
 }
 
 MainWindow::~MainWindow()
@@ -132,6 +139,14 @@ MainWindow::~MainWindow()
     coreThread->quit();
     coreThread->wait();
     delete core;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings;
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("windowState", saveState());
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& message)
