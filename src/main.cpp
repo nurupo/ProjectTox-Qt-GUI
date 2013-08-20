@@ -19,8 +19,6 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication::setOrganizationName("ProjectTOX");
-    QApplication::setApplicationName("TOX-Qt-GUI");
     QApplication a(argc, argv);
     Starter s;
     return a.exec();

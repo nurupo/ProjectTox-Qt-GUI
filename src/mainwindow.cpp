@@ -29,7 +29,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStackedWidget>
-#include <QSettings>
 
 #include <QDebug>
 
@@ -43,6 +42,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     setGeometry((screenWidth - appWidth) / 2, (screenHeight - appHeight) / 2, appWidth, appHeight);
 
+    setObjectName("mainwindow");
     setWindowTitle("developers' test version, not for public use");
     setWindowIcon(QIcon(":/icons/icon64.png"));
 
@@ -128,10 +128,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     setCentralWidget(pages);
 
-
-    QSettings settings;
-    restoreGeometry(settings.value("geometry").toByteArray());
-    restoreState(settings.value("windowState").toByteArray());
+    Settings::getInstance().loadWindow(this);
 }
 
 MainWindow::~MainWindow()
@@ -143,9 +140,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    QSettings settings;
-    settings.setValue("geometry", saveGeometry());
-    settings.setValue("windowState", saveState());
+    Settings::getInstance().saveWindow(this);
     QMainWindow::closeEvent(event);
 }
 
