@@ -11,6 +11,7 @@
 
 #include "Settings/settings.hpp"
 #include "elidelabel.hpp"
+#include "messagelabel.h"
 
 MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
     QScrollArea(parent)
@@ -31,7 +32,7 @@ MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
     mainlayout->setSpacing(1);
 }
 
-void MessageDisplayWidget2::setSmileyList(const EmoticonMenu::SmileyList &list)
+void MessageDisplayWidget2::setSmileyList(const EmoticonMenu::SmileyHash &list)
 {
     smileyList = list;
 }
@@ -45,30 +46,18 @@ void MessageDisplayWidget2::appendMessage(const QString &name, const QString &me
     nameLabel->setTextElideMode(Qt::ElideRight);
     nameLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     nameLabel->setToolTip(name);
-    nameLabel->setAlignment(Qt::AlignLeading |
-                            Qt::AlignLeft    |
-                            Qt::AlignTop);
+    nameLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
 
-    QLabel *messageLabel = new QLabel(this);
-    messageLabel->setWordWrap(true);
-    messageLabel->setOpenExternalLinks(true);
+    MessageLabel *messageLabel = new MessageLabel(this);
     messageLabel->setProperty("class", "msgMessage"); // for CSS styling
-    messageLabel->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard |
-                                          Qt::LinksAccessibleByMouse    |
-                                          Qt::TextBrowserInteraction    |
-                                          Qt::TextSelectableByKeyboard  |
-                                          Qt::TextSelectableByMouse);
-    messageLabel->setAlignment(Qt::AlignLeading |
-                               Qt::AlignLeft    |
-                               Qt::AlignTop);
+    messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
+    messageLabel->setSmileyList(smileyList);
 
     QLabel *timeLabel = new QLabel(this);
     timeLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     timeLabel->setForegroundRole(QPalette::Mid);
     timeLabel->setProperty("class", "msgTimestamp"); // for CSS styling
-    timeLabel->setAlignment(Qt::AlignRight |
-                            Qt::AlignTop   |
-                            Qt::AlignTrailing);
+    timeLabel->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignTrailing);
 
 
 
@@ -99,7 +88,6 @@ void MessageDisplayWidget2::appendMessage(const QString &name, const QString &me
     }
 
     messageLabel->setText(smile(urlify(message)));
-    qDebug() << messageLabel->text();
     timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
 
     // Add row

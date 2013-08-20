@@ -28,7 +28,7 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
-void InputTextWidget::setSmileyList(const EmoticonMenu::SmileyList &list)
+void InputTextWidget::setSmileyList(const EmoticonMenu::SmileyHash &list)
 {
     smileyList = list;
 }

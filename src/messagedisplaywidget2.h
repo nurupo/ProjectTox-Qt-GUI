@@ -28,7 +28,7 @@ class MessageDisplayWidget2 : public QScrollArea
 public:
     explicit MessageDisplayWidget2(QWidget *parent = 0);
 
-    void setSmileyList(const EmoticonMenu::SmileyList &list);
+    void setSmileyList(const EmoticonMenu::SmileyHash &list);
 
     void appendMessage(const QString &name, const QString &message);
     void appendErrorMessage(const QString &message);
@@ -42,7 +42,7 @@ private slots:
     
 private:
     QVBoxLayout *mainlayout;
-    EmoticonMenu::SmileyList smileyList;
+    EmoticonMenu::SmileyHash smileyList;
     QString lastName;
 
 

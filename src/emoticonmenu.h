@@ -5,15 +5,18 @@
 
 class QGridLayout;
 
+/*! This Class represents a menu with all smileys for adding into text input field.
+ * And it holds a hash of the smileys for translating image to text.
+ */
 class EmoticonMenu : public QMenu
 {
     Q_OBJECT
 public:
-    typedef QHash<QString,QStringList> SmileyList;
+    typedef QHash<QString,QStringList> SmileyHash; //!< Hash of all smiley image pathes (key) and lists of their textual trpresantations (values).
 
     explicit EmoticonMenu(QWidget *parent = 0);
 
-    SmileyList getSmileyList();
+    SmileyHash getSmileyList();
     
 signals:
     void insertEmoticon(QString);
@@ -27,7 +30,7 @@ private:
     void addEmoticon(const QString &imgPath, const QStringList &texts);
 
     QGridLayout *layout;
-    SmileyList smileyList;
+    SmileyHash smileyList;
 };
 
 #endif // EMOTICONMENU_H

@@ -4,6 +4,7 @@
 #include <QToolButton>
 #include <QDebug>
 #include <QHash>
+#include <QWidgetAction>
 
 EmoticonMenu::EmoticonMenu(QWidget *parent) :
     QMenu(parent)
@@ -11,6 +12,11 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
     layout = new QGridLayout(this);
     layout->setContentsMargins(1,1,1,1);
     layout->setSpacing(0);
+
+    QWidgetAction *action = new QWidgetAction(this);
+    action->setDefaultWidget(new QWidget(this));
+    action->defaultWidget()->setLayout(layout);
+    this->addAction(action);
 
     // some Skype smileys
     addEmoticon(":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)"});
@@ -32,15 +38,15 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
     // ...
     addEmoticon(":/icons/emoticons/emotion_angel.png",    {"O:)", "O:-)", "o:)", "o:-)", "(angel)"});
     // ...
-
-    /// \todo Recalculate menu size. It doesn't fit to screen size.
 }
 
-EmoticonMenu::SmileyList EmoticonMenu::getSmileyList()
+/*! Get a hash of all smileys. That can be used for functions like desmile. */
+EmoticonMenu::SmileyHash EmoticonMenu::getSmileyList()
 {
     return smileyList;
 }
 
+/*! Add smileys by setting a imgage file and a textlist of textual representations. */
 void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts)
 {
     QToolButton *button = new QToolButton(this);
@@ -55,6 +61,7 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts)
     smileyList.insert(imgPath, texts);
 }
 
+/*! Signal sends the (first) textual form of the clicked smiley. */
 void EmoticonMenu::onEmoticonTriggered()
 {
     emit insertEmoticon(QObject::sender()->property("smiley").toString());

@@ -27,7 +27,7 @@ class InputTextWidget : public QTextEdit
 public:
     InputTextWidget(QWidget* parent);
 
-    void setSmileyList(const EmoticonMenu::SmileyList &list);
+    void setSmileyList(const EmoticonMenu::SmileyHash &list);
 
 protected:
     void keyPressEvent(QKeyEvent* event);
@@ -36,7 +36,7 @@ signals:
     void messageSent(const QString& message);
 
 private:
-    EmoticonMenu::SmileyList smileyList;
+    EmoticonMenu::SmileyHash smileyList;
     QString desmile(QString htmlText);
 
 };
