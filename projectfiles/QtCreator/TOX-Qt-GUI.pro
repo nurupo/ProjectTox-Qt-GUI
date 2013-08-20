@@ -14,13 +14,17 @@ TEMPLATE = app
 CONFIG += c++11
 
 INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/core/
-win32:INCLUDEPATH += ../../libs/sodium/include/
-macx:INCLUDEPATH += /usr/local/include
 
 win32 {
+    INCLUDEPATH += ../../libs/sodium/include/
     LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a
 } else {
     macx {
+        QMAKE_CXXFLAGS += -stdlib=libc++
+        QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+
+        INCLUDEPATH += /usr/local/include
         LIBS += -L/usr/local/lib -lsodium
     } else {
         LIBS += -lsodium
