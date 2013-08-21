@@ -36,8 +36,6 @@ public:
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
-private:
-
 public slots:
     void start();
 
