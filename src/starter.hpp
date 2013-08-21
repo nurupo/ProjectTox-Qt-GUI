@@ -21,20 +21,21 @@
 
 #include <QObject>
 
+class StarterPrivate;
+
 class Starter : public QObject
 {
     Q_OBJECT
 public:
     Starter(QObject* parent = 0);
-
-private:
-    MainWindow* mainWindow;
-
-    void createMainWindow();
+    virtual ~Starter();
 
 private slots:
     void onDhtDialogAccepted();
 
+private:
+    StarterPrivate * const d_ptr;
+    Q_DECLARE_PRIVATE(Starter);
 };
 
 #endif // STARTER_HPP

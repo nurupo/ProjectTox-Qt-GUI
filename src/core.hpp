@@ -28,6 +28,7 @@ class Core : public QObject
 
 public:
     explicit Core();
+    virtual ~Core();
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
@@ -82,6 +83,9 @@ private:
 
         static uint16_t fromString(const QString& message, uint8_t* cMessage);
     };
+
+    void save();
+    void load();
 
 public slots:
     void start();

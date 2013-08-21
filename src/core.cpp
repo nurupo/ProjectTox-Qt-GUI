@@ -25,6 +25,9 @@
 
 #include <QThread>
 #include <QTime>
+#include <QFile>
+
+#include <QDebug>
 
 //hack to emit signals from static methods
 Core* core;
@@ -37,6 +40,21 @@ Core::Core() :
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Core::process);
     connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
+}
+
+Core::~Core()
+{
+    uint32_t size = Messenger_size();
+    QByteArray buf(size, 0);
+    Messenger_save(reinterpret_cast<uint8_t*>(buf.data()));
+    QFile file("save.bak");
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "Failed to write save.bak";
+	return;
+    }
+    file.write(buf);
+    file.close();
 }
 
 void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize)
@@ -172,6 +190,14 @@ void Core::checkConnection()
 void Core::start()
 {
     initMessenger();
+
+    QFile bak("save.bak");
+    if (bak.open(QIODevice::ReadOnly))
+    {
+        QByteArray arr = bak.readAll();
+	Messenger_load(reinterpret_cast<uint8_t*>(arr.data()), arr.length());
+	bak.close();
+    }
 
     m_callback_friendrequest(onFriendRequest);
     m_callback_friendmessage(onFriendMessage);
