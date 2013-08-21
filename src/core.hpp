@@ -21,6 +21,8 @@
 #include <QTimer>
 #include <QList>
 
+#include <Messenger.h>
+
 class Core : public QObject
 {
     Q_OBJECT
@@ -33,14 +35,16 @@ public:
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
 private:
-    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
-    static void onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendStatusChanged(int friendId, uint8_t status);
+    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata);
+    static void onFriendMessage(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata);
+    static void onFriendNameChange(Messenger *m, int friendId, uint8_t* cName, uint16_t cNameSize, void *userdata);
+    static void onStatusMessageChanged(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata);
+    static void onUserStatusChanged(Messenger *m, int friendId, USERSTATUS status, void *userdata);
+    static void onConnectionStatusChanged(Messenger *m, int friendId, uint8_t status, void *userdata);
 
     void checkConnection();
 
+    Messenger *messenger;
     QTimer* timer;
     QList<int> friendIdList;
 

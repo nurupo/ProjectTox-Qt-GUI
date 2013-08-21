@@ -41,22 +41,12 @@ Settings& Settings::getInstance()
 
 void Settings::saveWindow(const QMainWindow* window)
 {
-/*    QSettings settings(FILENAME, QSettings::IniFormat);
-    settings.beginGroup(window->objectName());
-    settings.setValue("geometry", window->saveGeometry());
-    settings.setValue("state", window->saveState());
-    settings.endGroup();*/
     windowSettings[window->objectName()].geometry = window->saveGeometry();
     windowSettings[window->objectName()].state = window->saveState();
 }
 
 void Settings::loadWindow(QMainWindow* window)
 {
-/*    QSettings settings(FILENAME, QSettings::IniFormat);
-    settings.beginGroup(window->objectName());
-    window->restoreGeometry(settings.value("geometry").toByteArray());
-    window->restoreState(settings.value("state").toByteArray());
-    settings.endGroup();*/
     QMap<QString,WindowSettings>::const_iterator i = windowSettings.constFind(window->objectName());
     if( i == windowSettings.constEnd() )
         return;
