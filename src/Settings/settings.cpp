@@ -41,20 +41,27 @@ Settings& Settings::getInstance()
 
 void Settings::saveWindow(const QMainWindow* window)
 {
-    QSettings settings(FILENAME, QSettings::IniFormat);
+/*    QSettings settings(FILENAME, QSettings::IniFormat);
     settings.beginGroup(window->objectName());
     settings.setValue("geometry", window->saveGeometry());
     settings.setValue("state", window->saveState());
-    settings.endGroup();
+    settings.endGroup();*/
+    windowSettings[window->objectName()].geometry = window->saveGeometry();
+    windowSettings[window->objectName()].state = window->saveState();
 }
 
 void Settings::loadWindow(QMainWindow* window)
 {
-    QSettings settings(FILENAME, QSettings::IniFormat);
+/*    QSettings settings(FILENAME, QSettings::IniFormat);
     settings.beginGroup(window->objectName());
     window->restoreGeometry(settings.value("geometry").toByteArray());
     window->restoreState(settings.value("state").toByteArray());
-    settings.endGroup();
+    settings.endGroup();*/
+    QMap<QString,WindowSettings>::const_iterator i = windowSettings.constFind(window->objectName());
+    if( i == windowSettings.constEnd() )
+        return;
+    window->restoreGeometry(i.value().geometry);
+    window->restoreState(i.value().state);
 }
 
 void Settings::load()
@@ -99,6 +106,17 @@ void Settings::load()
         //statusMessage = s.setValue("statusMessage", statusMessage);
     s.endGroup();
 
+    s.beginGroup("WindowSettings");
+    QStringList windows = s.childGroups();
+    foreach(QString windowName, windows)
+    {
+        s.beginGroup(windowName);
+        windowSettings[windowName].geometry = s.value("geometry").toByteArray();
+        windowSettings[windowName].state = s.value("state").toByteArray();
+        s.endGroup();
+    }
+    s.endGroup();
+
     loaded = true;
 }
 
@@ -131,6 +149,15 @@ void Settings::save()
     s.beginGroup("General");
         s.setValue("username", username);
         //s.setValue("statusMessage", statusMessage);
+    s.endGroup();
+
+    s.beginGroup("WindowSettings");
+    foreach(QString key, windowSettings.keys()) {
+        s.beginGroup(key);
+	s.setValue("geometry", windowSettings.value(key).geometry);
+	s.setValue("state", windowSettings.value(key).state);
+	s.endGroup();
+    }
     s.endGroup();
 }
 
