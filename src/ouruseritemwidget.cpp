@@ -55,14 +55,20 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameLabel->setTextElideMode(Qt::ElideRight);
     usernameLabel->setText(Settings::getInstance().getUsername());
 
+    //FIXME: check if there is a way to replace these containers to fix the label alignment
+    QWidget* usernameLabelContainer = new QWidget(this);
+    QVBoxLayout* usernameLabelContainerLayout = new QVBoxLayout(usernameLabelContainer);
+    usernameLabelContainerLayout->setMargin(0);
+    usernameLabelContainerLayout->addWidget(usernameLabel, 0, Qt::AlignVCenter);
+
     usernameEdit = new RenameEditWidget(usernameStackedWidget, QSize(10, 10));
     usernameEdit->setMinimumWidth(10);
     connect(usernameEdit, &QLineEdit::editingFinished,      this, &OurUserItemWidget::onUsernameChangeSubmited);
     connect(usernameEdit, &RenameEditWidget::escPressed,    this, &OurUserItemWidget::onUsernameChangeCancelled);
 
-    usernameStackedWidget->addWidget(usernameLabel);
+    usernameStackedWidget->addWidget(usernameLabelContainer);
     usernameStackedWidget->addWidget(usernameEdit);
-    usernameStackedWidget->setCurrentWidget(usernameLabel);
+    usernameStackedWidget->setCurrentWidget(usernameLabelContainer);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(2, 2, 2, 0);
@@ -91,7 +97,7 @@ void OurUserItemWidget::onUsernameChangeSubmited()
     //restore old username, usernameLabel still contains it
     usernameEdit->setText(usernameLabel->text());
     usernameEdit->clearFocus();
-    usernameStackedWidget->setCurrentWidget(usernameLabel);
+    usernameStackedWidget->setCurrentWidget(usernameLabelContainer);
     emit usernameChanged(newUsername);
 }
 
@@ -100,7 +106,7 @@ void OurUserItemWidget::onUsernameChangeCancelled()
     //restore old username, usernameLabel still contains it
     usernameEdit->setText(usernameLabel->text());
     usernameEdit->clearFocus();
-    usernameStackedWidget->setCurrentWidget(usernameLabel);
+    usernameStackedWidget->setCurrentWidget(usernameLabelContainer);
 }
 
 void OurUserItemWidget::setUsername(const QString& username)

@@ -36,6 +36,7 @@ public:
 private:
     QToolButton* statusButton;
     ElideLabel* usernameLabel;
+    QWidget* usernameLabelContainer;
     RenameEditWidget* usernameEdit;
     QStackedWidget* usernameStackedWidget;
     QString userId;
