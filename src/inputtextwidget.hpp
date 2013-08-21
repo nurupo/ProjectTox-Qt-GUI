@@ -35,6 +35,11 @@ protected:
 signals:
     void messageSent(const QString& message);
 
+private slots:
+    void copyPlainText();
+    void pastePlainText();
+    void cutPlainText();
+
 private:
     EmoticonMenu::SmileyHash smileyList;
     QString desmile(QString htmlText);

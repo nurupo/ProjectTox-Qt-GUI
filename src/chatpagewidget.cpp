@@ -49,6 +49,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 
     QHBoxLayout *inputLayout = new QHBoxLayout(inputPanel);
     inputLayout->setContentsMargins(0,0,0,0);
+    inputLayout->setSpacing(2);
     inputLayout->addWidget(input);
     inputLayout->addWidget(emoticonButton);
 

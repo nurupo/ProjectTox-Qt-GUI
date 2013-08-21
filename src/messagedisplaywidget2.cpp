@@ -30,6 +30,7 @@ MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
 
     mainlayout = new QVBoxLayout(widget);
     mainlayout->setSpacing(1);
+    mainlayout->setContentsMargins(1,1,1,1);
 }
 
 void MessageDisplayWidget2::setSmileyList(const EmoticonMenu::SmileyHash &list)
