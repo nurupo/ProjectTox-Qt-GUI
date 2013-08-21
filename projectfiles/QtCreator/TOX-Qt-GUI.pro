@@ -19,15 +19,36 @@ win32 {
     INCLUDEPATH += ../../libs/sodium/include/
     LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a
 } else {
-    macx {
-        QMAKE_CXXFLAGS += -stdlib=libc++
-        QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
-        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+    macx-g++ {
+        # To build a Mac OS X 10.6 compatible executable,
+        # we use MacPorts gcc 4.7 (to install: sudo port install gcc47)
+
+        # Why? Because the default gcc on Mac OS X (currently 4.2)
+        # doesn't support c++11
+
+        # Define a custom Qt5 Desktop kit using gcc instead of clang
+        # in QtCreator and select this kit for compilation
+
+        QMAKE_CXX = /opt/local/bin/g++-mp-4.7
 
         INCLUDEPATH += /usr/local/include
         LIBS += -L/usr/local/lib -lsodium
     } else {
-        LIBS += -lsodium
+        macx {
+            # To build a Mac OS X 10.7 (and higher) compatible executable,
+            # clang can be used directly
+
+            # for proper c++11 support we have to add
+            QMAKE_CXXFLAGS += -stdlib=libc++
+            # since -stdlib=libc++ requires 10.7 we have to add also
+            QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
+            QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+
+            INCLUDEPATH += /usr/local/include
+            LIBS += -L/usr/local/lib -lsodium
+        } else {
+            LIBS += -lsodium
+        }
     }
 }
 
