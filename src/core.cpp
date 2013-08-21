@@ -16,6 +16,8 @@
 
 #include "core.hpp"
 #include "Settings/settings.hpp"
+#include "cuserid.hpp"
+#include "cstring.hpp"
 
 #include <Messenger.h>
 
@@ -30,120 +32,6 @@
 #include <QDebug>
 
 #define MESSENGER_BAK "save.bak"
-
-class CUserId
-{
-public:
-    explicit CUserId(const QString& userId);
-    ~CUserId();
-
-    uint8_t* data();
-    uint16_t size();
-
-    static QString toString(const uint8_t* cUserId/*, uint16_t cUserIdSize*/);
-
-private:
-    uint8_t* cUserId;
-    uint16_t cUserIdSize;
-
-    static uint16_t fromString(const QString& userId, uint8_t* cUserId);
-};
-
-
-CUserId::CUserId(const QString &userId)
-{
-    cUserId = new uint8_t[FRIEND_ADDRESS_SIZE];
-    cUserIdSize = fromString(userId, cUserId);
-}
-
-CUserId::~CUserId()
-{
-    delete[] cUserId;
-}
-
-uint8_t* CUserId::data()
-{
-    return cUserId;
-}
-
-uint16_t CUserId::size()
-{
-    return cUserIdSize;
-}
-
-QString CUserId::toString(const uint8_t* cUserId/*, uint16_t cUserIdSize*/)
-{
-    return QString(QByteArray(reinterpret_cast<const char*>(cUserId), FRIEND_ADDRESS_SIZE).toHex()).toUpper();
-}
-
-uint16_t CUserId::fromString(const QString& userId, uint8_t* cUserId)
-{
-    QByteArray arr = QByteArray::fromHex(userId.toLower().toLatin1());
-    memcpy(cUserId, reinterpret_cast<uint8_t*>(arr.data()), arr.size());
-    return arr.size();
-}
-
-
-class CString
-{
-public:
-    explicit CString(const QString& string);
-    ~CString();
-
-    uint8_t* data();
-    uint16_t size();
-
-    static QString toString(const uint8_t* cMessage, uint16_t cMessageSize);
-    static QString toString(const uint8_t* cMessage);
-
-
-private:
-    const static int MAX_SIZE_OF_UTF8_ENCODED_CHARACTER = 4;
-
-    uint8_t* cString;
-    uint16_t cStringSize;
-
-    static uint16_t fromString(const QString& message, uint8_t* cMessage);
-};
-
-CString::CString(const QString& string)
-{
-    cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER + 1]();
-    cStringSize = fromString(string, cString);
-}
-
-CString::~CString()
-{
-    delete[] cString;
-}
-
-uint8_t* CString::data()
-{
-    return cString;
-}
-
-uint16_t CString::size()
-{
-    return cStringSize;
-}
-
-QString CString::toString(const uint8_t* cString, uint16_t cStringSize)
-{
-    return QString::fromUtf8(reinterpret_cast<const char*>(cString), cStringSize - 1);
-}
-
-QString CString::toString(const uint8_t* cString)
-{
-    return QString::fromUtf8(reinterpret_cast<const char*>(cString), -1);
-}
-
-uint16_t CString::fromString(const QString& string, uint8_t* cString)
-{
-    QByteArray byteArray = QByteArray(string.toUtf8());
-    memcpy(cString, reinterpret_cast<uint8_t*>(byteArray.data()), byteArray.size());
-    return byteArray.size() + 1;
-}
-
 
 class CorePrivate
 {
