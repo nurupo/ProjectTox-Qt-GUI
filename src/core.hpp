@@ -53,7 +53,7 @@ private:
         uint8_t* data();
         uint16_t size();
 
-        static QString toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/);
+        static QString toString(const uint8_t* cUserId/*, uint16_t cUserIdSize*/);
 
     private:
         uint8_t* cUserId;
@@ -71,8 +71,8 @@ private:
         uint8_t* data();
         uint16_t size();
 
-        static QString toString(uint8_t* cMessage, uint16_t cMessageSize);
-        static QString toString(uint8_t* cMessage);
+        static QString toString(const uint8_t* cMessage, uint16_t cMessageSize);
+        static QString toString(const uint8_t* cMessage);
 
 
     private:

@@ -29,6 +29,8 @@
 
 #include <QDebug>
 
+#define MESSENGER_BAK "save.bak"
+
 //hack to emit signals from static methods
 Core* core;
 
@@ -47,7 +49,7 @@ Core::~Core()
     uint32_t size = Messenger_size();
     QByteArray buf(size, 0);
     Messenger_save(reinterpret_cast<uint8_t*>(buf.data()));
-    QFile file("save.bak");
+    QFile file(MESSENGER_BAK);
     if (!file.open(QIODevice::WriteOnly))
     {
         qDebug() << "Failed to write save.bak";
@@ -191,19 +193,35 @@ void Core::start()
 {
     initMessenger();
 
-    QFile bak("save.bak");
-    if (bak.open(QIODevice::ReadOnly))
-    {
-        QByteArray arr = bak.readAll();
-	Messenger_load(reinterpret_cast<uint8_t*>(arr.data()), arr.length());
-	bak.close();
-    }
-
     m_callback_friendrequest(onFriendRequest);
     m_callback_friendmessage(onFriendMessage);
     m_callback_namechange(onFriendNameChange);
     m_callback_statusmessage(onStatusMessageChanged);
     m_callback_friendstatus(onFriendStatusChanged);
+
+    QFile bak(MESSENGER_BAK);
+    if (bak.open(QIODevice::ReadOnly)) {
+        QByteArray arr = bak.readAll();
+        Messenger_load(reinterpret_cast<uint8_t*>(arr.data()), arr.length());
+        bak.close();
+    }
+
+    int numfriends = m_get_numfriends();
+    for(int i = 0; i < numfriends; ++i) {
+        if(!m_get_friendclient_id(i))
+        {
+            continue;
+        }
+        QString client_id = CUserId::toString(m_get_friendclient_id(i));
+        emit friendAdded(i, client_id);
+
+        if(!m_get_friendname(i))
+        {
+            continue;
+        }
+        QString username = CString::toString(m_get_friendname(i));
+        emit friendUsernameChanged(i, username);
+    }
 
     emit userIdGenerated(CUserId::toString(self_public_key));
 
@@ -239,9 +257,9 @@ uint16_t Core::CUserId::size()
     return cUserIdSize;
 }
 
-QString Core::CUserId::toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/)
+QString Core::CUserId::toString(const uint8_t* cUserId/*, uint16_t cUserIdSize*/)
 {
-    return QString(QByteArray(reinterpret_cast<char*>(cUserId), CLIENT_ID_SIZE).toHex()).toUpper();
+    return QString(QByteArray(reinterpret_cast<const char*>(cUserId), CLIENT_ID_SIZE).toHex()).toUpper();
 }
 
 uint16_t Core::CUserId::fromString(const QString& userId, uint8_t* cUserId)
@@ -274,14 +292,14 @@ uint16_t Core::CString::size()
     return cStringSize;
 }
 
-QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
+QString Core::CString::toString(const uint8_t* cString, uint16_t cStringSize)
 {
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize - 1);
+    return QString::fromUtf8(reinterpret_cast<const char*>(cString), cStringSize - 1);
 }
 
-QString Core::CString::toString(uint8_t* cString)
+QString Core::CString::toString(const uint8_t* cString)
 {
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), -1);
+    return QString::fromUtf8(reinterpret_cast<const char*>(cString), -1);
 }
 
 uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
