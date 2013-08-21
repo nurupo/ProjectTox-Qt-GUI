@@ -40,6 +40,48 @@ For example, if your machine is dual core, use `make -j3`.
 
 If you want to build GUI by using Qt Creator, rather than terminal commands, follow Windows guide starting at "Then open the Qt Creator...".
 
+###Mac:
+
+Mac OS X 10.7.5
+XCode 4.6.2
+Apple LLVM version 4.2 (clang-425.0.28) (based on LLVM 3.2svn)
+
+This project depends on Qt5 and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium).
+
+1. Download and Install [Qt5.0.x](http://qt-project.org/downloads)
+2. Get sodium, compile and install [libsodium](https://github.com/jedisct1/libsodium):
+(requires `automake` and `libtool` being installed)
+```bashgit clone git://github.com/jedisct1/libsodium.git
+cd libsodium
+git checkout tags/0.4.2
+./autogen.sh
+./configure && make check
+sudo make install
+```
+3. Get this repo and the submodule [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core)
+```bash
+git clone --recursive git://github.com/nurupo/ProjectTox-Qt-GUI.git
+```
+4. Following additional Mac related lines have to be included in ../projectfiles/QtCreator/TOX-Qt-GUI.pro
+```
+QMAKE_CXXFLAGS += -stdlib=libc++
+QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+```
+5. Build the GUI:
+```bash
+cd ProjectTox-Qt-GUI
+mkdir build && cd build
+qmake -Wall ../projectfiles/QtCreator/TOX-Qt-GUI.pro
+make -j4
+```
+On success, this will build a `TOX-Qt-GUI` executable.
+
+Note that `qmake` might not be found by bash, in that case you should use qmake from Qt's installation directory.
+For example, my qmake was located at `/Users/xxxx/Qt/5.0.2/clang_64/bin/qmake`.
+
+If you want to build GUI by using Qt Creator, rather than terminal commands, follow Windows guide starting at "Then open the Qt Creator...".
+
 ###Windows:
 
 You should get and install **MinGW version** of Qt5 from [here](http://qt-project.org/downloads).
