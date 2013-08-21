@@ -31,14 +31,10 @@
 
 #define MESSENGER_BAK "save.bak"
 
-//hack to emit signals from static methods
-Core* core;
-
 Core::Core() :
     QObject(nullptr)
 {
     qRegisterMetaType<Core::FriendStatus>("FriendStatus");
-    core = this;
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Core::process);
     connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
@@ -61,21 +57,25 @@ Core::~Core()
 
 void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
 
 void Core::onFriendMessage(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendMessageRecieved(friendId, CString::toString(cMessage, cMessageSize));
 }
 
 void Core::onFriendNameChange(Messenger *m, int friendId, uint8_t* cName, uint16_t cNameSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
 }
 
 void Core::onStatusMessageChanged(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
 }
 
@@ -86,6 +86,7 @@ void Core::onUserStatusChanged(Messenger *m, int friendId, USERSTATUS status, vo
 
 void Core::onConnectionStatusChanged(Messenger *m, int friendId, uint8_t status, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     if (status) {
         emit core->friendStatusChanged(friendId, FriendStatus::Online);
     }
