@@ -78,7 +78,7 @@ void AddFriendDialog::accept()
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
-    } else if (userIdEdit->text().length() != 64 || !userIdEdit->text().contains(hexRegExp)) {
+    } else if (userIdEdit->text().length() != 76 || !userIdEdit->text().contains(hexRegExp)) {
         QMessageBox warning(this);
         warning.setText("Please enter a valid User ID.");
         warning.setIcon(QMessageBox::Warning);

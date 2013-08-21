@@ -17,19 +17,41 @@
 #include "starter.hpp"
 #include "Settings/settings.hpp"
 
-Starter::Starter(QObject* parent) :
-    QObject(parent)
+class StarterPrivate
 {
-    createMainWindow();
+public:
+    void createMainWindow();
+
+    MainWindow *mainWindow;
+};
+
+void StarterPrivate::createMainWindow()
+{
+    delete mainWindow;
+    mainWindow = new MainWindow();
+    mainWindow->show();
+}
+
+Starter::Starter(QObject* parent) :
+    QObject(parent),
+    d_ptr(new StarterPrivate)
+{
+    Q_D(Starter);
+
+    d->mainWindow = 0;
+    d->createMainWindow();
+}
+
+Starter::~Starter()
+{
+    Q_D(Starter);
+    delete d->mainWindow;
+    delete d;
 }
 
 void Starter::onDhtDialogAccepted()
 {
-    createMainWindow();
+    Q_D(Starter);
+    d->createMainWindow();
 }
 
-void Starter::createMainWindow()
-{
-    MainWindow* mainWindow = new MainWindow();
-    mainWindow->show();
-}

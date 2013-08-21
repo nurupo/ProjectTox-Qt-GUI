@@ -16,6 +16,8 @@
 
 #include "core.hpp"
 #include "Settings/settings.hpp"
+#include "cuserid.hpp"
+#include "cstring.hpp"
 
 #include <Messenger.h>
 
@@ -25,93 +27,212 @@
 
 #include <QThread>
 #include <QTime>
+#include <QFile>
 
-//hack to emit signals from static methods
-Core* core;
+#include <QDebug>
 
-Core::Core() :
-    QObject(nullptr)
+#define MESSENGER_BAK "save.bak"
+
+class CorePrivate
 {
-    qRegisterMetaType<Core::FriendStatus>("FriendStatus");
-    core = this;
-    timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Core::process);
-    connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
+public:
+    CorePrivate(Core *core);
+
+    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata);
+    static void onFriendMessage(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata);
+    static void onFriendNameChange(Messenger *m, int friendId, uint8_t* cName, uint16_t cNameSize, void *userdata);
+    static void onStatusMessageChanged(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata);
+    static void onUserStatusChanged(Messenger *m, int friendId, USERSTATUS status, void *userdata);
+    static void onConnectionStatusChanged(Messenger *m, int friendId, uint8_t status, void *userdata);
+
+    void checkConnection();
+    void save();
+    void load();
+
+    Messenger *messenger;
+    QTimer* timer;
+    QList<int> friendIdList;
+
+private:
+    Core * const q_ptr;
+    Q_DECLARE_PUBLIC(Core);
+};
+
+CorePrivate::CorePrivate(Core *core)
+    : q_ptr(core)
+{
+
 }
 
-void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize)
+void CorePrivate::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
+void CorePrivate::onFriendMessage(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendMessageRecieved(friendId, CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize)
+void CorePrivate::onFriendNameChange(Messenger *m, int friendId, uint8_t* cName, uint16_t cNameSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
 }
 
-void Core::onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
+void CorePrivate::onStatusMessageChanged(Messenger *m, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void *userdata)
 {
+    Core *core = static_cast<Core*>(userdata);
     emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onFriendStatusChanged(int friendId, uint8_t status)
+void CorePrivate::onUserStatusChanged(Messenger *m, int friendId, USERSTATUS status, void *userdata)
 {
-    emit core->friendStatusChanged(friendId, static_cast<FriendStatus>(status));
+    // TODO
+}
+
+void CorePrivate::onConnectionStatusChanged(Messenger *m, int friendId, uint8_t status, void *userdata)
+{
+    Core *core = static_cast<Core*>(userdata);
+    if (status) {
+        emit core->friendStatusChanged(friendId, Core::FriendStatus::Online);
+    }
+    else {
+        emit core->friendStatusChanged(friendId, Core::FriendStatus::NotFound);
+    }
+}
+
+
+void CorePrivate::checkConnection()
+{
+    Q_Q(Core);
+    static bool isConnected = false;
+
+    if (DHT_isconnected(messenger->dht) && !isConnected) {
+        emit q->connected();
+        isConnected = true;
+    } else if (!DHT_isconnected(messenger->dht) && isConnected) {
+        emit q->disconnected();
+        isConnected = false;
+    }
+}
+
+void CorePrivate::save()
+{
+    uint32_t size = Messenger_size(messenger);
+    QByteArray buf(size, 0);
+    Messenger_save(messenger, reinterpret_cast<uint8_t*>(buf.data()));
+    QFile file(MESSENGER_BAK);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "Failed to write save.bak";
+    return;
+    }
+    file.write(buf);
+    file.close();
+}
+
+void CorePrivate::load()
+{
+    Q_Q(Core);
+
+    QFile bak(MESSENGER_BAK);
+    if (bak.open(QIODevice::ReadOnly)) {
+        QByteArray arr = bak.readAll();
+        Messenger_load(messenger, reinterpret_cast<uint8_t*>(arr.data()), arr.length());
+        bak.close();
+
+        for(uint32_t i = 0; i < messenger->numfriends; ++i) {
+            QString client_id = CUserId::toString(messenger->friendlist[i].client_id);
+            emit q->friendAdded(i, client_id);
+
+            if(!*messenger->friendlist[i].name)
+            {
+                continue;
+            }
+            QString username = CString::toString(messenger->friendlist[i].name);
+            emit q->friendUsernameChanged(i, username);
+        }
+    }
+}
+
+Core::Core() :
+    QObject(nullptr),
+    d_ptr(new CorePrivate(this))
+{
+    Q_D(Core);
+
+    qRegisterMetaType<Core::FriendStatus>("FriendStatus");
+
+    d->timer = new QTimer(this);
+    connect(d->timer, &QTimer::timeout, this, &Core::process);
+    connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
+}
+
+Core::~Core()
+{
+    Q_D(Core);
+
+    d->save();
+
+    delete d;
 }
 
 void Core::acceptFriendRequest(const QString& userId)
 {
-    int friendId = m_addfriend_norequest(CUserId(userId).data());
+    Q_D(Core);
+    int friendId = m_addfriend_norequest(d->messenger, CUserId(userId).data());
     if (friendId == -1) {
         emit failedToAddFriend(userId);
     } else {
         emit friendAdded(friendId, userId);
-        friendIdList << friendId;
+        d->friendIdList << friendId;
     }
 }
 
 void Core::requestFriendship(const QString& userId, const QString& message)
 {
+    Q_D(Core);
     CString cMessage(message);
 
-    int friendId = m_addfriend(CUserId(userId).data(), cMessage.data(), cMessage.size());
+    int friendId = m_addfriend(d->messenger, CUserId(userId).data(), cMessage.data(), cMessage.size());
     if (friendId == -1) {
         emit failedToAddFriend(userId);
     } else {
         emit friendAdded(friendId, userId);
-        friendIdList << friendId;
+        d->friendIdList << friendId;
     }
 }
 
 void Core::sendMessage(int friendId, const QString& message)
 {
+    Q_D(Core);
     CString cMessage(message);
 
-    if (!m_sendmessage(friendId, cMessage.data(), cMessage.size())) {
+    if (!m_sendmessage(d->messenger, friendId, cMessage.data(), cMessage.size())) {
         emit failedToSendMessage(friendId, message);
     }
 }
 
 void Core::removeFriend(int friendId)
 {
-    if (m_delfriend(friendId) == -1) {
+    Q_D(Core);
+    if (m_delfriend(d->messenger, friendId) == -1) {
         emit failedToRemoveFriend(friendId);
     } else {
         emit friendRemoved(friendId);
-        friendIdList.removeOne(friendId);
+        d->friendIdList.removeOne(friendId);
     }
 }
 
 void Core::setUsername(const QString& username)
 {
+    Q_D(Core);
     CString cUsername(username);
 
-    if (setname(cUsername.data(), cUsername.size()) == -1) {
+    if (setname(d->messenger, cUsername.data(), cUsername.size()) == -1) {
         emit failedToSetUsername(username);
     } else {
         emit usernameSet(username);
@@ -120,9 +241,10 @@ void Core::setUsername(const QString& username)
 
 void Core::setStatusMessage(const QString &message)
 {
+    Q_D(Core);
     CString cMessage(message);
 
-    if (m_set_statusmessage(cMessage.data(), cMessage.size()) == -1) {
+    if (m_set_statusmessage(d->messenger, cMessage.data(), cMessage.size()) == -1) {
         emit failedToSetStatusMessage(message);
     } else {
         emit statusMessageSet(message);
@@ -131,16 +253,18 @@ void Core::setStatusMessage(const QString &message)
 
 void Core::process()
 {
-    doMessenger();
+    Q_D(Core);
+    doMessenger(d->messenger);
 #ifdef DEBUG
     //we want to see the debug messages immediately
     fflush(stdout);
 #endif
-    checkConnection();
+    d->checkConnection();
 }
 
 void Core::bootstrapDht()
 {
+    Q_D(Core);
     const Settings& s = Settings::getInstance();
     QList<Settings::DhtServer> dhtServerList = s.getDhtServerList();
 
@@ -152,115 +276,34 @@ void Core::bootstrapDht()
             continue;
         }
 
-        DHT_bootstrap(bootstrapIpPort, CUserId(dhtServer.userId).data());
-    }
-}
-
-void Core::checkConnection()
-{
-    static bool isConnected = false;
-
-    if (DHT_isconnected() && !isConnected) {
-        emit connected();
-        isConnected = true;
-    } else if (!DHT_isconnected() && isConnected) {
-        emit disconnected();
-        isConnected = false;
+        DHT_bootstrap(d->messenger->dht, bootstrapIpPort, CUserId(dhtServer.userId).data());
     }
 }
 
 void Core::start()
 {
-    initMessenger();
+    Q_D(Core);
 
-    m_callback_friendrequest(onFriendRequest);
-    m_callback_friendmessage(onFriendMessage);
-    m_callback_namechange(onFriendNameChange);
-    m_callback_statusmessage(onStatusMessageChanged);
-    m_callback_friendstatus(onFriendStatusChanged);
+    d->messenger = initMessenger();
 
-    emit userIdGenerated(CUserId::toString(self_public_key));
+    m_callback_friendrequest(d->messenger, CorePrivate::onFriendRequest, this);
+    m_callback_friendmessage(d->messenger, CorePrivate::onFriendMessage, this);
+    m_callback_namechange(d->messenger, CorePrivate::onFriendNameChange, this);
+    m_callback_statusmessage(d->messenger, CorePrivate::onStatusMessageChanged, this);
+    m_callback_userstatus(d->messenger, CorePrivate::onUserStatusChanged, this);
+    m_callback_connectionstatus(d->messenger, CorePrivate::onConnectionStatusChanged, this);
+
+    d->load();
+
+    uint8_t ourid[FRIEND_ADDRESS_SIZE];
+    getaddress(d->messenger, ourid);
+    emit userIdGenerated(CUserId::toString(ourid));
 
     CString cUsername(Settings::getInstance().getUsername());
-    setname(cUsername.data(), cUsername.size());
+    setname(d->messenger, cUsername.data(), cUsername.size());
 
     bootstrapDht();
 
-    timer->setInterval(30);
-    timer->start();
-}
-
-// CUserId
-
-Core::CUserId::CUserId(const QString &userId)
-{
-    cUserId = new uint8_t[CLIENT_ID_SIZE];
-    cUserIdSize = fromString(userId, cUserId);
-}
-
-Core::CUserId::~CUserId()
-{
-    delete[] cUserId;
-}
-
-uint8_t* Core::CUserId::data()
-{
-    return cUserId;
-}
-
-uint16_t Core::CUserId::size()
-{
-    return cUserIdSize;
-}
-
-QString Core::CUserId::toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/)
-{
-    return QString(QByteArray(reinterpret_cast<char*>(cUserId), CLIENT_ID_SIZE).toHex()).toUpper();
-}
-
-uint16_t Core::CUserId::fromString(const QString& userId, uint8_t* cUserId)
-{
-    QByteArray arr = QByteArray::fromHex(userId.toLower().toLatin1());
-    memcpy(cUserId, reinterpret_cast<uint8_t*>(arr.data()), arr.size());
-    return arr.size();
-}
-
-// CString
-
-Core::CString::CString(const QString& string)
-{
-    cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER + 1]();
-    cStringSize = fromString(string, cString);
-}
-
-Core::CString::~CString()
-{
-    delete[] cString;
-}
-
-uint8_t* Core::CString::data()
-{
-    return cString;
-}
-
-uint16_t Core::CString::size()
-{
-    return cStringSize;
-}
-
-QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
-{
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize - 1);
-}
-
-QString Core::CString::toString(uint8_t* cString)
-{
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), -1);
-}
-
-uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
-{
-    QByteArray byteArray = QByteArray(string.toUtf8());
-    memcpy(cString, reinterpret_cast<uint8_t*>(byteArray.data()), byteArray.size());
-    return byteArray.size() + 1;
+    d->timer->setInterval(30);
+    d->timer->start();
 }

@@ -21,6 +21,10 @@
 #include <QTimer>
 #include <QList>
 
+#include <Messenger.h>
+
+class CorePrivate;
+
 class Core : public QObject
 {
     Q_OBJECT
@@ -28,60 +32,9 @@ class Core : public QObject
 
 public:
     explicit Core();
+    virtual ~Core();
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
-
-private:
-    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
-    static void onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendStatusChanged(int friendId, uint8_t status);
-
-    void checkConnection();
-
-    QTimer* timer;
-    QList<int> friendIdList;
-
-    class CUserId
-    {
-    public:
-        explicit CUserId(const QString& userId);
-        ~CUserId();
-
-        uint8_t* data();
-        uint16_t size();
-
-        static QString toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/);
-
-    private:
-        uint8_t* cUserId;
-        uint16_t cUserIdSize;
-
-        static uint16_t fromString(const QString& userId, uint8_t* cUserId);
-    };
-
-    class CString
-    {
-    public:
-        explicit CString(const QString& string);
-        ~CString();
-
-        uint8_t* data();
-        uint16_t size();
-
-        static QString toString(uint8_t* cMessage, uint16_t cMessageSize);
-        static QString toString(uint8_t* cMessage);
-
-
-    private:
-        const static int MAX_SIZE_OF_UTF8_ENCODED_CHARACTER = 4;
-
-        uint8_t* cString;
-        uint16_t cStringSize;
-
-        static uint16_t fromString(const QString& message, uint8_t* cMessage);
-    };
 
 public slots:
     void start();
@@ -126,6 +79,9 @@ signals:
     void failedToSetUsername(const QString& username);
     void failedToSetStatusMessage(const QString& message);
 
+private:
+    CorePrivate * const d_ptr;
+    Q_DECLARE_PRIVATE(Core);
 };
 
 Q_DECLARE_METATYPE(Core::FriendStatus)
