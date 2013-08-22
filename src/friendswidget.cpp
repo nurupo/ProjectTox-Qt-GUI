@@ -26,7 +26,8 @@
 #include <QVBoxLayout>
 
 FriendsWidget::FriendsWidget(QWidget* parent) :
-    QWidget(parent)
+    QWidget(parent),
+    lastSelected(nullptr)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setSpacing(2);
@@ -122,6 +123,19 @@ void FriendsWidget::setUsername(int friendId, const QString& username)
     friendItem->setText(username);
 }
 
+void FriendsWidget::messageReceived(int friendId)
+{
+    QStandardItem* friendItem = findFriendItem(friendId);
+
+    if (friendItem == nullptr || friendItem == lastSelected) {
+        return;
+    }
+
+    QFont f = friendItem->data(Qt::FontRole).value<QFont>();
+    f.setBold(true);
+    friendItem->setData(f, Qt::FontRole);
+}
+
 QStandardItem* FriendsWidget::findFriendItem(int friendId) const
 {
     QModelIndexList indexList = friendModel->match(friendModel->index(0, 0), FriendIdRole, friendId);
@@ -184,6 +198,12 @@ void FriendsWidget::onFriendSelectionChanged(const QModelIndex& current, const Q
     QStandardItem* item = friendModel->itemFromIndex(friendProxyModel->mapToSource(current));
     if (item != nullptr) {
         emit friendSelectionChanged(item->data(FriendIdRole).toInt());
+
+        QFont f = item->data(Qt::FontRole).value<QFont>();
+        f.setBold(false);
+        item->setData(f, Qt::FontRole);
+
+        lastSelected = item;
     }
 }
 

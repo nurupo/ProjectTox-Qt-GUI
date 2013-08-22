@@ -45,6 +45,7 @@ private:
     FriendProxyModel* friendProxyModel;
     QMenu* friendContextMenu;
     QPushButton* addFriendButton;
+    QStandardItem* lastSelected;
 
     QStandardItem* findFriendItem(int friendId) const;
     void setStatus(QStandardItem* friendItem, Status status);
@@ -60,6 +61,7 @@ public slots:
     void addFriend(int friendId, const QString& userId);
     void removeFriend(int friendId);
     void setUsername(int friendId, const QString& username);
+    void messageReceived(int friendId);
 
 signals:
     void friendAdded(int friendId, const QString& userId);
