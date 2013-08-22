@@ -44,19 +44,18 @@ private:
     QStandardItemModel* friendModel;
     FriendProxyModel* friendProxyModel;
     QMenu* friendContextMenu;
-    QPushButton* addFriendButton;
 
     QStandardItem* findFriendItem(int friendId) const;
     void setStatus(QStandardItem* friendItem, Status status);
 
 private slots:
-    void onAddFriendButtonClicked();
     void onFriendContextMenuRequested(const QPoint& pos);
     void onCopyUserIdActionTriggered();
     void onRemoveFriendActionTriggered();
     void onFriendSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
 
 public slots:
+    void onAddFriendButtonClicked();
     void addFriend(int friendId, const QString& userId);
     void removeFriend(int friendId);
     void setUsername(int friendId, const QString& username);

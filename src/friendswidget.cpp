@@ -64,12 +64,8 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     filterEdit->setPlaceholderText("Search");
     connect(filterEdit, &FilterWidget::textChanged, friendProxyModel, &FriendProxyModel::setFilterFixedString);
 
-    addFriendButton = new QPushButton(QIcon(":/icons/user_add.png"), "Add Friend", this);
-    connect(addFriendButton, &QPushButton::clicked, this, &FriendsWidget::onAddFriendButtonClicked);
-
     layout->addWidget(filterEdit);
     layout->addWidget(friendView);
-    layout->addWidget(addFriendButton);
 }
 
 void FriendsWidget::addFriend(int friendId, const QString& userId)
