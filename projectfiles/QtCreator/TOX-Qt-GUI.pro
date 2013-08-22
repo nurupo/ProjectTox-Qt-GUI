@@ -93,9 +93,9 @@ HEADERS  += \
     ../../src/Settings/loggingsettingspage.hpp \
     ../../src/aboutdialog.hpp \
     ../../src/appinfo.hpp \
-    ../../src/messagedisplaywidget2.h \
-    ../../src/emoticonmenu.h \
-    ../../src/messagelabel.h
+    ../../src/messagelabel.hpp \
+    ../../src/messagedisplaywidget2.hpp \
+    ../../src/emoticonmenu.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \

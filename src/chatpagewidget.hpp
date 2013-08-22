@@ -45,15 +45,12 @@ private:
     QString username;
     Status status;
 
-private slots:
-    void onMessageSent(const QString& message);
-
 public slots:
     void messageReceived(const QString& message);
-    void failedToSendMessage(const QString& message);
+    void MessageSentResult(const QString& message, int messageId);
 
 signals:
-    void messageSent(const QString& message);
+    void sendMessage(const QString& message);
 
 };
 

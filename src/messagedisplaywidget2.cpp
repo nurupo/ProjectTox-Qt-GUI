@@ -1,4 +1,4 @@
-#include "messagedisplaywidget2.h"
+#include "messagedisplaywidget2.hpp"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -11,7 +11,8 @@
 
 #include "Settings/settings.hpp"
 #include "elidelabel.hpp"
-#include "messagelabel.h"
+#include "messagelabel.hpp"
+#include "emoticonmenu.hpp"
 
 MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
     QScrollArea(parent)
@@ -33,12 +34,7 @@ MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
     mainlayout->setContentsMargins(1,1,1,1);
 }
 
-void MessageDisplayWidget2::setSmileyList(const EmoticonMenu::SmileyHash &list)
-{
-    smileyList = list;
-}
-
-void MessageDisplayWidget2::appendMessage(const QString &name, const QString &message/*, const QString &timestamp, const QString &messageId*/)
+void MessageDisplayWidget2::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
     // Setup new row
     ElideLabel *nameLabel = new ElideLabel(this);
@@ -50,19 +46,32 @@ void MessageDisplayWidget2::appendMessage(const QString &name, const QString &me
     nameLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
 
     MessageLabel *messageLabel = new MessageLabel(this);
-    messageLabel->setProperty("class", "msgMessage"); // for CSS styling
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
-    messageLabel->setSmileyList(smileyList);
+    if(messageId) // Message sent
+    {
+        messageLabel->setMessageId(messageId);
+        messageLabel->setProperty("class", "msgMessage"); // for CSS styling
+        messageLabel->setText(EmoticonMenu::smile(urlify(message)));
+    }
+    else // Error
+    {
+        QPalette errorPal;
+        errorPal.setColor(QPalette::Foreground, Qt::red);
+        messageLabel->setPalette(errorPal);
+        messageLabel->setProperty("class", "msgError"); // for CSS styling
+        messageLabel->setText(urlify(message).prepend("<img src=\":/icons/error.png\" /> "));
+        messageLabel->setToolTip(tr("Couldn't send the message!"));
+    }
 
     QLabel *timeLabel = new QLabel(this);
     timeLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     timeLabel->setForegroundRole(QPalette::Mid);
     timeLabel->setProperty("class", "msgTimestamp"); // for CSS styling
     timeLabel->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignTrailing);
+    timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
 
 
-
-    // Insert new message
+    // Insert name
     if(name != lastName || mainlayout->count() < 1)
     {
         nameLabel->setText(name);
@@ -88,70 +97,6 @@ void MessageDisplayWidget2::appendMessage(const QString &name, const QString &me
         }
     }
 
-    messageLabel->setText(smile(urlify(message)));
-    timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
-
-    // Add row
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->setContentsMargins(0, 0, 0, 0);
-    hlayout->addWidget(nameLabel);
-    hlayout->addWidget(messageLabel);
-    hlayout->addWidget(timeLabel);
-    mainlayout->addLayout(hlayout);
-}
-
-void MessageDisplayWidget2::appendErrorMessage(const QString &message)
-{
-    QPalette errorPal;
-    errorPal.setColor(QPalette::Foreground, Qt::red);
-
-    // Setup new row
-    QLabel *nameLabel = new QLabel(this);
-    nameLabel->setMaximumWidth(50);
-    nameLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    nameLabel->setPalette(errorPal);
-    nameLabel->setProperty("class", "msgError"); // for CSS styling
-    nameLabel->setAlignment(Qt::AlignLeading |
-                            Qt::AlignLeft    |
-                            Qt::AlignTop);
-
-    QLabel *messageLabel = new QLabel(this);
-    messageLabel->setWordWrap(true);
-    messageLabel->setPalette(errorPal);
-    messageLabel->setProperty("class", "msgError"); // for CSS styling
-    messageLabel->setAlignment(Qt::AlignLeading |
-                               Qt::AlignLeft    |
-                               Qt::AlignTop);
-
-    QLabel *timeLabel = new QLabel(this);
-    timeLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    timeLabel->setPalette(errorPal);
-    timeLabel->setProperty("class", "msgError"); // for CSS styling
-    timeLabel->setAlignment(Qt::AlignRight |
-                            Qt::AlignTop   |
-                            Qt::AlignTrailing);
-
-    // Insert message
-    if("*" != lastName || mainlayout->count() < 1)
-    {
-        nameLabel->setText("*");
-        lastName = "*";
-
-        // Create line
-        if(mainlayout->count() > 0)
-        {
-            QFrame *line = new QFrame(this);
-            line->setFrameShape(QFrame::HLine);
-            line->setFrameShadow(QFrame::Plain);
-            line->setForegroundRole(QPalette::Midlight);
-            line->setProperty("class", "msgLine"); // for CSS styling
-            mainlayout->addWidget(line);
-        }
-    }
-
-    messageLabel->setText(message);
-    timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
-
     // Add row
     QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->setContentsMargins(0, 0, 0, 0);
@@ -170,16 +115,4 @@ void MessageDisplayWidget2::moveScrollBarToBottom(int min, int max)
 QString MessageDisplayWidget2::urlify(QString string)
 {
     return string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
-}
-
-QString MessageDisplayWidget2::smile(QString text)
-{
-    QHashIterator<QString, QStringList> i(smileyList);
-    while(i.hasNext())
-    {
-        i.next();
-        foreach (QString smileytext, i.value())
-            text.replace(smileytext, QString("<img src=\"%1\" />").arg(i.key()));
-    }
-    return text;
 }

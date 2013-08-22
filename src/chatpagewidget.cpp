@@ -19,8 +19,8 @@
 #include "status.hpp"
 #include "Settings/settings.hpp"
 
-#include "messagedisplaywidget2.h"
-#include "emoticonmenu.h"
+#include "messagedisplaywidget2.hpp"
+#include "emoticonmenu.hpp"
 
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -34,8 +34,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     display2 = new MessageDisplayWidget2(this);
 
     input = new InputTextWidget(this);
-    connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::messageSent);
-    connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::onMessageSent);
+    connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
 
     // Create emoticon menu :)
     QWidget *inputPanel = new QWidget(this);
@@ -67,18 +66,11 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->setContentsMargins(0, 3, 2, 3);
 
     // give all smileys whith their textual representations to the input dialog for desmiling
-    input->setSmileyList(menu->getSmileyList());
-    display2->setSmileyList(menu->getSmileyList());
 }
 
 int ChatPageWidget::getFriendId() const
 {
     return friendId;
-}
-
-void ChatPageWidget::onMessageSent(const QString& message)
-{
-    display2->appendMessage(Settings::getInstance().getUsername(), message);
 }
 
 void ChatPageWidget::messageReceived(const QString& message)
@@ -99,7 +91,7 @@ void ChatPageWidget::setStatus(Status newStatus)
     //input->setReadOnly(newStatus != Status::Online);
 }
 
-void ChatPageWidget::failedToSendMessage(const QString& message)
+void ChatPageWidget::MessageSentResult(const QString& message, int messageId)
 {
-    display2->appendErrorMessage(tr("Failed to send message: '%1'").arg(message));
+    display2->appendMessage(Settings::getInstance().getUsername(), message, messageId);
 }

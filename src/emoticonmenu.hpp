@@ -16,7 +16,9 @@ public:
 
     explicit EmoticonMenu(QWidget *parent = 0);
 
-    SmileyHash getSmileyList();
+    static SmileyHash &getSmileyHash();
+    static QString smile(QString text);
+    static QString desmile(QString htmlText);
     
 signals:
     void insertEmoticon(QString);
@@ -30,7 +32,6 @@ private:
     void addEmoticon(const QString &imgPath, const QStringList &texts);
 
     QGridLayout *layout;
-    SmileyHash smileyList;
 };
 
 #endif // EMOTICONMENU_H

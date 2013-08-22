@@ -1,10 +1,12 @@
-#include "emoticonmenu.h"
+#include "emoticonmenu.hpp"
 
 #include <QGridLayout>
 #include <QToolButton>
 #include <QDebug>
 #include <QHash>
 #include <QWidgetAction>
+#include <QRegularExpression>
+#include <QTextDocument>
 
 EmoticonMenu::EmoticonMenu(QWidget *parent) :
     QMenu(parent)
@@ -41,9 +43,41 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
 }
 
 /*! Get a hash of all smileys. That can be used for functions like desmile. */
-EmoticonMenu::SmileyHash EmoticonMenu::getSmileyList()
+EmoticonMenu::SmileyHash &EmoticonMenu::getSmileyHash()
 {
-    return smileyList;
+    static SmileyHash smileyHash;
+    return smileyHash;
+}
+
+QString EmoticonMenu::smile(QString text)
+{
+    QHashIterator<QString, QStringList> i(getSmileyHash());
+    while(i.hasNext())
+    {
+        i.next();
+        foreach (QString smileytext, i.value())
+            text.replace(smileytext, QString("<img src=\"%1\" />").arg(i.key()));
+    }
+    return text;
+}
+
+QString EmoticonMenu::desmile(QString htmlText)
+{
+    // Replace smileys by their textual representation
+    int i=0;
+    QRegularExpression re("<img[\\s]+[^>]*?((alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?)|(src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?))((src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|(alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|>)");
+    QRegularExpressionMatch match = re.match(htmlText, i);
+    while(match.hasMatch())
+    {
+        // Replace smiley and match next
+        htmlText.replace(match.captured(0), getSmileyHash().value(match.captured(5)).first());
+        match = re.match(htmlText, ++i);
+    }
+
+    // convert to plain text
+    QTextDocument doc;
+    doc.setHtml(htmlText);
+    return doc.toPlainText();
 }
 
 /*! Add smileys by setting a imgage file and a textlist of textual representations. */
@@ -58,7 +92,7 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts)
     connect(button, &QToolButton::clicked, this, &EmoticonMenu::close);
 
     layout->addWidget(button, layout->count()/5, layout->count()%5);
-    smileyList.insert(imgPath, texts);
+    getSmileyHash().insert(imgPath, texts);
 }
 
 /*! Signal sends the (first) textual form of the clicked smiley. */

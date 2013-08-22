@@ -18,11 +18,11 @@
 
 #include <QKeyEvent>
 #include <QDebug>
-#include <QRegularExpression>
-#include <QTextDocument>
+#include <QTextDocumentFragment>
 #include <QApplication>
 #include <QClipboard>
-#include <QTextDocumentFragment>
+
+#include "emoticonmenu.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
@@ -46,12 +46,6 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     addAction(actionPaste);
 }
 
-/*! Set smileyhash for smiley image <-> text replacing. */
-void InputTextWidget::setSmileyList(const EmoticonMenu::SmileyHash &list)
-{
-    smileyList = list;
-}
-
 /*! Handle keyboard events. */
 void InputTextWidget::keyPressEvent(QKeyEvent* event)
 {
@@ -59,7 +53,7 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
             && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier))
     {
-        emit messageSent(desmile(toHtml()));
+        emit sendMessage(EmoticonMenu::desmile(toHtml()));
         clear();
     }
 
@@ -76,32 +70,12 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
        QTextEdit::keyPressEvent(event);
 }
 
-/*! Replace smiley images by their textual representations. */
-QString InputTextWidget::desmile(QString htmlText)
-{
-    // Replace smileys by their textual representation
-    int i=0;
-    QRegularExpression re("<img[\\s]+[^>]*?((alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?)|(src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?))((src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|(alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|>)");
-    QRegularExpressionMatch match = re.match(htmlText, i);
-    while(match.hasMatch())
-    {
-        // Replace smiley and match next
-        htmlText.replace(match.captured(0), smileyList.value(match.captured(5)).first());
-        match = re.match(htmlText, ++i);
-    }
-
-    // convert to plain text
-    QTextDocument doc;
-    doc.setHtml(htmlText);
-    return doc.toPlainText();
-}
-
 /*! Copy texy without images, but textual representations of the smileys. */
 void InputTextWidget::copyPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(desmile(selection.toHtml()));
+    clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
 }
 
 /*! Paste only plain text. */
@@ -116,6 +90,6 @@ void InputTextWidget::cutPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(desmile(selection.toHtml()));
+    clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
     textCursor().removeSelectedText();
 }

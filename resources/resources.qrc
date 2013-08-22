@@ -26,5 +26,6 @@
         <file>icons/emoticons/emotion_tongue.png</file>
         <file>icons/emoticons/emotion_doubt.png</file>
         <file>icons/emoticons/emotion_evilgrin.png</file>
+        <file>icons/error.png</file>
     </qresource>
 </RCC>
