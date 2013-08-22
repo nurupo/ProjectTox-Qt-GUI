@@ -19,7 +19,7 @@
 #include "status.hpp"
 #include "Settings/settings.hpp"
 
-#include "messagedisplaywidget2.hpp"
+#include "messagedisplaywidget.hpp"
 #include "emoticonmenu.hpp"
 
 #include <QSplitter>
@@ -31,7 +31,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)
 {
     friendItem = new FriendItemWidget(this);
-    display2 = new MessageDisplayWidget2(this);
+    display = new MessageDisplayWidget(this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
@@ -55,7 +55,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
     splitter->setChildrenCollapsible(false);
-    splitter->addWidget(display2);
+    splitter->addWidget(display);
     splitter->addWidget(inputPanel);
     splitter->setStretchFactor(1, 3);
 
@@ -75,7 +75,7 @@ int ChatPageWidget::getFriendId() const
 
 void ChatPageWidget::messageReceived(const QString& message)
 {
-    display2->appendMessage(username, message);
+    display->appendMessage(username, message);
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
@@ -93,5 +93,5 @@ void ChatPageWidget::setStatus(Status newStatus)
 
 void ChatPageWidget::MessageSentResult(const QString& message, int messageId)
 {
-    display2->appendMessage(Settings::getInstance().getUsername(), message, messageId);
+    display->appendMessage(Settings::getInstance().getUsername(), message, messageId);
 }

@@ -20,11 +20,11 @@ class QVBoxLayout;
  * Seperator line | QFrame             | msgLine
  * Error message  | ElideLabel, QLabel | msgError
  */
-class MessageDisplayWidget2 : public QScrollArea
+class MessageDisplayWidget : public QScrollArea
 {
     Q_OBJECT
 public:
-    explicit MessageDisplayWidget2(QWidget *parent = 0);
+    explicit MessageDisplayWidget(QWidget *parent = 0);
 
     void appendMessage(const QString &name, const QString &message, int messageId = -1);
 

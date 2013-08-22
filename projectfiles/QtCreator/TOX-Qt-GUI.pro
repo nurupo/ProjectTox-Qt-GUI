@@ -59,9 +59,9 @@ SOURCES += \
     ../../src/Settings/customhintlistwidget.cpp \
     ../../src/Settings/loggingsettingspage.cpp \
     ../../src/aboutdialog.cpp \
-    ../../src/messagedisplaywidget2.cpp \
     ../../src/emoticonmenu.cpp \
-    ../../src/messagelabel.cpp
+    ../../src/messagelabel.cpp \
+    ../../src/messagedisplaywidget.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -94,8 +94,8 @@ HEADERS  += \
     ../../src/aboutdialog.hpp \
     ../../src/appinfo.hpp \
     ../../src/messagelabel.hpp \
-    ../../src/messagedisplaywidget2.hpp \
-    ../../src/emoticonmenu.hpp
+    ../../src/emoticonmenu.hpp \
+    ../../src/messagedisplaywidget.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \

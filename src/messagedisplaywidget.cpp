@@ -1,4 +1,4 @@
-#include "messagedisplaywidget2.hpp"
+#include "messagedisplaywidget.hpp"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -14,12 +14,12 @@
 #include "messagelabel.hpp"
 #include "emoticonmenu.hpp"
 
-MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
+MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
     QScrollArea(parent)
 {
     // Scroll down on new Message
     QScrollBar* scrollbar = verticalScrollBar();
-    connect(scrollbar, &QScrollBar::rangeChanged, this, &MessageDisplayWidget2::moveScrollBarToBottom);
+    connect(scrollbar, &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom);
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setWidgetResizable(true);
@@ -34,7 +34,7 @@ MessageDisplayWidget2::MessageDisplayWidget2(QWidget *parent) :
     mainlayout->setContentsMargins(1,1,1,1);
 }
 
-void MessageDisplayWidget2::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
+void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
     // Setup new row
     ElideLabel *nameLabel = new ElideLabel(this);
@@ -106,13 +106,13 @@ void MessageDisplayWidget2::appendMessage(const QString &name, const QString &me
     mainlayout->addLayout(hlayout);
 }
 
-void MessageDisplayWidget2::moveScrollBarToBottom(int min, int max)
+void MessageDisplayWidget::moveScrollBarToBottom(int min, int max)
 {
     Q_UNUSED(min);
     this->verticalScrollBar()->setValue(max);
 }
 
-QString MessageDisplayWidget2::urlify(QString string)
+QString MessageDisplayWidget::urlify(QString string)
 {
     return string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
 }

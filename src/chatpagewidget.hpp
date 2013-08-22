@@ -24,7 +24,7 @@
 #include <QTextEdit>
 #include <QWidget>
 
-class MessageDisplayWidget2;
+class MessageDisplayWidget;
 
 class ChatPageWidget : public QWidget
 {
@@ -37,7 +37,7 @@ public:
 
 private:
     FriendItemWidget* friendItem;
-    MessageDisplayWidget2 *display2;
+    MessageDisplayWidget *display;
 
     InputTextWidget* input;
 
