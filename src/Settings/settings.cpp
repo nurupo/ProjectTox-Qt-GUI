@@ -39,31 +39,6 @@ Settings& Settings::getInstance()
     return settings;
 }
 
-void Settings::saveWindow(const QMainWindow* window)
-{
-/*    QSettings settings(FILENAME, QSettings::IniFormat);
-    settings.beginGroup(window->objectName());
-    settings.setValue("geometry", window->saveGeometry());
-    settings.setValue("state", window->saveState());
-    settings.endGroup();*/
-    windowSettings[window->objectName()].geometry = window->saveGeometry();
-    windowSettings[window->objectName()].state = window->saveState();
-}
-
-void Settings::loadWindow(QMainWindow* window)
-{
-/*    QSettings settings(FILENAME, QSettings::IniFormat);
-    settings.beginGroup(window->objectName());
-    window->restoreGeometry(settings.value("geometry").toByteArray());
-    window->restoreState(settings.value("state").toByteArray());
-    settings.endGroup();*/
-    QMap<QString,WindowSettings>::const_iterator i = windowSettings.constFind(window->objectName());
-    if( i == windowSettings.constEnd() )
-        return;
-    window->restoreGeometry(i.value().geometry);
-    window->restoreState(i.value().state);
-}
-
 void Settings::load()
 {
     if (loaded) {
@@ -107,14 +82,13 @@ void Settings::load()
     s.endGroup();
 
     s.beginGroup("WindowSettings");
-    QStringList windows = s.childGroups();
-    foreach(QString windowName, windows)
-    {
-        s.beginGroup(windowName);
-        windowSettings[windowName].geometry = s.value("geometry").toByteArray();
-        windowSettings[windowName].state = s.value("state").toByteArray();
-        s.endGroup();
-    }
+        QList<QString> windowNames = s.childGroups();
+        for (const QString& name : windowNames) {
+            s.beginGroup(name);
+                windowSettings[name].geometry = s.value("geometry").toByteArray();
+                windowSettings[name].state = s.value("state").toByteArray();
+            s.endGroup();
+        }
     s.endGroup();
 
     loaded = true;
@@ -152,11 +126,12 @@ void Settings::save()
     s.endGroup();
 
     s.beginGroup("WindowSettings");
-    foreach(QString key, windowSettings.keys()) {
-        s.beginGroup(key);
-	s.setValue("geometry", windowSettings.value(key).geometry);
-	s.setValue("state", windowSettings.value(key).state);
-	s.endGroup();
+    const QList<QString> windowNames = windowSettings.keys();
+    for (const QString& name : windowNames) {
+        s.beginGroup(name);
+            s.setValue("geometry", windowSettings.value(name).geometry);
+            s.setValue("state", windowSettings.value(name).state);
+        s.endGroup();
     }
     s.endGroup();
 }
@@ -219,4 +194,21 @@ bool Settings::getEncryptLogs() const
 void Settings::setEncryptLogs(bool newValue)
 {
     encryptLogs = newValue;
+}
+
+void Settings::saveWindow(const QMainWindow* window)
+{
+    windowSettings[window->objectName()].geometry = window->saveGeometry();
+    windowSettings[window->objectName()].state = window->saveState();
+}
+
+void Settings::loadWindow(QMainWindow* window) const
+{
+    QHash<QString, WindowSettings>::const_iterator i = windowSettings.constFind(window->objectName());
+    if (i == windowSettings.constEnd()) {
+        return;
+    }
+
+    window->restoreGeometry(i.value().geometry);
+    window->restoreState(i.value().state);
 }
