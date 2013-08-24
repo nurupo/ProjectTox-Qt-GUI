@@ -64,8 +64,6 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->addWidget(splitter);
     layout->setSpacing(2);
     layout->setContentsMargins(0, 3, 2, 3);
-
-    // give all smileys whith their textual representations to the input dialog for desmiling
 }
 
 int ChatPageWidget::getFriendId() const
@@ -91,7 +89,12 @@ void ChatPageWidget::setStatus(Status newStatus)
     //input->setReadOnly(newStatus != Status::Online);
 }
 
-void ChatPageWidget::MessageSentResult(const QString& message, int messageId)
+void ChatPageWidget::setStatusmessage(const QString &message)
+{
+    friendItem->setStatusmessage(message);
+}
+
+void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
     display->appendMessage(Settings::getInstance().getUsername(), message, messageId);
 }

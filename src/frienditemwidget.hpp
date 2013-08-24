@@ -18,10 +18,10 @@
 #define FRIENDITEMWIDGET_HPP
 
 #include "status.hpp"
-#include "elidelabel.hpp"
-
-#include <QLabel>
 #include <QWidget>
+
+class QLabel;
+class ElideLabel;
 
 class FriendItemWidget : public QWidget
 {
@@ -30,13 +30,14 @@ public:
     FriendItemWidget(QWidget* parent);
 
 private:
-    QLabel* statusLabel;
+    QLabel *avatarLabel;
     ElideLabel* usernameLabel;
+    ElideLabel* statusmessageLabel;
 
 public slots:
     void setStatus(Status status);
     void setUsername(const QString& username);
-
+    void setStatusmessage(const QString &message);
 };
 
 #endif // FRIENDITEMWIDGET_HPP
