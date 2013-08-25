@@ -36,7 +36,31 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
 
 void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
-    // Setup new row
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom);
+    QHBoxLayout *newLayout = createNewLine(name, message, messageId);
+    mainlayout->addLayout(newLayout);
+}
+
+void MessageDisplayWidget::prependMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
+{
+    disconnect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom);
+    QHBoxLayout *newLayout = createNewLine(name, message, messageId);
+    mainlayout->insertLayout(0, newLayout);
+}
+
+void MessageDisplayWidget::moveScrollBarToBottom(int min, int max)
+{
+    Q_UNUSED(min);
+    this->verticalScrollBar()->setValue(max);
+}
+
+QString MessageDisplayWidget::urlify(QString string)
+{
+    return string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
+}
+
+QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
+{
     ElideLabel *nameLabel = new ElideLabel(this);
     nameLabel->setMaximumWidth(50);
     nameLabel->setTextElide(true);
@@ -47,7 +71,7 @@ void MessageDisplayWidget::appendMessage(const QString &name, const QString &mes
 
     MessageLabel *messageLabel = new MessageLabel(this);
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
-    if(messageId) // Message sent
+    if(messageId) // Message added to send que
     {
         messageLabel->setMessageId(messageId);
         messageLabel->setProperty("class", "msgMessage"); // for CSS styling
@@ -70,8 +94,7 @@ void MessageDisplayWidget::appendMessage(const QString &name, const QString &mes
     timeLabel->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignTrailing);
     timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
 
-
-    // Insert name
+    // Insert name if name has changed
     if(name != lastName || mainlayout->count() < 1)
     {
         nameLabel->setText(name);
@@ -97,22 +120,11 @@ void MessageDisplayWidget::appendMessage(const QString &name, const QString &mes
         }
     }
 
-    // Add row
+    // Return new line
     QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->setContentsMargins(0, 0, 0, 0);
     hlayout->addWidget(nameLabel);
     hlayout->addWidget(messageLabel);
     hlayout->addWidget(timeLabel);
-    mainlayout->addLayout(hlayout);
-}
-
-void MessageDisplayWidget::moveScrollBarToBottom(int min, int max)
-{
-    Q_UNUSED(min);
-    this->verticalScrollBar()->setValue(max);
-}
-
-QString MessageDisplayWidget::urlify(QString string)
-{
-    return string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
+    return hlayout;
 }

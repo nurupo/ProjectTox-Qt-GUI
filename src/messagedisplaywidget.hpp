@@ -27,6 +27,7 @@ public:
     explicit MessageDisplayWidget(QWidget *parent = 0);
 
     void appendMessage(const QString &name, const QString &message, int messageId = -1);
+    void prependMessage(const QString &name, const QString &message, int messageId = -1);
 
 signals:
     
@@ -40,6 +41,7 @@ private:
     QString lastName;
 
     QString urlify(QString string);
+    QHBoxLayout *createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
 };
 
 #endif // MESSAGEDISPLAYWIDGET2_H
