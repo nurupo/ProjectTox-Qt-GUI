@@ -80,11 +80,6 @@ void PagesWidget::messageReceived(int friendId, const QString &message)
     widget(friendId)->messageReceived(message);
 }
 
-void PagesWidget::setStatusmessage(int friendId, const QString &message)
-{
-    widget(friendId)->setStatusmessage(message);
-}
-
 void PagesWidget::messageSentResult(int friendId, const QString &message, int messageId)
 {
     widget(friendId)->messageSentResult(message, messageId);

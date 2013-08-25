@@ -70,7 +70,11 @@ QString EmoticonMenu::desmile(QString htmlText)
     while(match.hasMatch())
     {
         // Replace smiley and match next
-        htmlText.replace(match.captured(0), getSmileyHash().value(match.captured(5)).first());
+        QStringList textSmilies = getSmileyHash().value(match.captured(5));
+        if(textSmilies.isEmpty())
+            htmlText.remove(match.captured(0));
+        else
+            htmlText.replace(match.captured(0), textSmilies.first());
         match = re.match(htmlText, ++i);
     }
 

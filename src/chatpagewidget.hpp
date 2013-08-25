@@ -34,7 +34,6 @@ public:
     int getFriendId() const;
     void setUsername(const QString& username);
     void setStatus(Status status);
-    void setStatusmessage(const QString &message);
 
 private:
     FriendItemWidget* friendItem;

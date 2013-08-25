@@ -89,11 +89,6 @@ void ChatPageWidget::setStatus(Status newStatus)
     //input->setReadOnly(newStatus != Status::Online);
 }
 
-void ChatPageWidget::setStatusmessage(const QString &message)
-{
-    friendItem->setStatusmessage(message);
-}
-
 void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
     display->appendMessage(Settings::getInstance().getUsername(), message, messageId);
