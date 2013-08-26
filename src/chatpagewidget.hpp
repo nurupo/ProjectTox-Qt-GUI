@@ -25,6 +25,7 @@
 #include <QWidget>
 
 class MessageDisplayWidget;
+class QToolButton;
 
 class ChatPageWidget : public QWidget
 {
@@ -40,6 +41,7 @@ private:
     MessageDisplayWidget *display;
 
     InputTextWidget* input;
+    QToolButton *emoticonButton;
 
     int friendId;
     QString username;

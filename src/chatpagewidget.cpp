@@ -39,7 +39,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     // Create emoticon menu :)
     QWidget *inputPanel = new QWidget(this);
     EmoticonMenu *menu = new EmoticonMenu(this);
-    QToolButton *emoticonButton = new QToolButton(inputPanel);
+    emoticonButton = new QToolButton(inputPanel);
     emoticonButton->setPopupMode(QToolButton::InstantPopup);
     emoticonButton->setIcon(QIcon(":/icons/emoticons/emotion_smile.png"));
     emoticonButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
@@ -86,7 +86,9 @@ void ChatPageWidget::setStatus(Status newStatus)
 {
     status = newStatus;
     friendItem->setStatus(status);
-    //input->setReadOnly(newStatus != Status::Online);
+    input->setReadOnly(newStatus != Status::Online);
+    emoticonButton->setDisabled(newStatus != Status::Online);
+
 }
 
 void ChatPageWidget::messageSentResult(const QString& message, int messageId)
