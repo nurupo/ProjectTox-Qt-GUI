@@ -75,7 +75,7 @@ QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QStr
     {
         messageLabel->setMessageId(messageId);
         messageLabel->setProperty("class", "msgMessage"); // for CSS styling
-        messageLabel->setText(EmoticonMenu::smile(urlify(message)));
+        messageLabel->setText(EmoticonMenu::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>"));
     }
     else // Error
     {
@@ -83,7 +83,7 @@ QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QStr
         errorPal.setColor(QPalette::Foreground, Qt::red);
         messageLabel->setPalette(errorPal);
         messageLabel->setProperty("class", "msgError"); // for CSS styling
-        messageLabel->setText(urlify(message).prepend("<img src=\":/icons/error.png\" /> "));
+        messageLabel->setText(urlify(message.toHtmlEscaped()).prepend("<img src=\":/icons/error.png\" /> ").replace('\n', "<br>"));
         messageLabel->setToolTip(tr("Couldn't send the message!"));
     }
 
