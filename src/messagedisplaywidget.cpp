@@ -19,7 +19,7 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
 {
     // Scroll down on new Message
     QScrollBar* scrollbar = verticalScrollBar();
-    connect(scrollbar, &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom);
+    connect(scrollbar, &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setWidgetResizable(true);
@@ -36,7 +36,7 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
 
 void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
-    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom);
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
     QHBoxLayout *newLayout = createNewLine(name, message, messageId);
     mainlayout->addLayout(newLayout);
 }
@@ -123,8 +123,8 @@ QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QStr
     // Return new line
     QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->setContentsMargins(0, 0, 0, 0);
-    hlayout->addWidget(nameLabel);
-    hlayout->addWidget(messageLabel);
-    hlayout->addWidget(timeLabel);
+    hlayout->addWidget(nameLabel, 0, Qt::AlignTop);
+    hlayout->addWidget(messageLabel, 0, Qt::AlignTop);
+    hlayout->addWidget(timeLabel, 0, Qt::AlignTop);
     return hlayout;
 }
