@@ -27,6 +27,7 @@ class InputTextWidget : public QTextEdit
     Q_OBJECT
 public:
     InputTextWidget(QWidget* parent);
+    QSize sizeHint() const;
 
 protected:
     void keyPressEvent(QKeyEvent* event);

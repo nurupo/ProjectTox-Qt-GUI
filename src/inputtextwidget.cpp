@@ -29,7 +29,6 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
 {
     setMinimumSize(10, 50);
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
     // Create custom contextmenu
@@ -68,7 +67,12 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
 
     // normal text writing
     else
-       QTextEdit::keyPressEvent(event);
+        QTextEdit::keyPressEvent(event);
+}
+
+QSize InputTextWidget::sizeHint() const
+{
+    return QSize(10, 50);
 }
 
 /*! Copy texy without images, but textual representations of the smileys. */

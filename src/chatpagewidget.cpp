@@ -57,7 +57,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     splitter->setChildrenCollapsible(false);
     splitter->addWidget(display);
     splitter->addWidget(inputPanel);
-    splitter->setStretchFactor(1, 3);
+    splitter->setStretchFactor(0, 3);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(friendItem);
