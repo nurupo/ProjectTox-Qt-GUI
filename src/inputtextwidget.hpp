@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
+                  2013 by Martin Kröll <technikschlumpf@web.de>
     
     This file is part of Tox Qt GUI.
     
