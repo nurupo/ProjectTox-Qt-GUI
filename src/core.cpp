@@ -92,9 +92,9 @@ void Core::sendMessage(int friendId, const QString& message)
 {
     CString cMessage(message);
 
-    if (!m_sendmessage(friendId, cMessage.data(), cMessage.size())) {
-        emit failedToSendMessage(friendId, message);
-    }
+    int messageId = m_sendmessage(friendId, cMessage.data(), cMessage.size());
+    emit messageSentResult(friendId, message, messageId);
+
 }
 
 void Core::removeFriend(int friendId)

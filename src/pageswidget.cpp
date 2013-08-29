@@ -41,7 +41,7 @@ void PagesWidget::addPage(int friendId, const QString& username)
 {
     ChatPageWidget* chatPage = new ChatPageWidget(friendId, this);
     chatPage->setUsername(username);
-    connect(chatPage, &ChatPageWidget::messageSent, this, &PagesWidget::onMessageSent);
+    connect(chatPage, &ChatPageWidget::sendMessage, this, &PagesWidget::onMessageSent);
     addWidget(chatPage);
     qDebug() << "page" << friendId << "added" << count();
 }
@@ -72,7 +72,7 @@ void PagesWidget::statusChanged(int friendId, Status status)
 void PagesWidget::onMessageSent(const QString& message)
 {
     ChatPageWidget* chatPage = static_cast<ChatPageWidget*>(sender());
-    emit messageSent(chatPage->getFriendId(), message);
+    emit sendMessage(chatPage->getFriendId(), message);
 }
 
 void PagesWidget::messageReceived(int friendId, const QString &message)
@@ -80,7 +80,7 @@ void PagesWidget::messageReceived(int friendId, const QString &message)
     widget(friendId)->messageReceived(message);
 }
 
-void PagesWidget::failedToSendMessage(int friendId, const QString &message)
+void PagesWidget::messageSentResult(int friendId, const QString &message, int messageId)
 {
-    widget(friendId)->failedToSendMessage(message);
+    widget(friendId)->messageSentResult(message, messageId);
 }
