@@ -19,26 +19,45 @@
 #include "status.hpp"
 #include "Settings/settings.hpp"
 
+#include "messagedisplaywidget.hpp"
+#include "emoticonmenu.hpp"
+
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QDebug>
 
 ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)
 {
     friendItem = new FriendItemWidget(this);
-
     display = new MessageDisplayWidget(this);
 
     input = new InputTextWidget(this);
-    connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::messageSent);
-    connect(input, &InputTextWidget::messageSent, this, &ChatPageWidget::onMessageSent);
+    connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
+
+    // Create emoticon menu :)
+    QWidget *inputPanel = new QWidget(this);
+    EmoticonMenu *menu = new EmoticonMenu(this);
+    emoticonButton = new QToolButton(inputPanel);
+    emoticonButton->setPopupMode(QToolButton::InstantPopup);
+    emoticonButton->setIcon(QIcon(":/icons/emoticons/emotion_smile.png"));
+    emoticonButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    emoticonButton->setMenu(menu);
+    connect(menu, &EmoticonMenu::insertEmoticon, input, &InputTextWidget::insertHtml);
+
+    QHBoxLayout *inputLayout = new QHBoxLayout(inputPanel);
+    inputLayout->setContentsMargins(0,0,0,0);
+    inputLayout->setSpacing(2);
+    inputLayout->addWidget(input);
+    inputLayout->addWidget(emoticonButton);
 
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
     splitter->setChildrenCollapsible(false);
     splitter->addWidget(display);
-    splitter->addWidget(input);
-    splitter->setStretchFactor(1, 3);
+    splitter->addWidget(inputPanel);
+    splitter->setStretchFactor(0, 3);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(friendItem);
@@ -52,14 +71,9 @@ int ChatPageWidget::getFriendId() const
     return friendId;
 }
 
-void ChatPageWidget::onMessageSent(const QString& message)
-{
-    display->showMessage(Settings::getInstance().getUsername(), message);
-}
-
 void ChatPageWidget::messageReceived(const QString& message)
 {
-    display->showMessage(username, message);
+    display->appendMessage(username, message);
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
@@ -73,9 +87,11 @@ void ChatPageWidget::setStatus(Status newStatus)
     status = newStatus;
     friendItem->setStatus(status);
     input->setReadOnly(newStatus != Status::Online);
+    emoticonButton->setDisabled(newStatus != Status::Online);
+
 }
 
-void ChatPageWidget::failedToSendMessage(const QString& message)
+void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
-    display->showFailedToSendMessage(message);
+    display->appendMessage(Settings::getInstance().getUsername(), message, messageId);
 }

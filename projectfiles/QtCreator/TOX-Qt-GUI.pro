@@ -40,7 +40,6 @@ SOURCES += \
     ../../src/chatpagewidget.cpp \
     ../../src/pageswidget.cpp \
     ../../src/inputtextwidget.cpp \
-    ../../src/messagedisplaywidget.cpp \
     ../../src/frienditemwidget.cpp \
     ../../src/ouruseritemwidget.cpp \
     ../../src/renameeditwidget.cpp \
@@ -59,7 +58,10 @@ SOURCES += \
     ../../src/Settings/dhtserverdialog.cpp \
     ../../src/Settings/customhintlistwidget.cpp \
     ../../src/Settings/loggingsettingspage.cpp \
-    ../../src/aboutdialog.cpp
+    ../../src/aboutdialog.cpp \
+    ../../src/emoticonmenu.cpp \
+    ../../src/messagelabel.cpp \
+    ../../src/messagedisplaywidget.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -72,7 +74,6 @@ HEADERS  += \
     ../../src/chatpagewidget.hpp \
     ../../src/pageswidget.hpp \
     ../../src/inputtextwidget.hpp \
-    ../../src/messagedisplaywidget.hpp \
     ../../src/frienditemwidget.hpp \
     ../../src/ouruseritemwidget.hpp \
     ../../src/renameeditwidget.hpp \
@@ -91,7 +92,10 @@ HEADERS  += \
     ../../src/Settings/customhintlistwidget.hpp \
     ../../src/Settings/loggingsettingspage.hpp \
     ../../src/aboutdialog.hpp \
-    ../../src/appinfo.hpp
+    ../../src/appinfo.hpp \
+    ../../src/messagelabel.hpp \
+    ../../src/emoticonmenu.hpp \
+    ../../src/messagedisplaywidget.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \

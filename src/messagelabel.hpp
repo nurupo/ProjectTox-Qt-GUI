@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
+    Copyright (C) 2013 by Martin Kröll <technikschlumpf@web.de>
 
     This file is part of Tox Qt GUI.
 
@@ -14,29 +14,25 @@
     See the COPYING file for more details.
 */
 
-#ifndef FRIENDITEMWIDGET_HPP
-#define FRIENDITEMWIDGET_HPP
-
-#include "status.hpp"
-#include "elidelabel.hpp"
+#ifndef MESSAGELABEL_H
+#define MESSAGELABEL_H
 
 #include <QLabel>
-#include <QWidget>
 
-class FriendItemWidget : public QWidget
+class MessageLabel : public QLabel
 {
     Q_OBJECT
 public:
-    FriendItemWidget(QWidget* parent);
+    explicit MessageLabel(QWidget *parent = 0);
+
+    void setMessageId(int id);
+    int messageId();
+
+private slots:
+    void copyPlainText();
 
 private:
-    QLabel* statusLabel;
-    ElideLabel* usernameLabel;
-
-public slots:
-    void setStatus(Status status);
-    void setUsername(const QString& username);
-
+    int mId;
 };
 
-#endif // FRIENDITEMWIDGET_HPP
+#endif // MESSAGELABEL_H
