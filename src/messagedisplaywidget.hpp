@@ -21,6 +21,7 @@
 
 class QHBoxLayout;
 class QVBoxLayout;
+class QPropertyAnimation;
 
 /*! New message display widget.
  *
@@ -35,29 +36,37 @@ class QVBoxLayout;
  * Message        | QLabel             | msgMessage
  * Seperator line | QFrame             | msgLine
  * Error message  | ElideLabel, QLabel | msgError
+ * Message Row    | OpacityWidget      | msgRow
  */
 class MessageDisplayWidget : public QScrollArea
 {
     Q_OBJECT
 public:
+    Q_PROPERTY(int scrollPos READ scrollPos WRITE setScrollPos)
+
     explicit MessageDisplayWidget(QWidget *parent = 0);
 
     void appendMessage(const QString &name, const QString &message, int messageId = -1);
     void prependMessage(const QString &name, const QString &message, int messageId = -1);
 
+    int scrollPos() const;
+
 signals:
     
 public slots:
+    void setScrollPos(int arg);
 
 private slots:
     void moveScrollBarToBottom(int min, int max);
     
 private:
-    QVBoxLayout *mainlayout;
-    QString lastName;
+    QVBoxLayout        *mainlayout;
+    QString             lastName;
+    QPropertyAnimation *animation;
+    int                 mScrollPos;
 
     QString urlify(QString string);
-    QHBoxLayout *createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
+    QWidget *createNewRow(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
 };
 
 #endif // MESSAGEDISPLAYWIDGET2_H

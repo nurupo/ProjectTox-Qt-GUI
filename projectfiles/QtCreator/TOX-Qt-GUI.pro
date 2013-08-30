@@ -61,7 +61,8 @@ SOURCES += \
     ../../src/aboutdialog.cpp \
     ../../src/emoticonmenu.cpp \
     ../../src/messagelabel.cpp \
-    ../../src/messagedisplaywidget.cpp
+    ../../src/messagedisplaywidget.cpp \
+    ../../src/opacitywidget.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -95,7 +96,8 @@ HEADERS  += \
     ../../src/appinfo.hpp \
     ../../src/messagelabel.hpp \
     ../../src/emoticonmenu.hpp \
-    ../../src/messagedisplaywidget.hpp
+    ../../src/messagedisplaywidget.hpp \
+    ../../src/opacitywidget.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/core/DHT.c \

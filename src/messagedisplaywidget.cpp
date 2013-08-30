@@ -24,11 +24,13 @@
 #include <QRegularExpression>
 #include <QFrame>
 #include <QDebug>
+#include <QPropertyAnimation>
 
 #include "Settings/settings.hpp"
 #include "elidelabel.hpp"
 #include "messagelabel.hpp"
 #include "emoticonmenu.hpp"
+#include "opacitywidget.hpp"
 
 MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
     QScrollArea(parent)
@@ -48,26 +50,42 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
     mainlayout = new QVBoxLayout(widget);
     mainlayout->setSpacing(1);
     mainlayout->setContentsMargins(1,1,1,1);
+
+    // Animation
+    animation = new QPropertyAnimation(this, "scrollPos");
+    animation->setDuration(200);
+    animation->setLoopCount(1);
 }
 
 void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
     connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
-    QHBoxLayout *newLayout = createNewLine(name, message, messageId);
-    mainlayout->addLayout(newLayout);
+    mainlayout->addWidget(createNewRow(name, message, messageId));
 }
 
 void MessageDisplayWidget::prependMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
     disconnect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom);
-    QHBoxLayout *newLayout = createNewLine(name, message, messageId);
-    mainlayout->insertLayout(0, newLayout);
+    mainlayout->insertWidget(0, createNewRow(name, message, messageId));
+}
+
+int MessageDisplayWidget::scrollPos() const
+{
+    return mScrollPos;
+}
+
+void MessageDisplayWidget::setScrollPos(int arg)
+{
+    mScrollPos = arg;
+    verticalScrollBar()->setSliderPosition(arg);
 }
 
 void MessageDisplayWidget::moveScrollBarToBottom(int min, int max)
 {
     Q_UNUSED(min);
-    this->verticalScrollBar()->setValue(max);
+    animation->setKeyValueAt(0, verticalScrollBar()->sliderPosition());
+    animation->setKeyValueAt(1, max);
+    animation->start();
 }
 
 QString MessageDisplayWidget::urlify(QString string)
@@ -75,9 +93,12 @@ QString MessageDisplayWidget::urlify(QString string)
     return string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
 }
 
-QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
+QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
-    ElideLabel *nameLabel = new ElideLabel(this);
+    OpacityWidget *widget = new OpacityWidget(this);
+    widget->setProperty("class", "msgRow"); // for CSS styling
+
+    ElideLabel *nameLabel = new ElideLabel(widget);
     nameLabel->setMaximumWidth(50);
     nameLabel->setTextElide(true);
     nameLabel->setTextElideMode(Qt::ElideRight);
@@ -85,7 +106,7 @@ QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QStr
     nameLabel->setToolTip(name);
     nameLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
 
-    MessageLabel *messageLabel = new MessageLabel(this);
+    MessageLabel *messageLabel = new MessageLabel(widget);
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
     if(messageId) // Message added to send que
     {
@@ -103,7 +124,7 @@ QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QStr
         messageLabel->setToolTip(tr("Couldn't send the message!"));
     }
 
-    QLabel *timeLabel = new QLabel(this);
+    QLabel *timeLabel = new QLabel(widget);
     timeLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     timeLabel->setForegroundRole(QPalette::Mid);
     timeLabel->setProperty("class", "msgTimestamp"); // for CSS styling
@@ -137,10 +158,12 @@ QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QStr
     }
 
     // Return new line
-    QHBoxLayout *hlayout = new QHBoxLayout;
+    QHBoxLayout *hlayout = new QHBoxLayout(widget);
     hlayout->setContentsMargins(0, 0, 0, 0);
     hlayout->addWidget(nameLabel, 0, Qt::AlignTop);
     hlayout->addWidget(messageLabel, 0, Qt::AlignTop);
     hlayout->addWidget(timeLabel, 0, Qt::AlignTop);
-    return hlayout;
+    widget->setLayout(hlayout);
+
+    return widget;
 }
