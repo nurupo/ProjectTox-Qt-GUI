@@ -14,7 +14,7 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd ..
-  - git clone git@github.com:irungentoo/ProjectTox-Core.git
+  - git clone git://github.com/irungentoo/ProjectTox-Core.git
   - ./autoreconf -i
   - ./configure && make -j3
   - sudo make install
