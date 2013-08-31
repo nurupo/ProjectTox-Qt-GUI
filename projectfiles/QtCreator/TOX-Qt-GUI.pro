@@ -4,9 +4,31 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+defineTest(minQtVersion) {
+    maj = $$1
+    min = $$2
+    patch = $$3
+    isEqual(QT_MAJOR_VERSION, $$maj) {
+        isEqual(QT_MINOR_VERSION, $$min) {
+            isEqual(QT_PATCH_VERSION, $$patch) {
+                return(true)
+            }
+            greaterThan(QT_PATCH_VERSION, $$patch) {
+                return(true)
+            }
+        }
+        greaterThan(QT_MINOR_VERSION, $$min) {
+            return(true)
+        }
+    }
+    return(false)
+}
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+!minQtVersion(5, 1, 0) {
+    error("Cannot build with Qt version $${QT_VERSION}, this project requires at least Qt 5.1.0")
+}
+
+QT       += core gui widgets
 
 TARGET = TOX-Qt-GUI
 TEMPLATE = app
