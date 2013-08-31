@@ -18,12 +18,12 @@ win32:INCLUDEPATH += ../../libs/sodium/include/
 macx:INCLUDEPATH += /usr/local/include
 
 win32 {
-    LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a
+    LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a -ltoxcore.a
 } else {
     macx {
-        LIBS += -L/usr/local/lib -lsodium
+        LIBS += -L/usr/local/lib -lsodium -ltoxcore
     } else {
-        LIBS += -lsodium
+        LIBS += -lsodium -ltoxcore
     }
 }
 
@@ -96,28 +96,6 @@ HEADERS  += \
     ../../src/messagelabel.hpp \
     ../../src/emoticonmenu.hpp \
     ../../src/messagedisplaywidget.hpp
-
-SOURCES += \
-    ../../submodules/ProjectTox-Core/core/DHT.c \
-    ../../submodules/ProjectTox-Core/core/Lossless_UDP.c \
-    ../../submodules/ProjectTox-Core/core/Messenger.c \
-    ../../submodules/ProjectTox-Core/core/net_crypto.c \
-    ../../submodules/ProjectTox-Core/core/network.c \
-    ../../submodules/ProjectTox-Core/core/friend_requests.c \
-    ../../submodules/ProjectTox-Core/core/LAN_discovery.c \
-    ../../submodules/ProjectTox-Core/core/ping.c \
-    ../../submodules/ProjectTox-Core/core/util.c
-
-HEADERS  += \
-    ../../submodules/ProjectTox-Core/core/DHT.h \
-    ../../submodules/ProjectTox-Core/core/Lossless_UDP.h \
-    ../../submodules/ProjectTox-Core/core/Messenger.h \
-    ../../submodules/ProjectTox-Core/core/net_crypto.h \
-    ../../submodules/ProjectTox-Core/core/network.h \
-    ../../submodules/ProjectTox-Core/core/friend_requests.h \
-    ../../submodules/ProjectTox-Core/core/LAN_discovery.h \
-    ../../submodules/ProjectTox-Core/core/ping.h \
-    ../../submodules/ProjectTox-Core/core/util.h
 
 RESOURCES += \
     ../../resources/resources.qrc
