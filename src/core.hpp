@@ -44,7 +44,7 @@ private:
 
     QTimer* timer;
     QList<int> friendIdList;
-    Tox* handle = NULL;
+    Tox* handle;
 
     class CUserId
     {
