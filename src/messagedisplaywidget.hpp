@@ -14,8 +14,8 @@
     See the COPYING file for more details.
 */
 
-#ifndef MESSAGEDISPLAYWIDGET2_H
-#define MESSAGEDISPLAYWIDGET2_H
+#ifndef MESSAGEDISPLAYWIDGET_HPP
+#define MESSAGEDISPLAYWIDGET_HPP
 
 #include <QScrollArea>
 
@@ -45,19 +45,16 @@ public:
     void appendMessage(const QString &name, const QString &message, int messageId = -1);
     void prependMessage(const QString &name, const QString &message, int messageId = -1);
 
-signals:
-    
-public slots:
-
-private slots:
-    void moveScrollBarToBottom(int min, int max);
-    
 private:
     QVBoxLayout *mainlayout;
     QString lastName;
 
     QString urlify(QString string);
     QHBoxLayout *createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
+
+private slots:
+    void moveScrollBarToBottom(int min, int max);
+    
 };
 
-#endif // MESSAGEDISPLAYWIDGET2_H
+#endif // MESSAGEDISPLAYWIDGET_HPP

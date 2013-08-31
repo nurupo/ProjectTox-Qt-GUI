@@ -31,15 +31,16 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     setMinimumSize(10, 50);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
+    // TODO: Add more actions (Undo, Redo)
     // Create custom contextmenu
-    QAction *actionCopy  = new QAction(tr("Copy"), this);
     QAction *actionCut   = new QAction(tr("Cut"), this);
+    QAction *actionCopy  = new QAction(tr("Copy"), this);
     QAction *actionPaste = new QAction(tr("Paste"), this);
-    actionCopy->setShortcut(QKeySequence::Copy);
     actionCut->setShortcut(QKeySequence::Cut);
+    actionCopy->setShortcut(QKeySequence::Copy);
     actionPaste->setShortcut(QKeySequence::Paste);
-    connect(actionCopy,  &QAction::triggered, this, &InputTextWidget::copyPlainText);
     connect(actionCut,   &QAction::triggered, this, &InputTextWidget::cutPlainText);
+    connect(actionCopy,  &QAction::triggered, this, &InputTextWidget::copyPlainText);
     connect(actionPaste, &QAction::triggered, this, &InputTextWidget::pastePlainText);
     addAction(actionCopy);
     addAction(actionCut);
@@ -51,23 +52,22 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
 {
     // Send message on Return
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-            && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier))
-    {
+            && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
         emit sendMessage(EmoticonMenu::desmile(toHtml()));
         clear();
-    }
 
     // Override default shortcuts
-    else if(event == QKeySequence::Copy)
+    } else if (event == QKeySequence::Copy) {
         copyPlainText();
-    else if(event == QKeySequence::Cut)
+    } else if (event == QKeySequence::Cut) {
         cutPlainText();
-    else if(event == QKeySequence::Paste)
+    } else if (event == QKeySequence::Paste) {
         pastePlainText();
 
-    // normal text writing
-    else
+    // Normal text writing
+    } else {
         QTextEdit::keyPressEvent(event);
+    }
 }
 
 QSize InputTextWidget::sizeHint() const
@@ -75,7 +75,7 @@ QSize InputTextWidget::sizeHint() const
     return QSize(10, 50);
 }
 
-/*! Copy texy without images, but textual representations of the smileys. */
+/*! Copy text without images, but textual representations of the smileys. */
 void InputTextWidget::copyPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
@@ -90,7 +90,7 @@ void InputTextWidget::pastePlainText()
     insertPlainText(clipboard->text());
 }
 
-/*! Cut texy without images, but textual representations of the smileys. */
+/*! Cut text without images, but textual representations of the smileys. */
 void InputTextWidget::cutPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
