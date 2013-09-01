@@ -56,7 +56,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameLabel->setText(Settings::getInstance().getUsername());
 
     //FIXME: check if there is a way to replace these containers to fix the label alignment
-    QWidget* usernameLabelContainer = new QWidget(this);
+    usernameLabelContainer = new QWidget(this);
     QVBoxLayout* usernameLabelContainerLayout = new QVBoxLayout(usernameLabelContainer);
     usernameLabelContainerLayout->setMargin(0);
     usernameLabelContainerLayout->addWidget(usernameLabel, 0, Qt::AlignVCenter);
