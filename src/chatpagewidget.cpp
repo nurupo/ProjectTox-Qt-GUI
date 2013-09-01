@@ -18,7 +18,7 @@
 #include "ouruseritemwidget.hpp"
 #include "status.hpp"
 #include "Settings/settings.hpp"
-
+#include "customhintwidget.hpp"
 #include "messagedisplaywidget.hpp"
 #include "emoticonmenu.hpp"
 
@@ -37,7 +37,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
 
     // Create emoticon menu :)
-    QWidget *inputPanel = new QWidget(this);
+    CustomHintWidget *inputPanel = new CustomHintWidget(this, QSize(10, 10));
     EmoticonMenu *menu = new EmoticonMenu(this);
     emoticonButton = new QToolButton(inputPanel);
     emoticonButton->setPopupMode(QToolButton::InstantPopup);
