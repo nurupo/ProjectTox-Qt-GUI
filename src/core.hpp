@@ -17,28 +17,26 @@
 #ifndef CORE_HPP
 #define CORE_HPP
 
+#include "status.hpp"
+
+#include <tox.h>
+
 #include <QObject>
 #include <QTimer>
 #include <QList>
 
-#include <tox.h>
-
 class Core : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(FriendStatus)
-
 public:
     explicit Core();
-
-    enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
 private:
     static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
     static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
-    static void onUserStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS status, void* core);
+    static void onUserStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
 
     void checkConnection();
@@ -124,6 +122,7 @@ public slots:
 
     void setUsername(const QString& username);
     void setStatusMessage(const QString& message);
+    void setStatus(Status status);
 
     void process();
 
@@ -138,7 +137,7 @@ signals:
 
     void friendAdded(int friendId, const QString& userId);
 
-    void friendStatusChanged(int friendId, FriendStatus status);
+    void friendStatusChanged(int friendId, Status status);
     void friendStatusMessageChanged(int friendId, const QString& message);
     void friendUsernameChanged(int friendId, const QString& username);
 
@@ -157,8 +156,6 @@ signals:
     void failedToSetStatusMessage(const QString& message);
 
 };
-
-Q_DECLARE_METATYPE(Core::FriendStatus)
 
 #endif // CORE_HPP
 

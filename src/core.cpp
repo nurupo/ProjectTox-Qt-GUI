@@ -38,7 +38,6 @@
 Core::Core() :
     QObject(nullptr)
 {
-    qRegisterMetaType<Core::FriendStatus>("FriendStatus");
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Core::process);
     connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
@@ -64,14 +63,29 @@ void Core::onStatusMessageChanged(Tox*/* tox*/, int friendId, uint8_t* cMessage,
     emit static_cast<Core*>(core)->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, TOX_USERSTATUS/* status*/, void* core)
+void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, TOX_USERSTATUS userstatus, void* core)
 {
-    emit static_cast<Core*>(core)->friendStatusChanged(friendId, FriendStatus::Online);
+    Status status;
+    switch (userstatus) {
+        case TOX_USERSTATUS_NONE:
+            status = Status::Online;
+            break;
+        case TOX_USERSTATUS_AWAY:
+            status = Status::Away;
+            break;
+        case TOX_USERSTATUS_BUSY:
+            status = Status::Busy;
+            break;
+        default:
+            status = Status::Online;
+            break;
+    }
+    emit static_cast<Core*>(core)->friendStatusChanged(friendId, status);
 }
 
 void Core::onConnectionStatusChanged(Tox*/* tox*/, int friendId, uint8_t status, void* core)
 {
-    emit static_cast<Core*>(core)->friendStatusChanged(friendId, status ? FriendStatus::Online : FriendStatus::Confirmed);
+    emit static_cast<Core*>(core)->friendStatusChanged(friendId, status ? Status::Online : Status::Offline);
 }
 
 void Core::acceptFriendRequest(const QString& userId)
@@ -125,7 +139,6 @@ void Core::setUsername(const QString& username)
     }
 }
 
-
 void Core::setStatusMessage(const QString& /*message*/)
 {
 /*
@@ -137,6 +150,26 @@ void Core::setStatusMessage(const QString& /*message*/)
         emit statusMessageSet(message);
     }
 */
+}
+
+void Core::setStatus(Status status)
+{
+    TOX_USERSTATUS userstatus;
+    switch (status) {
+        case Status::Online:
+            userstatus = TOX_USERSTATUS_NONE;
+            break;
+        case Status::Away:
+            userstatus = TOX_USERSTATUS_AWAY;
+            break;
+        case Status::Busy:
+            userstatus = TOX_USERSTATUS_BUSY;
+            break;
+        default:
+            userstatus = TOX_USERSTATUS_INVALID;
+            break;
+    }
+    tox_set_userstatus(tox, userstatus);
 }
 
 void Core::bootstrapDht()

@@ -137,6 +137,9 @@ void OurUserItemWidget::onStatusActionTriggered()
     if (selectedStatus == Status::Offline) {
         CloseApplicationDialog dialog(this);
         dialog.exec();
+    } else {
+        statusButton->setIcon(QIcon(StatusHelper::getInfo(selectedStatus).iconPath));
+        emit statusSelected(selectedStatus);
     }
 }
 
