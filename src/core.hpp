@@ -21,6 +21,8 @@
 #include <QTimer>
 #include <QList>
 
+#include <tox.h>
+
 class Core : public QObject
 {
     Q_OBJECT
@@ -32,33 +34,60 @@ public:
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
 private:
-    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
-    static void onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendStatusChanged(int friendId, uint8_t status);
+    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
+    static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onUserStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS status, void* core);
+    static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
 
     void checkConnection();
+    uint32_t resolveAddress(const char* address) const;
 
+    Tox* tox;
     QTimer* timer;
-    QList<int> friendIdList;
 
-    class CUserId
+    class CData
     {
     public:
-        explicit CUserId(const QString& userId);
-        ~CUserId();
-
         uint8_t* data();
         uint16_t size();
 
-        static QString toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/);
+    protected:
+        explicit CData(const QString& data, uint16_t byteSize);
+        virtual ~CData();
+
+        static QString toString(uint8_t* cData, uint16_t cDataSize);
 
     private:
-        uint8_t* cUserId;
-        uint16_t cUserIdSize;
+        uint8_t* cData;
+        uint16_t cDataSize;
 
-        static uint16_t fromString(const QString& userId, uint8_t* cUserId);
+        static uint16_t fromString(const QString& userId, uint8_t* cData);
+    };
+
+    class CUserId : public CData
+    {
+    public:
+        explicit CUserId(const QString& userId);
+
+        static QString toString(uint8_t* cUserId);
+
+    private:
+        static const uint16_t SIZE = TOX_CLIENT_ID_SIZE;
+
+    };
+
+    class CFriendAddress : public CData
+    {
+    public:
+        explicit CFriendAddress(const QString& friendAddress);
+
+        static QString toString(uint8_t* cFriendAddress);
+
+    private:
+        static const uint16_t SIZE = TOX_FRIEND_ADDRESS_SIZE;
+
     };
 
     class CString
@@ -87,7 +116,7 @@ public slots:
     void start();
 
     void acceptFriendRequest(const QString& userId);
-    void requestFriendship(const QString& userId, const QString& message);
+    void requestFriendship(const QString& friendAddress, const QString& message);
 
     void removeFriend(int friendId);
 
@@ -113,7 +142,7 @@ signals:
     void friendStatusMessageChanged(int friendId, const QString& message);
     void friendUsernameChanged(int friendId, const QString& username);
 
-    void userIdGenerated(const QString& userId);
+    void friendAddressGenerated(const QString& friendAddress);
 
     void friendRemoved(int friendId);
 

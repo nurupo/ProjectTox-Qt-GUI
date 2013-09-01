@@ -31,9 +31,9 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
     QToolButton* renameUsernameButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change Username");
-    QToolButton* copyUserIdButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy User ID");
+    QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy Friend Address");
     connect(renameUsernameButton, &QToolButton::clicked, this, &OurUserItemWidget::onRenameUsernameButtonClicked);
-    connect(copyUserIdButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyUserIdButtonClicked);
+    connect(copyFriendAddressButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyFriendAddressButtonClicked);
 
     QMenu* statusMenu = new QMenu(statusButton);
     QList<QAction*> statusActions;
@@ -77,7 +77,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     layout->addWidget(statusButton, 0, Qt::AlignVCenter);
     layout->addWidget(usernameStackedWidget, 10, Qt::AlignVCenter);
     layout->addWidget(renameUsernameButton, 0, Qt::AlignRight | Qt::AlignVCenter);
-    layout->addWidget(copyUserIdButton, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(copyFriendAddressButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 }
 
 QToolButton* OurUserItemWidget::createToolButton(const QIcon& icon, const QSize iconSize, const QString& toolTip)
@@ -140,14 +140,14 @@ void OurUserItemWidget::onStatusActionTriggered()
     }
 }
 
-void OurUserItemWidget::onCopyUserIdButtonClicked()
+void OurUserItemWidget::onCopyFriendAddressButtonClicked()
 {
-    QGuiApplication::clipboard()->setText(userId);
+    QGuiApplication::clipboard()->setText(friendAddress);
 }
 
-void OurUserItemWidget::setUserId(const QString &userId)
+void OurUserItemWidget::setFriendAddress(const QString &friendAddress)
 {
-    this->userId = userId;
+    this->friendAddress = friendAddress;
 }
 
 void OurUserItemWidget::setStatus(Status status)

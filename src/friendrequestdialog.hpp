@@ -25,10 +25,6 @@ class FriendRequestDialog : public QDialog
 public:
     explicit FriendRequestDialog(QWidget *parent, const QString &userId, const QString &message);
     
-signals:
-    
-public slots:
-    
 };
 
 #endif // FRIENDREQUESTDIALOG_HPP

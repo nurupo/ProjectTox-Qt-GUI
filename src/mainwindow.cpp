@@ -103,7 +103,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
     connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
     connect(core, &Core::friendStatusChanged, this, &MainWindow::onFriendStatusChanged);
-    connect(core, &Core::userIdGenerated, ourUserItem, &OurUserItemWidget::setUserId);
+    connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);

@@ -66,7 +66,7 @@ signals:
     void friendStatusChanged(int friendId, Status status);
     void friendRemoved(int friendId);
     void friendSelectionChanged(int friendId);
-    void friendRequested(const QString& userId, const QString& message);
+    void friendRequested(const QString& friendAddress, const QString& message);
 
 };
 

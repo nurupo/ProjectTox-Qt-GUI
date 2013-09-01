@@ -27,12 +27,12 @@ class AddFriendDialog : public QDialog
 public:
     AddFriendDialog(QWidget* parent);
 
-    QString getUserId() const;
+    QString getFriendAddress() const;
     QString getMessage() const;
 
 
 private:
-    QLineEdit* userIdEdit;
+    QLineEdit* friendAddressEdit;
     QPlainTextEdit* messageEdit;
 
 public slots:

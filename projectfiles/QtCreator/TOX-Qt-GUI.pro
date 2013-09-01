@@ -35,7 +35,7 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/core/
+INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/
 win32:INCLUDEPATH += ../../libs/sodium/include/
 macx:INCLUDEPATH += /usr/local/include
 
@@ -120,26 +120,29 @@ HEADERS  += \
     ../../src/messagedisplaywidget.hpp
 
 SOURCES += \
-    ../../submodules/ProjectTox-Core/core/DHT.c \
-    ../../submodules/ProjectTox-Core/core/Lossless_UDP.c \
-    ../../submodules/ProjectTox-Core/core/Messenger.c \
-    ../../submodules/ProjectTox-Core/core/net_crypto.c \
-    ../../submodules/ProjectTox-Core/core/network.c \
-    ../../submodules/ProjectTox-Core/core/friend_requests.c \
-    ../../submodules/ProjectTox-Core/core/LAN_discovery.c \
-    ../../submodules/ProjectTox-Core/core/ping.c \
-    ../../submodules/ProjectTox-Core/core/util.c
+    ../../submodules/ProjectTox-Core/toxcore/DHT.c \
+    ../../submodules/ProjectTox-Core/toxcore/Lossless_UDP.c \
+    ../../submodules/ProjectTox-Core/toxcore/Messenger.c \
+    ../../submodules/ProjectTox-Core/toxcore/net_crypto.c \
+    ../../submodules/ProjectTox-Core/toxcore/network.c \
+    ../../submodules/ProjectTox-Core/toxcore/friend_requests.c \
+    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.c \
+    ../../submodules/ProjectTox-Core/toxcore/ping.c \
+    ../../submodules/ProjectTox-Core/toxcore/util.c \
+    ../../submodules/ProjectTox-Core/toxcore/tox.c
 
 HEADERS  += \
-    ../../submodules/ProjectTox-Core/core/DHT.h \
-    ../../submodules/ProjectTox-Core/core/Lossless_UDP.h \
-    ../../submodules/ProjectTox-Core/core/Messenger.h \
-    ../../submodules/ProjectTox-Core/core/net_crypto.h \
-    ../../submodules/ProjectTox-Core/core/network.h \
-    ../../submodules/ProjectTox-Core/core/friend_requests.h \
-    ../../submodules/ProjectTox-Core/core/LAN_discovery.h \
-    ../../submodules/ProjectTox-Core/core/ping.h \
-    ../../submodules/ProjectTox-Core/core/util.h
+    ../../submodules/ProjectTox-Core/toxcore/DHT.h \
+    ../../submodules/ProjectTox-Core/toxcore/Lossless_UDP.h \
+    ../../submodules/ProjectTox-Core/toxcore/Messenger.h \
+    ../../submodules/ProjectTox-Core/toxcore/net_crypto.h \
+    ../../submodules/ProjectTox-Core/toxcore/network.h \
+    ../../submodules/ProjectTox-Core/toxcore/friend_requests.h \
+    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.h \
+    ../../submodules/ProjectTox-Core/toxcore/ping.h \
+    ../../submodules/ProjectTox-Core/toxcore/util.h \
+    ../../submodules/ProjectTox-Core/toxcore/misc_tools.h \
+    ../../submodules/ProjectTox-Core/toxcore/tox.h
 
 RESOURCES += \
     ../../resources/resources.qrc
