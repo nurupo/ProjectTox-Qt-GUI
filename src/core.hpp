@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QList>
+#include <tox/tox.h>
 
 class Core : public QObject
 {
@@ -28,20 +29,22 @@ class Core : public QObject
 
 public:
     explicit Core();
+    ~Core();
 
     enum class FriendStatus {NotFound = 0, Added, RequestSent, Confirmed, Online};
 
 private:
-    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize);
-    static void onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize);
-    static void onFriendStatusChanged(int friendId, uint8_t status);
+    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
+    static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS status, void* core);
 
     void checkConnection();
 
     QTimer* timer;
     QList<int> friendIdList;
+    Tox* handle;
 
     class CUserId
     {

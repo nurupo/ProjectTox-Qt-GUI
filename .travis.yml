@@ -15,6 +15,13 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd ..
+  - git clone git://github.com/irungentoo/ProjectTox-Core.git
+  - cd ProjectTox-Core
+  - autoreconf -i
+  - ./configure && make -j3
+  - sudo make install
+  - sudo ldconfig
+  - cd ..
 
 script:
   - ~/Qt5.1.1/5.1.1/gcc_64/bin/qmake -v

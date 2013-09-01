@@ -17,8 +17,6 @@
 #include "core.hpp"
 #include "Settings/settings.hpp"
 
-#include <Messenger.h>
-
 #ifndef WIN32
 #include <arpa/inet.h>
 #endif
@@ -26,47 +24,49 @@
 #include <QThread>
 #include <QTime>
 
-//hack to emit signals from static methods
-Core* core;
-
 Core::Core() :
     QObject(nullptr)
 {
     qRegisterMetaType<Core::FriendStatus>("FriendStatus");
-    core = this;
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Core::process);
     connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
+
+    handle = tox_new();
 }
 
-void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize)
-{
-    emit core->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
+Core::~Core() {
+    tox_kill(handle);
 }
 
-void Core::onFriendMessage(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
+void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
-    emit core->friendMessageRecieved(friendId, CString::toString(cMessage, cMessageSize));
+    emit ((Core*)core)->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onFriendNameChange(int friendId, uint8_t* cName, uint16_t cNameSize)
+void Core::onFriendMessage(Tox*, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
-    emit core->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
+    emit ((Core*)core)->friendMessageRecieved(friendId, CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onStatusMessageChanged(int friendId, uint8_t* cMessage, uint16_t cMessageSize)
+void Core::onFriendNameChange(Tox*, int friendId, uint8_t* cName, uint16_t cNameSize, void* core)
 {
-    emit core->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
+    emit ((Core*)core)->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
 }
 
-void Core::onFriendStatusChanged(int friendId, uint8_t status)
+void Core::onStatusMessageChanged(Tox*, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
-    emit core->friendStatusChanged(friendId, static_cast<FriendStatus>(status));
+    emit ((Core*)core)->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
+}
+
+void Core::onFriendStatusChanged(Tox*, int friendId, TOX_USERSTATUS status, void* core)
+{
+    emit ((Core*)core)->friendStatusChanged(friendId, static_cast<FriendStatus>(status));
 }
 
 void Core::acceptFriendRequest(const QString& userId)
 {
-    int friendId = m_addfriend_norequest(CUserId(userId).data());
+    int friendId = tox_addfriend_norequest(handle, CUserId(userId).data());
     if (friendId == -1) {
         emit failedToAddFriend(userId);
     } else {
@@ -79,7 +79,7 @@ void Core::requestFriendship(const QString& userId, const QString& message)
 {
     CString cMessage(message);
 
-    int friendId = m_addfriend(CUserId(userId).data(), cMessage.data(), cMessage.size());
+    int friendId = tox_addfriend(handle, CUserId(userId).data(), cMessage.data(), cMessage.size());
     if (friendId == -1) {
         emit failedToAddFriend(userId);
     } else {
@@ -92,14 +92,14 @@ void Core::sendMessage(int friendId, const QString& message)
 {
     CString cMessage(message);
 
-    int messageId = m_sendmessage(friendId, cMessage.data(), cMessage.size());
+    int messageId = tox_sendmessage(handle, friendId, cMessage.data(), cMessage.size());
     emit messageSentResult(friendId, message, messageId);
 
 }
 
 void Core::removeFriend(int friendId)
 {
-    if (m_delfriend(friendId) == -1) {
+    if (tox_delfriend(handle, friendId) == -1) {
         emit failedToRemoveFriend(friendId);
     } else {
         emit friendRemoved(friendId);
@@ -111,7 +111,7 @@ void Core::setUsername(const QString& username)
 {
     CString cUsername(username);
 
-    if (setname(cUsername.data(), cUsername.size()) == -1) {
+    if (tox_setname(handle, cUsername.data(), cUsername.size()) == -1) {
         emit failedToSetUsername(username);
     } else {
         emit usernameSet(username);
@@ -122,7 +122,7 @@ void Core::setStatusMessage(const QString &message)
 {
     CString cMessage(message);
 
-    if (m_set_statusmessage(cMessage.data(), cMessage.size()) == -1) {
+    if (tox_set_statusmessage(handle, cMessage.data(), cMessage.size()) == -1) {
         emit failedToSetStatusMessage(message);
     } else {
         emit statusMessageSet(message);
@@ -131,7 +131,7 @@ void Core::setStatusMessage(const QString &message)
 
 void Core::process()
 {
-    doMessenger();
+    tox_do(handle);
 #ifdef DEBUG
     //we want to see the debug messages immediately
     fflush(stdout);
@@ -144,15 +144,17 @@ void Core::bootstrapDht()
     const Settings& s = Settings::getInstance();
     QList<Settings::DhtServer> dhtServerList = s.getDhtServerList();
 
-    IP_Port bootstrapIpPort;
+    tox_IP_Port bootstrapIpPort;
     for (const Settings::DhtServer& dhtServer : dhtServerList) {
         bootstrapIpPort.port = htons(dhtServer.port);
-        bootstrapIpPort.ip.i = resolve_addr(dhtServer.address.toLatin1().data());
+        //FIXME this is not in the api
+        // tox_resolve_addr(dhtServer.address.toLatin1().data());
+        bootstrapIpPort.ip.i = 0x58DFAF42;
         if (bootstrapIpPort.ip.i == 0) {
             continue;
         }
 
-        DHT_bootstrap(bootstrapIpPort, CUserId(dhtServer.userId).data());
+        tox_bootstrap(handle, bootstrapIpPort, CUserId(dhtServer.userId).data());
     }
 }
 
@@ -160,10 +162,10 @@ void Core::checkConnection()
 {
     static bool isConnected = false;
 
-    if (DHT_isconnected() && !isConnected) {
+    if (!isConnected && tox_isconnected(handle)) {
         emit connected();
         isConnected = true;
-    } else if (!DHT_isconnected() && isConnected) {
+    } else if (isConnected && !tox_isconnected(handle)) {
         emit disconnected();
         isConnected = false;
     }
@@ -171,18 +173,19 @@ void Core::checkConnection()
 
 void Core::start()
 {
-    initMessenger();
+    tox_callback_friendrequest(handle, onFriendRequest, (void*)this);
+    tox_callback_friendmessage(handle, onFriendMessage, (void*)this);
+    tox_callback_namechange(handle, onFriendNameChange, (void*)this);
+    tox_callback_statusmessage(handle, onStatusMessageChanged, (void*)this);
+    tox_callback_userstatus(handle, onFriendStatusChanged, (void*)this);
 
-    m_callback_friendrequest(onFriendRequest);
-    m_callback_friendmessage(onFriendMessage);
-    m_callback_namechange(onFriendNameChange);
-    m_callback_statusmessage(onStatusMessageChanged);
-    m_callback_friendstatus(onFriendStatusChanged);
+    uint8_t self_public_key [TOX_FRIEND_ADDRESS_SIZE];
+    tox_getaddress(handle, self_public_key);
 
     emit userIdGenerated(CUserId::toString(self_public_key));
 
     CString cUsername(Settings::getInstance().getUsername());
-    setname(cUsername.data(), cUsername.size());
+    tox_setname(handle, cUsername.data(), cUsername.size());
 
     bootstrapDht();
 
@@ -194,7 +197,7 @@ void Core::start()
 
 Core::CUserId::CUserId(const QString &userId)
 {
-    cUserId = new uint8_t[CLIENT_ID_SIZE];
+    cUserId = new uint8_t[TOX_FRIEND_ADDRESS_SIZE];
     cUserIdSize = fromString(userId, cUserId);
 }
 
@@ -215,7 +218,7 @@ uint16_t Core::CUserId::size()
 
 QString Core::CUserId::toString(uint8_t* cUserId/*, uint16_t cUserIdSize*/)
 {
-    return QString(QByteArray(reinterpret_cast<char*>(cUserId), CLIENT_ID_SIZE).toHex()).toUpper();
+    return QString(QByteArray(reinterpret_cast<char*>(cUserId), TOX_FRIEND_ADDRESS_SIZE).toHex()).toUpper();
 }
 
 uint16_t Core::CUserId::fromString(const QString& userId, uint8_t* cUserId)
