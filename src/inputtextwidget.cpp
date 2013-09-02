@@ -42,8 +42,8 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     connect(actionCut,   &QAction::triggered, this, &InputTextWidget::cutPlainText);
     connect(actionCopy,  &QAction::triggered, this, &InputTextWidget::copyPlainText);
     connect(actionPaste, &QAction::triggered, this, &InputTextWidget::pastePlainText);
-    addAction(actionCopy);
     addAction(actionCut);
+    addAction(actionCopy);
     addAction(actionPaste);
 }
 
