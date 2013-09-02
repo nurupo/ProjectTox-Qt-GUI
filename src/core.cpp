@@ -110,11 +110,12 @@ void Core::requestFriendship(const QString& friendAddress, const QString& messag
     CString cMessage(message);
 
     int friendId = tox_addfriend(tox, CFriendAddress(friendAddress).data(), cMessage.data(), cMessage.size());
+    const QString userId = friendAddress.mid(0, TOX_CLIENT_ID_SIZE * 2);
     // TODO: better error handling
     if (friendId < 0) {
-        emit failedToAddFriend(friendAddress);
+        emit failedToAddFriend(userId);
     } else {
-        emit friendAdded(friendId, friendAddress);
+        emit friendAdded(friendId, userId);
     }
 }
 
