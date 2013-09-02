@@ -30,8 +30,6 @@
 #include <QMessageBox>
 #include <QStackedWidget>
 
-#include <QDebug>
-
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {

@@ -30,6 +30,7 @@ class Core : public QObject
     Q_OBJECT
 public:
     explicit Core();
+    ~Core();
 
 private:
     static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);

@@ -36,11 +36,18 @@
 #include <QTime>
 
 Core::Core() :
-    QObject(nullptr)
+    tox(nullptr)
 {
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Core::process);
     connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
+}
+
+Core::~Core()
+{
+    if (tox) {
+        tox_kill(tox);
+    }
 }
 
 void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
