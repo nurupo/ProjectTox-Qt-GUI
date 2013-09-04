@@ -42,15 +42,15 @@ class MessageDisplayWidget : public QScrollArea
 public:
     explicit MessageDisplayWidget(QWidget *parent = 0);
 
-    void appendMessage(const QString &name, const QString &message, int messageId = -1);
-    void prependMessage(const QString &name, const QString &message, int messageId = -1);
+    void appendMessage(const QString &name, const QString &message, int messageId, bool isOur);
+    void prependMessage(const QString &name, const QString &message, int messageId, bool isOur);
 
 private:
     QVBoxLayout *mainlayout;
-    QString lastName;
+    bool lastMessageIsOurs;
 
     QString urlify(QString string);
-    QHBoxLayout *createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
+    QHBoxLayout *createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId, bool isOur);
 
 private slots:
     void moveScrollBarToBottom(int min, int max);

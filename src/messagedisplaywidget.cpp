@@ -50,17 +50,17 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
     mainlayout->setMargin(1);
 }
 
-void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
+void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId, bool isOur)
 {
     connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
-    QHBoxLayout *newLayout = createNewLine(name, message, messageId);
+    QHBoxLayout *newLayout = createNewLine(name, message, messageId, isOur);
     mainlayout->addLayout(newLayout);
 }
 
-void MessageDisplayWidget::prependMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
+void MessageDisplayWidget::prependMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId, bool isOur)
 {
     disconnect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom);
-    QHBoxLayout *newLayout = createNewLine(name, message, messageId);
+    QHBoxLayout *newLayout = createNewLine(name, message, messageId, isOur);
     mainlayout->insertLayout(0, newLayout);
 }
 
@@ -75,7 +75,7 @@ QString MessageDisplayWidget::urlify(QString string)
     return string.replace(QRegularExpression("((?:https?|ftp)://\\S+)"), "<a href=\"\\1\">\\1</a>");
 }
 
-QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
+QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId, bool isOur)
 {
     ElideLabel *nameLabel = new ElideLabel(this);
     nameLabel->setMaximumWidth(50);
@@ -110,13 +110,12 @@ QHBoxLayout *MessageDisplayWidget::createNewLine(const QString &name, const QStr
     timeLabel->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignTrailing);
     timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
 
-    // FIXME: names are arbitrary, it's possible that person you are talking to has the same name set
-    // Insert name if name has changed
-    if (name != lastName || mainlayout->count() < 1) {
+    // Insert name if sender changed.
+    if (lastMessageIsOurs != isOur || mainlayout->count() < 1) {
         nameLabel->setText(name);
-        lastName = name;
+        lastMessageIsOurs = isOur;
 
-        if (name == Settings::getInstance().getUsername()) {
+        if (isOur) {
             nameLabel->setForegroundRole(QPalette::Mid);
             nameLabel->setProperty("class", "msgUserName"); // for CSS styling
         } else {
