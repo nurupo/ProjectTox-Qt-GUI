@@ -26,6 +26,7 @@ class Starter : public QObject
     Q_OBJECT
 public:
     Starter(QObject* parent = 0);
+    ~Starter();
 
 private:
     MainWindow* mainWindow;

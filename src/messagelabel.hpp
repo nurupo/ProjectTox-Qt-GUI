@@ -14,8 +14,8 @@
     See the COPYING file for more details.
 */
 
-#ifndef MESSAGELABEL_H
-#define MESSAGELABEL_H
+#ifndef MESSAGELABEL_HPP
+#define MESSAGELABEL_HPP
 
 #include <QLabel>
 
@@ -26,7 +26,7 @@ public:
     explicit MessageLabel(QWidget *parent = 0);
 
     void setMessageId(int id);
-    int messageId();
+    int messageId() const;
 
 private slots:
     void copyPlainText();
@@ -35,4 +35,4 @@ private:
     int mId;
 };
 
-#endif // MESSAGELABEL_H
+#endif // MESSAGELABEL_HPP

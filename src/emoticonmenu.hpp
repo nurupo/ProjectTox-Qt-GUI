@@ -14,8 +14,8 @@
     See the COPYING file for more details.
 */
 
-#ifndef EMOTICONMENU_H
-#define EMOTICONMENU_H
+#ifndef EMOTICONMENU_HPP
+#define EMOTICONMENU_HPP
 
 #include <QMenu>
 
@@ -32,22 +32,24 @@ public:
 
     explicit EmoticonMenu(QWidget *parent = 0);
 
-    static SmileyHash &getSmileyHash();
     static QString smile(QString text);
     static QString desmile(QString htmlText);
-    
-signals:
-    void insertEmoticon(QString);
-    
-public slots:
-    
-private slots:
-    void onEmoticonTriggered();
 
 private:
+    void addEmoticons();
     void addEmoticon(const QString &imgPath, const QStringList &texts);
 
     QGridLayout *layout;
+    //TODO: Allow user to choose smiley pack on runtime?
+    const static QHash<QString, QStringList> smileyHash;
+    const static int EMOTICONS_IN_A_ROW = 5;
+    
+signals:
+    void insertEmoticon(QString);
+
+private slots:
+    void onEmoticonTriggered();
+
 };
 
-#endif // EMOTICONMENU_H
+#endif // EMOTICONMENU_HPP

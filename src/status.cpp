@@ -19,6 +19,8 @@
 const QList<StatusHelper::Info> StatusHelper::info =
 {
     {"Online", ":/icons/status_online.png"},
+    {"Away", ":/icons/status_away.png"},
+    {"Busy", ":/icons/status_busy.png"},
     {"Offline", ":/icons/status_offline.png"}
 };
 

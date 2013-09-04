@@ -4,7 +4,7 @@
 
 This project depends on Qt5 and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium).
 
-You should get and install Qt5.
+You should get and install **Qt5.1.0 or higher**.
 You can get Qt5 precompiled binaries and source code to compile them yourself from [here](http://qt-project.org/downloads).
 
 You should get and install [libsodium](https://github.com/jedisct1/libsodium):
@@ -42,7 +42,7 @@ If you want to build GUI by using Qt Creator, rather than terminal commands, fol
 
 ###Windows:
 
-You should get and install **MinGW version** of Qt5 from [here](http://qt-project.org/downloads).
+You should get and install **MinGW version** of **Qt5.1.0 or higher** from [here](http://qt-project.org/downloads).
 
 If you don't already have a git shell installed, you can use one that comes with [GitHub for Windows](http://windows.github.com/).
 

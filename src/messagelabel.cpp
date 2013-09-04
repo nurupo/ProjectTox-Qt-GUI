@@ -44,7 +44,7 @@ void MessageLabel::setMessageId(int id)
     mId = id;
 }
 
-int MessageLabel::messageId()
+int MessageLabel::messageId() const
 {
     return mId;
 }

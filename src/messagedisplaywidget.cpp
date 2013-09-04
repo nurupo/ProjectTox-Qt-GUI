@@ -55,6 +55,7 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
     animation = new QPropertyAnimation(this, "scrollPos");
     animation->setDuration(200);
     animation->setLoopCount(1);
+    mainlayout->setMargin(1);
 }
 
 void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
@@ -108,14 +109,14 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
 
     MessageLabel *messageLabel = new MessageLabel(widget);
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
-    if(messageId) // Message added to send que
-    {
+    // Message added to send que
+    if (messageId) {
         messageLabel->setMessageId(messageId);
         messageLabel->setProperty("class", "msgMessage"); // for CSS styling
         messageLabel->setText(EmoticonMenu::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>"));
-    }
-    else // Error
-    {
+
+    // Error
+    } else {
         QPalette errorPal;
         errorPal.setColor(QPalette::Foreground, Qt::red);
         messageLabel->setPalette(errorPal);
@@ -131,23 +132,21 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
     timeLabel->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignTrailing);
     timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
 
+    // FIXME: names are arbitrary, it's possible that person you are talking to has the same name set
     // Insert name if name has changed
-    if(name != lastName || mainlayout->count() < 1)
-    {
+    if (name != lastName || mainlayout->count() < 1) {
         nameLabel->setText(name);
         lastName = name;
 
-        if(name == Settings::getInstance().getUsername())
-        {
+        if (name == Settings::getInstance().getUsername()) {
             nameLabel->setForegroundRole(QPalette::Mid);
             nameLabel->setProperty("class", "msgUserName"); // for CSS styling
-        }
-        else
+        } else {
             nameLabel->setProperty("class", "msgFriendName"); // for CSS styling
+        }
 
         // Create line
-        if(mainlayout->count() > 0)
-        {
+        if (mainlayout->count() > 0) {
             QFrame *line = new QFrame(this);
             line->setFrameShape(QFrame::HLine);
             line->setFrameShadow(QFrame::Plain);
@@ -160,6 +159,7 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
     // Return new line
     QHBoxLayout *hlayout = new QHBoxLayout(widget);
     hlayout->setContentsMargins(0, 0, 0, 0);
+    hlayout->setMargin(0);
     hlayout->addWidget(nameLabel, 0, Qt::AlignTop);
     hlayout->addWidget(messageLabel, 0, Qt::AlignTop);
     hlayout->addWidget(timeLabel, 0, Qt::AlignTop);
