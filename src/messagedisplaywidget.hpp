@@ -68,9 +68,6 @@ private:
     QString urlify(QString string);
 
     QWidget *createNewRow(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
-
-private slots:
-    void moveScrollBarToBottom(int min, int max);
 };
 
 #endif // MESSAGEDISPLAYWIDGET_HPP
