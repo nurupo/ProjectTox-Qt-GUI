@@ -33,8 +33,6 @@
 #include <QToolBar>
 #include <QToolButton>
 
-#include <QDebug>
-
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
@@ -114,11 +112,13 @@ MainWindow::MainWindow(QWidget* parent)
     core->moveToThread(coreThread);
     connect(coreThread, &QThread::started, core, &Core::start);
 
+    qRegisterMetaType<Status>("Status");
+
     connect(core, &Core::connected, this, &MainWindow::onConnected);
     connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
     connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
-    connect(core, &Core::friendStatusChanged, this, &MainWindow::onFriendStatusChanged);
-    connect(core, &Core::userIdGenerated, ourUserItem, &OurUserItemWidget::setUserId);
+    connect(core, SIGNAL(friendStatusChanged(int, Status)), friendsWidget, SLOT(setStatus(int, Status)));
+    connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
@@ -135,6 +135,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
     connect(core, &Core::usernameSet, ourUserItem, &OurUserItemWidget::setUsername);
+
+    connect(ourUserItem, &OurUserItemWidget::statusSelected, core, &Core::setStatus);
 
     connect(pages, &PagesWidget::sendMessage, core, &Core::sendMessage);
 
@@ -165,32 +167,6 @@ void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& m
 
     if (dialog.exec() == QDialog::Accepted) {
         emit friendRequestAccepted(userId);
-    }
-}
-
-void MainWindow::onFriendStatusChanged(int friendId, Core::FriendStatus status)
-{
-    switch (status) {
-        case Core::FriendStatus::NotFound:
-            qDebug() << "status:" << "no such friend found" << friendId;
-            friendsWidget->setStatus(friendId, Status::Offline);
-            break;
-        case Core::FriendStatus::Added:
-            qDebug() << "status:" << "friend was added" << friendId;
-            friendsWidget->setStatus(friendId, Status::Offline);
-            break;
-        case Core::FriendStatus::RequestSent:
-            qDebug() << "status:" << "friend request was sent" << friendId;
-            friendsWidget->setStatus(friendId, Status::Offline);
-            break;
-        case Core::FriendStatus::Confirmed:
-            qDebug() << "status:" << "friend is confirmed" << friendId;
-            friendsWidget->setStatus(friendId, Status::Offline);
-            break;
-        case Core::FriendStatus::Online:
-            qDebug() << "status:" << "friend is online" << friendId;
-            friendsWidget->setStatus(friendId, Status::Online);
-            break;
     }
 }
 

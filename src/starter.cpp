@@ -18,9 +18,16 @@
 #include "Settings/settings.hpp"
 
 Starter::Starter(QObject* parent) :
-    QObject(parent)
+    QObject(parent), mainWindow(nullptr)
 {
     createMainWindow();
+}
+
+Starter::~Starter()
+{
+    if (mainWindow) {
+        delete mainWindow;
+    }
 }
 
 void Starter::onDhtDialogAccepted()
@@ -30,6 +37,6 @@ void Starter::onDhtDialogAccepted()
 
 void Starter::createMainWindow()
 {
-    MainWindow* mainWindow = new MainWindow();
+    mainWindow = new MainWindow();
     mainWindow->show();
 }

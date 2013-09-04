@@ -35,7 +35,6 @@ class FriendsWidget : public QWidget
 public:
     FriendsWidget(QWidget* parent);
     enum {UserIdRole = Qt::UserRole, FriendIdRole, StatusRole};
-    void setStatus(int friendId, Status status);
     QString getUsername(int friendId);
 
 private:
@@ -59,13 +58,14 @@ public slots:
     void addFriend(int friendId, const QString& userId);
     void removeFriend(int friendId);
     void setUsername(int friendId, const QString& username);
+    void setStatus(int friendId, Status status);
 
 signals:
     void friendAdded(int friendId, const QString& userId);
     void friendStatusChanged(int friendId, Status status);
     void friendRemoved(int friendId);
     void friendSelectionChanged(int friendId);
-    void friendRequested(const QString& userId, const QString& message);
+    void friendRequested(const QString& friendAddress, const QString& message);
 
 };
 

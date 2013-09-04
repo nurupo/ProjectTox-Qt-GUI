@@ -28,5 +28,7 @@
         <file>icons/emoticons/emotion_doubt.png</file>
         <file>icons/emoticons/emotion_evilgrin.png</file>
         <file>icons/error.png</file>
+        <file>icons/status_away.png</file>
+        <file>icons/status_busy.png</file>
     </qresource>
 </RCC>

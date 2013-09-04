@@ -17,6 +17,8 @@
 #include "addfrienddialog.hpp"
 #include "customhinttextedit.hpp"
 
+#include <tox.h>
+
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -33,8 +35,8 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
 
     QGroupBox* addFriendGroup = new QGroupBox("Add friend", this);
 
-    QLabel* userIdLabel = new QLabel("User ID:", addFriendGroup);
-    userIdEdit = new QLineEdit(addFriendGroup);
+    QLabel* friendAddressLabel = new QLabel("Friend Address:", addFriendGroup);
+    friendAddressEdit = new QLineEdit(addFriendGroup);
 
     QLabel* messageLabel = new QLabel("Message:", addFriendGroup);
     messageEdit = new QPlainTextEdit(addFriendGroup);
@@ -47,21 +49,21 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
 
     QGridLayout* groupLayout = new QGridLayout(addFriendGroup);
 
-    groupLayout->addWidget(userIdLabel,     0, 0, 1, 1);
-    groupLayout->addWidget(userIdEdit,      0, 1, 1, 1);
-    groupLayout->addWidget(messageLabel,    1, 0, 1, 1, Qt::AlignTop);
-    groupLayout->addWidget(messageEdit,     1, 1, 1, 1);
+    groupLayout->addWidget(friendAddressLabel,  0, 0, 1, 1);
+    groupLayout->addWidget(friendAddressEdit,   0, 1, 1, 1);
+    groupLayout->addWidget(messageLabel,        1, 0, 1, 1, Qt::AlignTop);
+    groupLayout->addWidget(messageEdit,         1, 1, 1, 1);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(addFriendGroup);
     layout->addWidget(buttonBox);
 
-    resize(300, 100);
+    resize(324, 100);
 }
 
-QString AddFriendDialog::getUserId() const
+QString AddFriendDialog::getFriendAddress() const
 {
-    return userIdEdit->text();
+    return friendAddressEdit->text();
 }
 
 QString AddFriendDialog::getMessage() const
@@ -73,14 +75,14 @@ void AddFriendDialog::accept()
 {
     const QRegularExpression hexRegExp("^[A-Fa-f0-9]+$");
 
-    if (userIdEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
+    if (friendAddressEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
         QMessageBox warning(this);
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
-    } else if (userIdEdit->text().length() != 64 || !userIdEdit->text().contains(hexRegExp)) {
+    } else if (friendAddressEdit->text().length() != (TOX_FRIEND_ADDRESS_SIZE * 2) || !friendAddressEdit->text().contains(hexRegExp)) {
         QMessageBox warning(this);
-        warning.setText("Please enter a valid User ID.");
+        warning.setText("Please enter a valid Friend address.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
     } else {

@@ -133,7 +133,7 @@ void FriendsWidget::onAddFriendButtonClicked()
     AddFriendDialog dialog(this);
 
     if (dialog.exec() == QDialog::Accepted) {
-        emit friendRequested(dialog.getUserId(), dialog.getMessage());
+        emit friendRequested(dialog.getFriendAddress(), dialog.getMessage());
     }
 }
 

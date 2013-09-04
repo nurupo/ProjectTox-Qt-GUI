@@ -39,7 +39,7 @@ private:
     QWidget* usernameLabelContainer;
     RenameEditWidget* usernameEdit;
     QStackedWidget* usernameStackedWidget;
-    QString userId;
+    QString friendAddress;
 
     QToolButton* createToolButton(const QIcon& icon, const QSize iconSize, const QString& toolTip);
 
@@ -48,10 +48,10 @@ private slots:
     void onUsernameChangeCancelled();
     void onRenameUsernameButtonClicked();
     void onStatusActionTriggered();
-    void onCopyUserIdButtonClicked();
+    void onCopyFriendAddressButtonClicked();
 
 public slots:
-    void setUserId(const QString &userId);
+    void setFriendAddress(const QString &friendAddress);
     void setStatus(Status status);
     void setUsername(const QString& username);
 

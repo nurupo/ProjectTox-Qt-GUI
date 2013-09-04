@@ -19,7 +19,7 @@
 
 #include <QObject>
 
-enum class Status : int {Online = 0, Offline};
+enum class Status : int {Online = 0, Away, Busy, Offline};
 
 class StatusHelper
 {
