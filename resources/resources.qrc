@@ -29,5 +29,6 @@
         <file>icons/error.png</file>
         <file>icons/status_away.png</file>
         <file>icons/status_busy.png</file>
+        <file>icons/application_side_list.png</file>
     </qresource>
 </RCC>
