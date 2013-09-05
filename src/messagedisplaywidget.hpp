@@ -46,8 +46,8 @@ public:
 
     explicit MessageDisplayWidget(QWidget *parent = 0);
 
-    void appendMessage(const QString &name, const QString &message, int messageId = -1);
-    void prependMessage(const QString &name, const QString &message, int messageId = -1);
+    void appendMessage(const QString &name, const QString &message, int messageId, bool isOur);
+    void prependMessage(const QString &name, const QString &message, int messageId, bool isOur);
 
     int scrollPos() const;
 
@@ -64,10 +64,11 @@ private:
     QString             lastName;
     QPropertyAnimation *animation;
     int                 mScrollPos;
+    bool                lastMessageIsOurs;
 
     QString urlify(QString string);
 
-    QWidget *createNewRow(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
+    QWidget *createNewRow(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId, bool isOur);
 };
 
 #endif // MESSAGEDISPLAYWIDGET_HPP

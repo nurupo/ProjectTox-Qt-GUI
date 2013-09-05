@@ -73,7 +73,7 @@ int ChatPageWidget::getFriendId() const
 
 void ChatPageWidget::messageReceived(const QString& message)
 {
-    display->appendMessage(username, message);
+    display->appendMessage(username, message, -1, false);
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
@@ -93,5 +93,5 @@ void ChatPageWidget::setStatus(Status newStatus)
 
 void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
-    display->appendMessage(Settings::getInstance().getUsername(), message, messageId);
+    display->appendMessage(Settings::getInstance().getUsername(), message, messageId, true);
 }
