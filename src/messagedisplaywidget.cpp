@@ -52,16 +52,20 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
     mainlayout->setContentsMargins(1,1,1,1);
 
     // Animation
-    animation = new QPropertyAnimation(this, "scrollPos");
-    animation->setDuration(200);
-    animation->setLoopCount(1);
-    mainlayout->setMargin(1);
+    if(Settings::getInstance().isAnimationEnabled())
+    {
+        animation = new QPropertyAnimation(this, "scrollPos");
+        animation->setDuration(200);
+        animation->setLoopCount(1);
+        mainlayout->setMargin(1);
+    }
 }
 
 void MessageDisplayWidget::appendMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
 {
     connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
-    mainlayout->addWidget(createNewRow(name, message, messageId));
+    QWidget *row = createNewRow(name, message, messageId);
+    mainlayout->addWidget(row);
 }
 
 void MessageDisplayWidget::prependMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId)
@@ -84,9 +88,16 @@ void MessageDisplayWidget::setScrollPos(int arg)
 void MessageDisplayWidget::moveScrollBarToBottom(int min, int max)
 {
     Q_UNUSED(min);
-    animation->setKeyValueAt(0, verticalScrollBar()->sliderPosition());
-    animation->setKeyValueAt(1, max);
-    animation->start();
+    if(Settings::getInstance().isAnimationEnabled())
+    {
+        animation->setKeyValueAt(0, verticalScrollBar()->sliderPosition());
+        animation->setKeyValueAt(1, max);
+        animation->start();
+    }
+    else
+    {
+        this->verticalScrollBar()->setValue(max);
+    }
 }
 
 QString MessageDisplayWidget::urlify(QString string)

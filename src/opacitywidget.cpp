@@ -17,6 +17,7 @@
 #include "opacitywidget.hpp"
 #include <QPropertyAnimation>
 #include <QGraphicsOpacityEffect>
+#include "Settings/settings.hpp"
 
 OpacityWidget::OpacityWidget(QWidget *parent) :
     QWidget(parent)
@@ -24,13 +25,17 @@ OpacityWidget::OpacityWidget(QWidget *parent) :
     // Opacity effect
     effect = new QGraphicsOpacityEffect(this);
     setGraphicsEffect(effect);
+    setOpacity(1);
 
     // Animation
-    animation = new QPropertyAnimation(this, "opacity");
-    animation->setDuration(200);
-    animation->setKeyValueAt(0, 0);
-    animation->setKeyValueAt(1, 1);
-    animation->setLoopCount(1);
+    if(Settings::getInstance().isAnimationEnabled())
+    {
+        animation = new QPropertyAnimation(this, "opacity");
+        animation->setDuration(210);
+        animation->setKeyValueAt(0, 0);
+        animation->setKeyValueAt(1, 1);
+        animation->setLoopCount(1);
+    }
 }
 
 qreal OpacityWidget::opacity() const
@@ -46,6 +51,8 @@ void OpacityWidget::setOpacity(qreal arg)
 
 void OpacityWidget::showEvent(QShowEvent *e)
 {
-    animation->start();
+    if(Settings::getInstance().isAnimationEnabled())
+        animation->start();
+
     QWidget::showEvent(e);
 }

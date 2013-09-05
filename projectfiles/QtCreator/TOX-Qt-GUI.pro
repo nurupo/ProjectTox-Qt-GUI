@@ -85,7 +85,8 @@ SOURCES += \
     ../../src/messagelabel.cpp \
     ../../src/messagedisplaywidget.cpp \
     ../../src/opacitywidget.cpp \
-    ../../src/customhintwidget.cpp
+    ../../src/customhintwidget.cpp \
+    ../../src/Settings/guisettingspage.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -121,7 +122,8 @@ HEADERS  += \
     ../../src/emoticonmenu.hpp \
     ../../src/messagedisplaywidget.hpp \
     ../../src/opacitywidget.hpp \
-    ../../src/customhintwidget.hpp
+    ../../src/customhintwidget.hpp \
+    ../../src/Settings/guisettingspage.h
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \
