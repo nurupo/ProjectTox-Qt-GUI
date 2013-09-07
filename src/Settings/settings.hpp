@@ -56,6 +56,9 @@ public:
     // Assumes all windows have unique objectName set
     void saveWindow(const QMainWindow* window);
 
+    bool isAnimationEnabled() const;
+    void setAnimationEnabled(bool newValue);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -85,6 +88,9 @@ private:
     };
 
     QHash<QString, WindowSettings> windowSettings;
+
+    // GUI
+    bool enableSmothAnimation;
 
 signals:
     //void dataChanged();
