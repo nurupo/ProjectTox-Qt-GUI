@@ -29,22 +29,24 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
 {
     setMinimumSize(10, 50);
-    setContextMenuPolicy(Qt::ActionsContextMenu);
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &InputTextWidget::customContextMenuRequested, this, &InputTextWidget::showContextMenu);
 
-    // TODO: Add more actions (Undo, Redo)
-    // Create custom contextmenu
-    QAction *actionCut   = new QAction(tr("Cut"), this);
-    QAction *actionCopy  = new QAction(tr("Copy"), this);
-    QAction *actionPaste = new QAction(tr("Paste"), this);
+    actionUndo  = new QAction(tr("Undo"), this);
+    actionRedo  = new QAction(tr("Redo"), this);
+    actionCut   = new QAction(QIcon(":/icons/cut.png"), tr("Cut"), this);
+    actionCopy  = new QAction(QIcon(":/icons/page_copy.png"), tr("Copy"), this);
+    actionPaste = new QAction(QIcon(":/icons/paste_plain.png"), tr("Paste"), this);
+    actionUndo->setShortcut(QKeySequence::Undo);
+    actionRedo->setShortcut(QKeySequence::Redo);
     actionCut->setShortcut(QKeySequence::Cut);
     actionCopy->setShortcut(QKeySequence::Copy);
     actionPaste->setShortcut(QKeySequence::Paste);
+    connect(actionUndo,  &QAction::triggered, this, &InputTextWidget::undo);
+    connect(actionRedo,  &QAction::triggered, this, &InputTextWidget::redo);
     connect(actionCut,   &QAction::triggered, this, &InputTextWidget::cutPlainText);
     connect(actionCopy,  &QAction::triggered, this, &InputTextWidget::copyPlainText);
     connect(actionPaste, &QAction::triggered, this, &InputTextWidget::pastePlainText);
-    addAction(actionCut);
-    addAction(actionCopy);
-    addAction(actionPaste);
 }
 
 /*! Handle keyboard events. */
@@ -79,8 +81,11 @@ QSize InputTextWidget::sizeHint() const
 void InputTextWidget::copyPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
+    if(!selection.isEmpty())
+    {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
+    }
 }
 
 /*! Paste only plain text. */
@@ -94,7 +99,42 @@ void InputTextWidget::pastePlainText()
 void InputTextWidget::cutPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
-    textCursor().removeSelectedText();
+    if(!selection.isEmpty())
+    {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
+        textCursor().removeSelectedText();
+    }
+}
+
+
+void InputTextWidget::showContextMenu(const QPoint &pos)
+{
+    QPoint globalPos = mapToGlobal(pos);
+
+    QMenu *contextMenu = new QMenu(this);
+    contextMenu->addAction(actionUndo);
+    contextMenu->addAction(actionRedo);
+    contextMenu->addSeparator();
+    contextMenu->addAction(actionCut);
+    contextMenu->addAction(actionCopy);
+    contextMenu->addAction(actionPaste);
+
+    // Disable cut and copy if nothing to copy
+    if(textCursor().selection().isEmpty())
+    {
+        actionCut->setDisabled(true);
+        actionCopy->setDisabled(true);
+    }
+
+    // Disable paste if clipboard is empty
+    if(QApplication::clipboard()->text().isEmpty())
+        actionPaste->setDisabled(true);
+
+    contextMenu->exec(globalPos);
+    contextMenu->deleteLater();
+
+    actionCut->setEnabled(true);
+    actionCopy->setEnabled(true);
+    actionPaste->setEnabled(true);
 }

@@ -36,6 +36,7 @@ signals:
     void sendMessage(const QString& message);
 
 private slots:
+    void showContextMenu(const QPoint &pos);
     void copyPlainText();
     void pastePlainText();
     void cutPlainText();
@@ -43,6 +44,11 @@ private slots:
 private:
     QString desmile(QString htmlText);
 
+    QAction *actionUndo;
+    QAction *actionRedo;
+    QAction *actionCut;
+    QAction *actionCopy;
+    QAction *actionPaste;
 };
 
 #endif // INPUTTEXTWIDGET_HPP
