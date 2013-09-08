@@ -21,6 +21,7 @@
 
 class QHBoxLayout;
 class QVBoxLayout;
+class QPropertyAnimation;
 
 /*! New message display widget.
  *
@@ -35,26 +36,39 @@ class QVBoxLayout;
  * Message        | QLabel             | msgMessage
  * Seperator line | QFrame             | msgLine
  * Error message  | ElideLabel, QLabel | msgError
+ * Message Row    | OpacityWidget      | msgRow
  */
 class MessageDisplayWidget : public QScrollArea
 {
     Q_OBJECT
 public:
+    Q_PROPERTY(int scrollPos READ scrollPos WRITE setScrollPos)
+
     explicit MessageDisplayWidget(QWidget *parent = 0);
 
-    void appendMessage(const QString &name, const QString &message, int messageId = -1);
-    void prependMessage(const QString &name, const QString &message, int messageId = -1);
+    void appendMessage(const QString &name, const QString &message, int messageId, bool isOur);
+    void prependMessage(const QString &name, const QString &message, int messageId, bool isOur);
 
-private:
-    QVBoxLayout *mainlayout;
-    QString lastName;
+    int scrollPos() const;
 
-    QString urlify(QString string);
-    QHBoxLayout *createNewLine(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId);
+signals:
+    
+public slots:
+    void setScrollPos(int arg);
 
 private slots:
     void moveScrollBarToBottom(int min, int max);
     
+private:
+    QVBoxLayout        *mainlayout;
+    QString             lastName;
+    QPropertyAnimation *animation;
+    int                 mScrollPos;
+    bool                lastMessageIsOurs;
+
+    QString urlify(QString string);
+
+    QWidget *createNewRow(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId, bool isOur);
 };
 
 #endif // MESSAGEDISPLAYWIDGET_HPP
