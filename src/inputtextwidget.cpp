@@ -31,6 +31,7 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     setMinimumSize(10, 50);
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InputTextWidget::customContextMenuRequested, this, &InputTextWidget::showContextMenu);
+    showPlaceholder(true);
 
     actionUndo  = new QAction(tr("Undo"), this);
     actionRedo  = new QAction(tr("Redo"), this);
@@ -72,9 +73,27 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     }
 }
 
+void InputTextWidget::focusInEvent(QFocusEvent *e)
+{
+    showPlaceholder(false);
+    QTextEdit::focusInEvent(e);
+}
+
+void InputTextWidget::focusOutEvent(QFocusEvent *e)
+{
+    showPlaceholder(true);
+    QTextEdit::focusInEvent(e);
+}
+
 QSize InputTextWidget::sizeHint() const
 {
     return QSize(10, 50);
+}
+
+void InputTextWidget::insertHtml(const QString &text)
+{
+    showPlaceholder(false);
+    QTextEdit::insertHtml(text);
 }
 
 /*! Copy text without images, but textual representations of the smileys. */
@@ -107,7 +126,6 @@ void InputTextWidget::cutPlainText()
     }
 }
 
-
 void InputTextWidget::showContextMenu(const QPoint &pos)
 {
     QPoint globalPos = mapToGlobal(pos);
@@ -137,4 +155,25 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     actionCut->setEnabled(true);
     actionCopy->setEnabled(true);
     actionPaste->setEnabled(true);
+}
+
+
+void InputTextWidget::showPlaceholder(bool show)
+{
+    if(show && toPlainText().isEmpty())
+    {
+        QPalette pal = palette();
+        pal.setColor(QPalette::Text, pal.color(QPalette::Mid));
+        setPalette(pal);
+        setText(tr("Type text here..."));
+        placeholder = true;
+    }
+    else if(!show && placeholder)
+    {
+        QPalette pal = palette();
+        pal.setColor(QPalette::Text, pal.color(QPalette::WindowText));
+        setPalette(pal);
+        clear();
+        placeholder = false;
+    }
 }
