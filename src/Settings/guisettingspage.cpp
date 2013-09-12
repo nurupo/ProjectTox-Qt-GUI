@@ -1,10 +1,17 @@
 #include "guisettingspage.h"
 
 #include "settings.hpp"
+#include "appinfo.hpp"
 
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QCheckBox>
+#include <QStandardPaths>
+#include <QDebug>
+#include <QDir>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QSettings>
 
 GuiSettingsPage::GuiSettingsPage(QWidget *parent) :
     AbstractSettingsPage(parent)
@@ -24,6 +31,26 @@ void GuiSettingsPage::setGui()
 {
     const Settings& settings = Settings::getInstance();
     enableAnimationCheckbox->setChecked(settings.isAnimationEnabled());
+
+    // Look for smiley packs
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+QDir::separator()+AppInfo::name+QDir::separator()+"smileys");
+    if(!dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+QDir::separator()+AppInfo::name+QDir::separator()+"smileys"))
+        qDebug() << tr("ERROR Couldn't create smileypack directory.");
+    qDebug() << dir.absolutePath();
+
+    // Go to all packs
+    dir.setFilter(QDir::Dirs|QDir::NoDot|QDir::NoDotDot);
+    QDirIterator it(dir);
+    while (it.hasNext()) {
+        qDebug() << it.next();
+
+        QFileInfo f(it.filePath()+QDir::separator()+"theme");
+        if(!f.exists())
+            continue;
+
+        QSettings packFile(f.absoluteFilePath(), QSettings::IniFormat);
+        qDebug() << packFile.value("pack/Name").toString();
+    }
 }
 
 void GuiSettingsPage::applyChanges()
