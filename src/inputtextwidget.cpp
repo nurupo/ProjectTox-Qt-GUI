@@ -33,8 +33,8 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     connect(this, &InputTextWidget::customContextMenuRequested, this, &InputTextWidget::showContextMenu);
     showPlaceholder(true);
 
-    actionUndo  = new QAction(tr("Undo"), this);
-    actionRedo  = new QAction(tr("Redo"), this);
+    actionUndo  = new QAction(QIcon(":/icons/arrow_undo.png"), tr("Undo"), this);
+    actionRedo  = new QAction(QIcon(":/icons/arrow_redo.png"), tr("Redo"), this);
     actionCut   = new QAction(QIcon(":/icons/cut.png"), tr("Cut"), this);
     actionCopy  = new QAction(QIcon(":/icons/page_copy.png"), tr("Copy"), this);
     actionPaste = new QAction(QIcon(":/icons/paste_plain.png"), tr("Paste"), this);
@@ -73,12 +73,14 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     }
 }
 
+// FIXME: Replace Placeholder by Qt5.2 placeholder.
 void InputTextWidget::focusInEvent(QFocusEvent *e)
 {
     showPlaceholder(false);
     QTextEdit::focusInEvent(e);
 }
 
+// FIXME: Replace Placeholder by Qt5.2 placeholder.
 void InputTextWidget::focusOutEvent(QFocusEvent *e)
 {
     showPlaceholder(true);
@@ -100,8 +102,7 @@ void InputTextWidget::insertHtml(const QString &text)
 void InputTextWidget::copyPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
-    if(!selection.isEmpty())
-    {
+    if(!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
     }
@@ -118,8 +119,7 @@ void InputTextWidget::pastePlainText()
 void InputTextWidget::cutPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
-    if(!selection.isEmpty())
-    {
+    if(!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
         textCursor().removeSelectedText();
@@ -139,15 +139,15 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     contextMenu->addAction(actionPaste);
 
     // Disable cut and copy if nothing to copy
-    if(textCursor().selection().isEmpty())
-    {
+    if(textCursor().selection().isEmpty()) {
         actionCut->setDisabled(true);
         actionCopy->setDisabled(true);
     }
 
     // Disable paste if clipboard is empty
-    if(QApplication::clipboard()->text().isEmpty())
+    if(QApplication::clipboard()->text().isEmpty()) {
         actionPaste->setDisabled(true);
+    }
 
     contextMenu->exec(globalPos);
     contextMenu->deleteLater();
@@ -157,19 +157,17 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     actionPaste->setEnabled(true);
 }
 
-
+// FIXME: Replace Placeholder by Qt5.2 placeholder.
 void InputTextWidget::showPlaceholder(bool show)
 {
-    if(show && toPlainText().isEmpty())
-    {
+    if(show && toPlainText().isEmpty()) {
         QPalette pal = palette();
         pal.setColor(QPalette::Text, pal.color(QPalette::Mid));
         setPalette(pal);
         setText(tr("Type text here..."));
         placeholder = true;
     }
-    else if(!show && placeholder)
-    {
+    else if(!show && placeholder) {
         QPalette pal = palette();
         pal.setColor(QPalette::Text, pal.color(QPalette::WindowText));
         setPalette(pal);
