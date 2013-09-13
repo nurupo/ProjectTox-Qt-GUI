@@ -86,7 +86,7 @@ void ChatPageWidget::setStatus(Status newStatus)
 {
     status = newStatus;
     friendItem->setStatus(status);
-    input->setReadOnly(newStatus == Status::Offline);
+    input->setDisabled(newStatus == Status::Offline);
     emoticonButton->setDisabled(newStatus == Status::Offline);
 
 }
