@@ -29,5 +29,10 @@
         <file>icons/error.png</file>
         <file>icons/status_away.png</file>
         <file>icons/status_busy.png</file>
+        <file>icons/application_side_list.png</file>
+        <file>icons/cut.png</file>
+        <file>icons/paste_plain.png</file>
+        <file>icons/arrow_redo.png</file>
+        <file>icons/arrow_undo.png</file>
     </qresource>
 </RCC>
