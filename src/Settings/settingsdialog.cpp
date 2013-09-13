@@ -17,6 +17,7 @@
 #include "dhtbootstrapsettingspage.hpp"
 #include "loggingsettingspage.hpp"
 #include "settingsdialog.hpp"
+#include "guisettingspage.h"
 
 SettingsDialog::SettingsDialog(QWidget* parent) :
     BasicSettingsDialog(parent)
@@ -26,6 +27,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     addPage(":/icons/server.png", "DHT Bootstrap", new DhtBootstrapSettingsPage(this));
     //NOTE: make use of when logging will be implemented
     //addPage(":/icons/database.png", "Logging", new LoggingSettingsPage(this));
+    addPage(":/icons/application_side_list.png", tr("GUI"), new GuiSettingsPage(this));
 
     listWidget->setCurrentRow(0);
     listWidget->setMinimumWidth(130);

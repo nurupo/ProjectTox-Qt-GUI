@@ -91,6 +91,10 @@ void Settings::load()
         }
     s.endGroup();
 
+    s.beginGroup("GUI");
+        enableSmothAnimation = s.value("smothAnimation", true).toBool();
+    s.endGroup();
+
     loaded = true;
 }
 
@@ -133,6 +137,10 @@ void Settings::save()
             s.setValue("state", windowSettings.value(name).state);
         s.endGroup();
     }
+    s.endGroup();
+
+    s.beginGroup("GUI");
+        s.setValue("smothAnimation", enableSmothAnimation);
     s.endGroup();
 }
 
@@ -211,4 +219,14 @@ void Settings::loadWindow(QMainWindow* window) const
 
     window->restoreGeometry(i.value().geometry);
     window->restoreState(i.value().state);
+}
+
+bool Settings::isAnimationEnabled() const
+{
+    return enableSmothAnimation;
+}
+
+void Settings::setAnimationEnabled(bool newValue)
+{
+    enableSmothAnimation = newValue;
 }
