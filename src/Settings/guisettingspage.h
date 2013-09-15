@@ -5,6 +5,8 @@
 
 class QGroupBox;
 class QCheckBox;
+class QComboBox;
+class QLabel;
 
 class GuiSettingsPage : public AbstractSettingsPage
 {
@@ -16,15 +18,20 @@ public:
     void setGui();
     void applyChanges();
     
-signals:
-    
-public slots:
-    
+private slots:
+    void updateSmileypackDetails(int index);
+
 private:
     QGroupBox* buildAnimationGroup();
+    QGroupBox* buildSmileypackGroup();
+
+
 
     QCheckBox* enableAnimationCheckbox;
 
+    QComboBox* smileypackCombobox;
+    QLabel*    smileypackNameLabel;
+    QLabel*    smileypackDescLabel;
 };
 
 #endif // GUISETTINGSPAGE_H
