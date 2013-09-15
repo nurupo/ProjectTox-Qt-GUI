@@ -28,7 +28,6 @@ class EmoticonMenu : public QMenu
 {
     Q_OBJECT
 public:
-    typedef QHash<QString,QStringList> SmileyHash; //!< Hash of all smiley image pathes (key) and lists of their textual trpresantations (values).
 
     explicit EmoticonMenu(QWidget *parent = 0);
 
@@ -41,7 +40,7 @@ private:
 
     QGridLayout *layout;
     //TODO: Allow user to choose smiley pack on runtime?
-    const static QHash<QString, QStringList> smileyHash;
+    const static QList<QPair<QString, QStringList>> smileyPairList;
     const static int EMOTICONS_IN_A_ROW = 5;
     
 signals:
