@@ -28,7 +28,6 @@ class EmoticonMenu : public QMenu
 {
     Q_OBJECT
 public:
-    typedef QHash<QString,QStringList> SmileyHash; //!< Hash of all smiley image pathes (key) and lists of their textual trpresantations (values).
 
     explicit EmoticonMenu(QWidget *parent = 0);
 
