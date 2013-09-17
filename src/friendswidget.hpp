@@ -22,6 +22,8 @@
 #include "friendproxymodel.hpp"
 #include "status.hpp"
 
+#include "ui_friendswidget.h"
+
 #include <QHash>
 #include <QMenu>
 #include <QPushButton>
@@ -29,7 +31,7 @@
 #include <QTreeView>
 #include <QWidget>
 
-class FriendsWidget : public QWidget
+class FriendsWidget : public QWidget, public Ui::FriendsWidget
 {
     Q_OBJECT
 public:
@@ -38,8 +40,6 @@ public:
     QString getUsername(int friendId);
 
 private:
-    FilterWidget* filterEdit;
-    CustomHintTreeView* friendView;
     QStandardItemModel* friendModel;
     FriendProxyModel* friendProxyModel;
     QMenu* friendContextMenu;

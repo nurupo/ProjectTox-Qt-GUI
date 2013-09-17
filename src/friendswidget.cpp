@@ -28,26 +28,13 @@
 FriendsWidget::FriendsWidget(QWidget* parent) :
     QWidget(parent)
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setSpacing(2);
-    layout->setContentsMargins(2, 2, 0, 2);
+    setupUi(this);
 
-    QAction* copyUserIdAction = new QAction(QIcon(":/icons/page_copy.png"), "Copy User ID", this);
     connect(copyUserIdAction, &QAction::triggered, this, &FriendsWidget::onCopyUserIdActionTriggered);
-
-    QAction* removeFriendAction = new QAction(QIcon(":/icons/user_delete.png"), "Remove", this);
     connect(removeFriendAction, &QAction::triggered, this, &FriendsWidget::onRemoveFriendActionTriggered);
-
     friendContextMenu = new QMenu(this);
     friendContextMenu->addActions(QList<QAction*>() << copyUserIdAction << removeFriendAction);
 
-    friendView = new CustomHintTreeView(this, QSize(100, 100));
-    friendView->setIconSize(QSize(24, 24));
-    friendView->setSortingEnabled(true);
-    friendView->setIndentation(0);
-    friendView->setHeaderHidden(true);
-    friendView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    friendView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(friendView, &QTreeView::customContextMenuRequested, this, &FriendsWidget::onFriendContextMenuRequested);
 
     friendModel = new QStandardItemModel(this);
@@ -59,13 +46,7 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     friendView->setModel(friendProxyModel);
     connect(friendView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FriendsWidget::onFriendSelectionChanged);
 
-
-    filterEdit = new FilterWidget(this);
-    filterEdit->setPlaceholderText("Search");
     connect(filterEdit, &FilterWidget::textChanged, friendProxyModel, &FriendProxyModel::setFilterFixedString);
-
-    layout->addWidget(filterEdit);
-    layout->addWidget(friendView);
 }
 
 void FriendsWidget::addFriend(int friendId, const QString& userId)

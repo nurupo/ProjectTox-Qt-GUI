@@ -22,7 +22,7 @@
 class CustomHintTreeView : public QTreeView
 {
 public:
-    explicit CustomHintTreeView(QWidget* parent, QSize startingSize);
+  explicit CustomHintTreeView(QWidget* parent, QSize startingSize = QSize(100, 100));
     QSize sizeHint() const;
 
 private:
