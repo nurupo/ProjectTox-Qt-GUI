@@ -154,3 +154,7 @@ RESOURCES += \
     ../../resources/resources.qrc
 
 win32:RC_FILE = ../../resources/win32_appicon.rc
+
+FORMS += \
+    ../../src/friendswidget.ui \
+    ../../src/aboutdialog.ui

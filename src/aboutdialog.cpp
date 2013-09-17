@@ -25,52 +25,19 @@
 AboutDialog::AboutDialog(QWidget *parent) :
     QDialog(parent)
 {
+    setupUi(this);
+
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowTitle("About");
 
     QGridLayout* layout = new QGridLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
-    const int SPACER_SIZE = 8;
     const QString Url("<a href=\"%2\">%1</a>");
 
-    QLabel* iconLabel = new QLabel(this);
-    iconLabel->setPixmap(QPixmap(":/icons/icon64.png"));
-    iconLabel->setFixedSize(64 + 4, 64 + 4);
-
-    QLabel* applicationNameLabel = getLabel(AppInfo::name, 16, true, Qt::AlignLeft);
-
-    QLabel* versionLabel = getLabel(QString("version %1").arg(AppInfo::version), 8, false, Qt::AlignLeft);
-
-    QLabel* buildDateLabel = getLabel(QString("Build date: %1").arg(AppInfo::buildDate), 8, false, Qt::AlignLeft);
-
-    QLabel* iconsSourceLabel = getLabel(QString("%1 %2").arg("This application uses").arg(Url.arg("FatCow icons").arg("http://www.fatcow.com/free-icons")), 8, false, Qt::AlignLeft);
-    iconsSourceLabel->setOpenExternalLinks(true);
-
-    QLabel* licenseLabel = getLabel(QString("License: %1").arg(AppInfo::license), 8, false, Qt::AlignLeft);
-
-    QLabel* copyrightLabel = getLabel(QString("(c) %1, %2").arg(AppInfo::years).arg(Url.arg(AppInfo::author).arg(AppInfo::Url)), 8, false, Qt::AlignCenter);
-    copyrightLabel->setOpenExternalLinks(true);
-
-    layout->addWidget(iconLabel,                                0, 0, 3, 1);
-    layout->addWidget(applicationNameLabel,                     0, 1, 1, 2);
-    layout->addWidget(versionLabel,                             1, 1, 1, 2);
-    layout->addWidget(buildDateLabel,                           2, 1, 1, 2);
-    layout->addItem(new QSpacerItem(SPACER_SIZE, SPACER_SIZE),  3, 2, 1, 1);
-    layout->addWidget(iconsSourceLabel,                         4, 0, 1, 3);
-    layout->addItem(new QSpacerItem(SPACER_SIZE, SPACER_SIZE),  5, 2, 1, 1);
-    layout->addWidget(licenseLabel,                             6, 0, 1, 3);
-    layout->addItem(new QSpacerItem(SPACER_SIZE, SPACER_SIZE),  7, 2, 1, 1);
-    layout->addWidget(copyrightLabel,                           8, 0, 1, 3);
+    applicationNameLabel->setText(AppInfo::name);
+    versionLabel->setText(QString("version %1").arg(AppInfo::version));
+    buildDateLabel->setText(QString("Build date: %1").arg(AppInfo::buildDate));
+    iconsSourceLabel->setText(QString("%1 %2").arg("This application uses").arg(Url.arg("FatCow icons").arg("http://www.fatcow.com/free-icons")));
+    licenseLabel->setText(QString("License: %1").arg(AppInfo::license));
+    copyrightLabel->setText(QString("(c) %1, %2").arg(AppInfo::years).arg(Url.arg(AppInfo::author).arg(AppInfo::Url)));
 }
-
-QLabel* AboutDialog::getLabel(const QString& text, int size, bool bold, Qt::Alignment alignment)
-{
-    QLabel* label = new QLabel(text, this);
-    QFont font = QFont(label->font().family(), size);
-    font.setBold(bold);
-    label->setFont(font);
-    label->setAlignment(alignment);
-    return label;
-}
-

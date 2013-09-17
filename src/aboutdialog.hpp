@@ -17,10 +17,12 @@
 #ifndef ABOUTDIALOG_HPP
 #define ABOUTDIALOG_HPP
 
+#include "ui_aboutdialog.h"
+
 #include <QDialog>
 #include <QLabel>
 
-class AboutDialog : public QDialog
+class AboutDialog : public QDialog, public Ui::AboutDialog
 {
 public:
     explicit AboutDialog(QWidget* parent);
