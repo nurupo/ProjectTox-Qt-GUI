@@ -2,7 +2,7 @@
 
 ###Linux:
 
-This project depends on Qt5 and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium).
+This project depends on Qt5, g++, and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium).
 
 You should get and install **Qt5.1.0 or higher**.
 You can get Qt5 precompiled binaries and source code to compile them yourself from [here](http://qt-project.org/downloads).
