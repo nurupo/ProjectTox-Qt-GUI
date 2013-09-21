@@ -21,6 +21,7 @@
 #include "friendrequestdialog.hpp"
 #include "pageswidget.hpp"
 #include "Settings/settings.hpp"
+#include "closeapplicationdialog.hpp"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -29,6 +30,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStackedWidget>
+#include <QToolBar>
+#include <QToolButton>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -43,26 +46,7 @@ MainWindow::MainWindow(QWidget* parent)
     setObjectName("mainwindow");
     setWindowTitle("developers' test version, not for public use");
     setWindowIcon(QIcon(":/icons/icon64.png"));
-
-    QMenuBar* menu = new QMenuBar(this);
-    setMenuBar(menu);
     setContextMenuPolicy(Qt::PreventContextMenu);
-
-    QMenu* toolsMenu = menu->addMenu("Tools");
-
-    QAction* settingsAction = new QAction(QIcon(":/icons/setting_tools.png"), "Settings", this);
-    connect(settingsAction, &QAction::triggered, this, &MainWindow::onSettingsActionTriggered);
-
-    toolsMenu->addActions(QList<QAction*>() << settingsAction);
-
-    QMenu* aboutMenu = menu->addMenu("About");
-    QAction* aboutQtAction = new QAction("About Qt", this);
-    QAction* aboutAppAction = new QAction(QString("About %1").arg(AppInfo::name), this);
-
-    connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(aboutAppAction, &QAction::triggered, this, &MainWindow::onAboutAppActionTriggered);
-
-    aboutMenu->addActions(QList<QAction*>() << aboutQtAction << aboutAppAction);
 
     QDockWidget* friendDock = new QDockWidget(this);
     friendDock->setObjectName("FriendDock");
@@ -75,14 +59,45 @@ MainWindow::MainWindow(QWidget* parent)
     QVBoxLayout* layout = new QVBoxLayout(friendDockWidget);
     layout->setMargin(0);
     layout->setSpacing(0);
+    friendDock->setWidget(friendDockWidget);
 
     ourUserItem = new OurUserItemWidget(this);
     friendsWidget = new FriendsWidget(friendDockWidget);
 
+    // Create toolbar
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    toolBar->setIconSize(QSize(16, 16));
+
+    QToolButton *addFriendButton = new QToolButton(toolBar);
+    addFriendButton->setIcon(QIcon("://icons/user_add.png"));
+    addFriendButton->setToolTip(tr("Add friend"));
+    connect(addFriendButton, &QToolButton::clicked, friendsWidget, &FriendsWidget::onAddFriendButtonClicked);
+
+    QWidget *spacer = new QWidget(toolBar);
+    spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+
+    QToolButton *menuButton = new QToolButton(toolBar);
+    menuButton->setIcon(QIcon("://icons/cog.png"));
+    menuButton->setToolTip(tr("Mainmenu"));
+    menuButton->setPopupMode(QToolButton::InstantPopup);
+    QMenu *mainmenu = new QMenu(menuButton);
+    mainmenu->addAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this, SLOT(onSettingsActionTriggered()));
+    mainmenu->addSeparator();
+    mainmenu->addAction(tr("About %1").arg(AppInfo::name), this, SLOT(onAboutAppActionTriggered()));
+    mainmenu->addAction(tr("About Qt"), qApp, SLOT(aboutQt()));
+    mainmenu->addSeparator();
+    mainmenu->addAction(tr("Quit"), this, SLOT(onQuitApplicationTriggered()), QKeySequence::Quit);
+    menuButton->setMenu(mainmenu);
+
+    toolBar->addWidget(addFriendButton);
+    toolBar->addWidget(spacer);
+    toolBar->addWidget(menuButton);
+    // Create toolbar end
+
     layout->addWidget(ourUserItem);
     layout->addWidget(friendsWidget);
-
-    friendDock->setWidget(friendDockWidget);
+    layout->addWidget(toolBar);
 
     PagesWidget* pages = new PagesWidget(this);
     connect(friendsWidget, &FriendsWidget::friendAdded, pages, &PagesWidget::addPage);
@@ -189,5 +204,11 @@ void MainWindow::onSettingsActionTriggered()
 void MainWindow::onAboutAppActionTriggered()
 {
     AboutDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::onQuitApplicationTriggered()
+{
+    CloseApplicationDialog dialog(this);
     dialog.exec();
 }

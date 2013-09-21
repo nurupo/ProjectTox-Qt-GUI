@@ -52,6 +52,7 @@ private slots:
     void onFailedToAddFriend(const QString& userId);
     void onSettingsActionTriggered();
     void onAboutAppActionTriggered();
+    void onQuitApplicationTriggered();
 
 signals:
     void friendRequestAccepted(const QString &userId);

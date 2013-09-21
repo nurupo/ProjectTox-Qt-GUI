@@ -18,13 +18,11 @@
 
 #include <QGridLayout>
 #include <QToolButton>
-#include <QDebug>
-#include <QHash>
 #include <QWidgetAction>
 #include <QRegularExpression>
 #include <QTextDocument>
 
-const QHash<QString, QStringList> EmoticonMenu::smileyHash =
+const QList<QPair<QString, QStringList>> EmoticonMenu::smileyPairList =
 {
     {":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)"}},
     {":/icons/emoticons/emotion_sad.png",      {":(", ":-("}},
@@ -73,11 +71,9 @@ SmileypackParser::SmileyHash &EmoticonMenu::getSmileyHash()
 
 QString EmoticonMenu::smile(QString text)
 {
-    QHashIterator<QString, QStringList> i(smileyHash);
-    while (i.hasNext()) {
-        i.next();
-        for (const QString& smileytext : i.value()) {
-            text.replace(smileytext, QString("<img src=\"%1\" />").arg(i.key()));
+    for (const auto& pair : smileyPairList) {
+        for (const QString& smileytext : pair.second) {
+            text.replace(smileytext, QString("<img src=\"%1\" />").arg(pair.first));
         }
     }
     return text;
@@ -87,15 +83,20 @@ QString EmoticonMenu::desmile(QString htmlText)
 {
     // Replace smileys by their textual representation
     int i = 0;
-    QRegularExpression re("<img[\\s]+[^>]*?((alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?)|(src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?))((src*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|(alt*?[\\s]?=[\\s\\\"\\']+(.*?)[\\\"\\']+.*?>)|>)");
+    QRegularExpression re(R"_(<img[\s]+[^>]*?((alt*?[\s]?=[\s\"\']+(.*?)[\"\']+.*?)|(src*?[\s]?=[\s\"\']+(.*?)[\"\']+.*?))((src*?[\s]?=[\s\"\']+(.*?)[\"\']+.*?>)|(alt*?[\s]?=[\s\"\']+(.*?)[\"\']+.*?>)|>))_");
     QRegularExpressionMatch match = re.match(htmlText, i);
     while (match.hasMatch()) {
         // Replace smiley and match next
-        QStringList textSmilies = smileyHash.value(match.captured(5));
-        if (textSmilies.isEmpty()) {
-            htmlText.remove(match.captured(0));
-        } else {
-            htmlText.replace(match.captured(0), textSmilies.first());
+        for (const auto& pair : smileyPairList) {
+            if (pair.first == match.captured(5)) {
+                const QStringList& textSmilies = pair.second;
+                if (textSmilies.isEmpty()) {
+                    htmlText.remove(match.captured(0));
+                } else {
+                    htmlText.replace(match.captured(0), textSmilies.first());
+                }
+                break;
+            }
         }
         match = re.match(htmlText, ++i);
     }
@@ -108,17 +109,9 @@ QString EmoticonMenu::desmile(QString htmlText)
 
 void EmoticonMenu::addEmoticons()
 {
-    /*QHashIterator<QString, QStringList> i(smileyHash);
-    while (i.hasNext()) {
-        i.next();
-        addEmoticon(i.key(), i.value());
-    }*/
-
-    QHashIterator<QString, QStringList> i(SmileypackParser::getSmileyHash());
-        while (i.hasNext()) {
-            i.next();
-            addEmoticon(i.key(), i.value());
-        }
+    for (const auto& pair : smileyPairList) {
+        addEmoticon(pair.first, pair.second);
+    }
 }
 
 void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts)
