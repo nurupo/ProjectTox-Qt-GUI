@@ -18,6 +18,7 @@
 #define EMOTICONMENU_HPP
 
 #include <QMenu>
+#include "Settings/smileypackparser.h"
 
 class QGridLayout;
 
@@ -43,6 +44,9 @@ private:
     //TODO: Allow user to choose smiley pack on runtime?
     const static QHash<QString, QStringList> smileyHash;
     const static int EMOTICONS_IN_A_ROW = 5;
+
+    static SmileypackParser::SmileyHash shash;
+    static SmileypackParser::SmileyHash &getSmileyHash();
     
 signals:
     void insertEmoticon(QString);

@@ -55,9 +55,20 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
 
     action->setDefaultWidget(actionDefaultWidget);
 
+    //shash.insert(":/icons/emoticons/emotion_smile.png", QStringList() << ":)" << ":-)" << ":o)");
+
+    getSmileyHash().insert(":/icons/emoticons/emotion_smile.png", {":)", ":-)", ":o)"});
+
     addAction(action);
 
     addEmoticons();
+}
+
+/*! Get a hash of all smileys. That can be used for functions like desmile. */
+SmileypackParser::SmileyHash &EmoticonMenu::getSmileyHash()
+{
+    static SmileypackParser::SmileyHash shash;
+    return shash;
 }
 
 QString EmoticonMenu::smile(QString text)
@@ -97,11 +108,17 @@ QString EmoticonMenu::desmile(QString htmlText)
 
 void EmoticonMenu::addEmoticons()
 {
-    QHashIterator<QString, QStringList> i(smileyHash);
+    /*QHashIterator<QString, QStringList> i(smileyHash);
     while (i.hasNext()) {
         i.next();
         addEmoticon(i.key(), i.value());
-    }
+    }*/
+
+    QHashIterator<QString, QStringList> i(SmileypackParser::getSmileyHash());
+        while (i.hasNext()) {
+            i.next();
+            addEmoticon(i.key(), i.value());
+        }
 }
 
 void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts)

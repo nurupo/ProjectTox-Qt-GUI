@@ -32,6 +32,7 @@ private:
     QComboBox* smileypackCombobox;
     QLabel*    smileypackNameLabel;
     QLabel*    smileypackDescLabel;
+    QLabel*    smileypackWebLabel;
 };
 
 #endif // GUISETTINGSPAGE_H

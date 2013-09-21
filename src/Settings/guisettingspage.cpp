@@ -17,6 +17,8 @@
 #include <QComboBox>
 #include <QLabel>
 
+#include "smileypackparser.h"
+
 GuiSettingsPage::GuiSettingsPage(QWidget *parent) :
     AbstractSettingsPage(parent)
 {
@@ -52,22 +54,16 @@ void GuiSettingsPage::setGui()
         if(!f.exists())
             continue;
 
-        QSettings packFile(f.absoluteFilePath(), QSettings::IniFormat);
-        packFile.setIniCodec("UTF-8");
+        qDebug() << it.filePath()+QDir::separator()+"theme";
 
-        QString name = packFile.value("head/Name").toString();
-        QString icon = it.filePath()+QDir::separator()+packFile.value("head/Icon").toString();
-        QStringList data;
-        data << name << packFile.value("head/Author").toString() << packFile.value("head/Description").toString();
-        smileypackCombobox->addItem(QIcon(icon), name, data);
+        SmileypackParser parser;
+        parser.parseFile(it.filePath()+QDir::separator()+"theme");
 
-        qDebug() << packFile.value("head/Author").toString();
+        QString icon = it.filePath()+QDir::separator()+parser.getHeader().value("Icon");
+        QVariant data;
+        data.setValue(parser.getHeader());
 
-        packFile.beginGroup("smileys");
-        foreach (QString key, packFile.allKeys()) {
-            //qDebug() << packFile.value(key).toString().split(QRegularExpression("\\s+"),QString::SkipEmptyParts);
-        }
-        packFile.endGroup();
+        smileypackCombobox->addItem(QIcon(icon), parser.getHeader().value("Name"), data);
     }
 }
 
@@ -96,16 +92,42 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
 
     smileypackNameLabel = new QLabel(group);
     smileypackDescLabel = new QLabel(group);
+    smileypackWebLabel  = new QLabel(group);
+
+    smileypackNameLabel->setWordWrap(true);
+    smileypackNameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
     smileypackDescLabel->setWordWrap(true);
+    smileypackDescLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    smileypackWebLabel->setVisible(false);
+    smileypackWebLabel->setOpenExternalLinks(true);
 
     layout->addWidget(smileypackCombobox);
     layout->addWidget(smileypackNameLabel);
     layout->addWidget(smileypackDescLabel);
+    layout->addWidget(smileypackWebLabel);
     return group;
 }
 
 void GuiSettingsPage::updateSmileypackDetails(int index)
 {
-    smileypackNameLabel->setText(tr("<b>%1</b> by %2").arg(smileypackCombobox->itemData(index).toStringList().at(0)).arg(smileypackCombobox->itemData(index).toStringList().at(1)));
-    smileypackDescLabel->setText(smileypackCombobox->itemData(index).toStringList().at(2));
+    SmileypackParser::HeaderHash header = smileypackCombobox->itemData(index).value<SmileypackParser::HeaderHash>();
+
+    QString version;
+    if (!header.value("Version").isEmpty()) {
+        version = "v" + header.value("Version");
+    }
+
+    smileypackNameLabel->setText(tr("<b>%1</b> %2 by %3").arg(header.value("Name"), version, header.value("Author")));
+    smileypackDescLabel->setText(QString("\"<i>%1</i>\"").arg(header.value("Description")));
+
+    if (!header.value("Website").isEmpty()) {
+        smileypackWebLabel->setText(QString("<a href=\"%1\">%1</a>").arg(header.value("Website")));
+        smileypackWebLabel->setVisible(true);
+    }
+    else {
+        smileypackWebLabel->clear();
+        smileypackWebLabel->setVisible(false);
+    }
 }
