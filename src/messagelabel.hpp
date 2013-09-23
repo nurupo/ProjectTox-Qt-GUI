@@ -28,11 +28,13 @@ public:
     void setMessageId(int id);
     int messageId() const;
 
-private slots:
-    void copyPlainText();
-
 private:
     int mId;
+    QAction *copyAction;
+    QAction *copyAllAction;
+
+private slots:
+    void showContextMenu(const QPoint &pos);
 };
 
 #endif // MESSAGELABEL_HPP
