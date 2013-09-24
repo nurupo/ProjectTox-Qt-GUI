@@ -35,11 +35,9 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
 void EmoticonMenu::updateEmoticons()
 {
     // Delete old menu
-    if (!action && !actionDefaultWidget && !layout) {
-        action->deleteLater();
-        actionDefaultWidget->deleteLater();
-        layout->deleteLater();
-    }
+    action->deleteLater();
+    actionDefaultWidget->deleteLater();
+    layout->deleteLater();
 
     // Create new menu
     action = new QWidgetAction(this);
@@ -65,14 +63,10 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts,
 
         QFont font;
         font.setPixelSize(16);
-        button->setFont(font);
-
         if (Settings::getInstance().isDejavuFont()) {
-            button->setFont(QFont("DejaVu Sans"));
+            font.setFamily("DejaVu Sans");
         }
-        else {
-            button->setFont(QFont());
-        }
+        button->setFont(font);
     }
     else {
         button->setIcon(QIcon(imgPath));

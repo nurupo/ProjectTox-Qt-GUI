@@ -31,6 +31,7 @@ public:
 
 public slots:
     void insertHtml(const QString &text);
+    void updateFont();
 
 protected:
     void keyPressEvent(QKeyEvent* event);

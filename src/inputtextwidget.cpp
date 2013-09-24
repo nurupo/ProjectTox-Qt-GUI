@@ -27,6 +27,7 @@
 #include <QMenu>
 
 #include "smileypack.h"
+#include "Settings/settings.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
@@ -99,6 +100,15 @@ void InputTextWidget::insertHtml(const QString &text)
 {
     showPlaceholder(false);
     QTextEdit::insertHtml(text);
+}
+
+void InputTextWidget::updateFont()
+{
+    QFont font;
+    if (Settings::getInstance().isDejavuFont()) {
+        font.setFamily("DejaVu Sans");
+    }
+    setFont(font);
 }
 
 /*! Copy text without images, but textual representations of the smileys. */

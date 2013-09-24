@@ -50,9 +50,8 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowIcon(QIcon(":/icons/icon64.png"));
     setContextMenuPolicy(Qt::PreventContextMenu);
 
-    // install font
-    int id = QFontDatabase::addApplicationFont("://DejaVuSans.ttf");
-    qDebug() << QFontDatabase::applicationFontFamilies(id); ///////////////////////////////////////////////////////// TODO
+    // install Unicode 6.1 supporting font
+    QFontDatabase::addApplicationFont("://DejaVuSans.ttf");
 
     QDockWidget* friendDock = new QDockWidget(this);
     friendDock->setObjectName("FriendDock");
