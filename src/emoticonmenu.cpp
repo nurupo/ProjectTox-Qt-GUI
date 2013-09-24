@@ -63,6 +63,10 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts,
     if (isEmoij) {
         button->setText(imgPath);
         button->setProperty("smiley", imgPath);
+
+        QFont font;
+        font.setPixelSize(16);
+        button->setFont(font);
     }
     else {
         button->setIcon(QIcon(imgPath));
