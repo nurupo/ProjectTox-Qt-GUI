@@ -36,6 +36,7 @@ void GuiSettingsPage::setGui()
 {
     const Settings& settings = Settings::getInstance();
     enableAnimationCheckbox->setChecked(settings.isAnimationEnabled());
+    useDejavuFontCheckbox->setChecked(settings.isDejavuFont());
 
     // Insert Emoij
     Smileypack emoijPack;
@@ -52,6 +53,7 @@ void GuiSettingsPage::applyChanges()
 {
     Settings& settings = Settings::getInstance();
     settings.setAnimationEnabled(enableAnimationCheckbox->isChecked());
+    settings.setDejavuFont(useDejavuFontCheckbox->isChecked());
 
     // Parse the selected smileypack
     Smileypack newPack;
@@ -88,8 +90,13 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
     smileypackDescLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     smileypackDescLabel->setOpenExternalLinks(true);
 
+    useDejavuFontCheckbox = new QCheckBox(group);
+    useDejavuFontCheckbox->setText(tr("Use \"DejaVu Sans\" font."));
+    useDejavuFontCheckbox->setToolTip(tr("This font supports Unicode 6.1 and Emoij."));
+
     layout->addWidget(smileypackCombobox);
     layout->addWidget(smileypackDescLabel);
+    layout->addWidget(useDejavuFontCheckbox);
     return group;
 }
 

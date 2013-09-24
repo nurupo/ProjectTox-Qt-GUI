@@ -25,6 +25,7 @@
 #include <QFrame>
 #include <QDebug>
 #include <QPropertyAnimation>
+#include <QFontDatabase>
 
 #include "Settings/settings.hpp"
 #include "smileypack.h"
@@ -125,6 +126,10 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
         messageLabel->setMessageId(messageId);
         messageLabel->setProperty("class", "msgMessage"); // for CSS styling
         messageLabel->setText(Smileypack::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>"));
+
+        if (Settings::getInstance().isDejavuFont()) {
+            messageLabel->setFont(QFont("DejaVu Sans"));
+        }
 
     // Error
     } else {

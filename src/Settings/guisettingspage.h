@@ -33,6 +33,7 @@ private:
 
     QComboBox* smileypackCombobox;
     QLabel*    smileypackDescLabel;
+    QCheckBox* useDejavuFontCheckbox;
 };
 
 

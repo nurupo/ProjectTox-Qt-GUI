@@ -26,18 +26,20 @@
 EmoticonMenu::EmoticonMenu(QWidget *parent) :
     QMenu(parent)
 {
-    action = NULL;
+    action              = NULL;
     actionDefaultWidget = NULL;
-    layout = NULL;
+    layout              = NULL;
     updateEmoticons();
 }
 
 void EmoticonMenu::updateEmoticons()
 {
     // Delete old menu
-    action->deleteLater();
-    actionDefaultWidget->deleteLater();
-    layout->deleteLater();
+    if (!action && !actionDefaultWidget && !layout) {
+        action->deleteLater();
+        actionDefaultWidget->deleteLater();
+        layout->deleteLater();
+    }
 
     // Create new menu
     action = new QWidgetAction(this);
@@ -47,9 +49,6 @@ void EmoticonMenu::updateEmoticons()
     layout->setSpacing(0);
     action->setDefaultWidget(actionDefaultWidget);
     addAction(action);
-
-    // get the current smileys from parser
-    connect(&Settings::getInstance(), &Settings::smileyPackChanged, this, &EmoticonMenu::updateEmoticons);
 
     // Add new pack
     for (const auto& pair : Smileypack::currentPack().getList()) {
@@ -67,6 +66,13 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts,
         QFont font;
         font.setPixelSize(16);
         button->setFont(font);
+
+        if (Settings::getInstance().isDejavuFont()) {
+            button->setFont(QFont("DejaVu Sans"));
+        }
+        else {
+            button->setFont(QFont());
+        }
     }
     else {
         button->setIcon(QIcon(imgPath));

@@ -63,7 +63,7 @@ Smileypack::Smileypack(QObject *parent) :
     emoij = true;
 
     name = "Emoij";
-    author = "Unicode 6.1";
+    author = "Unicode 6.0";
     description = "Emoij is a Unicode block containing graphic representations of faces, which are often associated with classic emoticons.";
 }
 

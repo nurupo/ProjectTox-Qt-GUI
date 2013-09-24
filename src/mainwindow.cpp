@@ -32,6 +32,8 @@
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QToolButton>
+#include <QFontDatabase>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -47,6 +49,10 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowTitle("developers' test version, not for public use");
     setWindowIcon(QIcon(":/icons/icon64.png"));
     setContextMenuPolicy(Qt::PreventContextMenu);
+
+    // install font
+    int id = QFontDatabase::addApplicationFont("://DejaVuSans.ttf");
+    qDebug() << QFontDatabase::applicationFontFamilies(id); ///////////////////////////////////////////////////////// TODO
 
     QDockWidget* friendDock = new QDockWidget(this);
     friendDock->setObjectName("FriendDock");

@@ -62,6 +62,9 @@ public:
     QString getSmileyPack() const;
     void setSmileyPack(const QString &value);
 
+    bool isDejavuFont() const;
+    void setDejavuFont(bool value);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -95,13 +98,14 @@ private:
     // GUI
     bool enableSmothAnimation;
     QString smileyPack;
+    bool dejavuFont;
 
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
     void smileyPackChanged();
-
+    void dejavuFontChanged();
 };
 
 #endif // SETTINGS_HPP

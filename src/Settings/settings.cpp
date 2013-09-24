@@ -102,6 +102,7 @@ void Settings::load()
     s.beginGroup("GUI");
         enableSmothAnimation = s.value("smothAnimation", true).toBool();
         smileyPack = s.value("smileyPack", "").toString();
+        dejavuFont = s.value("dejavuFont", false).toBool();
     s.endGroup();
 
     loaded = true;
@@ -151,6 +152,7 @@ void Settings::save()
     s.beginGroup("GUI");
         s.setValue("smothAnimation", enableSmothAnimation);
         s.setValue("smileyPack", smileyPack);
+        s.setValue("dejavuFont", dejavuFont);
     s.endGroup();
 }
 
@@ -250,4 +252,15 @@ void Settings::setSmileyPack(const QString &value)
 {
     smileyPack = value;
     emit smileyPackChanged();
+}
+
+bool Settings::isDejavuFont() const
+{
+    return dejavuFont;
+}
+
+void Settings::setDejavuFont(bool value)
+{
+    dejavuFont = value;
+    emit dejavuFontChanged();
 }
