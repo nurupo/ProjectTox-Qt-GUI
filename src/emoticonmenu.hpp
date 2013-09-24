@@ -18,9 +18,9 @@
 #define EMOTICONMENU_HPP
 
 #include <QMenu>
-#include "Settings/smileypackparser.h"
 
 class QGridLayout;
+class QWidgetAction;
 
 /*! This Class represents a menu with all smileys for adding into text input field.
  * And it holds a hash of the smileys for translating image to text.
@@ -29,23 +29,19 @@ class EmoticonMenu : public QMenu
 {
     Q_OBJECT
 public:
-
     explicit EmoticonMenu(QWidget *parent = 0);
 
-    static QString smile(QString text);
-    static QString desmile(QString htmlText);
+public slots:
+    void updateEmoticons();
 
 private:
-    void addEmoticons();
-    void addEmoticon(const QString &imgPath, const QStringList &texts);
+    void addEmoticon(const QString &imgPath, const QStringList &texts, bool isEmoij = false);
 
     QGridLayout *layout;
-    //TODO: Allow user to choose smiley pack on runtime?
-    const static QList<QPair<QString, QStringList>> smileyPairList;
-    const static int EMOTICONS_IN_A_ROW = 5;
+    QWidgetAction *action;
+    QWidget* actionDefaultWidget;
 
-    static SmileypackParser::SmileyHash shash;
-    static SmileypackParser::SmileyHash &getSmileyHash();
+    const int EMOTICONS_IN_A_ROW = 5;
     
 signals:
     void insertEmoticon(QString);

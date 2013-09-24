@@ -7,7 +7,6 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QCheckBox>
-#include <QStandardPaths>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
@@ -17,7 +16,7 @@
 #include <QComboBox>
 #include <QLabel>
 
-#include "smileypackparser.h"
+#include "smileypack.h"
 
 GuiSettingsPage::GuiSettingsPage(QWidget *parent) :
     AbstractSettingsPage(parent)
@@ -38,39 +37,33 @@ void GuiSettingsPage::setGui()
     const Settings& settings = Settings::getInstance();
     enableAnimationCheckbox->setChecked(settings.isAnimationEnabled());
 
-    // Look for smiley packs
-    QDir dir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+QDir::separator()+AppInfo::name+QDir::separator()+"smileys");
-    if(!dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+QDir::separator()+AppInfo::name+QDir::separator()+"smileys"))
-        qDebug() << tr("ERROR Couldn't create smileypack directory.");
-    //qDebug() << dir.absolutePath();
+    // Insert Emoij
+    Smileypack emoijPack;
+    smileypackCombobox->addItem(emoijPack.getName(), tr("<b>%1</b> by %2<br>\"<i>%3</i>\"").arg(emoijPack.getName(), emoijPack.getAuthor(), emoijPack.getDescription()));
 
-    // Go to all packs
-    dir.setFilter(QDir::Dirs|QDir::NoDot|QDir::NoDotDot);
-    QDirIterator it(dir);
-    while (it.hasNext()) {
-        it.next();
+    // Insert smileypacks
+    searchSmileyPacks();
 
-        QFileInfo f(it.filePath()+QDir::separator()+"theme");
-        if(!f.exists())
-            continue;
-
-        qDebug() << it.filePath()+QDir::separator()+"theme";
-
-        SmileypackParser parser;
-        parser.parseFile(it.filePath()+QDir::separator()+"theme");
-
-        QString icon = it.filePath()+QDir::separator()+parser.getHeader().value("Icon");
-        QVariant data;
-        data.setValue(parser.getHeader());
-
-        smileypackCombobox->addItem(QIcon(icon), parser.getHeader().value("Name"), data);
-    }
+    // Load smileypack
+    smileypackCombobox->setCurrentText(settings.getSmileyPack());
 }
 
 void GuiSettingsPage::applyChanges()
 {
     Settings& settings = Settings::getInstance();
     settings.setAnimationEnabled(enableAnimationCheckbox->isChecked());
+
+    // Parse the selected smileypack
+    Smileypack newPack;
+    newPack.parseFile(Smileypack::packDir()+QDir::separator()+smileypackCombobox->currentText()+QDir::separator()+"theme");
+    Smileypack::currentPack() = newPack;
+
+    if(smileypackCombobox->currentText() != "Emoij") {
+        settings.setSmileyPack(smileypackCombobox->currentText());
+    }
+    else {
+        settings.setSmileyPack("");
+    }
 }
 
 QGroupBox *GuiSettingsPage::buildAnimationGroup()
@@ -90,44 +83,50 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
     smileypackCombobox = new QComboBox(group);
     connect(smileypackCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSmileypackDetails(int)));
 
-    smileypackNameLabel = new QLabel(group);
     smileypackDescLabel = new QLabel(group);
-    smileypackWebLabel  = new QLabel(group);
-
-    smileypackNameLabel->setWordWrap(true);
-    smileypackNameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
     smileypackDescLabel->setWordWrap(true);
     smileypackDescLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-    smileypackWebLabel->setVisible(false);
-    smileypackWebLabel->setOpenExternalLinks(true);
+    smileypackDescLabel->setOpenExternalLinks(true);
 
     layout->addWidget(smileypackCombobox);
-    layout->addWidget(smileypackNameLabel);
     layout->addWidget(smileypackDescLabel);
-    layout->addWidget(smileypackWebLabel);
     return group;
+}
+
+void GuiSettingsPage::searchSmileyPacks()
+{
+    // go to smiley pack folder
+    QDir dir(Smileypack::packDir());
+    if(!dir.mkpath(Smileypack::packDir()))
+        return;
+
+    // Go through all packs
+    dir.setFilter(QDir::Dirs|QDir::NoDot|QDir::NoDotDot);
+    QDirIterator it(dir);
+    while (it.hasNext()) {
+        it.next();
+
+        QFileInfo f(it.filePath()+QDir::separator()+"theme");
+        if (!f.exists()) {
+            continue;
+        }
+
+        Smileypack newPack;
+        if (!newPack.parseFile(it.filePath()+QDir::separator()+"theme")) {
+            continue;
+        }
+
+        QString version = newPack.getVersion();
+        if (!version.isEmpty()) {
+            version.prepend(" v");
+        }
+        QString desc = tr("<b>%1</b>%2 by %3<br>\"<i>%4</i>\"<br><a href=\"%5\">%5</a>").arg(newPack.getName(), version, newPack.getAuthor(), newPack.getDescription(), newPack.getWebsite());
+
+        smileypackCombobox->addItem(QIcon(it.filePath()+QDir::separator()+newPack.getIcon()), f.dir().dirName(), desc);
+    }
 }
 
 void GuiSettingsPage::updateSmileypackDetails(int index)
 {
-    SmileypackParser::HeaderHash header = smileypackCombobox->itemData(index).value<SmileypackParser::HeaderHash>();
-
-    QString version;
-    if (!header.value("Version").isEmpty()) {
-        version = "v" + header.value("Version");
-    }
-
-    smileypackNameLabel->setText(tr("<b>%1</b> %2 by %3").arg(header.value("Name"), version, header.value("Author")));
-    smileypackDescLabel->setText(QString("\"<i>%1</i>\"").arg(header.value("Description")));
-
-    if (!header.value("Website").isEmpty()) {
-        smileypackWebLabel->setText(QString("<a href=\"%1\">%1</a>").arg(header.value("Website")));
-        smileypackWebLabel->setVisible(true);
-    }
-    else {
-        smileypackWebLabel->clear();
-        smileypackWebLabel->setVisible(false);
-    }
+    smileypackDescLabel->setText(smileypackCombobox->itemData(index).toString());
 }

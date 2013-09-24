@@ -21,7 +21,7 @@
 #include <QApplication>
 #include <QClipboard>
 
-#include "emoticonmenu.hpp"
+#include "smileypack.h"
 
 MessageLabel::MessageLabel(QWidget *parent) :
     QLabel(parent)
@@ -52,5 +52,5 @@ int MessageLabel::messageId() const
 void MessageLabel::copyPlainText()
 {
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(EmoticonMenu::desmile(text()));
+    clipboard->setText(Smileypack::desmile(text()));
 }

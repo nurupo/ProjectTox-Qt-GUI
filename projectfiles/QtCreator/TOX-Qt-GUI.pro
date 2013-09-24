@@ -87,7 +87,7 @@ SOURCES += \
     ../../src/opacitywidget.cpp \
     ../../src/customhintwidget.cpp \
     ../../src/Settings/guisettingspage.cpp \
-    ../../src/Settings/smileypackparser.cpp
+    ../../src/smileypack.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -125,7 +125,7 @@ HEADERS  += \
     ../../src/opacitywidget.hpp \
     ../../src/customhintwidget.hpp \
     ../../src/Settings/guisettingspage.h \
-    ../../src/Settings/smileypackparser.h
+    ../../src/smileypack.h
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \

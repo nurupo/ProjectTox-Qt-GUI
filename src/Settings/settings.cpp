@@ -16,9 +16,11 @@
 
 #include "settings.hpp"
 #include "settingsdialog.hpp"
+#include "smileypack.h"
 
 #include <QFile>
 #include <QSettings>
+#include <QDir>
 
 const QString Settings::FILENAME = "settings.ini";
 
@@ -26,6 +28,12 @@ Settings::Settings() :
     loaded(false)
 {
     load();
+
+    // Load saved smileypack
+    if (!Settings::getSmileyPack().isEmpty()) {
+        Smileypack::currentPack().parseFile(Smileypack::packDir()+QDir::separator()+Settings::getSmileyPack()+QDir::separator()+"theme");
+        emit smileyPackChanged();
+    }
 }
 
 Settings::~Settings()
@@ -93,6 +101,7 @@ void Settings::load()
 
     s.beginGroup("GUI");
         enableSmothAnimation = s.value("smothAnimation", true).toBool();
+        smileyPack = s.value("smileyPack", "").toString();
     s.endGroup();
 
     loaded = true;
@@ -141,6 +150,7 @@ void Settings::save()
 
     s.beginGroup("GUI");
         s.setValue("smothAnimation", enableSmothAnimation);
+        s.setValue("smileyPack", smileyPack);
     s.endGroup();
 }
 
@@ -229,4 +239,15 @@ bool Settings::isAnimationEnabled() const
 void Settings::setAnimationEnabled(bool newValue)
 {
     enableSmothAnimation = newValue;
+}
+
+QString Settings::getSmileyPack() const
+{
+    return smileyPack;
+}
+
+void Settings::setSmileyPack(const QString &value)
+{
+    smileyPack = value;
+    emit smileyPackChanged();
 }

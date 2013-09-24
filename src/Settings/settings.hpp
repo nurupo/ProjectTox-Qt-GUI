@@ -59,6 +59,9 @@ public:
     bool isAnimationEnabled() const;
     void setAnimationEnabled(bool newValue);
 
+    QString getSmileyPack() const;
+    void setSmileyPack(const QString &value);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -91,11 +94,13 @@ private:
 
     // GUI
     bool enableSmothAnimation;
+    QString smileyPack;
 
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
+    void smileyPackChanged();
 
 };
 
