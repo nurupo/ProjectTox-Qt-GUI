@@ -30,6 +30,9 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
     actionDefaultWidget = NULL;
     layout              = NULL;
     updateEmoticons();
+
+    connect(&Settings::getInstance(), &Settings::smileyPackChanged, this, &EmoticonMenu::updateEmoticons);
+    connect(&Settings::getInstance(), &Settings::dejavuFontChanged, this, &EmoticonMenu::updateEmoticons);
 }
 
 void EmoticonMenu::updateEmoticons()

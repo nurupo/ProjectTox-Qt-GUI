@@ -127,10 +127,6 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
         messageLabel->setProperty("class", "msgMessage"); // for CSS styling
         messageLabel->setText(Smileypack::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>"));
 
-        if (Settings::getInstance().isDejavuFont()) {
-            messageLabel->setFont(QFont("DejaVu Sans"));
-        }
-
     // Error
     } else {
         QPalette errorPal;
@@ -169,6 +165,12 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
             line->setProperty("class", "msgLine"); // for CSS styling
             mainlayout->addWidget(line);
         }
+    }
+
+    if (Settings::getInstance().isDejavuFont()) {
+        nameLabel->setFont(QFont("DejaVu Sans"));
+        messageLabel->setFont(QFont("DejaVu Sans"));
+        timeLabel->setFont(QFont("DejaVu Sans"));
     }
 
     // Return new line

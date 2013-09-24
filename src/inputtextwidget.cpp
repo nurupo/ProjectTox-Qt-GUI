@@ -36,6 +36,7 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InputTextWidget::customContextMenuRequested, this, &InputTextWidget::showContextMenu);
     showPlaceholder(true);
+    updateFont();
 
     actionUndo  = new QAction(QIcon(":/icons/arrow_undo.png"), tr("Undo"), this);
     actionRedo  = new QAction(QIcon(":/icons/arrow_redo.png"), tr("Redo"), this);
@@ -52,6 +53,7 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     connect(actionCut,   &QAction::triggered, this, &InputTextWidget::cutPlainText);
     connect(actionCopy,  &QAction::triggered, this, &InputTextWidget::copyPlainText);
     connect(actionPaste, &QAction::triggered, this, &InputTextWidget::pastePlainText);
+    connect(&Settings::getInstance(), &Settings::dejavuFontChanged, this, &InputTextWidget::updateFont);
 }
 
 /*! Handle keyboard events. */

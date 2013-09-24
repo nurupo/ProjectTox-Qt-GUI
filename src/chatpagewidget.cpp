@@ -35,7 +35,6 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
-    connect(&Settings::getInstance(), &Settings::dejavuFontChanged, input, &InputTextWidget::updateFont);
 
     // Create emoticon menu :)
     CustomHintWidget *inputPanel = new CustomHintWidget(this, QSize(10, 10));
@@ -46,8 +45,6 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     emoticonButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     emoticonButton->setMenu(menu);
     connect(menu, &EmoticonMenu::insertEmoticon, input, &InputTextWidget::insertHtml);
-    connect(&Settings::getInstance(), &Settings::smileyPackChanged, menu, &EmoticonMenu::updateEmoticons);
-    connect(&Settings::getInstance(), &Settings::dejavuFontChanged, menu, &EmoticonMenu::updateEmoticons);
 
     QHBoxLayout *inputLayout = new QHBoxLayout(inputPanel);
     inputLayout->setContentsMargins(0,0,0,0);
