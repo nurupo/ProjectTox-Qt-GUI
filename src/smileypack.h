@@ -13,29 +13,40 @@ public:
     typedef QList<QPair<QString, QStringList>> SmileyList;
 
     explicit Smileypack(QObject *parent = 0);
+    explicit Smileypack(const QByteArray &savedData, QObject *parent = 0);
     void operator=(const Smileypack &other);
 
     bool parseFile(const QString &filePath);
 
-    const QString &getName() const { return name; }
-    const QString &getAuthor() const { return author; }
-    const QString &getDescription() const { return description; }
-    const QString &getVersion() const { return version; }
-    const QString &getWebsite() const { return website; }
-    const QString &getIcon() const { return icon; }
-    const SmileyList &getList() const { return list; }
-    void  setList(const SmileyList &xList) { list = xList; }
+    const QString &getThemeFile() const             { return themeFile;   }
+    void           setThemeFile(const QString &x)   { themeFile = x;      }
+    const QString &getName() const                  { return name;        }
+    void           setName(const QString &x)        { name = x;           }
+    const QString &getAuthor() const                { return author;      }
+    void           setAuthor(const QString &x)      { author = x;         }
+    const QString &getDescription() const           { return description; }
+    void           setDescription(const QString &x) { description = x;    }
+    const QString &getVersion() const               { return version;     }
+    void           setVersion(const QString &x)     { version = x;        }
+    const QString &getWebsite() const               { return website;     }
+    void           setWebsite(const QString &x)     { website = x;        }
+    const QString &getIcon() const                  { return icon;        }
+    void           setIcon(const QString &x)        { icon = x;           }
+    const SmileyList &getList() const               { return list;        }
+    void              setList(const SmileyList &x)  { list = x;           }
+    bool  isEmoij() const                           { return emoij;       }
+    void setEmoij(bool x)                           { emoij = x;          }
 
-    bool isEmoij() const { return emoij; }
-    void setEmoij();
+    const QByteArray save();
+    void restore(const QByteArray &array);
 
     // Current seleced Smileypack functions
     static const QString& packDir();
-    static Smileypack &currentPack();
     static QString smile(QString text);
     static QString desmile(QString htmlText);
 
 private:
+    QString themeFile;
     QString name;
     QString author;
     QString description;
@@ -54,5 +65,8 @@ private:
     };
     void processLine(const QString &xLine, const QString &xPath, ParserStates &xState);
 };
+
+QDataStream &operator<<(QDataStream &out, const Smileypack &pack);
+QDataStream &operator>>(QDataStream &in, Smileypack &pack);
 
 #endif // SMILEYPACK_H

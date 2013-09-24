@@ -52,8 +52,9 @@ void EmoticonMenu::updateEmoticons()
     addAction(action);
 
     // Add new pack
-    for (const auto& pair : Smileypack::currentPack().getList()) {
-        addEmoticon(pair.first, pair.second, Smileypack::currentPack().isEmoij());
+    Smileypack pack(Settings::getInstance().getSmileyPack());
+    for (const auto& pair : pack.getList()) {
+        addEmoticon(pair.first, pair.second, pack.isEmoij());
     }
 }
 

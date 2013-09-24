@@ -59,8 +59,8 @@ public:
     bool isAnimationEnabled() const;
     void setAnimationEnabled(bool newValue);
 
-    QString getSmileyPack() const;
-    void setSmileyPack(const QString &value);
+    QByteArray getSmileyPack() const;
+    void setSmileyPack(const QByteArray &value);
 
     bool isDejavuFont() const;
     void setDejavuFont(bool value);
@@ -97,7 +97,7 @@ private:
 
     // GUI
     bool enableSmothAnimation;
-    QString smileyPack;
+    QByteArray smileyPack;
     bool dejavuFont;
 
 signals:

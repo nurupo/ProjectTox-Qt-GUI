@@ -5,7 +5,9 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QDir>
+#include <QDataStream>
 #include "appinfo.hpp"
+#include "Settings/settings.hpp"
 
 const Smileypack::SmileyList Smileypack::emoijList =
 {
@@ -63,8 +65,14 @@ Smileypack::Smileypack(QObject *parent) :
     emoij = true;
 
     name = "Emoij";
-    author = "Unicode 6.0";
+    author = "Unicode 6.1";
     description = "Emoij is a Unicode block containing graphic representations of faces, which are often associated with classic emoticons.";
+}
+
+Smileypack::Smileypack(const QByteArray &savedData, QObject *parent) :
+    QObject(parent)
+{
+    restore(savedData);
 }
 
 void Smileypack::operator =(const Smileypack &other)
@@ -79,17 +87,12 @@ void Smileypack::operator =(const Smileypack &other)
     icon= other.icon;
 }
 
-Smileypack &Smileypack::currentPack()
-{
-    static Smileypack currentPack;
-    return currentPack;
-}
-
 QString Smileypack::smile(QString text)
 {
-    for (const auto& pair : currentPack().getList()) {
+    Smileypack pack(Settings::getInstance().getSmileyPack());
+    for (const auto& pair : pack.getList()) {
         for (const QString& smileytext : pair.second) {
-            if (currentPack().isEmoij()) {
+            if (pack.isEmoij()) {
                 text.replace(smileytext, pair.first);
             }
             else {
@@ -102,8 +105,9 @@ QString Smileypack::smile(QString text)
 
 QString Smileypack::desmile(QString htmlText)
 {
+    Smileypack pack(Settings::getInstance().getSmileyPack());
     // Cancel if emoij
-    if(currentPack().isEmoij()) {
+    if(pack.isEmoij()) {
         QTextDocument doc;
         doc.setHtml(htmlText);
         return doc.toPlainText();
@@ -115,7 +119,7 @@ QString Smileypack::desmile(QString htmlText)
     QRegularExpressionMatch match = re.match(htmlText, i);
     while (match.hasMatch()) {
         // Replace smiley and match next
-        for (const auto& pair : currentPack().getList()) {
+        for (const auto& pair : pack.getList()) {
             if (pair.first == match.captured(5)) {
                 const QStringList& textSmilies = pair.second;
                 if (textSmilies.isEmpty()) {
@@ -143,6 +147,8 @@ bool Smileypack::parseFile(const QString &filePath)
         return false;
     }
 
+    themeFile = filePath;
+
     // Clear old data
     list.clear();
     emoij = false;
@@ -166,6 +172,21 @@ bool Smileypack::parseFile(const QString &filePath)
     // End parsing
     file.close();
     return true;
+}
+
+const QByteArray Smileypack::save()
+{
+    QByteArray ret;
+    QDataStream stream(&ret, QIODevice::WriteOnly);
+    stream << (*this);
+    return ret.toBase64();
+}
+
+void Smileypack::restore(const QByteArray &array)
+{
+    QByteArray tmp = QByteArray::fromBase64(array);
+    QDataStream stream(&tmp, QIODevice::ReadOnly);
+    stream >> (*this);
 }
 
 void Smileypack::processLine(const QString &xLine, const QString &xPath, ParserStates &xState)
@@ -209,4 +230,36 @@ const QString &Smileypack::packDir()
 {
     static QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+QDir::separator()+AppInfo::name+QDir::separator()+"smileys";
     return path;
+}
+
+QDataStream &operator<<(QDataStream &out, const Smileypack &pack)
+{
+    out << pack.getThemeFile() << pack.getName() << pack.getAuthor() << pack.getDescription() << pack.getVersion() << pack.getWebsite() << pack.getIcon() << pack.isEmoij();
+    out << pack.getList();
+    return out;
+}
+
+QDataStream &operator >>(QDataStream &in, Smileypack &pack)
+{
+    QString themefile;
+    QString name;
+    QString author;
+    QString desc;
+    QString version;
+    QString website;
+    QString icon;
+    bool    emoij;
+    Smileypack::SmileyList list;
+    in >> themefile >> name >> author >> desc >> version >> website >> icon >> emoij >> list;
+
+    pack.setThemeFile(themefile);
+    pack.setName(name);
+    pack.setAuthor(author);
+    pack.setDescription(desc);
+    pack.setVersion(version);
+    pack.setWebsite(website);
+    pack.setIcon(icon);
+    pack.setEmoij(emoij);
+    pack.setList(list);
+    return in;
 }

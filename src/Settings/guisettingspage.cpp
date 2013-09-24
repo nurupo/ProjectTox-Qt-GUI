@@ -40,13 +40,18 @@ void GuiSettingsPage::setGui()
 
     // Insert Emoij
     Smileypack emoijPack;
-    smileypackCombobox->addItem(emoijPack.getName(), tr("<b>%1</b> by %2<br>\"<i>%3</i>\"").arg(emoijPack.getName(), emoijPack.getAuthor(), emoijPack.getDescription()));
+    QVariant data(emoijPack.save());
+    smileypackCombobox->addItem("☺ "+emoijPack.getName(), data);
 
     // Insert smileypacks
     searchSmileyPacks();
 
     // Load smileypack
-    smileypackCombobox->setCurrentText(settings.getSmileyPack());
+    int index = smileypackCombobox->findData(settings.getSmileyPack());
+    if (index < 0) {
+        index = 0;
+    }
+    smileypackCombobox->setCurrentIndex(index);
 }
 
 void GuiSettingsPage::applyChanges()
@@ -54,18 +59,7 @@ void GuiSettingsPage::applyChanges()
     Settings& settings = Settings::getInstance();
     settings.setAnimationEnabled(enableAnimationCheckbox->isChecked());
     settings.setDejavuFont(useDejavuFontCheckbox->isChecked());
-
-    // Parse the selected smileypack
-    Smileypack newPack;
-    newPack.parseFile(Smileypack::packDir()+QDir::separator()+smileypackCombobox->currentText()+QDir::separator()+"theme");
-    Smileypack::currentPack() = newPack;
-
-    if(smileypackCombobox->currentText() != "Emoij") {
-        settings.setSmileyPack(smileypackCombobox->currentText());
-    }
-    else {
-        settings.setSmileyPack("");
-    }
+    settings.setSmileyPack(smileypackCombobox->itemData(smileypackCombobox->currentIndex()).toByteArray());
 }
 
 QGroupBox *GuiSettingsPage::buildAnimationGroup()
@@ -119,21 +113,28 @@ void GuiSettingsPage::searchSmileyPacks()
         }
 
         Smileypack newPack;
-        if (!newPack.parseFile(it.filePath()+QDir::separator()+"theme")) {
+        if (!newPack.parseFile(f.absoluteFilePath())) {
             continue;
         }
 
-        QString version = newPack.getVersion();
-        if (!version.isEmpty()) {
-            version.prepend(" v");
-        }
-        QString desc = tr("<b>%1</b>%2 by %3<br>\"<i>%4</i>\"<br><a href=\"%5\">%5</a>").arg(newPack.getName(), version, newPack.getAuthor(), newPack.getDescription(), newPack.getWebsite());
-
-        smileypackCombobox->addItem(QIcon(it.filePath()+QDir::separator()+newPack.getIcon()), f.dir().dirName(), desc);
+        QVariant data(newPack.save());
+        smileypackCombobox->addItem(QIcon(it.filePath()+QDir::separator()+newPack.getIcon()), newPack.getName(), data);
     }
 }
 
 void GuiSettingsPage::updateSmileypackDetails(int index)
 {
-    smileypackDescLabel->setText(smileypackCombobox->itemData(index).toString());
+    Smileypack pack(smileypackCombobox->itemData(index).toByteArray());
+
+    QString version = pack.getVersion();
+    if (!version.isEmpty()) {
+        version.prepend(" v");
+    }
+    QString website = pack.getWebsite();
+    if (!website.isEmpty()) {
+        website = QString("<br><a href=\"%1\">%1</a>").arg(website);
+    }
+
+    QString desc = tr("<b>%1</b>%2 by %3<br>\"<i>%4</i>\"%5").arg(pack.getName(), version, pack.getAuthor(), pack.getDescription(), website);
+    smileypackDescLabel->setText(desc);
 }

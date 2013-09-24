@@ -28,12 +28,6 @@ Settings::Settings() :
     loaded(false)
 {
     load();
-
-    // Load saved smileypack
-    if (!Settings::getSmileyPack().isEmpty()) {
-        Smileypack::currentPack().parseFile(Smileypack::packDir()+QDir::separator()+Settings::getSmileyPack()+QDir::separator()+"theme");
-        emit smileyPackChanged();
-    }
 }
 
 Settings::~Settings()
@@ -101,7 +95,7 @@ void Settings::load()
 
     s.beginGroup("GUI");
         enableSmothAnimation = s.value("smothAnimation", true).toBool();
-        smileyPack = s.value("smileyPack", "").toString();
+        smileyPack = s.value("smileyPack").toByteArray();
         dejavuFont = s.value("dejavuFont", false).toBool();
     s.endGroup();
 
@@ -243,12 +237,12 @@ void Settings::setAnimationEnabled(bool newValue)
     enableSmothAnimation = newValue;
 }
 
-QString Settings::getSmileyPack() const
+QByteArray Settings::getSmileyPack() const
 {
     return smileyPack;
 }
 
-void Settings::setSmileyPack(const QString &value)
+void Settings::setSmileyPack(const QByteArray &value)
 {
     smileyPack = value;
     emit smileyPackChanged();
