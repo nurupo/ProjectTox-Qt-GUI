@@ -33,6 +33,7 @@ void Smileypack::operator =(const Smileypack &other)
     icon= other.icon;
 }
 
+/*! Replace all text smileys by images or emoij */
 QString Smileypack::smile(QString text)
 {
     Smileypack pack(Settings::getInstance().getSmileyPack());
@@ -41,16 +42,59 @@ QString Smileypack::smile(QString text)
         text = Smileypack::demoij(text);
     }
 
-    for (const auto& pair : pack.getList()) {
-        for (const QString& smileytext : pair.second) {
-            if (pack.isEmoij()) {
-                text.replace(smileytext.toHtmlEscaped(), pair.first);
-            }
-            else {
-                text.replace(smileytext.toHtmlEscaped(), QString("<img src=\"%1\" />").arg(pair.first));
+    // whlie smileys found to replace
+    bool found;
+    do {
+        found = false;
+
+        // Fill a map with positions of possible smileys
+        QMap<int, QStringList> possibleTexts;
+        for (const auto& pair : pack.getList()) {
+            for (const QString& smileytext : pair.second) {
+                int pos = text.indexOf(smileytext);
+                if (pos > -1) {
+                    possibleTexts.insertMulti(pos, {smileytext, pair.first});
+                    found = true;
+                }
             }
         }
-    }
+
+        // check the first smiley alternative representations
+        QMapIterator<int, QStringList> first(possibleTexts);
+        if(first.hasNext())
+        {
+            first.next();
+            int length = first.value().first().count();
+            QString repSrt = first.value().first();
+            int     repPos = first.key();
+            QString repRep = first.value().at(1);
+
+            QMapIterator<int, QStringList> i(possibleTexts);
+            i.next();
+
+            // Search for a longer smileyrepresentation at same position
+            while (i.hasNext() && i.key() < first.key() + length) {
+                i.next();
+
+                // If there is a longer smileyrepresentation, use it
+                if (i.value().count() > length) {
+                    repPos = i.key();
+                    repSrt = i.value().first();
+                    repRep = i.value().at(1);
+                }
+            }
+
+            // Replace found smiley
+            if (pack.isEmoij()) {
+                text.replace(repPos, repSrt.count(), repRep);
+            }
+            else {
+                text.replace(repPos, repSrt.count(), QString("<img src=\"%1\" />").arg(repRep));
+            }
+
+        }
+    } while (found);
+
     return text;
 }
 

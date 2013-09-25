@@ -26,9 +26,9 @@
 EmoticonMenu::EmoticonMenu(QWidget *parent) :
     QMenu(parent)
 {
-    action              = NULL;
-    actionDefaultWidget = NULL;
-    layout              = NULL;
+    action              = new QWidgetAction(this);
+    actionDefaultWidget = new QWidget(this);
+    layout              = new QGridLayout(actionDefaultWidget);
     updateEmoticons();
 
     connect(&Settings::getInstance(), &Settings::smileyPackChanged, this, &EmoticonMenu::updateEmoticons);
