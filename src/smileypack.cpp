@@ -36,13 +36,18 @@ void Smileypack::operator =(const Smileypack &other)
 QString Smileypack::smile(QString text)
 {
     Smileypack pack(Settings::getInstance().getSmileyPack());
+
+    if (!pack.isEmoij()) {
+        text = Smileypack::demoij(text);
+    }
+
     for (const auto& pair : pack.getList()) {
         for (const QString& smileytext : pair.second) {
             if (pack.isEmoij()) {
-                text.replace(smileytext, pair.first);
+                text.replace(smileytext.toHtmlEscaped(), pair.first);
             }
             else {
-                text.replace(smileytext, QString("<img src=\"%1\" />").arg(pair.first));
+                text.replace(smileytext.toHtmlEscaped(), QString("<img src=\"%1\" />").arg(pair.first));
             }
         }
     }
@@ -85,6 +90,16 @@ QString Smileypack::desmile(QString htmlText)
     return doc.toPlainText();
 }
 
+/*! Replace Emoij by text strings */
+QString Smileypack::demoij(QString text)
+{
+    for (const auto& pair : Smileypack::emoijList()) {
+        const QStringList& textSmilies = pair.second;
+        text.replace(pair.first, textSmilies.first().toHtmlEscaped());
+    }
+    return text;
+}
+
 const Smileypack::SmileyList Smileypack::emoijList()
 {
     static const SmileyList tmpList =
@@ -122,7 +137,7 @@ const Smileypack::SmileyList Smileypack::emoijList()
         // Facepalm         (facepalm)
         {"😇", {"O:)", "O:-)", "o:)", "o:-)", "(angel)"}},
         // ...
-        {"♥", {"(h)"}},
+        {"♥", {"<3",  "(h)"}},
         // ...
         {"☔", {"(rain)"}},
         {"☀", {"(sun)"}},
