@@ -18,6 +18,9 @@ public:
 
     bool parseFile(const QString &filePath);
 
+    const QByteArray save();
+    void restore(const QByteArray &array);
+
     const QString &getThemeFile() const             { return themeFile;   }
     void           setThemeFile(const QString &x)   { themeFile = x;      }
     const QString &getName() const                  { return name;        }
@@ -37,13 +40,11 @@ public:
     bool  isEmoij() const                           { return emoij;       }
     void setEmoij(bool x)                           { emoij = x;          }
 
-    const QByteArray save();
-    void restore(const QByteArray &array);
-
-    // Current seleced Smileypack functions
     static const QString& packDir();
     static QString smile(QString text);
     static QString desmile(QString htmlText);
+    static const SmileyList emoijList();
+    static const SmileyList defaultList();
 
 private:
     QString themeFile;
@@ -55,8 +56,6 @@ private:
     QString icon;
     SmileyList list;
     bool emoij;
-
-    static const SmileyList emoijList;
 
     // Parser functions
     enum ParserStates{

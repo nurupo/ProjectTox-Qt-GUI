@@ -38,10 +38,23 @@ void GuiSettingsPage::setGui()
     enableAnimationCheckbox->setChecked(settings.isAnimationEnabled());
     useDejavuFontCheckbox->setChecked(settings.isDejavuFont());
 
-    // Insert Emoij
+    // Insert Emoij pack
     Smileypack emoijPack;
-    QVariant data(emoijPack.save());
-    smileypackCombobox->addItem("☺ "+emoijPack.getName(), data);
+    emoijPack.setName("Emoij");
+    emoijPack.setAuthor("Unicode 6.1");
+    emoijPack.setDescription("Emoij is a Unicode block containing graphic representations of faces, which are often associated with classic emoticons.");
+    emoijPack.setList(Smileypack::emoijList());
+    emoijPack.setEmoij(true);
+    smileypackCombobox->addItem("☺ "+emoijPack.getName(), emoijPack.save());
+
+    // Insert Default pack
+    Smileypack defaultPack;
+    defaultPack.setName("TOX Qt GUI Smileys");
+    defaultPack.setAuthor("FatCow");
+    defaultPack.setDescription("TODO: Design a default smileypack for TOX Qt GUI.");
+    defaultPack.setIcon(":/icons/emoticons/emotion_smile.png");
+    defaultPack.setList(Smileypack::defaultList());
+    smileypackCombobox->addItem(QIcon(defaultPack.getIcon()), defaultPack.getName(), defaultPack.save());
 
     // Insert smileypacks
     searchSmileyPacks();
@@ -49,7 +62,7 @@ void GuiSettingsPage::setGui()
     // Load smileypack
     int index = smileypackCombobox->findData(settings.getSmileyPack());
     if (index < 0) {
-        index = 0;
+        index = 1;
     }
     smileypackCombobox->setCurrentIndex(index);
 }
@@ -86,7 +99,7 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
 
     useDejavuFontCheckbox = new QCheckBox(group);
     useDejavuFontCheckbox->setText(tr("Use \"DejaVu Sans\" font."));
-    useDejavuFontCheckbox->setToolTip(tr("This font supports Unicode 6.1 and Emoij."));
+    useDejavuFontCheckbox->setToolTip(tr("This font supports Unicode 6.1 and Emoij.\nUse it this font your native font doesn't support it."));
 
     layout->addWidget(smileypackCombobox);
     layout->addWidget(smileypackDescLabel);
@@ -96,7 +109,7 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
 
 void GuiSettingsPage::searchSmileyPacks()
 {
-    // go to smiley pack folder
+    // Go to smiley pack folder
     QDir dir(Smileypack::packDir());
     if(!dir.mkpath(Smileypack::packDir()))
         return;
@@ -107,16 +120,19 @@ void GuiSettingsPage::searchSmileyPacks()
     while (it.hasNext()) {
         it.next();
 
+        // Check theme file
         QFileInfo f(it.filePath()+QDir::separator()+"theme");
         if (!f.exists()) {
             continue;
         }
 
+        // Parse theme file
         Smileypack newPack;
         if (!newPack.parseFile(f.absoluteFilePath())) {
             continue;
         }
 
+        // Add new pack to combobox
         QVariant data(newPack.save());
         smileypackCombobox->addItem(QIcon(it.filePath()+QDir::separator()+newPack.getIcon()), newPack.getName(), data);
     }
@@ -134,7 +150,14 @@ void GuiSettingsPage::updateSmileypackDetails(int index)
     if (!website.isEmpty()) {
         website = QString("<br><a href=\"%1\">%1</a>").arg(website);
     }
-
     QString desc = tr("<b>%1</b>%2 by %3<br>\"<i>%4</i>\"%5").arg(pack.getName(), version, pack.getAuthor(), pack.getDescription(), website);
     smileypackDescLabel->setText(desc);
+
+    if (pack.isEmoij()) {
+        useDejavuFontCheckbox->setVisible(true);
+    }
+    else {
+        useDejavuFontCheckbox->setVisible(false);
+        useDejavuFontCheckbox->setChecked(false);
+    }
 }

@@ -9,64 +9,10 @@
 #include "appinfo.hpp"
 #include "Settings/settings.hpp"
 
-const Smileypack::SmileyList Smileypack::emoijList =
-{
-    // Skype Smileys
-    {"☺", {":)",  ":-)"}},
-    {"😞", {":(",  ":-("}},
-    {"😄", {":D",  ":-D"}},
-    {"😎", {"8)",  "8-)",  "B)",  "B-)"}},
-    {"😲", {":O",  ":-O",  ":o",  ":-o"}},
-    {"😉", {";)",  ";-)"}},
-    {"😢", {";(",  ";-("}},
-    {"😓", {"(:|",  "(:-|"}},
-    {"😐", {":|",  ":-|"}},
-    {"😚", {":*",  ":-*"}},
-    {"😜", {":P",  ":-P",  ":p",  ":-p"}},
-    // Blushing         :$
-    {"😒", {":^)",  ":^-)"}},
-    {"😪", {"|)",   "|-)"}},
-    // Dull             |-(
-    {"😍", {"(inlove)"}},
-    {"😈", {"]:)", "]:-)", "(devil)"}},
-    // Fingers crossed  (yn)
-    // Yawn             (yawn)
-    // Puking           (puke)
-    // Doh!             (doh)
-    {"😠", {">:(", ">:-(", "(angry)"}},
-    // It wasn’t me!    (wasntme)
-    // Party            (party)
-    {"😰", {"(worry)"}},
-    {"😏", {"(mm)"}},
-    // Nerdy            (nerd)
-    {"😷", {":x",  ":-x",  ":X",  ":-X"}},
-    // Hi               (wave)
-    // Facepalm         (facepalm)
-    {"😇", {"O:)", "O:-)", "o:)", "o:-)", "(angel)"}},
-    // ...
-    {"♥", {"(h)"}},
-    // ...
-    {"☔", {"(rain)"}},
-    {"☀", {"(sun)"}},
-    // Tumbleweed       (tumbleweed)
-    {"♫", {"(music)"}},
-    // ...
-    {"☕", {"(coffee)"}},
-    // ...
-    {"★", {"(*)"}},
-    // Additional smileys
-    {"🐱", {":3"}}
-};
-
 Smileypack::Smileypack(QObject *parent) :
     QObject(parent)
 {
-    list = emoijList;
-    emoij = true;
-
-    name = "Emoij";
-    author = "Unicode 6.1";
-    description = "Emoij is a Unicode block containing graphic representations of faces, which are often associated with classic emoticons.";
+    emoij = false;
 }
 
 Smileypack::Smileypack(const QByteArray &savedData, QObject *parent) :
@@ -139,6 +85,81 @@ QString Smileypack::desmile(QString htmlText)
     return doc.toPlainText();
 }
 
+const Smileypack::SmileyList Smileypack::emoijList()
+{
+    static const SmileyList tmpList =
+    {
+        // Skype Smileys
+        {"☺", {":)",  ":-)"}},
+        {"😞", {":(",  ":-("}},
+        {"😄", {":D",  ":-D"}},
+        {"😎", {"8)",  "8-)",  "B)",  "B-)"}},
+        {"😲", {":O",  ":-O",  ":o",  ":-o"}},
+        {"😉", {";)",  ";-)"}},
+        {"😢", {";(",  ";-("}},
+        {"😓", {"(:|",  "(:-|"}},
+        {"😐", {":|",  ":-|"}},
+        {"😚", {":*",  ":-*"}},
+        {"😜", {":P",  ":-P",  ":p",  ":-p"}},
+        // Blushing         :$
+        {"😒", {":^)",  ":^-)"}},
+        {"😪", {"|)",   "|-)"}},
+        // Dull             |-(
+        {"😍", {"(inlove)"}},
+        {"😈", {"]:)", "]:-)", "(devil)"}},
+        // Fingers crossed  (yn)
+        // Yawn             (yawn)
+        // Puking           (puke)
+        // Doh!             (doh)
+        {"😠", {">:(", ">:-(", "(angry)"}},
+        // It wasn’t me!    (wasntme)
+        // Party            (party)
+        {"😰", {"(worry)"}},
+        {"😏", {"(mm)"}},
+        // Nerdy            (nerd)
+        {"😷", {":x",  ":-x",  ":X",  ":-X"}},
+        // Hi               (wave)
+        // Facepalm         (facepalm)
+        {"😇", {"O:)", "O:-)", "o:)", "o:-)", "(angel)"}},
+        // ...
+        {"♥", {"(h)"}},
+        // ...
+        {"☔", {"(rain)"}},
+        {"☀", {"(sun)"}},
+        // Tumbleweed       (tumbleweed)
+        {"♫", {"(music)"}},
+        // ...
+        {"☕", {"(coffee)"}},
+        // ...
+        {"★", {"(*)"}},
+        // Additional smileys
+        {"🐱", {":3"}}
+    };
+    return tmpList;
+}
+
+const Smileypack::SmileyList Smileypack::defaultList()
+{
+    static const SmileyList tmpList =
+    {
+        {":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)"}},
+        {":/icons/emoticons/emotion_sad.png",      {":(", ":-("}},
+        {":/icons/emoticons/emotion_grin.png",     {":D", ":-D"}},
+        {":/icons/emoticons/emotion_cool.png",     {"8)", "8-)"}},
+        {":/icons/emoticons/emotion_suprised.png", {":O", ":-O"}},
+        {":/icons/emoticons/emotion_wink.png",     {";)", ";-)"}},
+        {":/icons/emoticons/emotion_cry.png",      {";(", ";-("}},
+        {":/icons/emoticons/emotion_sweat.png",    {"(:|"}},
+        {":/icons/emoticons/emotion_kiss.png",     {":*", ":-*"}},
+        {":/icons/emoticons/emotion_tongue.png",   {":P", ":-P"}},
+        {":/icons/emoticons/emotion_doubt.png",    {":^)", ":^-)"}},
+        {":/icons/emoticons/emotion_love.png",     {"(inlove)"}},
+        {":/icons/emoticons/emotion_evilgrin.png", {"]:)", "]:-)"}},
+        {":/icons/emoticons/emotion_angel.png",    {"O:)", "O:-)", "o:)", "o:-)", "(angel)"}}
+    };
+    return tmpList;
+}
+
 bool Smileypack::parseFile(const QString &filePath)
 {
     // Open file
@@ -179,13 +200,13 @@ const QByteArray Smileypack::save()
     QByteArray ret;
     QDataStream stream(&ret, QIODevice::WriteOnly);
     stream << (*this);
-    return ret.toBase64();
+    return ret;
 }
 
 void Smileypack::restore(const QByteArray &array)
 {
-    QByteArray tmp = QByteArray::fromBase64(array);
-    QDataStream stream(&tmp, QIODevice::ReadOnly);
+    QByteArray ar = array;
+    QDataStream stream(&ar, QIODevice::ReadOnly);
     stream >> (*this);
 }
 
