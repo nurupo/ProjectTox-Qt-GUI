@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QClipboard>
+#include <QMenu>
 
 #include "smileypack.h"
 
@@ -29,14 +30,24 @@ MessageLabel::MessageLabel(QWidget *parent) :
     setTextFormat(Qt::RichText);
     setWordWrap(true);
     setOpenExternalLinks(true);
-    setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse);
+    setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse | Qt::TextSelectableByMouse);
 
     // Create contextmenu
-    QAction *copyAction = new QAction(tr("Copy"), this);
+    copyAction = new QAction(tr("Copy"), this);
     copyAction->setShortcut(QKeySequence::Copy);
-    connect(copyAction, &QAction::triggered, this, &MessageLabel::copyPlainText);
-    addAction(copyAction);
-    setContextMenuPolicy(Qt::ActionsContextMenu);
+    connect(copyAction, &QAction::triggered, [this]()
+    {
+        QApplication::clipboard()->setText(Smileypack::desmile(selectedText()));
+    });
+
+    copyAllAction = new QAction(QIcon(":/icons/page_copy.png"), tr("Copy Message"), this);
+    connect(copyAllAction, &QAction::triggered, [this]()
+    {
+        QApplication::clipboard()->setText(Smileypack::desmile(text()));
+    });
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &MessageLabel::customContextMenuRequested, this, &MessageLabel::showContextMenu);
 }
 
 void MessageLabel::setMessageId(int id)
@@ -49,8 +60,17 @@ int MessageLabel::messageId() const
     return mId;
 }
 
-void MessageLabel::copyPlainText()
+void MessageLabel::showContextMenu(const QPoint &pos)
 {
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(Smileypack::desmile(text()));
+    QPoint globalPos = mapToGlobal(pos);
+
+    QMenu *contextMenu = new QMenu(this);
+
+    contextMenu->addAction(copyAction);
+    contextMenu->addAction(copyAllAction);
+
+    copyAction->setEnabled(hasSelectedText());
+
+    contextMenu->exec(globalPos);
+    contextMenu->deleteLater();
 }
