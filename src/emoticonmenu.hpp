@@ -41,7 +41,7 @@ private:
     QWidgetAction *action;
     QWidget* actionDefaultWidget;
 
-    const int EMOTICONS_IN_A_ROW = 5;
+    const static int EMOTICONS_IN_A_ROW = 5;
     
 signals:
     void insertEmoticon(QString);
