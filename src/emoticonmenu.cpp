@@ -32,7 +32,7 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
     updateEmoticons();
 
     connect(&Settings::getInstance(), &Settings::smileyPackChanged, this, &EmoticonMenu::updateEmoticons);
-    connect(&Settings::getInstance(), &Settings::dejavuFontChanged, this, &EmoticonMenu::updateEmoticons);
+    connect(&Settings::getInstance(), &Settings::emojFontChanged, this, &EmoticonMenu::updateEmoticons);
 }
 
 void EmoticonMenu::updateEmoticons()
@@ -67,7 +67,7 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts,
 
         QFont font;
         font.setPixelSize(16);
-        if (Settings::getInstance().isDejavuFont()) {
+        if (Settings::getInstance().isCurstomEmoijFont()) {
             font.setFamily("DejaVu Sans");
         }
         button->setFont(font);

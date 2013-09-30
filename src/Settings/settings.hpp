@@ -62,8 +62,14 @@ public:
     QByteArray getSmileyPack() const;
     void setSmileyPack(const QByteArray &value);
 
-    bool isDejavuFont() const;
-    void setDejavuFont(bool value);
+    bool isCurstomEmoijFont() const;
+    void setCurstomEmoijFont(bool value);
+
+    QString getEmoijFont() const;
+    void setEmoijFont(const QString &value);
+
+    int getEmoijSize() const;
+    void setEmoijSize(int value);
 
 private:
     Settings();
@@ -98,14 +104,16 @@ private:
     // GUI
     bool enableSmothAnimation;
     QByteArray smileyPack;
-    bool dejavuFont;
+    bool customEmoijFont;
+    QString emoijFont;
+    int     emoijSize;
 
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
     void smileyPackChanged();
-    void dejavuFontChanged();
+    void emojFontChanged();
 };
 
 #endif // SETTINGS_HPP

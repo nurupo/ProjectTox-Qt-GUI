@@ -96,7 +96,9 @@ void Settings::load()
     s.beginGroup("GUI");
         enableSmothAnimation = s.value("smothAnimation", true).toBool();
         smileyPack = s.value("smileyPack").toByteArray();
-        dejavuFont = s.value("dejavuFont", false).toBool();
+        customEmoijFont = s.value("customEmoijFont", false).toBool();
+        emoijFont = s.value("emoijFont", "DejaVu Sans").toString();
+        emoijSize = s.value("emoijSize", 12).toInt();
     s.endGroup();
 
     loaded = true;
@@ -146,7 +148,9 @@ void Settings::save()
     s.beginGroup("GUI");
         s.setValue("smothAnimation", enableSmothAnimation);
         s.setValue("smileyPack", smileyPack);
-        s.setValue("dejavuFont", dejavuFont);
+        s.setValue("customEmoijFont", customEmoijFont);
+        s.setValue("emoijFont", emoijFont);
+        s.setValue("emoijSize", emoijSize);
     s.endGroup();
 }
 
@@ -248,13 +252,35 @@ void Settings::setSmileyPack(const QByteArray &value)
     emit smileyPackChanged();
 }
 
-bool Settings::isDejavuFont() const
+bool Settings::isCurstomEmoijFont() const
 {
-    return dejavuFont;
+    return customEmoijFont;
 }
 
-void Settings::setDejavuFont(bool value)
+void Settings::setCurstomEmoijFont(bool value)
 {
-    dejavuFont = value;
-    emit dejavuFontChanged();
+    customEmoijFont = value;
+    emit emojFontChanged();
+}
+
+int Settings::getEmoijSize() const
+{
+    return emoijSize;
+}
+
+void Settings::setEmoijSize(int value)
+{
+    emoijSize = value;
+    emit emojFontChanged();
+}
+
+QString Settings::getEmoijFont() const
+{
+    return emoijFont;
+}
+
+void Settings::setEmoijFont(const QString &value)
+{
+    emoijFont = value;
+    emit emojFontChanged();
 }

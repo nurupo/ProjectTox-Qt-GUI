@@ -7,6 +7,8 @@ class QGroupBox;
 class QCheckBox;
 class QComboBox;
 class QLabel;
+class QToolButton;
+class EmoijFontSettings;
 
 class GuiSettingsPage : public AbstractSettingsPage
 {
@@ -28,12 +30,12 @@ private:
     void searchSmileyPacks();
 
 
-
+    EmoijFontSettings *emoijSettings;
     QCheckBox* enableAnimationCheckbox;
 
     QComboBox* smileypackCombobox;
+    QToolButton *emoijButton;
     QLabel*    smileypackDescLabel;
-    QCheckBox* useDejavuFontCheckbox;
 };
 
 

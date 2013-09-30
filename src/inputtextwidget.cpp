@@ -53,7 +53,7 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     connect(actionCut,   &QAction::triggered, this, &InputTextWidget::cutPlainText);
     connect(actionCopy,  &QAction::triggered, this, &InputTextWidget::copyPlainText);
     connect(actionPaste, &QAction::triggered, this, &InputTextWidget::pastePlainText);
-    connect(&Settings::getInstance(), &Settings::dejavuFontChanged, this, &InputTextWidget::updateFont);
+    connect(&Settings::getInstance(), &Settings::emojFontChanged, this, &InputTextWidget::updateFont);
 }
 
 /*! Handle keyboard events. */
@@ -107,7 +107,7 @@ void InputTextWidget::insertHtml(const QString &text)
 void InputTextWidget::updateFont()
 {
     QFont font;
-    if (Settings::getInstance().isDejavuFont()) {
+    if (Settings::getInstance().isCurstomEmoijFont()) {
         font.setFamily("DejaVu Sans");
     }
     setFont(font);

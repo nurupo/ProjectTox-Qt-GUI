@@ -36,7 +36,9 @@ void Smileypack::operator =(const Smileypack &other)
 /*! Replace all text smileys by images or emoij */
 QString Smileypack::smile(QString text)
 {
-    Smileypack pack(Settings::getInstance().getSmileyPack());
+    Settings &settings = Settings::getInstance();
+    Smileypack pack(settings.getSmileyPack());
+
 
     if (!pack.isEmoij()) {
         text = Smileypack::demoij(text);
@@ -86,6 +88,9 @@ QString Smileypack::smile(QString text)
 
             // Replace found smiley
             if (pack.isEmoij()) {
+                /*if (settings.isCurstomEmoijFont()) {
+                    repRep = QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmoijFont(), QString::number(settings.getEmoijSize()), repRep);
+                }*/
                 text.replace(repPos, repSrt.count(), repRep);
             }
             else {
@@ -94,6 +99,11 @@ QString Smileypack::smile(QString text)
 
         }
     } while (found);
+
+
+    if (settings.isCurstomEmoijFont() && pack.isEmoij()) {
+        text = Smileypack::resizeEmoij(text);
+    }
 
     return text;
 }
@@ -141,6 +151,21 @@ QString Smileypack::demoij(QString text)
         const QStringList& textSmilies = pair.second;
         text.replace(pair.first, textSmilies.first().toHtmlEscaped());
     }
+    return text;
+}
+
+QString Smileypack::resizeEmoij(QString text)
+{
+    Settings &settings = Settings::getInstance();
+
+    // All Unicode 6.2 emoij Emoticons
+    // TODO find a regular expression for that
+    QStringList foundEmoijs({"😀","😁","😂","😃","😄","😅","😆","😇","😈","😉","😊","😋","😌","😍","😎","😏","😐","😑","😒","😓","😔","😕","😖","😗","😘","😙","😚","😛","😜","😝","😞","😟","😠","😡","😢","😣","😤","😥","😦","😧","😨","😩","😪","😫","😬","😭","😮","😯","😰","😱","😲","😳","😴","😵","😶","😷","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙅","🙆","🙇","🙈","🙉","🙊","🙋","🙌","🙍","🙎","🙏","☺","☹","⚇","🐱"});
+
+    for(QString emo : foundEmoijs) {
+        text.replace(emo, QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmoijFont(), QString::number(settings.getEmoijSize()), emo));
+    }
+
     return text;
 }
 

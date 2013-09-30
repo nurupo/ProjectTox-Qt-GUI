@@ -44,6 +44,7 @@ public:
     static QString smile(QString text);
     static QString desmile(QString htmlText);
     static QString demoij(QString text);
+    static QString resizeEmoij(QString text);
     static const SmileyList emoijList();
     static const SmileyList defaultList();
 

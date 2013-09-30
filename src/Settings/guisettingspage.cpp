@@ -15,8 +15,10 @@
 #include <QRegularExpression>
 #include <QComboBox>
 #include <QLabel>
+#include <QToolButton>
 
 #include "smileypack.h"
+#include "emoijfontsettings.h"
 
 GuiSettingsPage::GuiSettingsPage(QWidget *parent) :
     AbstractSettingsPage(parent)
@@ -36,7 +38,10 @@ void GuiSettingsPage::setGui()
 {
     const Settings& settings = Settings::getInstance();
     enableAnimationCheckbox->setChecked(settings.isAnimationEnabled());
-    useDejavuFontCheckbox->setChecked(settings.isDejavuFont());
+
+    emoijSettings->setCustomEmoijFont(settings.isCurstomEmoijFont());
+    emoijSettings->setEmoijFont(settings.getEmoijFont());
+    emoijSettings->setEmoijSize(settings.getEmoijSize());
 
     // Insert Emoij pack
     Smileypack emoijPack;
@@ -71,8 +76,11 @@ void GuiSettingsPage::applyChanges()
 {
     Settings& settings = Settings::getInstance();
     settings.setAnimationEnabled(enableAnimationCheckbox->isChecked());
-    settings.setDejavuFont(useDejavuFontCheckbox->isChecked());
+
     settings.setSmileyPack(smileypackCombobox->itemData(smileypackCombobox->currentIndex()).toByteArray());
+    settings.setCurstomEmoijFont(emoijSettings->isCustomEmoijFont());
+    settings.setEmoijFont(emoijSettings->getEmoijFont());
+    settings.setEmoijSize(emoijSettings->getEmoijSize());
 }
 
 QGroupBox *GuiSettingsPage::buildAnimationGroup()
@@ -92,18 +100,22 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
     smileypackCombobox = new QComboBox(group);
     connect(smileypackCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSmileypackDetails(int)));
 
+    emoijSettings = new EmoijFontSettings(group);
+    emoijButton = new QToolButton(group);
+    emoijButton->setText("...");
+    connect(emoijButton, &QToolButton::clicked, emoijSettings, &EmoijFontSettings::exec);
+
+    QHBoxLayout *selectLayout = new QHBoxLayout;
+    selectLayout->addWidget(smileypackCombobox);
+    selectLayout->addWidget(emoijButton);
+
     smileypackDescLabel = new QLabel(group);
     smileypackDescLabel->setWordWrap(true);
     smileypackDescLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     smileypackDescLabel->setOpenExternalLinks(true);
 
-    useDejavuFontCheckbox = new QCheckBox(group);
-    useDejavuFontCheckbox->setText(tr("Use \"DejaVu Sans\" font."));
-    useDejavuFontCheckbox->setToolTip(tr("This font supports Unicode 6.1 and Emoij.\nUse it this font your native font doesn't support it."));
-
-    layout->addWidget(smileypackCombobox);
+    layout->addLayout(selectLayout);
     layout->addWidget(smileypackDescLabel);
-    layout->addWidget(useDejavuFontCheckbox);
     return group;
 }
 
@@ -154,10 +166,10 @@ void GuiSettingsPage::updateSmileypackDetails(int index)
     smileypackDescLabel->setText(desc);
 
     if (pack.isEmoij()) {
-        useDejavuFontCheckbox->setVisible(true);
+        emoijButton->setVisible(true);
+
     }
     else {
-        useDejavuFontCheckbox->setVisible(false);
-        useDejavuFontCheckbox->setChecked(false);
+        emoijButton->setVisible(false);
     }
 }
