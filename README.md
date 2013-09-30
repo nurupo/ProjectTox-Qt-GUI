@@ -6,7 +6,9 @@ A front end for [ProjectTox Core](https://github.com/irungentoo/ProjectTox-Core)
 
 Please note that development is very early on and the project is not ready to use yet.
 
-## Screenshot
+## Screenshots
+
+![Hi There](http://i.imgur.com/sVB0TX9.png "Current master branch running on Windows 7")
 
 ![Hi There](http://i.imgur.com/Wv3lrO7.png "Version 0.1.0 running on Windows 7")
 
