@@ -167,12 +167,6 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
         }
     }
 
-    if (Settings::getInstance().isCurstomEmoijFont()) {
-        nameLabel->setFont(QFont("DejaVu Sans"));
-        messageLabel->setFont(QFont("DejaVu Sans"));
-        timeLabel->setFont(QFont("DejaVu Sans"));
-    }
-
     // Return new line
     QHBoxLayout *hlayout = new QHBoxLayout(widget);
     hlayout->setContentsMargins(0, 0, 0, 0);

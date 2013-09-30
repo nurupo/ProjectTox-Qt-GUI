@@ -60,17 +60,18 @@ void EmoticonMenu::updateEmoticons()
 
 void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts, bool isEmoij)
 {
+    Settings &settings = Settings::getInstance();
+
     QToolButton *button = new QToolButton(this);
     if (isEmoij) {
-        button->setText(imgPath);
-        button->setProperty("smiley", imgPath);
-
         QFont font;
         font.setPixelSize(16);
-        if (Settings::getInstance().isCurstomEmoijFont()) {
-            font.setFamily("DejaVu Sans");
+        if (settings.isCurstomEmoijFont()) {
+            font.setFamily(settings.getEmoijFont());
         }
         button->setFont(font);
+        button->setText(imgPath);
+        button->setProperty("smiley", imgPath);
     }
     else {
         button->setIcon(QIcon(imgPath));
