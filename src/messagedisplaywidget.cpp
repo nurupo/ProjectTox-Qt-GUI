@@ -74,6 +74,41 @@ void MessageDisplayWidget::prependMessage(const QString &name, const QString &me
     mainlayout->insertWidget(0, createNewRow(name, message, messageId, isOur));
 }
 
+void MessageDisplayWidget::appendAction(const QString &name, const QString &message)
+{
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
+
+    OpacityWidget *widget = new OpacityWidget(this);
+    widget->setProperty("class", "msgRow"); // for CSS styling
+
+    QPalette actionPalette;
+    actionPalette.setColor(QPalette::Foreground, Qt::darkGreen);
+
+    QLabel *messageLabel = new QLabel(widget);
+    messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
+    messageLabel->setPalette(actionPalette);
+    messageLabel->setText(QString("<i>* %1 %2</i>").arg(name, message.toHtmlEscaped()).replace('\n', "<br>"));
+    messageLabel->setProperty("class", "msgAction"); // for CSS styling
+    messageLabel->setWordWrap(true);
+    messageLabel->setTextFormat(Qt::RichText);
+
+    QLabel *timeLabel = new QLabel(widget);
+    timeLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    timeLabel->setForegroundRole(QPalette::Mid);
+    timeLabel->setProperty("class", "msgTimestamp"); // for CSS styling
+    timeLabel->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignTrailing);
+    timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
+
+    QHBoxLayout *hlayout = new QHBoxLayout(widget);
+    hlayout->setContentsMargins(0, 0, 0, 0);
+    hlayout->setMargin(0);
+    hlayout->addWidget(messageLabel, 0, Qt::AlignTop);
+    hlayout->addWidget(timeLabel, 0, Qt::AlignTop);
+    widget->setLayout(hlayout);
+
+    mainlayout->addWidget(widget);
+}
+
 int MessageDisplayWidget::scrollPos() const
 {
     return mScrollPos;

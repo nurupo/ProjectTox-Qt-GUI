@@ -40,6 +40,7 @@ protected:
 
 signals:
     void sendMessage(const QString& message);
+    void sendAction(const QString& action);
 
 private slots:
     void showContextMenu(const QPoint &pos);
