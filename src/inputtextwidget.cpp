@@ -22,8 +22,12 @@
 #include <QTextDocumentFragment>
 #include <QApplication>
 #include <QClipboard>
+#include <QIcon>
+#include <QAction>
+#include <QMenu>
 
-#include "emoticonmenu.hpp"
+#include "smileypack.h"
+#include "Settings/settings.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
@@ -56,7 +60,7 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     // Send message on Return
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
             && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
-        emit sendMessage(EmoticonMenu::desmile(toHtml()));
+        emit sendMessage(Smileypack::desmile(toHtml()));
         clear();
 
     // Override default shortcuts
@@ -104,7 +108,7 @@ void InputTextWidget::copyPlainText()
     QTextDocumentFragment selection = textCursor().selection();
     if(!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
+        clipboard->setText(Smileypack::desmile(selection.toHtml()));
     }
 }
 
@@ -121,7 +125,7 @@ void InputTextWidget::cutPlainText()
     QTextDocumentFragment selection = textCursor().selection();
     if(!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
+        clipboard->setText(Smileypack::desmile(selection.toHtml()));
         textCursor().removeSelectedText();
     }
 }

@@ -32,6 +32,8 @@
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QToolButton>
+#include <QFontDatabase>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -47,6 +49,9 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowTitle("developers' test version, not for public use");
     setWindowIcon(QIcon(":/icons/icon64.png"));
     setContextMenuPolicy(Qt::PreventContextMenu);
+
+    // install Unicode 6.1 supporting font
+    QFontDatabase::addApplicationFont("://DejaVuSans.ttf");
 
     QDockWidget* friendDock = new QDockWidget(this);
     friendDock->setObjectName("FriendDock");

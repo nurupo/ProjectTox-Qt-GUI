@@ -20,8 +20,9 @@
 #include <QDebug>
 #include <QApplication>
 #include <QClipboard>
+#include <QMenu>
 
-#include "emoticonmenu.hpp"
+#include "smileypack.h"
 
 MessageLabel::MessageLabel(QWidget *parent) :
     QLabel(parent)
@@ -36,13 +37,13 @@ MessageLabel::MessageLabel(QWidget *parent) :
     copyAction->setShortcut(QKeySequence::Copy);
     connect(copyAction, &QAction::triggered, [this]()
     {
-        QApplication::clipboard()->setText(EmoticonMenu::desmile(selectedText()));
+        QApplication::clipboard()->setText(Smileypack::desmile(selectedText()));
     });
 
     copyAllAction = new QAction(QIcon(":/icons/page_copy.png"), tr("Copy Message"), this);
     connect(copyAllAction, &QAction::triggered, [this]()
     {
-        QApplication::clipboard()->setText(EmoticonMenu::desmile(text()));
+        QApplication::clipboard()->setText(Smileypack::desmile(text()));
     });
 
     setContextMenuPolicy(Qt::CustomContextMenu);
