@@ -82,6 +82,12 @@ void FriendRequestWidget::addFriendRequest(const QString &userId, const QString 
     updateGui();
 }
 
+void FriendRequestWidget::resizeEvent(QResizeEvent *e)
+{
+    QWidget::resizeEvent(e);
+    updateGui();
+}
+
 void FriendRequestWidget::acceptUser()
 {
     emit userAccepted(it.key());
@@ -119,9 +125,9 @@ void FriendRequestWidget::updateGui()
 
     // Recalculate popup size
     if (button->menu()) {
-        actionDefaultWidget->setFixedWidth(button->sizeHint().width());
+        button->menu()->setFixedWidth(button->width());
+        actionDefaultWidget->setFixedWidth(button->menu()->width() - 4);
         actionDefaultWidget->setFixedHeight(message->sizeHint().height()+clientId->sizeHint().height()+accaptButton->sizeHint().height()+4+2*2);
-        button->menu()->setFixedWidth(button->sizeHint().width());
-        button->menu()->setFixedHeight(message->sizeHint().height()+clientId->sizeHint().height()+accaptButton->sizeHint().height()+4+2*2);
+        button->menu()->setFixedHeight(message->sizeHint().height()+clientId->sizeHint().height()+accaptButton->sizeHint().height()+4+2*2+4);
     }
 }

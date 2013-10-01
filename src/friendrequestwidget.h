@@ -37,6 +37,9 @@ signals:
 public slots:
     void addFriendRequest(const QString &userId, const QString &msg);
 
+protected:
+    void resizeEvent(QResizeEvent *e);
+
 private slots:
     void acceptUser();
     void rejectUser();
