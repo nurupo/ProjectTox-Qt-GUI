@@ -68,10 +68,12 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts,
         font.setPixelSize(16);
         if (settings.isCurstomEmoijFont()) {
             font.setFamily(settings.getEmoijFont());
+            button->setProperty("smiley", Smileypack::resizeEmoij(imgPath));
+        } else {
+            button->setProperty("smiley", imgPath);
         }
         button->setFont(font);
         button->setText(imgPath);
-        button->setProperty("smiley", imgPath);
     }
     else {
         button->setIcon(QIcon(imgPath));
@@ -89,5 +91,5 @@ void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts,
 /*! Signal sends the (first) textual form of the clicked smiley. */
 void EmoticonMenu::onEmoticonTriggered()
 {
-    emit insertEmoticon(QObject::sender()->property("smiley").toString());
+    emit insertEmoticon("&nbsp;"+QObject::sender()->property("smiley").toString()+"&nbsp;");
 }
