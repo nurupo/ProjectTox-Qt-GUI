@@ -66,7 +66,6 @@ SOURCES += \
     ../../src/ouruseritemwidget.cpp \
     ../../src/renameeditwidget.cpp \
     ../../src/status.cpp \
-    ../../src/friendrequestdialog.cpp \
     ../../src/customhinttextedit.cpp \
     ../../src/elidelabel.cpp \
     ../../src/core.cpp \
@@ -103,7 +102,6 @@ HEADERS  += \
     ../../src/frienditemwidget.hpp \
     ../../src/ouruseritemwidget.hpp \
     ../../src/renameeditwidget.hpp \
-    ../../src/friendrequestdialog.hpp \
     ../../src/customhinttextedit.hpp \
     ../../src/elidelabel.hpp \
     ../../src/core.hpp \

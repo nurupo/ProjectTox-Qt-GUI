@@ -18,7 +18,6 @@
 
 #include "aboutdialog.hpp"
 #include "appinfo.hpp"
-#include "friendrequestdialog.hpp"
 #include "pageswidget.hpp"
 #include "Settings/settings.hpp"
 #include "closeapplicationdialog.hpp"
@@ -119,7 +118,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(core, &Core::connected, this, &MainWindow::onConnected);
     connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
-    //connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
     connect(core, &Core::friendRequestRecieved, friendRequestWidget, &FriendRequestWidget::addFriendRequest);
     connect(core, SIGNAL(friendStatusChanged(int, Status)), friendsWidget, SLOT(setStatus(int, Status)));
     connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
@@ -135,7 +133,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     coreThread->start(/*QThread::IdlePriority*/);
 
-    //connect(this, &MainWindow::friendRequestAccepted, core, &Core::acceptFriendRequest);
     connect(friendRequestWidget, &FriendRequestWidget::userAccepted, core, &Core::acceptFriendRequest);
 
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
@@ -164,15 +161,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     Settings::getInstance().saveWindow(this);
     QMainWindow::closeEvent(event);
-}
-
-void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& message)
-{
-    FriendRequestDialog dialog(this, userId, message);
-
-    if (dialog.exec() == QDialog::Accepted) {
-        emit friendRequestAccepted(userId);
-    }
 }
 
 void MainWindow::onConnected()
