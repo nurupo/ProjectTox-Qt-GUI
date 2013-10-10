@@ -49,7 +49,7 @@ public:
 
     void appendMessage(const QString &name, const QString &message, int messageId, bool isOur);
     void prependMessage(const QString &name, const QString &message, int messageId, bool isOur);
-    void appendAction(const QString &name, const QString &message);
+    void appendAction(const QString &name, const QString &message, bool isOur);
 
     int scrollPos() const;
 

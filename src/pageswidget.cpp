@@ -100,7 +100,7 @@ void PagesWidget::messageSentResult(int friendId, const QString &message, int me
 void PagesWidget::actionResult(int friendId, const QString &action, int success)
 {
     if (success) {
-        widget(friendId)->actionReceived(action);
+        widget(friendId)->actionSentResult(action);
     } else {
         widget(friendId)->messageSentResult(action, success);
     }

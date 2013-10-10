@@ -99,5 +99,10 @@ void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 
 void ChatPageWidget::actionReceived(const QString &message)
 {
-    display->appendAction(username, message);
+    display->appendAction(username, message, false);
+}
+
+void ChatPageWidget::actionSentResult(const QString &message)
+{
+    display->appendAction(username, message, true);
 }
