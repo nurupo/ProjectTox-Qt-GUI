@@ -187,7 +187,7 @@ void FriendRequestWidget::updateGui()
     }
 }
 
-/*! Go to firsr friend request */
+/*! Go to first friend request */
 void FriendRequestWidget::goFirst()
 {
     it.toFront();
