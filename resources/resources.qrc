@@ -37,5 +37,6 @@
         <file>icons/arrow_undo.png</file>
         <file>icons/accept.png</file>
         <file>icons/cancel.png</file>
+        <file>icons/resultset_next.png</file>
     </qresource>
 </RCC>

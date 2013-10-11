@@ -19,12 +19,22 @@
 
 #include <QWidget>
 
+class QFrame;
 class QLabel;
 class ElideLabel;
 class QPushButton;
-class QToolButton;
-class QMenu;
+class QPropertyAnimation;
 
+/*! FriendRequestWidget shows incoming friend requests.
+ *
+ * CSS classes for styling
+ * -----------------------
+ *
+ * Object         | Qt class           | CSS class
+ * ---------------|--------------------|--------------
+ * Button         | QPushButton        | frqButton
+ * Details widget | QFrame             | frqDetails
+ */
 class FriendRequestWidget : public QWidget
 {
     Q_OBJECT
@@ -43,20 +53,25 @@ protected:
 private slots:
     void acceptUser();
     void rejectUser();
+    void showDetails(bool show);
+    void nextRequest();
 
 private:
-    QToolButton *button;
-    QMenu       *menu;
-    QWidget     *actionDefaultWidget;
+    QPushButton *button;
+    QFrame      *detailsWidget;
     ElideLabel  *clientId;
     QLabel      *message;
-    QPushButton *accaptButton;
+    QPushButton *acceptButton;
     QPushButton *rejectButton;
+    QPushButton *nextButton;
+
+    QPropertyAnimation *animation;
 
     QHash<QString, QString>                requests;
     QMutableHashIterator<QString, QString> it;
 
     void updateGui();
+    void goFirst();
 };
 
 #endif // FRIENDREQUESTLABEL_H
