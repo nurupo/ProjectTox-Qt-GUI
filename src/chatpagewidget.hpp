@@ -50,9 +50,12 @@ private:
 public slots:
     void messageReceived(const QString& message);
     void messageSentResult(const QString& message, int messageId);
+    void actionReceived(const QString& message);
+    void actionSentResult(const QString& message);
 
 signals:
     void sendMessage(const QString& message);
+    void sendAction(const QString& action);
 
 };
 
