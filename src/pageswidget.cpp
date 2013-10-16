@@ -102,6 +102,7 @@ void PagesWidget::actionResult(int friendId, const QString &action, int success)
     if (success) {
         widget(friendId)->actionSentResult(action);
     } else {
+        // FIXME: that is one confusing way of reporting a error
         widget(friendId)->messageSentResult(action, success);
     }
 }
