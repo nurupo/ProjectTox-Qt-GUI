@@ -121,6 +121,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
+    connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::usernameChanged);
     connect(core, &Core::friendRemoved, friendsWidget, &FriendsWidget::removeFriend);
@@ -128,6 +129,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::failedToRemoveFriend, this, &MainWindow::onFailedToRemoveFriend);
     connect(core, &Core::failedToAddFriend, this, &MainWindow::onFailedToAddFriend);
     connect(core, &Core::messageSentResult, pages, &PagesWidget::messageSentResult);
+    connect(core, &Core::actionSentResult, pages, &PagesWidget::actionResult);
 
     coreThread->start(/*QThread::IdlePriority*/);
 
@@ -139,6 +141,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ourUserItem, &OurUserItemWidget::statusSelected, core, &Core::setStatus);
 
     connect(pages, &PagesWidget::sendMessage, core, &Core::sendMessage);
+    connect(pages, &PagesWidget::sendAction,  core, &Core::sendAction);
 
     connect(friendsWidget, &FriendsWidget::friendRequested, core, &Core::requestFriendship);
     connect(friendsWidget, &FriendsWidget::friendRemoved, core, &Core::removeFriend);

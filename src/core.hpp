@@ -39,6 +39,7 @@ private:
     static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onUserStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
+    static void onAction(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
 
     void checkConnection();
     uint32_t resolveAddress(const char* address) const;
@@ -120,6 +121,7 @@ public slots:
     void removeFriend(int friendId);
 
     void sendMessage(int friendId, const QString& message);
+    void sendAction(int friendId, const QString& action);
 
     void setUsername(const QString& username);
     void setStatusMessage(const QString& message);
@@ -150,11 +152,14 @@ signals:
     void statusMessageSet(const QString& message);
 
     void messageSentResult(int friendId, const QString& message, int messageId);
+    void actionSentResult(int friendId, const QString& action, int success);
 
     void failedToAddFriend(const QString& userId);
     void failedToRemoveFriend(int friendId);
     void failedToSetUsername(const QString& username);
     void failedToSetStatusMessage(const QString& message);
+
+    void actionReceived(int friendId, const QString& acionMessage);
 
 };
 

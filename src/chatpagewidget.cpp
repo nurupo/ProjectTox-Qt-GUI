@@ -35,6 +35,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
+    connect(input, &InputTextWidget::sendAction,  this, &ChatPageWidget::sendAction);
 
     // Create emoticon menu :)
     CustomHintWidget *inputPanel = new CustomHintWidget(this, QSize(10, 10));
@@ -94,4 +95,14 @@ void ChatPageWidget::setStatus(Status newStatus)
 void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
     display->appendMessage(Settings::getInstance().getUsername(), message, messageId, true);
+}
+
+void ChatPageWidget::actionReceived(const QString &message)
+{
+    display->appendAction(username, message, false);
+}
+
+void ChatPageWidget::actionSentResult(const QString &message)
+{
+    display->appendAction(username, message, true);
 }

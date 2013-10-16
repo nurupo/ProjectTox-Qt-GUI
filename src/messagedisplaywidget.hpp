@@ -37,6 +37,7 @@ class QPropertyAnimation;
  * Seperator line | QFrame             | msgLine
  * Error message  | ElideLabel, QLabel | msgError
  * Message Row    | OpacityWidget      | msgRow
+ * Action         | QLabel             | msgAction
  */
 class MessageDisplayWidget : public QScrollArea
 {
@@ -48,6 +49,7 @@ public:
 
     void appendMessage(const QString &name, const QString &message, int messageId, bool isOur);
     void prependMessage(const QString &name, const QString &message, int messageId, bool isOur);
+    void appendAction(const QString &name, const QString &message, bool isOur);
 
     int scrollPos() const;
 

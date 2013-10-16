@@ -56,7 +56,13 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     // Send message on Return
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
             && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
-        emit sendMessage(EmoticonMenu::desmile(toHtml()));
+        if (toPlainText().startsWith("/me ") ) {
+            QString html = toHtml();
+            html.remove(html.indexOf("/me "), 4);
+            emit sendAction(EmoticonMenu::desmile(html));
+        } else {
+            emit sendMessage(EmoticonMenu::desmile(toHtml()));
+        }
         clear();
 
     // Override default shortcuts

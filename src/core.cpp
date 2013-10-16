@@ -95,6 +95,11 @@ void Core::onConnectionStatusChanged(Tox*/* tox*/, int friendId, uint8_t status,
     emit static_cast<Core*>(core)->friendStatusChanged(friendId, status ? Status::Online : Status::Offline);
 }
 
+void Core::onAction(Tox*/* tox*/, int friendId, uint8_t *cMessage, uint16_t cMessageSize, void *core)
+{
+    emit static_cast<Core*>(core)->actionReceived(friendId, CString::toString(cMessage, cMessageSize));
+}
+
 void Core::acceptFriendRequest(const QString& userId)
 {
     int friendId = tox_addfriend_norequest(tox, CUserId(userId).data());
@@ -125,6 +130,13 @@ void Core::sendMessage(int friendId, const QString& message)
 
     int messageId = tox_sendmessage(tox, friendId, cMessage.data(), cMessage.size());
     emit messageSentResult(friendId, message, messageId);
+}
+
+void Core::sendAction(int friendId, const QString &action)
+{
+    CString cMessage(action);
+    int ret = tox_sendaction(tox, friendId, cMessage.data(), cMessage.size());
+    emit actionSentResult(friendId, action, ret);
 }
 
 void Core::removeFriend(int friendId)
@@ -260,6 +272,7 @@ void Core::start()
     //tox_callback_statusmessage(tox, onStatusMessageChanged, this);
     tox_callback_userstatus(tox, onUserStatusChanged, this);
     tox_callback_connectionstatus(tox, onConnectionStatusChanged, this);
+    tox_callback_action(tox, onAction, this);
 
     uint8_t friendAddress[TOX_FRIEND_ADDRESS_SIZE];
     tox_getaddress(tox, friendAddress);

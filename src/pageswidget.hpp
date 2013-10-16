@@ -32,6 +32,7 @@ private:
 
 private slots:
     void onMessageSent(const QString& message);
+    void onActionToSend(const QString& action);
 
 public slots:
     void addPage(int friendId, const QString& username);
@@ -40,11 +41,14 @@ public slots:
     void statusChanged(int friendId, Status status);
     void usernameChanged(int friendId, const QString& username);
     void messageReceived(int friendId, const QString& message);
+    void actionReceived(int friendId, const QString& message);
 
     void messageSentResult(int friendId, const QString& message, int messageId);
+    void actionResult(int friendId, const QString &action, int success);
 
 signals:
     void sendMessage(int friendId, const QString& message);
+    void sendAction(int friendId, const QString& action);
 
 };
 
