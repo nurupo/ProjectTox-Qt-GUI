@@ -52,24 +52,21 @@ private slots:
     void onUsernameChangeSubmited();
     void onUsernameChangeCancelled();
     void onRenameUsernameButtonClicked();
-    void onStatusActionTriggered();
-    void onCopyFriendAddressButtonClicked();
-
     void onStatusMessageChangeSubmited();
     void onStatusMessageChangeCancelled();
     void onChangeStatusMessageButtonClicked();
+    void onStatusActionTriggered();
+    void onCopyFriendAddressButtonClicked();
 
 public slots:
     void setFriendAddress(const QString &friendAddress);
     void setStatus(Status status);
     void setUsername(const QString& username);
-
     void setStatusMessage(const QString& statusMessage);
 
 signals:
     void statusSelected(Status status);
     void usernameChanged(const QString& username);
-
     void statusMessageChanged(const QString& statusMessage);
 
 };
