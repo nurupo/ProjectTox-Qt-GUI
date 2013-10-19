@@ -44,9 +44,9 @@ If you want to build GUI by using Qt Creator, rather than terminal commands, fol
 
 You should get and install **MinGW version** of **Qt5.1.0 or higher** from [here](http://qt-project.org/downloads).
 
-If you don't already have a git shell installed, you can use one that comes with [GitHub for Windows](http://windows.github.com/).
+If you don't already have a git shell installed, you can get one [here](http://git-scm.com/download/win).
 
-Open the git shell and run:
+Open the git shell, navigate to a desired directory and run:
 ```cmd
 git clone --recursive git://github.com/nurupo/ProjectTox-Qt-GUI.git
 cd ProjectTox-Qt-GUI
