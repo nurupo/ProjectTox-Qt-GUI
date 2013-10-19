@@ -17,6 +17,7 @@
 #include "elidelabel.hpp"
 
 #include <QPainter>
+#include <QMouseEvent>
 
 ElideLabel::ElideLabel(QWidget *parent) :
     QLabel(parent), _textElide(false), _textElideMode(Qt::ElideNone)
@@ -33,6 +34,12 @@ void ElideLabel::paintEvent(QPaintEvent *event)
     } else {
         QLabel::paintEvent(event);
     }
+}
+
+void ElideLabel::mousePressEvent(QMouseEvent *ev)
+{
+    if(ev->type() ==  QEvent::MouseButtonPress)
+        emit clicked();
 }
 
 void ElideLabel::setTextElide(bool set)

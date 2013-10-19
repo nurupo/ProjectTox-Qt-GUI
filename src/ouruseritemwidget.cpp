@@ -31,10 +31,10 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
     QToolButton* renameUsernameButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change Username");
-    QToolButton* changeStatusMessageButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change status message");
+    //QToolButton* changeStatusMessageButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change status message");
     QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy Friend Address");
     connect(renameUsernameButton, &QToolButton::clicked, this, &OurUserItemWidget::onRenameUsernameButtonClicked);
-    connect(changeStatusMessageButton, &QToolButton::clicked, this, &OurUserItemWidget::onChangeStatusMessageButtonClicked);
+    //connect(changeStatusMessageButton, &QToolButton::clicked, this, &OurUserItemWidget::onChangeStatusMessageButtonClicked);
     connect(copyFriendAddressButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyFriendAddressButtonClicked);
 
     QMenu* statusMenu = new QMenu(statusButton);
@@ -64,6 +64,11 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusMessageLabel->setTextElide(true);
     statusMessageLabel->setTextElideMode(Qt::ElideRight);
     statusMessageLabel->setText(Settings::getInstance().getStatusMessage());
+    const double statusMessageFontSizeRatio = 1.2;
+    QFont font = usernameLabel->font();
+    font.setPointSize(font.pointSize()/statusMessageFontSizeRatio);
+    statusMessageLabel->setFont(font);
+    connect(statusMessageLabel, &ElideLabel::clicked, this, &OurUserItemWidget::onChangeStatusMessageButtonClicked);
 
     //FIXME: check if there is a way to replace these containers to fix the label alignment
     //Username UI elements
@@ -90,17 +95,21 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
 
     statusMessageEdit = new RenameEditWidget(statusMessageStackedWidget, QSize(10, 10));
     statusMessageEdit->setMinimumWidth(10);
+    QFont statusEditFont = statusMessageEdit->font();
+    statusEditFont.setPointSize(usernameEdit->font().pointSize()/statusMessageFontSizeRatio);
+    statusMessageEdit->setFont(statusEditFont);
     connect(statusMessageEdit, &QLineEdit::editingFinished, this, &OurUserItemWidget::onStatusMessageChangeSubmited);
     connect(statusMessageEdit, &RenameEditWidget::escPressed, this, &OurUserItemWidget::onStatusMessageChangeCancelled);
 
     statusMessageStackedWidget->addWidget(statusMessageLabelContainer);
     statusMessageStackedWidget->addWidget(statusMessageEdit);
     statusMessageStackedWidget->setCurrentWidget(statusMessageLabelContainer);
-    statusMessageStackedWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    statusMessageStackedWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
     QWidget* userInformationWidget = new QWidget(this);
     QVBoxLayout* userInformationLayout = new QVBoxLayout(userInformationWidget);
     userInformationLayout->setMargin(0);
+    userInformationLayout->setSpacing(0);
     userInformationLayout->addWidget(usernameStackedWidget);
     userInformationLayout->addWidget(statusMessageStackedWidget);
 
@@ -110,7 +119,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     layout->addWidget(statusButton, 0, Qt::AlignVCenter);
     layout->addWidget(userInformationWidget);
     layout->addWidget(renameUsernameButton, 0, Qt::AlignRight | Qt::AlignVCenter);
-    layout->addWidget(changeStatusMessageButton, 0, Qt::AlignRight | Qt::AlignVCenter);
+    //layout->addWidget(changeStatusMessageButton, 0, Qt::AlignRight | Qt::AlignVCenter);
     layout->addWidget(copyFriendAddressButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 }
 

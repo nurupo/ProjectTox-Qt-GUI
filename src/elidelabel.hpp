@@ -21,6 +21,7 @@
 
 class ElideLabel : public QLabel
 {
+    Q_OBJECT
 public:
     explicit ElideLabel(QWidget *parent = 0);
 
@@ -30,8 +31,12 @@ public:
     void setTextElideMode(Qt::TextElideMode mode);
     Qt::TextElideMode textElideMode() const;
 
+signals:
+    void clicked();
+
 protected:
     void paintEvent(QPaintEvent *event);
+    void mousePressEvent(QMouseEvent *ev);
     
 private:
     bool _textElide;
