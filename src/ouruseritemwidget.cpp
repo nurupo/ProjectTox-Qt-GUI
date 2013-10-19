@@ -31,8 +31,10 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
     QToolButton* renameUsernameButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change Username");
+    QToolButton* changeStatusMessageButton = createToolButton(QIcon(":/icons/textfield_rename.png"), QSize(16, 16), "Change status message");
     QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy Friend Address");
     connect(renameUsernameButton, &QToolButton::clicked, this, &OurUserItemWidget::onRenameUsernameButtonClicked);
+    connect(changeStatusMessageButton, &QToolButton::clicked, this, &OurUserItemWidget::onChangeStatusMessageButtonClicked);
     connect(copyFriendAddressButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyFriendAddressButtonClicked);
 
     QMenu* statusMenu = new QMenu(statusButton);
@@ -55,7 +57,16 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameLabel->setTextElideMode(Qt::ElideRight);
     usernameLabel->setText(Settings::getInstance().getUsername());
 
+    statusMessageStackedWidget = new QStackedWidget(this);
+
+    statusMessageLabel = new ElideLabel(statusMessageStackedWidget);
+    statusMessageLabel->setMinimumWidth(10);
+    statusMessageLabel->setTextElide(true);
+    statusMessageLabel->setTextElideMode(Qt::ElideRight);
+    statusMessageLabel->setText(Settings::getInstance().getStatusMessage());
+
     //FIXME: check if there is a way to replace these containers to fix the label alignment
+    //Username UI elements
     usernameLabelContainer = new QWidget(this);
     QVBoxLayout* usernameLabelContainerLayout = new QVBoxLayout(usernameLabelContainer);
     usernameLabelContainerLayout->setMargin(0);
@@ -69,14 +80,37 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameStackedWidget->addWidget(usernameLabelContainer);
     usernameStackedWidget->addWidget(usernameEdit);
     usernameStackedWidget->setCurrentWidget(usernameLabelContainer);
+    usernameStackedWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+    //Status Message UI elements
+    statusMessageLabelContainer = new QWidget(this);
+    QVBoxLayout* statusMessageLabelContainerLayout = new QVBoxLayout(statusMessageLabelContainer);
+    statusMessageLabelContainerLayout->setMargin(0);
+    statusMessageLabelContainerLayout->addWidget(statusMessageLabel, 0, Qt::AlignVCenter);
+
+    statusMessageEdit = new RenameEditWidget(statusMessageStackedWidget, QSize(10, 10));
+    statusMessageEdit->setMinimumWidth(10);
+    connect(statusMessageEdit, &QLineEdit::editingFinished, this, &OurUserItemWidget::onStatusMessageChangeSubmited);
+    connect(statusMessageEdit, &RenameEditWidget::escPressed, this, &OurUserItemWidget::onStatusMessageChangeCancelled);
+
+    statusMessageStackedWidget->addWidget(statusMessageLabelContainer);
+    statusMessageStackedWidget->addWidget(statusMessageEdit);
+    statusMessageStackedWidget->setCurrentWidget(statusMessageLabelContainer);
+    statusMessageStackedWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+    QWidget* userInformationWidget = new QWidget(this);
+    QVBoxLayout* userInformationLayout = new QVBoxLayout(userInformationWidget);
+    userInformationLayout->setMargin(0);
+    userInformationLayout->addWidget(usernameStackedWidget);
+    userInformationLayout->addWidget(statusMessageStackedWidget);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(2, 2, 2, 0);
     layout->setSpacing(2);
-
     layout->addWidget(statusButton, 0, Qt::AlignVCenter);
-    layout->addWidget(usernameStackedWidget, 10, Qt::AlignVCenter);
+    layout->addWidget(userInformationWidget);
     layout->addWidget(renameUsernameButton, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(changeStatusMessageButton, 0, Qt::AlignRight | Qt::AlignVCenter);
     layout->addWidget(copyFriendAddressButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 }
 
@@ -116,6 +150,13 @@ void OurUserItemWidget::setUsername(const QString& username)
     Settings::getInstance().setUsername(username);
 }
 
+void OurUserItemWidget::setStatusMessage(const QString &statusMessage)
+{
+    statusMessageEdit->setText(statusMessage);
+    statusMessageLabel->setText(statusMessage);
+    Settings::getInstance().setStatusMessage(statusMessage);
+}
+
 void OurUserItemWidget::onRenameUsernameButtonClicked()
 {
     usernameEdit->setText(usernameLabel->text());
@@ -146,6 +187,34 @@ void OurUserItemWidget::onStatusActionTriggered()
 void OurUserItemWidget::onCopyFriendAddressButtonClicked()
 {
     QGuiApplication::clipboard()->setText(friendAddress);
+}
+
+void OurUserItemWidget::onStatusMessageChangeSubmited()
+{
+    QString newStatusMessage = statusMessageEdit->text();
+    //restore old statusMessage, statusMessageLabel still contains it
+    statusMessageEdit->setText(statusMessageLabel->text());
+    statusMessageEdit->clearFocus();
+    statusMessageStackedWidget->setCurrentWidget(statusMessageLabelContainer);
+    emit statusMessageChanged(newStatusMessage);
+}
+
+void OurUserItemWidget::onStatusMessageChangeCancelled()
+{
+    statusMessageEdit->setText(statusMessageLabel->text());
+    statusMessageEdit->clearFocus();
+    statusMessageStackedWidget->setCurrentWidget(statusMessageLabelContainer);
+}
+
+void OurUserItemWidget::onChangeStatusMessageButtonClicked()
+{
+    statusMessageEdit->setText(statusMessageLabel->text());
+    statusMessageStackedWidget->setCurrentWidget(statusMessageEdit);
+    if (statusMessageEdit->hasFocus()) {
+        statusMessageEdit->clearFocus();
+    } else {
+        statusMessageEdit->setFocus();
+    }
 }
 
 void OurUserItemWidget::setFriendAddress(const QString &friendAddress)

@@ -41,6 +41,11 @@ private:
     QStackedWidget* usernameStackedWidget;
     QString friendAddress;
 
+    ElideLabel* statusMessageLabel;
+    QWidget* statusMessageLabelContainer;
+    RenameEditWidget* statusMessageEdit;
+    QStackedWidget* statusMessageStackedWidget;
+
     QToolButton* createToolButton(const QIcon& icon, const QSize iconSize, const QString& toolTip);
 
 private slots:
@@ -50,14 +55,22 @@ private slots:
     void onStatusActionTriggered();
     void onCopyFriendAddressButtonClicked();
 
+    void onStatusMessageChangeSubmited();
+    void onStatusMessageChangeCancelled();
+    void onChangeStatusMessageButtonClicked();
+
 public slots:
     void setFriendAddress(const QString &friendAddress);
     void setStatus(Status status);
     void setUsername(const QString& username);
 
+    void setStatusMessage(const QString& statusMessage);
+
 signals:
     void statusSelected(Status status);
     void usernameChanged(const QString& username);
+
+    void statusMessageChanged(const QString& statusMessage);
 
 };
 
