@@ -65,7 +65,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     connect(statusMessageLabel, &ElideLabel::clicked, this, &OurUserItemWidget::onChangeStatusMessageButtonClicked);
 
     //Style statusMessageLabel
-    const double statusMessageFontSizeRatio = 1.2;
+    const double statusMessageFontSizeRatio = 1.1;  //change this number to make the status message font size larger or smaller
     QFont font = usernameLabel->font();
     font.setPointSize(font.pointSize()/statusMessageFontSizeRatio);
     statusMessageLabel->setFont(font);
@@ -96,9 +96,6 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
 
     statusMessageEdit = new RenameEditWidget(statusMessageStackedWidget, QSize(10, 10));
     statusMessageEdit->setMinimumWidth(10);
-    QFont statusEditFont = statusMessageEdit->font();
-    statusEditFont.setPointSize(usernameEdit->font().pointSize()/statusMessageFontSizeRatio);
-    statusMessageEdit->setFont(statusEditFont);
     connect(statusMessageEdit, &QLineEdit::editingFinished, this, &OurUserItemWidget::onStatusMessageChangeSubmited);
     connect(statusMessageEdit, &RenameEditWidget::escPressed, this, &OurUserItemWidget::onStatusMessageChangeCancelled);
 
