@@ -51,10 +51,10 @@ private:
 private slots:
     void onUsernameChangeSubmited();
     void onUsernameChangeCancelled();
-    void onRenameUsernameButtonClicked();
+    void onUsernameLabelClicked();
     void onStatusMessageChangeSubmited();
     void onStatusMessageChangeCancelled();
-    void onChangeStatusMessageButtonClicked();
+    void onStatusMessageLabelClicked();
     void onStatusActionTriggered();
     void onCopyFriendAddressButtonClicked();
 

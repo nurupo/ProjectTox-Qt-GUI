@@ -36,7 +36,7 @@ signals:
 
 protected:
     void paintEvent(QPaintEvent *event);
-    void mousePressEvent(QMouseEvent *ev);
+    bool eventFilter(QObject *obj, QEvent *ev);
     
 private:
     bool _textElide;
