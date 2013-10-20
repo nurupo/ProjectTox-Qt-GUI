@@ -29,9 +29,6 @@ public:
 protected:
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 
-private:
-    Status getStatus(const QModelIndex& index) const;
-
 };
 
 #endif // FRIENDPROXYMODEL_HPP

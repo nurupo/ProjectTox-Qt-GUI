@@ -17,6 +17,7 @@
 #include "addfrienddialog.hpp"
 #include "friendproxymodel.hpp"
 #include "friendswidget.hpp"
+#include "frienditemdelegate.hpp"
 
 #include <QAction>
 #include <QClipboard>
@@ -42,11 +43,12 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     friendContextMenu->addActions(QList<QAction*>() << copyUserIdAction << removeFriendAction);
 
     friendView = new CustomHintTreeView(this, QSize(100, 100));
-    friendView->setIconSize(QSize(24, 24));
+    friendView->setIconSize(QSize(32, 32));
     friendView->setSortingEnabled(true);
     friendView->setIndentation(0);
     friendView->setHeaderHidden(true);
     friendView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    friendView->setItemDelegateForColumn(0, new FriendItemDelegate(this));
     friendView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(friendView, &QTreeView::customContextMenuRequested, this, &FriendsWidget::onFriendContextMenuRequested);
 
@@ -70,10 +72,12 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
 
 void FriendsWidget::addFriend(int friendId, const QString& userId)
 {
-    QStandardItem* item = new QStandardItem(userId);
-    item->setData(userId, UserIdRole);
+    QStandardItem* item = new QStandardItem();
+    item->setData(userId, FriendItemDelegate::UsernameRole);
+    item->setData(userId, FriendItemDelegate::UserIdRole);
     item->setData(QString("User ID: %1").arg(userId), Qt::ToolTipRole);
-    item->setData(friendId, FriendIdRole);
+    item->setData(friendId, FriendItemDelegate::FriendIdRole);
+    item->setData("A sample status message", FriendItemDelegate::StatusMessageRole);
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 
     emit friendAdded(friendId, userId);
@@ -97,12 +101,9 @@ void FriendsWidget::setStatus(int friendId, Status status)
 
 void FriendsWidget::setStatus(QStandardItem* friendItem, Status status)
 {
-    friendItem->setData(QIcon(StatusHelper::getInfo(status).iconPath), Qt::DecorationRole);
+    friendItem->setData(QVariant::fromValue(status), FriendItemDelegate::StatusRole);
 
-    //used for sorting model
-    friendItem->setData(QVariant::fromValue(status), StatusRole);
-
-    int friendId = friendItem->data(FriendIdRole).toInt();
+    int friendId = friendItem->data(FriendItemDelegate::FriendIdRole).toInt();
 
     emit friendStatusChanged(friendId, status);
 }
@@ -115,12 +116,24 @@ void FriendsWidget::setUsername(int friendId, const QString& username)
         return;
     }
 
-    friendItem->setText(username);
+    friendItem->setData(username, FriendItemDelegate::UsernameRole);
+}
+
+
+void FriendsWidget::setStatusMessage(int friendId, const QString& statusMessage)
+{
+    QStandardItem* friendItem = findFriendItem(friendId);
+
+    if (friendItem == nullptr) {
+        return;
+    }
+
+    friendItem->setData(statusMessage, FriendItemDelegate::StatusMessageRole);
 }
 
 QStandardItem* FriendsWidget::findFriendItem(int friendId) const
 {
-    QModelIndexList indexList = friendModel->match(friendModel->index(0, 0), FriendIdRole, friendId);
+    QModelIndexList indexList = friendModel->match(friendModel->index(0, 0), FriendItemDelegate::FriendIdRole, friendId);
     if (indexList.size() == 1) {
         return friendModel->itemFromIndex(indexList.at(0));
     }
@@ -152,14 +165,14 @@ void FriendsWidget::onCopyUserIdActionTriggered()
 {
     // friendContextMenuRequested already made sure that there is only one index selected
     QModelIndex selectedIndex = friendView->selectionModel()->selectedIndexes().at(0);
-    QGuiApplication::clipboard()->setText(friendProxyModel->mapToSource(selectedIndex).data(UserIdRole).toString());
+    QGuiApplication::clipboard()->setText(friendProxyModel->mapToSource(selectedIndex).data(FriendItemDelegate::UserIdRole).toString());
 }
 
 void FriendsWidget::onRemoveFriendActionTriggered()
 {
     QModelIndex selectedIndex = friendView->selectionModel()->selectedIndexes().at(0);
 
-    int friendId = friendProxyModel->mapToSource(selectedIndex).data(FriendIdRole).toInt();
+    int friendId = friendProxyModel->mapToSource(selectedIndex).data(FriendItemDelegate::FriendIdRole).toInt();
 
     emit friendRemoved(friendId);
 }
@@ -179,7 +192,7 @@ void FriendsWidget::onFriendSelectionChanged(const QModelIndex& current, const Q
 {
     QStandardItem* item = friendModel->itemFromIndex(friendProxyModel->mapToSource(current));
     if (item != nullptr) {
-        emit friendSelectionChanged(item->data(FriendIdRole).toInt());
+        emit friendSelectionChanged(item->data(FriendItemDelegate::FriendIdRole).toInt());
     }
 }
 

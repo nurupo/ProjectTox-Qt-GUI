@@ -15,24 +15,73 @@
 */
 
 #include "frienditemdelegate.hpp"
+#include "status.hpp"
 
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
+#include <QPen>
 
-FriendItemDelegate::FriendItemDelegate(QObject *parent) :
+FriendItemDelegate::FriendItemDelegate(QObject* parent) :
     QStyledItemDelegate(parent)
 {
 }
 
-void FriendItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+QSize FriendItemDelegate::sizeHint(const QStyleOptionViewItem&  option, const QModelIndex& index) const
 {
-    QLabel username(index.data(Qt::DisplayRole).toString());
-    //username.setAlignment(Qt::AlignLeft);
-    qDebug() << "called";
-    username.render(painter);
-    QStyledItemDelegate::paint(painter, option, index);
-    //very useful http://qt-articles.blogspot.com/2010/07/how-to-customize-listview-in-qt-using.html
-    //might be useful too http://doc.qt.digia.com/qq/qq24-delegates.html
+    QIcon statusIcon = QIcon(StatusHelper::getInfo(getStatus(index)).iconPath);
+    QSize statusIconSize = statusIcon.actualSize(option.decorationSize);
+
+    static const int VERTICAL_PADDING = 2;
+
+    return QSize(statusIconSize.width(), VERTICAL_PADDING + statusIconSize.height() + VERTICAL_PADDING);
 }
 
+void FriendItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    QStyledItemDelegate::paint(painter, option, index);
+
+    painter->save();
+
+    QSize hint = sizeHint(option, index);
+
+    //Status Icon
+    QIcon statusIcon = QIcon(StatusHelper::getInfo(getStatus(index)).iconPath);
+    QSize statusIconSize = statusIcon.actualSize(option.decorationSize);
+
+    static const int ICON_X_OFFSET = 0;
+
+    painter->drawPixmap(ICON_X_OFFSET, option.rect.top() + (hint.height() - statusIconSize.height())/2, statusIcon.pixmap(statusIconSize.width(), statusIconSize.height()));
+
+    //Username
+    QFont usernameFont = QApplication::font();
+
+    static const int USERNAME_X_OFFSET = 2;
+
+    painter->setFont(usernameFont);
+    QString elidedUsername = painter->fontMetrics().elidedText(index.data(UsernameRole).toString(), Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET));
+    painter->drawText(ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET, option.rect.top() + hint.height()/2 - painter->fontMetrics().descent(), elidedUsername);
+
+    //Status Message
+    QFont statusMessageFont = QApplication::font();
+
+    painter->setPen(Qt::gray);
+
+    static const int STATUSMESSAGE_X_OFFSET = USERNAME_X_OFFSET;
+
+    painter->setFont(statusMessageFont);
+    QString elidedStatuseMessage = painter->fontMetrics().elidedText(index.data(StatusMessageRole).toString(), Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET));
+    painter->drawText(ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET, option.rect.top() + hint.height()/2 + painter->fontMetrics().ascent(), elidedStatuseMessage);
+
+    painter->restore();
+}
+
+Status FriendItemDelegate::getStatus(const QModelIndex& index)
+{
+    if (index.data(StatusRole).canConvert<Status>()) {
+        return index.data(StatusRole).value<Status>();
+    } else {
+        qDebug() << "Couldn't convert status for" << index.data(UsernameRole).toString() << "with friendId" << index.data(FriendIdRole).toInt();
+        return Status::Offline;
+    }
+}
