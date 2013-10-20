@@ -124,7 +124,7 @@ HEADERS  += \
     ../../src/messagedisplaywidget.hpp \
     ../../src/opacitywidget.hpp \
     ../../src/customhintwidget.hpp \
-    ../../src/Settings/guisettingspage.h \
+    ../../src/Settings/guisettingspage.hpp \
     ../../src/frienditemdelegate.hpp
 
 SOURCES += \

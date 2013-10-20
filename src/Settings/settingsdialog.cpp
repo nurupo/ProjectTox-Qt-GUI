@@ -17,7 +17,7 @@
 #include "dhtbootstrapsettingspage.hpp"
 #include "loggingsettingspage.hpp"
 #include "settingsdialog.hpp"
-#include "guisettingspage.h"
+#include "guisettingspage.hpp"
 
 SettingsDialog::SettingsDialog(QWidget* parent) :
     BasicSettingsDialog(parent)
