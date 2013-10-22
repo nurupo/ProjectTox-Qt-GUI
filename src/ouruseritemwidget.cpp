@@ -47,21 +47,21 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
 
     usernameStackedWidget = new QStackedWidget(this);
 
-    usernameLabel = new ElideLabel(usernameStackedWidget);
+    usernameLabel = new ElideLabelEditable(usernameStackedWidget);
     usernameLabel->setMinimumWidth(10);
     usernameLabel->setTextElide(true);
     usernameLabel->setTextElideMode(Qt::ElideRight);
     usernameLabel->setText(Settings::getInstance().getUsername());
-    connect(usernameLabel, &ElideLabel::clicked, this, &OurUserItemWidget::onUsernameLabelClicked);
+    connect(usernameLabel, &ElideLabelEditable::clicked, this, &OurUserItemWidget::onUsernameLabelClicked);
 
     statusMessageStackedWidget = new QStackedWidget(this);
 
-    statusMessageLabel = new ElideLabel(statusMessageStackedWidget);
+    statusMessageLabel = new ElideLabelEditable(statusMessageStackedWidget);
     statusMessageLabel->setMinimumWidth(10);
     statusMessageLabel->setTextElide(true);
     statusMessageLabel->setTextElideMode(Qt::ElideRight);
     statusMessageLabel->setText(Settings::getInstance().getStatusMessage());
-    connect(statusMessageLabel, &ElideLabel::clicked, this, &OurUserItemWidget::onStatusMessageLabelClicked);
+    connect(statusMessageLabel, &ElideLabelEditable::clicked, this, &OurUserItemWidget::onStatusMessageLabelClicked);
 
     //Style statusMessageLabel
     const double statusMessageFontSizeRatio = 1.1;  //change this number to make the status message font size larger or smaller

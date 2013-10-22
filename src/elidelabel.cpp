@@ -17,13 +17,10 @@
 #include "elidelabel.hpp"
 
 #include <QPainter>
-#include <QMouseEvent>
-#include <QApplication>
 
 ElideLabel::ElideLabel(QWidget *parent) :
     QLabel(parent), _textElide(false), _textElideMode(Qt::ElideNone)
 {
-    this->installEventFilter(this);
 }
 
 void ElideLabel::paintEvent(QPaintEvent *event)
@@ -36,25 +33,6 @@ void ElideLabel::paintEvent(QPaintEvent *event)
     } else {
         QLabel::paintEvent(event);
     }
-}
-
-bool ElideLabel::eventFilter(QObject *obj, QEvent *ev)
-{
-    switch(ev->type()) {
-    case QEvent::MouseButtonRelease:
-        emit clicked();
-        break;
-    case QEvent::Enter:
-        QApplication::setOverrideCursor(QCursor(Qt::IBeamCursor));
-        break;
-    case QEvent::Leave:
-        QApplication::restoreOverrideCursor();
-        break;
-    default:
-        return false;
-    }
-
-    return true;    //will have returned false already if event was unhandled by the switch statement
 }
 
 void ElideLabel::setTextElide(bool set)

@@ -18,6 +18,7 @@
 #define OURUSERITEMWIDGET_HPP
 
 #include "elidelabel.hpp"
+#include "elidelabeleditable.hpp"
 #include "renameeditwidget.hpp"
 #include "status.hpp"
 
@@ -35,13 +36,13 @@ public:
 
 private:
     QToolButton* statusButton;
-    ElideLabel* usernameLabel;
+    ElideLabelEditable* usernameLabel;
     QWidget* usernameLabelContainer;
     RenameEditWidget* usernameEdit;
     QStackedWidget* usernameStackedWidget;
     QString friendAddress;
 
-    ElideLabel* statusMessageLabel;
+    ElideLabelEditable* statusMessageLabel;
     QWidget* statusMessageLabelContainer;
     RenameEditWidget* statusMessageEdit;
     QStackedWidget* statusMessageStackedWidget;
