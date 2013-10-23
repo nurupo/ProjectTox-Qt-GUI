@@ -1,4 +1,4 @@
-#include "guisettingspage.h"
+#include "guisettingspage.hpp"
 
 #include "settings.hpp"
 

@@ -1,5 +1,5 @@
-#ifndef GUISETTINGSPAGE_H
-#define GUISETTINGSPAGE_H
+#ifndef GUISETTINGSPAGE_HPP
+#define GUISETTINGSPAGE_HPP
 
 #include "abstractsettingspage.hpp"
 
@@ -27,4 +27,4 @@ private:
 
 };
 
-#endif // GUISETTINGSPAGE_H
+#endif // GUISETTINGSPAGE_HPP

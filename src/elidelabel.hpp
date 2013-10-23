@@ -21,6 +21,7 @@
 
 class ElideLabel : public QLabel
 {
+    Q_OBJECT
 public:
     explicit ElideLabel(QWidget *parent = 0);
 

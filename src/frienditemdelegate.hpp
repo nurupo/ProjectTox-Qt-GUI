@@ -17,17 +17,19 @@
 #ifndef FRIENDITEMDELEGATE_HPP
 #define FRIENDITEMDELEGATE_HPP
 
-#include <QLabel>
 #include <QStyledItemDelegate>
+#include "status.hpp"
 
 class FriendItemDelegate : public QStyledItemDelegate
 {
 public:
     FriendItemDelegate(QObject *parent = 0);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem&  option, const QModelIndex& index) const;
 
-private:
-    QLabel statusIcon;
+    enum {UsernameRole = Qt::UserRole, StatusRole, StatusMessageRole, UserIdRole, FriendIdRole};
+
+    static Status getStatus(const QModelIndex& index);
 
 };
 

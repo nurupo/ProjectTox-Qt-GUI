@@ -78,7 +78,7 @@ void Settings::load()
 
     s.beginGroup("General");
         username = s.value("username", "My name").toString();
-        //statusMessage = s.setValue("statusMessage", statusMessage);
+        statusMessage = s.value("statusMessage", "My message").toString();
     s.endGroup();
 
     s.beginGroup("WindowSettings");
@@ -126,7 +126,7 @@ void Settings::save()
 
     s.beginGroup("General");
         s.setValue("username", username);
-        //s.setValue("statusMessage", statusMessage);
+        s.setValue("statusMessage", statusMessage);
     s.endGroup();
 
     s.beginGroup("WindowSettings");

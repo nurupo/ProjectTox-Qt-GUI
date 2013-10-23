@@ -86,6 +86,8 @@ SOURCES += \
     ../../src/opacitywidget.cpp \
     ../../src/customhintwidget.cpp \
     ../../src/Settings/guisettingspage.cpp \
+    ../../src/frienditemdelegate.cpp \
+    ../../src/elidelabeleditable.cpp \
     ../../src/friendrequestwidget.cpp
 
 HEADERS  += \
@@ -122,6 +124,9 @@ HEADERS  += \
     ../../src/messagedisplaywidget.hpp \
     ../../src/opacitywidget.hpp \
     ../../src/customhintwidget.hpp \
+    ../../src/Settings/guisettingspage.hpp \
+    ../../src/frienditemdelegate.hpp \
+    ../../src/elidelabeleditable.hpp \
     ../../src/Settings/guisettingspage.h \
     ../../src/friendrequestwidget.h
 

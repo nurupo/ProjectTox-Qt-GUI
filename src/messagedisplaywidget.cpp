@@ -74,6 +74,13 @@ void MessageDisplayWidget::prependMessage(const QString &name, const QString &me
     mainlayout->insertWidget(0, createNewRow(name, message, messageId, isOur));
 }
 
+void MessageDisplayWidget::appendAction(const QString &name, const QString &message, bool isOur)
+{
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
+    QWidget *row = createNewRow("*", name+" "+message, -2, isOur);
+    mainlayout->addWidget(row);
+}
+
 int MessageDisplayWidget::scrollPos() const
 {
     return mScrollPos;
@@ -120,19 +127,28 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
 
     MessageLabel *messageLabel = new MessageLabel(widget);
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
-    // Message added to send que
-    if (messageId) {
+    QString messageText = EmoticonMenu::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>");
+    // Action
+    if(messageId < -1) {
+        QPalette actionPal;
+        actionPal.setColor(QPalette::Foreground, Qt::darkGreen);
+        messageLabel->setPalette(actionPal);
+        messageLabel->setProperty("class", "msgAction"); // for CSS styling
+        messageLabel->setText(QString("<i>%1</i>").arg(messageText));
+    }
+    // Message
+    else if (messageId != 0) {
         messageLabel->setMessageId(messageId);
         messageLabel->setProperty("class", "msgMessage"); // for CSS styling
-        messageLabel->setText(EmoticonMenu::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>"));
-
+        messageLabel->setText(messageText);
+    }
     // Error
-    } else {
+    else {
         QPalette errorPal;
         errorPal.setColor(QPalette::Foreground, Qt::red);
         messageLabel->setPalette(errorPal);
         messageLabel->setProperty("class", "msgError"); // for CSS styling
-        messageLabel->setText(urlify(message.toHtmlEscaped()).prepend("<img src=\":/icons/error.png\" /> ").replace('\n', "<br>"));
+        messageLabel->setText(QString("<img src=\":/icons/error.png\" /> %1").arg(messageText));
         messageLabel->setToolTip(tr("Couldn't send the message!"));
     }
 
@@ -144,9 +160,8 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
     timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
 
     // Insert name if sender changed.
-    if (lastMessageIsOurs != isOur || mainlayout->count() < 1) {
+    if (lastMessageIsOurs != isOur || mainlayout->count() < 1 || messageId < -1) {
         nameLabel->setText(name);
-        lastMessageIsOurs = isOur;
 
         if (isOur) {
             nameLabel->setForegroundRole(QPalette::Mid);
@@ -156,7 +171,7 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
         }
 
         // Create line
-        if (mainlayout->count() > 0) {
+        if (lastMessageIsOurs != isOur && mainlayout->count() > 0) {
             QFrame *line = new QFrame(this);
             line->setFrameShape(QFrame::HLine);
             line->setFrameShadow(QFrame::Plain);
@@ -164,6 +179,8 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
             line->setProperty("class", "msgLine"); // for CSS styling
             mainlayout->addWidget(line);
         }
+
+        lastMessageIsOurs = isOur;
     }
 
     // Return new line

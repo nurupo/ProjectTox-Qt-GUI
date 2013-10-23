@@ -14,9 +14,9 @@
     See the COPYING file for more details.
 */
 
-
 #include "friendproxymodel.hpp"
 #include "friendswidget.hpp"
+#include "frienditemdelegate.hpp"
 
 #include <QModelIndex>
 #include <QDebug>
@@ -28,26 +28,15 @@ FriendProxyModel::FriendProxyModel(QObject* parent) :
 
 bool FriendProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    Status leftStatus = getStatus(left);
+    Status leftStatus = FriendItemDelegate::getStatus(left);
     QString leftName = left.data().toString();
 
-    Status rightStatus = getStatus(right);
+    Status rightStatus = FriendItemDelegate::getStatus(right);
     QString rightName = right.data().toString();
 
     if (leftStatus == rightStatus) {
         return leftName.localeAwareCompare(rightName) > 0;
     } else {
         return leftStatus > rightStatus;
-    }
-}
-
-Status FriendProxyModel::getStatus(const QModelIndex& index) const
-{
-    if (index.data(FriendsWidget::StatusRole).canConvert<Status>()) {
-        qDebug() << "Converted status for" << index.data().toString();
-        return index.data(FriendsWidget::StatusRole).value<Status>();
-    } else {
-        qDebug() << "Couldn't convert status for" << index.data().toString();
-        return Status::Offline;
     }
 }

@@ -42,6 +42,7 @@ void PagesWidget::addPage(int friendId, const QString& username)
     ChatPageWidget* chatPage = new ChatPageWidget(friendId, this);
     chatPage->setUsername(username);
     connect(chatPage, &ChatPageWidget::sendMessage, this, &PagesWidget::onMessageSent);
+    connect(chatPage, &ChatPageWidget::sendAction,  this, &PagesWidget::onActionToSend);
     addWidget(chatPage);
     qDebug() << "page" << friendId << "added" << count();
 }
@@ -75,12 +76,33 @@ void PagesWidget::onMessageSent(const QString& message)
     emit sendMessage(chatPage->getFriendId(), message);
 }
 
+void PagesWidget::onActionToSend(const QString &action)
+{
+    ChatPageWidget* chatPage = static_cast<ChatPageWidget*>(sender());
+    emit sendAction(chatPage->getFriendId(), action);
+}
+
 void PagesWidget::messageReceived(int friendId, const QString &message)
 {
     widget(friendId)->messageReceived(message);
 }
 
+void PagesWidget::actionReceived(int friendId, const QString &message)
+{
+    widget(friendId)->actionReceived(message);
+}
+
 void PagesWidget::messageSentResult(int friendId, const QString &message, int messageId)
 {
     widget(friendId)->messageSentResult(message, messageId);
+}
+
+void PagesWidget::actionResult(int friendId, const QString &action, int success)
+{
+    if (success) {
+        widget(friendId)->actionSentResult(action);
+    } else {
+        // FIXME: that is one confusing way of reporting a error
+        widget(friendId)->messageSentResult(action, success);
+    }
 }
