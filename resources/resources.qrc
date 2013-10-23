@@ -35,5 +35,8 @@
         <file>icons/paste_plain.png</file>
         <file>icons/arrow_redo.png</file>
         <file>icons/arrow_undo.png</file>
+        <file>icons/accept.png</file>
+        <file>icons/cancel.png</file>
+        <file>icons/resultset_next.png</file>
     </qresource>
 </RCC>

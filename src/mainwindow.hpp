@@ -27,6 +27,8 @@
 #include <QTextBrowser>
 #include <QThread>
 
+class FriendRequestWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -43,11 +45,11 @@ private:
     QThread* coreThread;
     FriendsWidget* friendsWidget;
     OurUserItemWidget* ourUserItem;
+    FriendRequestWidget* friendRequestWidget;
 
 private slots:
     void onConnected();
     void onDisconnected();
-    void onFriendRequestRecieved(const QString &userId, const QString &message);
     void onFailedToRemoveFriend(int friendId);
     void onFailedToAddFriend(const QString& userId);
     void onSettingsActionTriggered();

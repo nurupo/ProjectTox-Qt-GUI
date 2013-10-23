@@ -18,10 +18,10 @@
 
 #include "aboutdialog.hpp"
 #include "appinfo.hpp"
-#include "friendrequestdialog.hpp"
 #include "pageswidget.hpp"
 #include "Settings/settings.hpp"
 #include "closeapplicationdialog.hpp"
+#include "friendrequestwidget.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget* parent)
     friendDock->setWidget(friendDockWidget);
 
     ourUserItem = new OurUserItemWidget(this);
+    friendRequestWidget = new FriendRequestWidget(this);
     friendsWidget = new FriendsWidget(friendDockWidget);
 
     // Create toolbar
@@ -96,6 +97,7 @@ MainWindow::MainWindow(QWidget* parent)
     // Create toolbar end
 
     layout->addWidget(ourUserItem);
+    layout->addWidget(friendRequestWidget);
     layout->addWidget(friendsWidget);
     layout->addWidget(toolBar);
 
@@ -116,7 +118,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(core, &Core::connected, this, &MainWindow::onConnected);
     connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
-    connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
+    connect(core, &Core::friendRequestRecieved, friendRequestWidget, &FriendRequestWidget::addFriendRequest);
     connect(core, SIGNAL(friendStatusChanged(int, Status)), friendsWidget, SLOT(setStatus(int, Status)));
     connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
@@ -133,7 +135,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     coreThread->start(/*QThread::IdlePriority*/);
 
-    connect(this, &MainWindow::friendRequestAccepted, core, &Core::acceptFriendRequest);
+    connect(friendRequestWidget, &FriendRequestWidget::userAccepted, core, &Core::acceptFriendRequest);
 
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
     connect(core, &Core::usernameSet, ourUserItem, &OurUserItemWidget::setUsername);
@@ -165,15 +167,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     Settings::getInstance().saveWindow(this);
     QMainWindow::closeEvent(event);
-}
-
-void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& message)
-{
-    FriendRequestDialog dialog(this, userId, message);
-
-    if (dialog.exec() == QDialog::Accepted) {
-        emit friendRequestAccepted(userId);
-    }
 }
 
 void MainWindow::onConnected()
