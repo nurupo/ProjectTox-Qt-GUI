@@ -20,6 +20,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QToolButton>
 #include <QPropertyAnimation>
 #include <QFrame>
 
@@ -48,17 +49,20 @@ FriendRequestWidget::FriendRequestWidget(QWidget *parent) :
     message = new QLabel(detailsWidget);
     message->setWordWrap(true);
 
-    acceptButton = new QPushButton(detailsWidget);
+    acceptButton = new QToolButton(detailsWidget);
     acceptButton->setIcon(QIcon("://icons/accept.png"));
     acceptButton->setToolTip(tr("Accept request"));
+    acceptButton->setAutoRaise(true);
 
-    rejectButton = new QPushButton(detailsWidget);
+    rejectButton = new QToolButton(detailsWidget);
     rejectButton->setIcon(QIcon("://icons/cancel.png"));
     rejectButton->setToolTip(tr("Reject request"));
+    rejectButton->setAutoRaise(true);
 
-    nextButton = new QPushButton(detailsWidget);
+    nextButton = new QToolButton(detailsWidget);
     nextButton->setIcon(QIcon("://icons/resultset_next.png"));
     nextButton->setToolTip(tr("Next request"));
+    nextButton->setAutoRaise(true);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(acceptButton);
@@ -67,7 +71,7 @@ FriendRequestWidget::FriendRequestWidget(QWidget *parent) :
     buttonLayout->setContentsMargins(0,0,0,0);
 
     QVBoxLayout *detailsLayout = new QVBoxLayout(detailsWidget);
-    detailsLayout->setContentsMargins(0,0,0,0);
+    detailsLayout->setContentsMargins(2,2,2,2);
     detailsLayout->setSpacing(2);
     detailsLayout->addWidget(clientId);
     detailsLayout->addWidget(message);
@@ -76,7 +80,7 @@ FriendRequestWidget::FriendRequestWidget(QWidget *parent) :
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(button);
     layout->addWidget(detailsWidget);
-    layout->setContentsMargins(2,2,2,2);
+    layout->setContentsMargins(4,4,4,4);
     layout->setSpacing(0);
 
     connect(button,       &QPushButton::toggled, this, &FriendRequestWidget::showDetails);
@@ -108,7 +112,7 @@ void FriendRequestWidget::addFriendRequest(const QString &userId, const QString 
 void FriendRequestWidget::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
-    clientId->setMaximumWidth(width());
+    clientId->setMaximumWidth(detailsWidget->width());
 }
 
 void FriendRequestWidget::acceptUser()

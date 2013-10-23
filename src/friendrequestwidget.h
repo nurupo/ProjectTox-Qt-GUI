@@ -23,6 +23,7 @@ class QFrame;
 class QLabel;
 class ElideLabel;
 class QPushButton;
+class QToolButton;
 class QPropertyAnimation;
 
 /*! FriendRequestWidget shows incoming friend requests.
@@ -61,9 +62,9 @@ private:
     QFrame      *detailsWidget;
     ElideLabel  *clientId;
     QLabel      *message;
-    QPushButton *acceptButton;
-    QPushButton *rejectButton;
-    QPushButton *nextButton;
+    QToolButton *acceptButton;
+    QToolButton *rejectButton;
+    QToolButton *nextButton;
 
     QPropertyAnimation *animation;
 
