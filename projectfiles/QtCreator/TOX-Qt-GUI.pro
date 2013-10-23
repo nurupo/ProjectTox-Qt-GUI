@@ -87,7 +87,8 @@ SOURCES += \
     ../../src/opacitywidget.cpp \
     ../../src/customhintwidget.cpp \
     ../../src/Settings/guisettingspage.cpp \
-    ../../src/frienditemdelegate.cpp
+    ../../src/frienditemdelegate.cpp \
+    ../../src/elidelabeleditable.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -125,7 +126,8 @@ HEADERS  += \
     ../../src/opacitywidget.hpp \
     ../../src/customhintwidget.hpp \
     ../../src/Settings/guisettingspage.hpp \
-    ../../src/frienditemdelegate.hpp
+    ../../src/frienditemdelegate.hpp \
+    ../../src/elidelabeleditable.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \

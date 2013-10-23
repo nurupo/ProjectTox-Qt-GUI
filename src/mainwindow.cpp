@@ -138,6 +138,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
     connect(core, &Core::usernameSet, ourUserItem, &OurUserItemWidget::setUsername);
 
+    connect(ourUserItem, &OurUserItemWidget::statusMessageChanged, core, &Core::setStatusMessage);
+    connect(core, &Core::statusMessageSet, ourUserItem, &OurUserItemWidget::setStatusMessage);
+
     connect(ourUserItem, &OurUserItemWidget::statusSelected, core, &Core::setStatus);
 
     connect(pages, &PagesWidget::sendMessage, core, &Core::sendMessage);

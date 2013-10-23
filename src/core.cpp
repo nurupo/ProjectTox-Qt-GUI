@@ -159,17 +159,15 @@ void Core::setUsername(const QString& username)
     }
 }
 
-void Core::setStatusMessage(const QString& /*message*/)
+void Core::setStatusMessage(const QString& message)
 {
-/*
     CString cMessage(message);
 
-    if (m_set_statusmessage(cMessage.data(), cMessage.size()) == -1) {
+    if (tox_set_statusmessage(tox, cMessage.data(), cMessage.size()) == -1) {
         emit failedToSetStatusMessage(message);
     } else {
         emit statusMessageSet(message);
     }
-*/
 }
 
 void Core::setStatus(Status status)
@@ -269,7 +267,7 @@ void Core::start()
     tox_callback_friendrequest(tox, onFriendRequest, this);
     tox_callback_friendmessage(tox, onFriendMessage, this);
     tox_callback_namechange(tox, onFriendNameChange, this);
-    //tox_callback_statusmessage(tox, onStatusMessageChanged, this);
+    tox_callback_statusmessage(tox, onStatusMessageChanged, this);
     tox_callback_userstatus(tox, onUserStatusChanged, this);
     tox_callback_connectionstatus(tox, onConnectionStatusChanged, this);
     tox_callback_action(tox, onAction, this);
