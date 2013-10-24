@@ -14,27 +14,21 @@
     See the COPYING file for more details.
 */
 
-#ifndef RENAMEEDITWIDGET_HPP
-#define RENAMEEDITWIDGET_HPP
+#include "esclineedit.hpp"
 
-#include <QLineEdit>
+#include <QKeyEvent>
+#include <QMouseEvent>
 
-class RenameEditWidget : public QLineEdit
+EscLineEdit::EscLineEdit(QWidget* parent) :
+    QLineEdit(parent)
 {
-    Q_OBJECT
-public:
-    RenameEditWidget(QWidget* parent, QSize startingSize);
-    QSize sizeHint() const;
+}
 
-protected:
-    void keyPressEvent(QKeyEvent* event);
-
-private:
-    QSize startingSize;
-
-signals:
-    void escPressed();
-
-};
-
-#endif // RENAMEEDITWIDGET_HPP
+void EscLineEdit::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Escape && event->modifiers() == Qt::NoModifier) {
+        emit escPressed();
+    } else {
+       QLineEdit::keyPressEvent(event);
+    }
+}

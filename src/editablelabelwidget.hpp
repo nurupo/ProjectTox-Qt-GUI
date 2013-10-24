@@ -14,37 +14,38 @@
     See the COPYING file for more details.
 */
 
-#ifndef ELIDELABEL_HPP
-#define ELIDELABEL_HPP
+#ifndef EDITABLELABELWIDGET_HPP
+#define EDITABLELABELWIDGET_HPP
 
-#include <QLabel>
+#include "clickablelabel.hpp"
+#include "esclineedit.hpp"
 
-class ElideLabel : public QLabel
+#include <QLineEdit>
+#include <QStackedWidget>
+
+class EditableLabelWidget : public QStackedWidget
 {
     Q_OBJECT
 public:
-    explicit ElideLabel(QWidget *parent = 0);
+    explicit EditableLabelWidget(QWidget* parent = 0);
 
-    void setTextElide(bool set);
-    bool textElide() const;
+    ClickableLabel* label;
+    EscLineEdit* lineEdit;
 
-    void setTextElideMode(Qt::TextElideMode mode);
-    Qt::TextElideMode textElideMode() const;
 
-    void setShowToolTipOnElide(bool show);
-    bool showToolTipOnElide();
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-    bool event(QEvent *e) override;
+    void addWidget(QWidget* w);
     
-private:
-    bool _textElide;
-    Qt::TextElideMode _textElideMode;
+    void setText(const QString& text);
 
-    bool _showToolTipOnElide;
+private slots:
+    void onCurrentChanged(int index);
+    void onLabelChangeSubmited();
+    void onLabelChangeCancelled();
+    void onLabelClicked();
 
+signals:
+    void textChanged(QString newText, QString oldText);
     
 };
 
-#endif // ELIDELABEL_HPP
+#endif // EDITABLELABELWIDGET_HPP

@@ -64,7 +64,6 @@ SOURCES += \
     ../../src/inputtextwidget.cpp \
     ../../src/frienditemwidget.cpp \
     ../../src/ouruseritemwidget.cpp \
-    ../../src/renameeditwidget.cpp \
     ../../src/status.cpp \
     ../../src/friendrequestdialog.cpp \
     ../../src/customhinttextedit.cpp \
@@ -88,7 +87,9 @@ SOURCES += \
     ../../src/customhintwidget.cpp \
     ../../src/Settings/guisettingspage.cpp \
     ../../src/frienditemdelegate.cpp \
-    ../../src/elidelabeleditable.cpp
+    ../../src/editablelabelwidget.cpp \
+    ../../src/clickablelabel.cpp \
+    ../../src/esclineedit.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -103,7 +104,6 @@ HEADERS  += \
     ../../src/inputtextwidget.hpp \
     ../../src/frienditemwidget.hpp \
     ../../src/ouruseritemwidget.hpp \
-    ../../src/renameeditwidget.hpp \
     ../../src/friendrequestdialog.hpp \
     ../../src/customhinttextedit.hpp \
     ../../src/elidelabel.hpp \
@@ -127,7 +127,9 @@ HEADERS  += \
     ../../src/customhintwidget.hpp \
     ../../src/Settings/guisettingspage.hpp \
     ../../src/frienditemdelegate.hpp \
-    ../../src/elidelabeleditable.hpp
+    ../../src/editablelabelwidget.hpp \
+    ../../src/clickablelabel.hpp \
+    ../../src/esclineedit.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \

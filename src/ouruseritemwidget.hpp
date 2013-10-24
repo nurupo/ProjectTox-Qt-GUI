@@ -17,9 +17,7 @@
 #ifndef OURUSERITEMWIDGET_HPP
 #define OURUSERITEMWIDGET_HPP
 
-#include "elidelabel.hpp"
-#include "elidelabeleditable.hpp"
-#include "renameeditwidget.hpp"
+#include "editablelabelwidget.hpp"
 #include "status.hpp"
 
 #include <QLabel>
@@ -36,26 +34,16 @@ public:
 
 private:
     QToolButton* statusButton;
-    ElideLabelEditable* usernameLabel;
-    QWidget* usernameLabelContainer;
-    RenameEditWidget* usernameEdit;
-    QStackedWidget* usernameStackedWidget;
     QString friendAddress;
 
-    ElideLabelEditable* statusMessageLabel;
-    QWidget* statusMessageLabelContainer;
-    RenameEditWidget* statusMessageEdit;
-    QStackedWidget* statusMessageStackedWidget;
+    EditableLabelWidget* usernameWidget;
+    EditableLabelWidget* statusMessageWidget;
 
     QToolButton* createToolButton(const QIcon& icon, const QSize iconSize, const QString& toolTip);
 
 private slots:
-    void onUsernameChangeSubmited();
-    void onUsernameChangeCancelled();
-    void onUsernameLabelClicked();
-    void onStatusMessageChangeSubmited();
-    void onStatusMessageChangeCancelled();
-    void onStatusMessageLabelClicked();
+    void onUsernameChanged(const QString& newUsername, const QString& oldUsername);
+    void onStatusMessageChanged(const QString& newStatusMessage, const QString& oldStatusMessage);
     void onStatusActionTriggered();
     void onCopyFriendAddressButtonClicked();
 

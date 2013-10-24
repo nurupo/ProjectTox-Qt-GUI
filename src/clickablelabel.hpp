@@ -1,8 +1,8 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
-    
+
     This file is part of Tox Qt GUI.
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -10,41 +10,27 @@
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    
+
     See the COPYING file for more details.
 */
 
-#ifndef ELIDELABEL_HPP
-#define ELIDELABEL_HPP
+#ifndef CLICKABLELABEL_HPP
+#define CLICKABLELABEL_HPP
 
-#include <QLabel>
+#include "elidelabel.hpp"
 
-class ElideLabel : public QLabel
+class ClickableLabel : public ElideLabel
 {
     Q_OBJECT
 public:
-    explicit ElideLabel(QWidget *parent = 0);
-
-    void setTextElide(bool set);
-    bool textElide() const;
-
-    void setTextElideMode(Qt::TextElideMode mode);
-    Qt::TextElideMode textElideMode() const;
-
-    void setShowToolTipOnElide(bool show);
-    bool showToolTipOnElide();
-
+    explicit ClickableLabel(QWidget* parent = 0);
+    
 protected:
-    void paintEvent(QPaintEvent *event) override;
-    bool event(QEvent *e) override;
-    
-private:
-    bool _textElide;
-    Qt::TextElideMode _textElideMode;
+    bool event(QEvent* event) override;
 
-    bool _showToolTipOnElide;
+signals:
+    void clicked();
 
-    
 };
 
-#endif // ELIDELABEL_HPP
+#endif // CLICKABLELABEL_HPP

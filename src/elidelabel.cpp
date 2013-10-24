@@ -17,22 +17,38 @@
 #include "elidelabel.hpp"
 
 #include <QPainter>
+#include <QEvent>
 
 ElideLabel::ElideLabel(QWidget *parent) :
-    QLabel(parent), _textElide(false), _textElideMode(Qt::ElideNone)
+    QLabel(parent), _textElide(false), _textElideMode(Qt::ElideNone), _showToolTipOnElide(false)
 {
 }
 
 void ElideLabel::paintEvent(QPaintEvent *event)
 {
+    QFrame::paintEvent(event);
     QPainter p(this);
     QFontMetrics metrics(font());
     if ((metrics.width(text()) > contentsRect().width()) && textElide()) {
         QString elidedText = fontMetrics().elidedText(text(), textElideMode(), rect().width());
-        p.drawText(rect(), elidedText);
+        p.drawText(rect(), alignment(), elidedText);
     } else {
         QLabel::paintEvent(event);
     }
+}
+
+bool ElideLabel::event(QEvent *event)
+{
+    if (event->type() == QEvent::ToolTip) {
+        QFontMetrics metrics(font());
+        if ((metrics.width(text()) > contentsRect().width()) && textElide() && showToolTipOnElide()) {
+            setToolTip(text());
+        } else {
+            setToolTip("");
+        }
+    }
+
+    return QLabel::event(event);
 }
 
 void ElideLabel::setTextElide(bool set)
@@ -53,4 +69,14 @@ void ElideLabel::setTextElideMode(Qt::TextElideMode mode)
 Qt::TextElideMode ElideLabel::textElideMode() const
 {
     return _textElideMode;
+}
+
+void ElideLabel::setShowToolTipOnElide(bool show)
+{
+    _showToolTipOnElide = show;
+}
+
+bool ElideLabel::showToolTipOnElide()
+{
+    return _showToolTipOnElide;
 }

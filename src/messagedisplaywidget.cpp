@@ -122,7 +122,7 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
     nameLabel->setTextElide(true);
     nameLabel->setTextElideMode(Qt::ElideRight);
     nameLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    nameLabel->setToolTip(name);
+    nameLabel->setShowToolTipOnElide(true);
     nameLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
 
     MessageLabel *messageLabel = new MessageLabel(widget);

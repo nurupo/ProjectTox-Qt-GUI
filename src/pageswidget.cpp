@@ -23,6 +23,8 @@ PagesWidget::PagesWidget(QWidget* parent) :
     QStackedWidget(parent)
 {
     addWidget(new QWidget(this));
+
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 // if preformance would be critical, replace with QHash<int friendId, ChatPageWidget*>

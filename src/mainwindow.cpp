@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget* parent)
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolBar->setIconSize(QSize(16, 16));
+    toolBar->setFocusPolicy(Qt::ClickFocus);
 
     QToolButton *addFriendButton = new QToolButton(toolBar);
     addFriendButton->setIcon(QIcon("://icons/user_add.png"));

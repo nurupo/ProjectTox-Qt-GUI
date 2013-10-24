@@ -78,7 +78,7 @@ void Settings::load()
 
     s.beginGroup("General");
         username = s.value("username", "My name").toString();
-        statusMessage = s.value("statusMessage", "My message").toString();
+        statusMessage = s.value("statusMessage", "My status").toString();
     s.endGroup();
 
     s.beginGroup("WindowSettings");
