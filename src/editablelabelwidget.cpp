@@ -17,7 +17,6 @@
 #include "editablelabelwidget.hpp"
 
 #include <QVBoxLayout>
-#include <QDebug>
 
 EditableLabelWidget::EditableLabelWidget(QWidget* parent) :
     QStackedWidget(parent)

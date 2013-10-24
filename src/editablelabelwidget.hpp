@@ -32,7 +32,6 @@ public:
     ClickableLabel* label;
     EscLineEdit* lineEdit;
 
-
     void addWidget(QWidget* w);
     
     void setText(const QString& text);

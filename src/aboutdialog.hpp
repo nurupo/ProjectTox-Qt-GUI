@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
 
-    This file is part of NFK Lobby.
+    This file is part of Tox Qt GUI.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
