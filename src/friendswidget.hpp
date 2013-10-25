@@ -54,7 +54,6 @@ private slots:
     void onFriendSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
 
 public slots:
-    void onAddFriendButtonClicked();
     void addFriend(int friendId, const QString& userId);
     void removeFriend(int friendId);
     void setUsername(int friendId, const QString& username);
@@ -66,7 +65,6 @@ signals:
     void friendStatusChanged(int friendId, Status status);
     void friendRemoved(int friendId);
     void friendSelectionChanged(int friendId);
-    void friendRequested(const QString& friendAddress, const QString& message);
 
 };
 

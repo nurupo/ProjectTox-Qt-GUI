@@ -45,6 +45,7 @@ private:
     OurUserItemWidget* ourUserItem;
 
 private slots:
+    void onAddFriendButtonClicked();
     void onConnected();
     void onDisconnected();
     void onFriendRequestRecieved(const QString &userId, const QString &message);
@@ -55,7 +56,8 @@ private slots:
     void onQuitApplicationTriggered();
 
 signals:
-    void friendRequestAccepted(const QString &userId);
+    void friendRequestAccepted(const QString& userId);
+    void friendRequested(const QString& friendAddress, const QString& message);
 
 };
 

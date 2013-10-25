@@ -14,7 +14,6 @@
     See the COPYING file for more details.
 */
 
-#include "addfrienddialog.hpp"
 #include "friendproxymodel.hpp"
 #include "friendswidget.hpp"
 #include "frienditemdelegate.hpp"
@@ -139,15 +138,6 @@ QStandardItem* FriendsWidget::findFriendItem(int friendId) const
     }
 
     return nullptr;
-}
-
-void FriendsWidget::onAddFriendButtonClicked()
-{
-    AddFriendDialog dialog(this);
-
-    if (dialog.exec() == QDialog::Accepted) {
-        emit friendRequested(dialog.getFriendAddress(), dialog.getMessage());
-    }
 }
 
 void FriendsWidget::onFriendContextMenuRequested(const QPoint& pos)

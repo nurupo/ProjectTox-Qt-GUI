@@ -17,6 +17,7 @@
 #include "mainwindow.hpp"
 
 #include "aboutdialog.hpp"
+#include "addfrienddialog.hpp"
 #include "appinfo.hpp"
 #include "friendrequestdialog.hpp"
 #include "pageswidget.hpp"
@@ -73,7 +74,7 @@ MainWindow::MainWindow(QWidget* parent)
     QToolButton *addFriendButton = new QToolButton(toolBar);
     addFriendButton->setIcon(QIcon("://icons/user_add.png"));
     addFriendButton->setToolTip(tr("Add friend"));
-    connect(addFriendButton, &QToolButton::clicked, friendsWidget, &FriendsWidget::onAddFriendButtonClicked);
+    connect(addFriendButton, &QToolButton::clicked, this, &MainWindow::onAddFriendButtonClicked);
 
     QWidget *spacer = new QWidget(toolBar);
     spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -134,6 +135,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     coreThread->start(/*QThread::IdlePriority*/);
 
+    connect(this, &MainWindow::friendRequested, core, &Core::requestFriendship);
+
     connect(this, &MainWindow::friendRequestAccepted, core, &Core::acceptFriendRequest);
 
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
@@ -147,7 +150,6 @@ MainWindow::MainWindow(QWidget* parent)
     connect(pages, &PagesWidget::sendMessage, core, &Core::sendMessage);
     connect(pages, &PagesWidget::sendAction,  core, &Core::sendAction);
 
-    connect(friendsWidget, &FriendsWidget::friendRequested, core, &Core::requestFriendship);
     connect(friendsWidget, &FriendsWidget::friendRemoved, core, &Core::removeFriend);
 
     setCentralWidget(pages);
@@ -174,6 +176,15 @@ void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& m
 
     if (dialog.exec() == QDialog::Accepted) {
         emit friendRequestAccepted(userId);
+    }
+}
+
+void MainWindow::onAddFriendButtonClicked()
+{
+    AddFriendDialog dialog(this);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        emit friendRequested(dialog.getFriendAddress(), dialog.getMessage());
     }
 }
 
