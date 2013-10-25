@@ -55,12 +55,12 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     friendModel = new QStandardItemModel(this);
 
     friendProxyModel = new FriendProxyModel(this);
+    friendProxyModel->setFilterRole(FriendItemDelegate::UsernameRole);
     friendProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     friendProxyModel->setSourceModel(friendModel);
 
     friendView->setModel(friendProxyModel);
     connect(friendView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FriendsWidget::onFriendSelectionChanged);
-
 
     filterEdit = new FilterWidget(this);
     filterEdit->setPlaceholderText("Search");

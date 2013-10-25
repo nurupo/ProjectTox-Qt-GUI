@@ -33,7 +33,7 @@ public:
     EscLineEdit* lineEdit;
 
     void addWidget(QWidget* w);
-    
+
     void setText(const QString& text);
 
 private slots:
