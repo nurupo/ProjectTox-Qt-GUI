@@ -17,21 +17,6 @@
 #include "core.hpp"
 #include "Settings/settings.hpp"
 
-#ifdef WIN32
-    #ifndef WINVER
-        //Windows XP
-        #define WINVER 0x0501
-    #endif
-    #include <winsock2.h>
-    #include <windows.h>
-    #include <ws2tcpip.h>
-#else
-    #include <arpa/inet.h>
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netdb.h>
-#endif
-
 #include <QThread>
 #include <QTime>
 
@@ -195,46 +180,9 @@ void Core::bootstrapDht()
     const Settings& s = Settings::getInstance();
     QList<Settings::DhtServer> dhtServerList = s.getDhtServerList();
 
-    tox_IP_Port bootstrapIpPort;
     for (const Settings::DhtServer& dhtServer : dhtServerList) {
-        bootstrapIpPort.port = htons(dhtServer.port);
-        bootstrapIpPort.ip.i = resolveAddress(dhtServer.address.toLatin1().data());
-        if (bootstrapIpPort.ip.i == 0) {
-            continue;
-        }
-
-        tox_bootstrap(tox, bootstrapIpPort, CUserId(dhtServer.userId).data());
+       tox_bootstrap_from_address(tox, dhtServer.address.toLatin1().data(), 0, htons(dhtServer.port), CUserId(dhtServer.userId).data());
     }
-}
-
-uint32_t Core::resolveAddress(const char* address) const
-{
-    struct addrinfo* server = NULL;
-    struct addrinfo hints;
-    int rc;
-    uint32_t addr;
-
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET; // IPv4 only right now.
-    hints.ai_socktype = SOCK_DGRAM; // type of socket Tox uses.
-
-    rc = getaddrinfo(address, "echo", &hints, &server);
-
-    // Lookup failed.
-    if (rc != 0) {
-        return 0;
-    }
-
-    // IPv4 records only..
-    if (server->ai_family != AF_INET) {
-        freeaddrinfo(server);
-        return 0;
-    }
-
-    addr = ((struct sockaddr_in*)server->ai_addr)->sin_addr.s_addr;
-
-    freeaddrinfo(server);
-    return addr;
 }
 
 void Core::process()
@@ -262,7 +210,7 @@ void Core::checkConnection()
 
 void Core::start()
 {
-    tox = tox_new();
+    tox = tox_new(0);
 
     tox_callback_friendrequest(tox, onFriendRequest, this);
     tox_callback_friendmessage(tox, onFriendMessage, this);

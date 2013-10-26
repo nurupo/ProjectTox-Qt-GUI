@@ -141,7 +141,8 @@ SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.c \
     ../../submodules/ProjectTox-Core/toxcore/ping.c \
     ../../submodules/ProjectTox-Core/toxcore/util.c \
-    ../../submodules/ProjectTox-Core/toxcore/tox.c
+    ../../submodules/ProjectTox-Core/toxcore/tox.c \
+    ../../submodules/ProjectTox-Core/toxcore/group_chats.c
 
 HEADERS  += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.h \
@@ -154,7 +155,8 @@ HEADERS  += \
     ../../submodules/ProjectTox-Core/toxcore/ping.h \
     ../../submodules/ProjectTox-Core/toxcore/util.h \
     ../../submodules/ProjectTox-Core/toxcore/misc_tools.h \
-    ../../submodules/ProjectTox-Core/toxcore/tox.h
+    ../../submodules/ProjectTox-Core/toxcore/tox.h \
+    ../../submodules/ProjectTox-Core/toxcore/group_chats.h
 
 RESOURCES += \
     ../../resources/resources.qrc
