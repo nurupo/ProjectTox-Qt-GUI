@@ -132,6 +132,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::failedToAddFriend, this, &MainWindow::onFailedToAddFriend);
     connect(core, &Core::messageSentResult, pages, &PagesWidget::messageSentResult);
     connect(core, &Core::actionSentResult, pages, &PagesWidget::actionResult);
+    connect(core, &Core::friendStatusMessageChanged, friendsWidget, &FriendsWidget::setStatusMessage);
 
     coreThread->start(/*QThread::IdlePriority*/);
 

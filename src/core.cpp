@@ -280,6 +280,9 @@ void Core::start()
     CString cUsername(Settings::getInstance().getUsername());
     tox_setname(tox, cUsername.data(), cUsername.size());
 
+    CString cStatusMessage(Settings::getInstance().getStatusMessage());
+    tox_set_statusmessage(tox, cStatusMessage.data(), cStatusMessage.size());
+
     bootstrapDht();
 
     timer->setInterval(30);
