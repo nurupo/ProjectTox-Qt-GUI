@@ -64,7 +64,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->addWidget(friendItem);
     layout->addWidget(splitter);
     layout->setSpacing(2);
-    layout->setContentsMargins(0, 3, 2, 3);
+    layout->setContentsMargins(0, 0, 2, 3);
 }
 
 int ChatPageWidget::getFriendId() const
@@ -89,7 +89,11 @@ void ChatPageWidget::setStatus(Status newStatus)
     friendItem->setStatus(status);
     input->setDisabled(newStatus == Status::Offline);
     emoticonButton->setDisabled(newStatus == Status::Offline);
+}
 
+void ChatPageWidget::setStatusMessage(const QString& statusMessage)
+{
+    friendItem->setStatusMessage(statusMessage);
 }
 
 void ChatPageWidget::messageSentResult(const QString& message, int messageId)

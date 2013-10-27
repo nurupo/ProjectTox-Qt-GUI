@@ -133,6 +133,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::messageSentResult, pages, &PagesWidget::messageSentResult);
     connect(core, &Core::actionSentResult, pages, &PagesWidget::actionResult);
     connect(core, &Core::friendStatusMessageChanged, friendsWidget, &FriendsWidget::setStatusMessage);
+    connect(core, &Core::friendStatusMessageChanged, pages, &PagesWidget::statusMessageChanged);
 
     coreThread->start(/*QThread::IdlePriority*/);
 

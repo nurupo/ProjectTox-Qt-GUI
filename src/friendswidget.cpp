@@ -76,7 +76,6 @@ void FriendsWidget::addFriend(int friendId, const QString& userId)
     item->setData(userId, FriendItemDelegate::UserIdRole);
     item->setData(QString("User ID: %1").arg(userId), Qt::ToolTipRole);
     item->setData(friendId, FriendItemDelegate::FriendIdRole);
-    item->setData("A sample status message", FriendItemDelegate::StatusMessageRole);
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 
     emit friendAdded(friendId, userId);

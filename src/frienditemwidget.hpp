@@ -32,10 +32,12 @@ public:
 private:
     QLabel* statusLabel;
     ElideLabel* usernameLabel;
+    ElideLabel* statusMessageLabel;
 
 public slots:
     void setStatus(Status status);
     void setUsername(const QString& username);
+    void setStatusMessage(const QString& statusMessage);
 
 };
 

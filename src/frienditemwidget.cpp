@@ -17,7 +17,7 @@
 #include "frienditemwidget.hpp"
 
 #include <QHBoxLayout>
-#include <QDebug>
+#include <QVBoxLayout>
 
 FriendItemWidget::FriendItemWidget(QWidget* parent) :
     QWidget(parent)
@@ -30,13 +30,32 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     usernameLabel->setAlignment(Qt::AlignLeft);
     usernameLabel->setTextElide(true);
     usernameLabel->setTextElideMode(Qt::ElideRight);
+    usernameLabel->setShowToolTipOnElide(true);
     usernameLabel->setMinimumSize(10, 10);
-    //usernameLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    statusMessageLabel = new ElideLabel(this);
+    statusMessageLabel->setAlignment(Qt::AlignLeft);
+    statusMessageLabel->setTextElide(true);
+    statusMessageLabel->setTextElideMode(Qt::ElideRight);
+    statusMessageLabel->setShowToolTipOnElide(true);
+    statusMessageLabel->setMinimumSize(10, 10);
+    QPalette palette;
+    palette.setColor(QPalette::Foreground, Qt::gray);
+    statusMessageLabel->setPalette(palette);
+
+    QWidget* textWidget = new QWidget(this);
+
+    QVBoxLayout* textLayout = new QVBoxLayout(textWidget);
+    textLayout->setContentsMargins(0, 0, 0, 0);
+    textLayout->setSpacing(2);
+    textLayout->addWidget(usernameLabel, 0, Qt::AlignVCenter);
+    textLayout->addWidget(statusMessageLabel, 0, Qt::AlignVCenter);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 2, 0, 2);
+    layout->setContentsMargins(0, 2, 0, 0);
+    layout->setSpacing(2);
     layout->addWidget(statusLabel, 0, Qt::AlignVCenter);
-    layout->addWidget(usernameLabel, 0, Qt::AlignVCenter);
+    layout->addWidget(textWidget, 0, Qt::AlignVCenter);
 }
 
 void FriendItemWidget::setStatus(Status status)
@@ -47,4 +66,9 @@ void FriendItemWidget::setStatus(Status status)
 void FriendItemWidget::setUsername(const QString& username)
 {
     usernameLabel->setText(username);
+}
+
+void FriendItemWidget::setStatusMessage(const QString& statusMessage)
+{
+    statusMessageLabel->setText(statusMessage);
 }

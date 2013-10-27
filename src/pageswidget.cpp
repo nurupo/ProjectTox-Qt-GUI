@@ -72,6 +72,11 @@ void PagesWidget::statusChanged(int friendId, Status status)
     widget(friendId)->setStatus(status);
 }
 
+void PagesWidget::statusMessageChanged(int friendId, const QString& statusMessage)
+{
+    widget(friendId)->setStatusMessage(statusMessage);
+}
+
 void PagesWidget::onMessageSent(const QString& message)
 {
     ChatPageWidget* chatPage = static_cast<ChatPageWidget*>(sender());
