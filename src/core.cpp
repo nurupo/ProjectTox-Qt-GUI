@@ -212,6 +212,11 @@ void Core::start()
 {
     tox = tox_new(0);
 
+    if (tox == nullptr) {
+        emit failedToStart();
+        return;
+    }
+
     tox_callback_friendrequest(tox, onFriendRequest, this);
     tox_callback_friendmessage(tox, onFriendMessage, this);
     tox_callback_namechange(tox, onFriendNameChange, this);

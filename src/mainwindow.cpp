@@ -135,6 +135,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendStatusMessageChanged, friendsWidget, &FriendsWidget::setStatusMessage);
     connect(core, &Core::friendStatusMessageChanged, pages, &PagesWidget::statusMessageChanged);
 
+    connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
+
     coreThread->start(/*QThread::IdlePriority*/);
 
     connect(this, &MainWindow::friendRequested, core, &Core::requestFriendship);
@@ -214,6 +216,15 @@ void MainWindow::onFailedToAddFriend(const QString& userId)
     critical.setText(QString("Couldn't add friend with User ID\n\"%1\"").arg(userId));
     critical.setIcon(QMessageBox::Critical);
     critical.exec();
+}
+
+void MainWindow::onFailedToStartCore()
+{
+    QMessageBox critical(this);
+    critical.setText("If you see this message that means that something very bad has happened.\n\nYou could have reached a limit on how many instances of this program can be run on a single computer, or you could just run out of memory, or something else horrible has happened.\n\nWhichever is the case, the application will terminate after you close this message.");
+    critical.setIcon(QMessageBox::Critical);
+    critical.exec();
+    qApp->quit();
 }
 
 void MainWindow::onSettingsActionTriggered()

@@ -160,6 +160,8 @@ signals:
 
     void actionReceived(int friendId, const QString& acionMessage);
 
+    void failedToStart();
+
 };
 
 #endif // CORE_HPP
