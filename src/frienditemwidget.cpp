@@ -43,19 +43,24 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     palette.setColor(QPalette::Foreground, Qt::gray);
     statusMessageLabel->setPalette(palette);
 
-    QWidget* textWidget = new QWidget(this);
+    QWidget* statusWidget = new QWidget(this);
+    QVBoxLayout* statusLayout = new QVBoxLayout(statusWidget);
+    statusLayout->setContentsMargins(0, 4, 0, 0);
+    statusLayout->addWidget(statusLabel);
 
+    QWidget* textWidget = new QWidget(this);
     QVBoxLayout* textLayout = new QVBoxLayout(textWidget);
-    textLayout->setContentsMargins(0, 0, 0, 0);
+    textLayout->setContentsMargins(0, 2, 0, 0);
     textLayout->setSpacing(2);
-    textLayout->addWidget(usernameLabel, 0, Qt::AlignVCenter);
-    textLayout->addWidget(statusMessageLabel, 0, Qt::AlignVCenter);
+    textLayout->addWidget(usernameLabel);
+    textLayout->addWidget(statusMessageLabel);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 2, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(2);
-    layout->addWidget(statusLabel, 0, Qt::AlignVCenter);
-    layout->addWidget(textWidget, 0, Qt::AlignVCenter);
+    layout->addWidget(statusWidget, 0, Qt::AlignTop);
+    layout->addWidget(textWidget, 1, Qt::AlignVCenter);
+
 }
 
 void FriendItemWidget::setStatus(Status status)
@@ -71,4 +76,5 @@ void FriendItemWidget::setUsername(const QString& username)
 void FriendItemWidget::setStatusMessage(const QString& statusMessage)
 {
     statusMessageLabel->setText(statusMessage);
+    statusMessageLabel->setVisible(statusMessage.trimmed().length() != 0);
 }

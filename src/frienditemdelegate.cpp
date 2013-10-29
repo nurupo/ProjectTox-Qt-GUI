@@ -53,25 +53,33 @@ void FriendItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
     painter->drawPixmap(ICON_X_OFFSET, option.rect.top() + (hint.height() - statusIconSize.height())/2, statusIcon.pixmap(statusIconSize.width(), statusIconSize.height()));
 
+
     //Username
+    QString username = index.data(UsernameRole).toString();
+
+    QString statusMessage = index.data(StatusMessageRole).toString();
+    const bool statusMessageIsVisible = statusMessage.trimmed().length() != 0;
+
     QFont usernameFont = QApplication::font();
 
     static const int USERNAME_X_OFFSET = 2;
 
     painter->setFont(usernameFont);
-    QString elidedUsername = painter->fontMetrics().elidedText(index.data(UsernameRole).toString(), Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET));
-    painter->drawText(ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET, option.rect.top() + hint.height()/2 - painter->fontMetrics().descent(), elidedUsername);
+    QString elidedUsername = painter->fontMetrics().elidedText(username, Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET));
+    painter->drawText(ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET, option.rect.top() + hint.height()/2 + ((statusMessageIsVisible ? 0 : painter->fontMetrics().ascent()) - painter->fontMetrics().descent())/2, elidedUsername);
 
-    //Status Message
-    QFont statusMessageFont = QApplication::font();
+    if (statusMessageIsVisible) {
+        //Status Message
+        QFont statusMessageFont = QApplication::font();
 
-    painter->setPen(Qt::gray);
+        painter->setPen(Qt::gray);
 
-    static const int STATUSMESSAGE_X_OFFSET = USERNAME_X_OFFSET;
+        static const int STATUSMESSAGE_X_OFFSET = USERNAME_X_OFFSET;
 
-    painter->setFont(statusMessageFont);
-    QString elidedStatuseMessage = painter->fontMetrics().elidedText(index.data(StatusMessageRole).toString(), Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET));
-    painter->drawText(ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET, option.rect.top() + hint.height()/2 + painter->fontMetrics().ascent(), elidedStatuseMessage);
+        painter->setFont(statusMessageFont);
+        QString elidedStatuseMessage = painter->fontMetrics().elidedText(statusMessage, Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET));
+        painter->drawText(ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET, option.rect.top() + hint.height()/2 + painter->fontMetrics().ascent(), elidedStatuseMessage);
+    }
 
     painter->restore();
 }
