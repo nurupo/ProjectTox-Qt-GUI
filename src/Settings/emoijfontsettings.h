@@ -14,45 +14,38 @@
     See the COPYING file for more details.
 */
 
-#ifndef GUISETTINGSPAGE_HPP
-#define GUISETTINGSPAGE_HPP
+#ifndef EMOIJFONTSETTINGS_H
+#define EMOIJFONTSETTINGS_H
 
-#include "abstractsettingspage.hpp"
+#include <QDialog>
 
 class QGroupBox;
-class QCheckBox;
+class QFontComboBox;
 class QComboBox;
 class QLabel;
-class QToolButton;
-class EmoijFontSettings;
 
-class GuiSettingsPage : public AbstractSettingsPage
+class EmoijFontSettings : public QDialog
 {
     Q_OBJECT
 public:
-    GuiSettingsPage(QWidget *parent);
+    explicit EmoijFontSettings(QWidget *parent = 0);
 
-    void buildGui();
-    void setGui();
-    void applyChanges();
-    
+    bool    isCustomEmoijFont();
+    void    setCustomEmoijFont(bool x);
+    QString getEmoijFont();
+    void    setEmoijFont(const QString &x);
+    int     getEmoijSize();
+    void    setEmoijSize(int x);
+
 private slots:
-    void updateSmileypackDetails(int index);
-
+    void updatePreview();
+    void resetToDefault();
+    
 private:
-    QGroupBox* buildAnimationGroup();
-    QGroupBox* buildSmileypackGroup();
-
-    void searchSmileyPacks();
-
-
-    EmoijFontSettings *emoijSettings;
-    QCheckBox* enableAnimationCheckbox;
-
-    QComboBox* smileypackCombobox;
-    QToolButton *emoijButton;
-    QLabel*    smileypackDescLabel;
+    QGroupBox *selectGroup;
+    QFontComboBox *fontCombobox;
+    QComboBox *sizeComboBox;
+    QLabel    *previewLabel;
 };
 
-
-#endif // GUISETTINGSPAGE_HPP
+#endif // EMOIJFONTSETTINGS_H

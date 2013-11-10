@@ -16,9 +16,11 @@
 
 #include "settings.hpp"
 #include "settingsdialog.hpp"
+#include "smileypack.h"
 
 #include <QFile>
 #include <QSettings>
+#include <QDir>
 
 const QString Settings::FILENAME = "settings.ini";
 
@@ -93,6 +95,10 @@ void Settings::load()
 
     s.beginGroup("GUI");
         enableSmothAnimation = s.value("smothAnimation", true).toBool();
+        smileyPack = s.value("smileyPack").toByteArray();
+        customEmoijFont = s.value("customEmoijFont", false).toBool();
+        emoijFont = s.value("emoijFont", "DejaVu Sans").toString();
+        emoijSize = s.value("emoijSize", 12).toInt();
     s.endGroup();
 
     loaded = true;
@@ -141,6 +147,10 @@ void Settings::save()
 
     s.beginGroup("GUI");
         s.setValue("smothAnimation", enableSmothAnimation);
+        s.setValue("smileyPack", smileyPack);
+        s.setValue("customEmoijFont", customEmoijFont);
+        s.setValue("emoijFont", emoijFont);
+        s.setValue("emoijSize", emoijSize);
     s.endGroup();
 }
 
@@ -229,4 +239,48 @@ bool Settings::isAnimationEnabled() const
 void Settings::setAnimationEnabled(bool newValue)
 {
     enableSmothAnimation = newValue;
+}
+
+QByteArray Settings::getSmileyPack() const
+{
+    return smileyPack;
+}
+
+void Settings::setSmileyPack(const QByteArray &value)
+{
+    smileyPack = value;
+    emit smileyPackChanged();
+}
+
+bool Settings::isCurstomEmoijFont() const
+{
+    return customEmoijFont;
+}
+
+void Settings::setCurstomEmoijFont(bool value)
+{
+    customEmoijFont = value;
+    emit emojFontChanged();
+}
+
+int Settings::getEmoijSize() const
+{
+    return emoijSize;
+}
+
+void Settings::setEmoijSize(int value)
+{
+    emoijSize = value;
+    emit emojFontChanged();
+}
+
+QString Settings::getEmoijFont() const
+{
+    return emoijFont;
+}
+
+void Settings::setEmoijFont(const QString &value)
+{
+    emoijFont = value;
+    emit emojFontChanged();
 }

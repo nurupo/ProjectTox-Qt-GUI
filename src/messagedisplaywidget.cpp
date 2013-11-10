@@ -25,11 +25,12 @@
 #include <QFrame>
 #include <QDebug>
 #include <QPropertyAnimation>
+#include <QFontDatabase>
 
 #include "Settings/settings.hpp"
+#include "smileypack.h"
 #include "elidelabel.hpp"
 #include "messagelabel.hpp"
-#include "emoticonmenu.hpp"
 #include "opacitywidget.hpp"
 
 MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
@@ -127,7 +128,7 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
 
     MessageLabel *messageLabel = new MessageLabel(widget);
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
-    QString messageText = EmoticonMenu::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>");
+    QString messageText = Smileypack::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>");
     // Action
     if(messageId < -1) {
         QPalette actionPal;

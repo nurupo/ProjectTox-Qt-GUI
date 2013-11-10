@@ -59,6 +59,18 @@ public:
     bool isAnimationEnabled() const;
     void setAnimationEnabled(bool newValue);
 
+    QByteArray getSmileyPack() const;
+    void setSmileyPack(const QByteArray &value);
+
+    bool isCurstomEmoijFont() const;
+    void setCurstomEmoijFont(bool value);
+
+    QString getEmoijFont() const;
+    void setEmoijFont(const QString &value);
+
+    int getEmoijSize() const;
+    void setEmoijSize(int value);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -91,12 +103,17 @@ private:
 
     // GUI
     bool enableSmothAnimation;
+    QByteArray smileyPack;
+    bool customEmoijFont;
+    QString emoijFont;
+    int     emoijSize;
 
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
-
+    void smileyPackChanged();
+    void emojFontChanged();
 };
 
 #endif // SETTINGS_HPP

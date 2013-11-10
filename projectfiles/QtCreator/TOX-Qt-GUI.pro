@@ -86,6 +86,8 @@ SOURCES += \
     ../../src/opacitywidget.cpp \
     ../../src/customhintwidget.cpp \
     ../../src/Settings/guisettingspage.cpp \
+    ../../src/smileypack.cpp \
+    ../../src/Settings/emoijfontsettings.cpp \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/clickablelabel.cpp \
@@ -126,6 +128,8 @@ HEADERS  += \
     ../../src/opacitywidget.hpp \
     ../../src/customhintwidget.hpp \
     ../../src/Settings/guisettingspage.hpp \
+    ../../src/smileypack.h \
+    ../../src/Settings/emoijfontsettings.h \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/clickablelabel.hpp \

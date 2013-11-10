@@ -22,8 +22,12 @@
 #include <QTextDocumentFragment>
 #include <QApplication>
 #include <QClipboard>
+#include <QIcon>
+#include <QAction>
+#include <QMenu>
 
-#include "emoticonmenu.hpp"
+#include "smileypack.h"
+#include "Settings/settings.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
@@ -59,9 +63,9 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
         if (toPlainText().startsWith("/me ") ) {
             QString html = toHtml();
             html.remove(html.indexOf("/me "), 4);
-            emit sendAction(EmoticonMenu::desmile(html));
+            emit sendAction(Smileypack::desmile(html));
         } else {
-            emit sendMessage(EmoticonMenu::desmile(toHtml()));
+            emit sendMessage(Smileypack::desmile(toHtml()));
         }
         clear();
 
@@ -110,7 +114,7 @@ void InputTextWidget::copyPlainText()
     QTextDocumentFragment selection = textCursor().selection();
     if(!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
+        clipboard->setText(Smileypack::desmile(selection.toHtml()));
     }
 }
 
@@ -127,7 +131,7 @@ void InputTextWidget::cutPlainText()
     QTextDocumentFragment selection = textCursor().selection();
     if(!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(EmoticonMenu::desmile(selection.toHtml()));
+        clipboard->setText(Smileypack::desmile(selection.toHtml()));
         textCursor().removeSelectedText();
     }
 }
