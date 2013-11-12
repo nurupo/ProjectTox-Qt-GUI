@@ -14,7 +14,7 @@
     See the COPYING file for more details.
 */
 
-#include "smileypack.h"
+#include "smileypack.hpp"
 
 #include <QTextDocument>
 #include <QRegularExpression>
@@ -28,7 +28,7 @@
 Smileypack::Smileypack(QObject *parent) :
     QObject(parent)
 {
-    emoij = false;
+    emoji = false;
 }
 
 Smileypack::Smileypack(const QByteArray &savedData, QObject *parent) :
@@ -40,24 +40,24 @@ Smileypack::Smileypack(const QByteArray &savedData, QObject *parent) :
 void Smileypack::operator =(const Smileypack &other)
 {
     list = other.getList();
-    emoij = other.isEmoij();
+    emoji = other.isEmoji();
     name = other.name;
-    author= other.author;
-    description= other.description;
-    version= other.version;
-    website= other.website;
-    icon= other.icon;
+    author = other.author;
+    description = other.description;
+    version = other.version;
+    website = other.website;
+    icon = other.icon;
 }
 
-/*! Replace all text smileys by images or emoij */
-QString Smileypack::smile(QString text)
+/*! Replace all text smileys by images or emoji */
+QString Smileypack::smilify(QString text)
 {
     Settings &settings = Settings::getInstance();
     Smileypack pack(settings.getSmileyPack());
 
 
-    if (!pack.isEmoij()) {
-        text = Smileypack::demoij(text);
+    if (!pack.isEmoji()) {
+        text = Smileypack::deemojify(text);
     }
 
     // whlie smileys found to replace
@@ -103,9 +103,9 @@ QString Smileypack::smile(QString text)
             }
 
             // Replace found smiley
-            if (pack.isEmoij()) {
-                /*if (settings.isCurstomEmoijFont()) {
-                    repRep = QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmoijFont(), QString::number(settings.getEmoijSize()), repRep);
+            if (pack.isEmoji()) {
+                /*if (settings.isCurstomEmojiFont()) {
+                    repRep = QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmojiFont(), QString::number(settings.getEmojiSize()), repRep);
                 }*/
                 text.replace(repPos, repSrt.count(), repRep);
             }
@@ -117,18 +117,18 @@ QString Smileypack::smile(QString text)
     } while (found);
 
 
-    if (settings.isCurstomEmoijFont() && pack.isEmoij()) {
-        text = Smileypack::resizeEmoij(text);
+    if (settings.isCurstomEmojiFont() && pack.isEmoji()) {
+        text = Smileypack::resizeEmoji(text);
     }
 
     return text;
 }
 
-QString Smileypack::desmile(QString htmlText)
+QString Smileypack::desmilify(QString htmlText)
 {
     Smileypack pack(Settings::getInstance().getSmileyPack());
-    // Cancel if emoij
-    if(pack.isEmoij()) {
+    // Cancel if emoji
+    if (pack.isEmoji()) {
         QTextDocument doc;
         doc.setHtml(htmlText);
         return doc.toPlainText();
@@ -160,36 +160,38 @@ QString Smileypack::desmile(QString htmlText)
     return doc.toPlainText();
 }
 
-/*! Replace Emoij by text strings */
-QString Smileypack::demoij(QString text)
+/*! Replace Emoji by text strings */
+QString Smileypack::deemojify(QString text)
 {
-    for (const auto& pair : Smileypack::emoijList()) {
+    for (const auto& pair : Smileypack::emojiList()) {
         const QStringList& textSmilies = pair.second;
         text.replace(pair.first, textSmilies.first().toHtmlEscaped());
     }
     return text;
 }
 
-QString Smileypack::resizeEmoij(QString text)
+QString Smileypack::resizeEmoji(QString text)
 {
     Settings &settings = Settings::getInstance();
 
-    // All Unicode 6.2 emoij "Emoticons" and a some of "Miscellaneous Symbols and Pictographs"
+    // All Unicode 6.2 emoji "Emoticons" and a some of "Miscellaneous Symbols and Pictographs"
     // TODO find a regular expression for that
-    QStringList foundEmoijs({"😀","😁","😂","😃","😄","😅","😆","😇","😈","😉","😊","😋","😌","😍","😎","😏","😐","😑","😒","😓","😔","😕","😖","😗","😘","😙","😚","😛","😜","😝","😞","😟","😠","😡","😢","😣","😤","😥","😦","😧","😨","😩","😪","😫","😬","😭","😮","😯","😰","😱","😲","😳","😴","😵","😶","😷","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙅","🙆","🙇","🙈","🙉","🙊","🙋","🙌","🙍","🙎","🙏","☺","☹","⚇","🐱","♥","☔","☀","♫","☕","★"});
+    // nurupo: that will do `text.replace(QRegularExpression("([\\x{1F600}-\\x{1F64F}])"), QString("<span style=\"font-family: '%1'; font-size: %2pt;\">\\1</span>").arg(settings.getEmojiFont(), QString::number(settings.getEmojiSize())));`
+    //         except that you used symbols outside the Emoticons range (1F600-1F64F), so we need count for the too
+    QStringList foundEmojis({"😀","😁","😂","😃","😄","😅","😆","😇","😈","😉","😊","😋","😌","😍","😎","😏","😐","😑","😒","😓","😔","😕","😖","😗","😘","😙","😚","😛","😜","😝","😞","😟","😠","😡","😢","😣","😤","😥","😦","😧","😨","😩","😪","😫","😬","😭","😮","😯","😰","😱","😲","😳","😴","😵","😶","😷","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙅","🙆","🙇","🙈","🙉","🙊","🙋","🙌","🙍","🙎","🙏","☺","☹","⚇","🐱","♥","☔","☀","♫","☕","★"});
 
-    for(QString emo : foundEmoijs) {
-        text.replace(emo, QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmoijFont(), QString::number(settings.getEmoijSize()), emo));
+    for(QString emo : foundEmojis) {
+        text.replace(emo, QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmojiFontFamily(), QString::number(settings.getEmojiFontPointSize()), emo));
     }
 
     return text;
 }
 
-const Smileypack::SmileyList Smileypack::emoijList()
+const Smileypack::SmileyList Smileypack::emojiList()
 {
     static const SmileyList tmpList =
     {
-        // Skype Smileys
+        // Smileys
         {"☺", {":)",  ":-)"}},
         {"😞", {":(",  ":-("}},
         {"😄", {":D",  ":-D"}},
@@ -272,7 +274,7 @@ bool Smileypack::parseFile(const QString &filePath)
 
     // Clear old data
     list.clear();
-    emoij = false;
+    emoji = false;
     name.clear();
     author.clear();
     description.clear();
@@ -355,7 +357,7 @@ const QString &Smileypack::packDir()
 
 QDataStream &operator<<(QDataStream &out, const Smileypack &pack)
 {
-    out << pack.getThemeFile() << pack.getName() << pack.getAuthor() << pack.getDescription() << pack.getVersion() << pack.getWebsite() << pack.getIcon() << pack.isEmoij();
+    out << pack.getThemeFile() << pack.getName() << pack.getAuthor() << pack.getDescription() << pack.getVersion() << pack.getWebsite() << pack.getIcon() << pack.isEmoji();
     out << pack.getList();
     return out;
 }
@@ -369,9 +371,9 @@ QDataStream &operator >>(QDataStream &in, Smileypack &pack)
     QString version;
     QString website;
     QString icon;
-    bool    emoij;
+    bool    emoji;
     Smileypack::SmileyList list;
-    in >> themefile >> name >> author >> desc >> version >> website >> icon >> emoij >> list;
+    in >> themefile >> name >> author >> desc >> version >> website >> icon >> emoji >> list;
 
     pack.setThemeFile(themefile);
     pack.setName(name);
@@ -380,7 +382,7 @@ QDataStream &operator >>(QDataStream &in, Smileypack &pack)
     pack.setVersion(version);
     pack.setWebsite(website);
     pack.setIcon(icon);
-    pack.setEmoij(emoij);
+    pack.setEmoji(emoji);
     pack.setList(list);
     return in;
 }

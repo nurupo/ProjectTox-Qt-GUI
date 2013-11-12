@@ -16,11 +16,12 @@
 
 #include "settings.hpp"
 #include "settingsdialog.hpp"
-#include "smileypack.h"
+#include "smileypack.hpp"
 
 #include <QFile>
 #include <QSettings>
 #include <QDir>
+#include <QApplication>
 
 const QString Settings::FILENAME = "settings.ini";
 
@@ -94,11 +95,11 @@ void Settings::load()
     s.endGroup();
 
     s.beginGroup("GUI");
-        enableSmothAnimation = s.value("smothAnimation", true).toBool();
+        enableSmoothAnimation = s.value("smoothAnimation", true).toBool();
         smileyPack = s.value("smileyPack").toByteArray();
-        customEmoijFont = s.value("customEmoijFont", false).toBool();
-        emoijFont = s.value("emoijFont", "DejaVu Sans").toString();
-        emoijSize = s.value("emoijSize", 12).toInt();
+        customEmojiFont = s.value("customEmojiFont", true).toBool();
+        emojiFontFamily = s.value("emojiFontFamily", "DejaVu Sans").toString();
+        emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
     s.endGroup();
 
     loaded = true;
@@ -146,11 +147,11 @@ void Settings::save()
     s.endGroup();
 
     s.beginGroup("GUI");
-        s.setValue("smothAnimation", enableSmothAnimation);
+        s.setValue("smoothAnimation", enableSmoothAnimation);
         s.setValue("smileyPack", smileyPack);
-        s.setValue("customEmoijFont", customEmoijFont);
-        s.setValue("emoijFont", emoijFont);
-        s.setValue("emoijSize", emoijSize);
+        s.setValue("customEmojiFont", customEmojiFont);
+        s.setValue("emojiFontFamily", emojiFontFamily);
+        s.setValue("emojiFontPointSize", emojiFontPointSize);
     s.endGroup();
 }
 
@@ -233,12 +234,12 @@ void Settings::loadWindow(QMainWindow* window) const
 
 bool Settings::isAnimationEnabled() const
 {
-    return enableSmothAnimation;
+    return enableSmoothAnimation;
 }
 
 void Settings::setAnimationEnabled(bool newValue)
 {
-    enableSmothAnimation = newValue;
+    enableSmoothAnimation = newValue;
 }
 
 QByteArray Settings::getSmileyPack() const
@@ -252,35 +253,35 @@ void Settings::setSmileyPack(const QByteArray &value)
     emit smileyPackChanged();
 }
 
-bool Settings::isCurstomEmoijFont() const
+bool Settings::isCurstomEmojiFont() const
 {
-    return customEmoijFont;
+    return customEmojiFont;
 }
 
-void Settings::setCurstomEmoijFont(bool value)
+void Settings::setCurstomEmojiFont(bool value)
 {
-    customEmoijFont = value;
-    emit emojFontChanged();
+    customEmojiFont = value;
+    emit emojiFontChanged();
 }
 
-int Settings::getEmoijSize() const
+int Settings::getEmojiFontPointSize() const
 {
-    return emoijSize;
+    return emojiFontPointSize;
 }
 
-void Settings::setEmoijSize(int value)
+void Settings::setEmojiFontPointSize(int value)
 {
-    emoijSize = value;
-    emit emojFontChanged();
+    emojiFontPointSize = value;
+    emit emojiFontChanged();
 }
 
-QString Settings::getEmoijFont() const
+QString Settings::getEmojiFontFamily() const
 {
-    return emoijFont;
+    return emojiFontFamily;
 }
 
-void Settings::setEmoijFont(const QString &value)
+void Settings::setEmojiFontFamily(const QString &value)
 {
-    emoijFont = value;
-    emit emojFontChanged();
+    emojiFontFamily = value;
+    emit emojiFontChanged();
 }

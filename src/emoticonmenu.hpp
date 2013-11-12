@@ -35,7 +35,7 @@ public slots:
     void updateEmoticons();
 
 private:
-    void addEmoticon(const QString &imgPath, const QStringList &texts, bool isEmoij = false);
+    void addEmoticon(const QString &imgPath, const QStringList &texts, bool isEmoji = false);
 
     QGridLayout *layout;
     QWidgetAction *action;

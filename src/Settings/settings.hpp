@@ -62,14 +62,14 @@ public:
     QByteArray getSmileyPack() const;
     void setSmileyPack(const QByteArray &value);
 
-    bool isCurstomEmoijFont() const;
-    void setCurstomEmoijFont(bool value);
+    bool isCurstomEmojiFont() const;
+    void setCurstomEmojiFont(bool value);
 
-    QString getEmoijFont() const;
-    void setEmoijFont(const QString &value);
+    QString getEmojiFontFamily() const;
+    void setEmojiFontFamily(const QString &value);
 
-    int getEmoijSize() const;
-    void setEmoijSize(int value);
+    int getEmojiFontPointSize() const;
+    void setEmojiFontPointSize(int value);
 
 private:
     Settings();
@@ -102,18 +102,18 @@ private:
     QHash<QString, WindowSettings> windowSettings;
 
     // GUI
-    bool enableSmothAnimation;
+    bool enableSmoothAnimation;
     QByteArray smileyPack;
-    bool customEmoijFont;
-    QString emoijFont;
-    int     emoijSize;
+    bool customEmojiFont;
+    QString emojiFontFamily;
+    int     emojiFontPointSize;
 
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
     void smileyPackChanged();
-    void emojFontChanged();
+    void emojiFontChanged();
 };
 
 #endif // SETTINGS_HPP

@@ -14,8 +14,8 @@
     See the COPYING file for more details.
 */
 
-#ifndef SMILEYPACK_H
-#define SMILEYPACK_H
+#ifndef SMILEYPACK_HPP
+#define SMILEYPACK_HPP
 
 #include <QObject>
 #include <QPair>
@@ -53,15 +53,15 @@ public:
     void           setIcon(const QString &x)        { icon = x;           }
     const SmileyList &getList() const               { return list;        }
     void              setList(const SmileyList &x)  { list = x;           }
-    bool  isEmoij() const                           { return emoij;       }
-    void setEmoij(bool x)                           { emoij = x;          }
+    bool  isEmoji() const                           { return emoji;       }
+    void setEmoji(bool x)                           { emoji = x;          }
 
     static const QString& packDir();
-    static QString smile(QString text);
-    static QString desmile(QString htmlText);
-    static QString demoij(QString text);
-    static QString resizeEmoij(QString text);
-    static const SmileyList emoijList();
+    static QString smilify(QString text);
+    static QString desmilify(QString htmlText);
+    static QString deemojify(QString text);
+    static QString resizeEmoji(QString text);
+    static const SmileyList emojiList();
     static const SmileyList defaultList();
 
 private:
@@ -73,7 +73,7 @@ private:
     QString website;
     QString icon;
     SmileyList list;
-    bool emoij;
+    bool emoji;
 
     // Parser functions
     enum ParserStates{
@@ -86,4 +86,4 @@ private:
 QDataStream &operator<<(QDataStream &out, const Smileypack &pack);
 QDataStream &operator>>(QDataStream &in, Smileypack &pack);
 
-#endif // SMILEYPACK_H
+#endif // SMILEYPACK_HPP

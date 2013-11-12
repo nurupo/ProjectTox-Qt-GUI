@@ -14,38 +14,41 @@
     See the COPYING file for more details.
 */
 
-#ifndef EMOIJFONTSETTINGS_H
-#define EMOIJFONTSETTINGS_H
+#ifndef EMOJIFONTSETTINGSDIALOG_HPP
+#define EMOJIFONTSETTINGSDIALOG_HPP
 
 #include <QDialog>
 
+class EmojiFontComboBox;
 class QGroupBox;
-class QFontComboBox;
-class QComboBox;
 class QLabel;
+class QSpinBox;
 
-class EmoijFontSettings : public QDialog
+class EmojiFontSettingsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit EmoijFontSettings(QWidget *parent = 0);
+    explicit EmojiFontSettingsDialog(QWidget *parent = 0);
 
-    bool    isCustomEmoijFont();
-    void    setCustomEmoijFont(bool x);
-    QString getEmoijFont();
-    void    setEmoijFont(const QString &x);
-    int     getEmoijSize();
-    void    setEmoijSize(int x);
+    bool    useCustomFont() const;
+    void    setUseCustomFont(bool use);
+    QString getFontFamily() const;
+    void    setFontFamily(QString fontFamily);
+    int     getFontPointSize() const;
+    void    setFontPointSize(int pointSize);
+    
+private:
+    QGroupBox *selectGroup;
+    EmojiFontComboBox *fontComboBox;
+    QSpinBox *sizeComboBox;
+    QLabel   *previewLabel;
+    QString  defaultFontFamily;
+    int      defaultFontPointSize;
 
 private slots:
     void updatePreview();
     void resetToDefault();
-    
-private:
-    QGroupBox *selectGroup;
-    QFontComboBox *fontCombobox;
-    QComboBox *sizeComboBox;
-    QLabel    *previewLabel;
+
 };
 
-#endif // EMOIJFONTSETTINGS_H
+#endif // EMOJIFONTSETTINGSDIALOG_HPP

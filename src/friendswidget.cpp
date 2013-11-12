@@ -20,7 +20,6 @@
 
 #include <QAction>
 #include <QClipboard>
-#include <QDebug>
 #include <QGuiApplication>
 #include <QHeaderView>
 #include <QVBoxLayout>

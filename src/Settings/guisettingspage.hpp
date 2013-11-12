@@ -24,7 +24,7 @@ class QCheckBox;
 class QComboBox;
 class QLabel;
 class QToolButton;
-class EmoijFontSettings;
+class EmojiFontSettingsDialog;
 
 class GuiSettingsPage : public AbstractSettingsPage
 {
@@ -46,11 +46,11 @@ private:
     void searchSmileyPacks();
 
 
-    EmoijFontSettings *emoijSettings;
+    EmojiFontSettingsDialog *emojiSettings;
     QCheckBox* enableAnimationCheckbox;
 
     QComboBox* smileypackCombobox;
-    QToolButton *emoijButton;
+    QToolButton *emojiButton;
     QLabel*    smileypackDescLabel;
 };
 

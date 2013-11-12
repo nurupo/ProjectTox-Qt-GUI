@@ -23,7 +23,6 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QCheckBox>
-#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
@@ -33,8 +32,8 @@
 #include <QLabel>
 #include <QToolButton>
 
-#include "smileypack.h"
-#include "emoijfontsettings.h"
+#include "smileypack.hpp"
+#include "emojifontsettingsdialog.hpp"
 
 GuiSettingsPage::GuiSettingsPage(QWidget *parent) :
     AbstractSettingsPage(parent)
@@ -55,18 +54,18 @@ void GuiSettingsPage::setGui()
     const Settings& settings = Settings::getInstance();
     enableAnimationCheckbox->setChecked(settings.isAnimationEnabled());
 
-    emoijSettings->setCustomEmoijFont(settings.isCurstomEmoijFont());
-    emoijSettings->setEmoijFont(settings.getEmoijFont());
-    emoijSettings->setEmoijSize(settings.getEmoijSize());
+    emojiSettings->setUseCustomFont(settings.isCurstomEmojiFont());
+    emojiSettings->setFontFamily(settings.getEmojiFontFamily());
+    emojiSettings->setFontPointSize(settings.getEmojiFontPointSize());
 
-    // Insert Emoij pack
-    Smileypack emoijPack;
-    emoijPack.setName("Emoij");
-    emoijPack.setAuthor("Unicode 6.1");
-    emoijPack.setDescription("Emoij is a Unicode block containing graphic representations of faces, which are often associated with classic emoticons.");
-    emoijPack.setList(Smileypack::emoijList());
-    emoijPack.setEmoij(true);
-    smileypackCombobox->addItem("☺ "+emoijPack.getName(), emoijPack.save());
+    // Insert Emoji pack
+    Smileypack emojiPack;
+    emojiPack.setName("Emoji");
+    emojiPack.setAuthor("Unicode 6.1");
+    emojiPack.setDescription("Emoji is a Unicode block containing graphic representations of faces, which are often associated with classic emoticons.");
+    emojiPack.setList(Smileypack::emojiList());
+    emojiPack.setEmoji(true);
+    smileypackCombobox->addItem("☺ "+emojiPack.getName(), emojiPack.save());
 
     // Insert Default pack
     Smileypack defaultPack;
@@ -94,14 +93,14 @@ void GuiSettingsPage::applyChanges()
     settings.setAnimationEnabled(enableAnimationCheckbox->isChecked());
 
     settings.setSmileyPack(smileypackCombobox->itemData(smileypackCombobox->currentIndex()).toByteArray());
-    settings.setCurstomEmoijFont(emoijSettings->isCustomEmoijFont());
-    settings.setEmoijFont(emoijSettings->getEmoijFont());
-    settings.setEmoijSize(emoijSettings->getEmoijSize());
+    settings.setCurstomEmojiFont(emojiSettings->useCustomFont());
+    settings.setEmojiFontFamily(emojiSettings->getFontFamily());
+    settings.setEmojiFontPointSize(emojiSettings->getFontPointSize());
 }
 
 QGroupBox *GuiSettingsPage::buildAnimationGroup()
 {
-    QGroupBox *group = new QGroupBox(tr("Smoth animation"), this);
+    QGroupBox *group = new QGroupBox(tr("Smooth animation"), this);
     QVBoxLayout* layout = new QVBoxLayout(group);
     enableAnimationCheckbox = new QCheckBox(tr("Enable animation"), group);
 
@@ -116,14 +115,14 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
     smileypackCombobox = new QComboBox(group);
     connect(smileypackCombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSmileypackDetails(int)));
 
-    emoijSettings = new EmoijFontSettings(group);
-    emoijButton = new QToolButton(group);
-    emoijButton->setText("...");
-    connect(emoijButton, &QToolButton::clicked, emoijSettings, &EmoijFontSettings::exec);
+    emojiSettings = new EmojiFontSettingsDialog(group);
+    emojiButton = new QToolButton(group);
+    emojiButton->setText("...");
+    connect(emojiButton, &QToolButton::clicked, emojiSettings, &EmojiFontSettingsDialog::exec);
 
     QHBoxLayout *selectLayout = new QHBoxLayout;
     selectLayout->addWidget(smileypackCombobox);
-    selectLayout->addWidget(emoijButton);
+    selectLayout->addWidget(emojiButton);
 
     smileypackDescLabel = new QLabel(group);
     smileypackDescLabel->setWordWrap(true);
@@ -181,11 +180,11 @@ void GuiSettingsPage::updateSmileypackDetails(int index)
     QString desc = tr("<b>%1</b>%2 by %3<br>\"<i>%4</i>\"%5").arg(pack.getName(), version, pack.getAuthor(), pack.getDescription(), website);
     smileypackDescLabel->setText(desc);
 
-    if (pack.isEmoij()) {
-        emoijButton->setVisible(true);
+    if (pack.isEmoji()) {
+        emojiButton->setVisible(true);
 
     }
     else {
-        emoijButton->setVisible(false);
+        emojiButton->setVisible(false);
     }
 }

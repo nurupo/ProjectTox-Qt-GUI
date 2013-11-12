@@ -25,7 +25,6 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QDebug>
 
 ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)

@@ -19,7 +19,6 @@
 #include "frienditemdelegate.hpp"
 
 #include <QModelIndex>
-#include <QDebug>
 
 FriendProxyModel::FriendProxyModel(QObject* parent) :
     QSortFilterProxyModel(parent)

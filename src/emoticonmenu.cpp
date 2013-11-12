@@ -20,7 +20,7 @@
 #include <QToolButton>
 #include <QWidgetAction>
 
-#include "smileypack.h"
+#include "smileypack.hpp"
 #include "Settings/settings.hpp"
 
 EmoticonMenu::EmoticonMenu(QWidget *parent) :
@@ -32,7 +32,7 @@ EmoticonMenu::EmoticonMenu(QWidget *parent) :
     updateEmoticons();
 
     connect(&Settings::getInstance(), &Settings::smileyPackChanged, this, &EmoticonMenu::updateEmoticons);
-    connect(&Settings::getInstance(), &Settings::emojFontChanged, this, &EmoticonMenu::updateEmoticons);
+    connect(&Settings::getInstance(), &Settings::emojiFontChanged, this, &EmoticonMenu::updateEmoticons);
 }
 
 void EmoticonMenu::updateEmoticons()
@@ -54,21 +54,21 @@ void EmoticonMenu::updateEmoticons()
     // Add new pack
     Smileypack pack(Settings::getInstance().getSmileyPack());
     for (const auto& pair : pack.getList()) {
-        addEmoticon(pair.first, pair.second, pack.isEmoij());
+        addEmoticon(pair.first, pair.second, pack.isEmoji());
     }
 }
 
-void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts, bool isEmoij)
+void EmoticonMenu::addEmoticon(const QString &imgPath, const QStringList &texts, bool isEmoji)
 {
     Settings &settings = Settings::getInstance();
 
     QToolButton *button = new QToolButton(this);
-    if (isEmoij) {
+    if (isEmoji) {
         QFont font;
         font.setPixelSize(16);
-        if (settings.isCurstomEmoijFont()) {
-            font.setFamily(settings.getEmoijFont());
-            button->setProperty("smiley", Smileypack::resizeEmoij(imgPath));
+        if (settings.isCurstomEmojiFont()) {
+            font.setFamily(settings.getEmojiFontFamily());
+            button->setProperty("smiley", Smileypack::resizeEmoji(imgPath));
         } else {
             button->setProperty("smiley", imgPath);
         }

@@ -23,12 +23,11 @@
 #include <QScrollBar>
 #include <QRegularExpression>
 #include <QFrame>
-#include <QDebug>
 #include <QPropertyAnimation>
 #include <QFontDatabase>
 
 #include "Settings/settings.hpp"
-#include "smileypack.h"
+#include "smileypack.hpp"
 #include "elidelabel.hpp"
 #include "messagelabel.hpp"
 #include "opacitywidget.hpp"
@@ -128,7 +127,7 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
 
     MessageLabel *messageLabel = new MessageLabel(widget);
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
-    QString messageText = Smileypack::smile(urlify(message.toHtmlEscaped())).replace('\n', "<br>");
+    QString messageText = Smileypack::smilify(urlify(message.toHtmlEscaped())).replace('\n', "<br>");
     // Action
     if(messageId < -1) {
         QPalette actionPal;

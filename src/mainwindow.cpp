@@ -34,7 +34,6 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QFontDatabase>
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
