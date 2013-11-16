@@ -33,9 +33,6 @@ private:
 
     void createMainWindow();
 
-private slots:
-    void onDhtDialogAccepted();
-
 };
 
 #endif // STARTER_HPP

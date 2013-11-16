@@ -20,6 +20,7 @@
 Starter::Starter(QObject* parent) :
     QObject(parent), mainWindow(nullptr)
 {
+    // place a login dialog here
     createMainWindow();
 }
 
@@ -28,11 +29,6 @@ Starter::~Starter()
     if (mainWindow) {
         delete mainWindow;
     }
-}
-
-void Starter::onDhtDialogAccepted()
-{
-    createMainWindow();
 }
 
 void Starter::createMainWindow()
