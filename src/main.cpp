@@ -20,6 +20,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    // used in QStandardPaths
+    a.setApplicationName("Qt GUI");
+    a.setOrganizationName("Tox");
     Starter s;
     return a.exec();
 }

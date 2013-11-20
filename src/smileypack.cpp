@@ -351,7 +351,7 @@ void Smileypack::processLine(const QString &xLine, const QString &xPath, ParserS
 
 const QString &Smileypack::packDir()
 {
-    static QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+QDir::separator()+AppInfo::name+QDir::separator()+"smileys";
+    static QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + "smileys";
     return path;
 }
 
