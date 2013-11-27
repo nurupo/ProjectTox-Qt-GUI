@@ -18,12 +18,15 @@
 #define CORE_HPP
 
 #include "status.hpp"
+#include "filetransferstate.hpp"
 
 #include <tox.h>
 
 #include <QObject>
 #include <QTimer>
 #include <QList>
+
+#define MAX_TRANSFER 100
 
 class Core : public QObject
 {
@@ -48,6 +51,7 @@ private:
 
     Tox* tox;
     QTimer* timer;
+    QList<FileTransferState*> fileSenders;
 
     class CData
     {
@@ -129,18 +133,21 @@ public slots:
     void setStatus(Status status);
 
     void process();
+    void sendFiles();
 
     void bootstrapDht();
 
-    void fileSendRequestReply(int friendId, quint8 filenumber, quint8 message_id);
+    void fileSendRequest(int friendId, const QString& filename);
+    void sendFile(int friendId, FileTransferState* state);
+    void fileSendReply(int friendId, quint8 filenumber, quint8 message_id);
 
 
 signals:
     void connected();
     void disconnected();
 
-    void friendRequestRecieved(const QString& userId, const QString& message);
-    void friendMessageRecieved(int friendId, const QString& message);
+    void friendRequestReceived(const QString& userId, const QString& message);
+    void friendMessageReceived(int friendId, const QString& message);
 
     void friendAdded(int friendId, const QString& userId);
 
@@ -167,9 +174,11 @@ signals:
 
     void failedToStart();
 
-    void fileSendRequestRecieved(int friendId, quint8 filenumber, quint64 filesize, const QString& filename);
-    void fileControlRecieved(int friendId, unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data);
-    void fileDataRecieved(int friendId, quint8 filenumber, const QByteArray& data);
+    void fileSendRequestReceived(int friendId, quint8 filenumber, quint64 filesize, const QString& filename);
+    void fileControlReceived(int friendId, unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data);
+    void fileDataReceived(int friendId, quint8 filenumber, const QByteArray& data);
+
+    void fileSendCompleted(int friendId, int filenumber);
 };
 
 #endif // CORE_HPP

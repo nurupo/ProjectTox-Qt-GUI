@@ -19,7 +19,7 @@
 
 #include <QScrollArea>
 
-#include "pageswidget.hpp"
+#include "filetransferstate.hpp"
 
 class QHBoxLayout;
 class QVBoxLayout;

@@ -25,16 +25,19 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QDebug>
 
 ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)
 {
     friendItem = new FriendItemWidget(this);
     display = new MessageDisplayWidget(this);
+    filesendButton = new QPushButton(tr("Send File"), this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
     connect(input, &InputTextWidget::sendAction,  this, &ChatPageWidget::sendAction);
+    connect(filesendButton, &QPushButton::clicked, this, &ChatPageWidget::promptSendFile);
 
     // Create emoticon menu :)
     CustomHintWidget *inputPanel = new CustomHintWidget(this, QSize(10, 10));
@@ -51,6 +54,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     inputLayout->setSpacing(2);
     inputLayout->addWidget(input);
     inputLayout->addWidget(emoticonButton);
+    inputLayout->addWidget(filesendButton);
 
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
@@ -110,7 +114,7 @@ void ChatPageWidget::actionSentResult(const QString &message)
     display->appendAction(username, message, true);
 }
 
-quint8 ChatPageWidget::fileSendRecieved(quint8 filenumber, quint64 filesize, const QString& filename)
+quint8 ChatPageWidget::fileSendReceived(quint8 filenumber, quint64 filesize, const QString& filename)
 {
   QMessageBox::StandardButton ret = QMessageBox::question(this,
       tr("File Transfer"),
@@ -135,24 +139,47 @@ quint8 ChatPageWidget::fileSendRecieved(quint8 filenumber, quint64 filesize, con
   return msg_id;
 }
 
-void ChatPageWidget::fileControlRecieved(unsigned int receive_send, quint8 filenumber, quint8 control_type)
+void ChatPageWidget::fileControlReceived(unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data)
 {
     if (receive_send == 0 && control_type == TOX_FILECONTROL_FINISHED) {
         FileTransferState* state = states[filenumber];
         states.remove(filenumber);
         delete state;
+    } else if (receive_send == 1 && control_type == TOX_FILECONTROL_ACCEPT) {
+      FileTransferState* state = new FileTransferState(friendId, filenumber,
+          QFileInfo(currentSendFilename).size(), currentSendFilename,
+          FileTransferState::SEND);
+      states.insert(filenumber, state);
+      display->appendProgress(currentSendFilename, state, true);
+      emit sendFile(state);
     }
 }
 
-void ChatPageWidget::fileDataRecieved(quint8 filenumber, const QByteArray& data)
+void ChatPageWidget::fileDataReceived(quint8 filenumber, const QByteArray& data)
 {
   FileTransferState* state = states[filenumber];
   try {
     state->writeData(data);
-  } catch(std::runtime_error e) {
+  } catch(std::exception e) {
     QMessageBox::critical(this, tr("Error"),
         tr("failed to write data for `%1'").arg(state->fileName()));
     states.remove(filenumber);
     delete state;
+  }
+}
+
+void ChatPageWidget::fileSendCompletedReceived(int filenumber)
+{
+  FileTransferState* state = states[filenumber];
+  states.remove(filenumber);
+  delete state;
+}
+
+void ChatPageWidget::promptSendFile(void)
+{
+  QString filename = QFileDialog::getOpenFileName(this, tr("Select a file"));
+  if (filename.length()) {
+    currentSendFilename = filename;
+    emit sendFileRequest(filename);
   }
 }

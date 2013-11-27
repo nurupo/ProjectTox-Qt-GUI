@@ -116,11 +116,11 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(core, &Core::connected, this, &MainWindow::onConnected);
     connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
-    connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
+    connect(core, &Core::friendRequestReceived, this, &MainWindow::onFriendRequestReceived);
     connect(core, SIGNAL(friendStatusChanged(int, Status)), friendsWidget, SLOT(setStatus(int, Status)));
     connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
-    connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
+    connect(core, &Core::friendMessageReceived, pages, &PagesWidget::messageReceived);
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::usernameChanged);
@@ -133,10 +133,14 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendStatusMessageChanged, friendsWidget, &FriendsWidget::setStatusMessage);
     connect(core, &Core::friendStatusMessageChanged, pages, &PagesWidget::statusMessageChanged);
 
-    connect(core, &Core::fileSendRequestRecieved, pages, &PagesWidget::fileSendRequest);
-    connect(core, &Core::fileControlRecieved, pages, &PagesWidget::fileControl);
-    connect(core, &Core::fileDataRecieved, pages, &PagesWidget::fileData);
-    connect(pages, &PagesWidget::fileSendRequestReply, core, &Core::fileSendRequestReply);
+    connect(core, &Core::fileSendRequestReceived, pages, &PagesWidget::fileSendRequestReceived);
+    connect(core, &Core::fileControlReceived, pages, &PagesWidget::fileControl);
+    connect(core, &Core::fileDataReceived, pages, &PagesWidget::fileData);
+    connect(core, &Core::fileSendCompleted, pages, &PagesWidget::fileSendCompleted);
+
+    connect(pages, &PagesWidget::fileSendRequest, core, &Core::fileSendRequest);
+    connect(pages, &PagesWidget::sendFile, core, &Core::sendFile);
+    connect(pages, &PagesWidget::fileSendReply, core, &Core::fileSendReply);
 
     connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
 
@@ -183,7 +187,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& message)
+void MainWindow::onFriendRequestReceived(const QString& userId, const QString& message)
 {
     FriendRequestDialog dialog(this, userId, message);
 
