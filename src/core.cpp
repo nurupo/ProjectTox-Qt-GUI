@@ -19,6 +19,7 @@
 
 #include <QThread>
 #include <QTime>
+#include <QDebug>
 
 Core::Core() :
     tox(nullptr)
@@ -83,6 +84,20 @@ void Core::onConnectionStatusChanged(Tox*/* tox*/, int friendId, uint8_t status,
 void Core::onAction(Tox*/* tox*/, int friendId, uint8_t *cMessage, uint16_t cMessageSize, void *core)
 {
     emit static_cast<Core*>(core)->actionReceived(friendId, CString::toString(cMessage, cMessageSize));
+}
+
+void Core::onFileSendRequest(Tox*, int friendId, uint8_t filenumber, uint64_t filesize, uint8_t *filename, uint16_t filename_length, void *core)
+{
+    emit static_cast<Core*>(core)->fileSendRequestRecieved(friendId, filenumber, filesize, CString::toString(filename, filename_length));
+}
+void Core::onFileControl(Tox*, int friendId, uint8_t receive_send, uint8_t filenumber, uint8_t control_type, uint8_t *data, uint16_t length, void *core)
+{
+    emit static_cast<Core*>(core)->fileControlRecieved(friendId, receive_send, filenumber, control_type, QByteArray((const char*)data, length));
+}
+
+void Core::onFileData(Tox*, int friendId, uint8_t filenumber, uint8_t *data, uint16_t length, void *core)
+{
+    emit static_cast<Core*>(core)->fileDataRecieved(friendId, filenumber, QByteArray((const char*)data, length));
 }
 
 void Core::acceptFriendRequest(const QString& userId)
@@ -224,6 +239,9 @@ void Core::start()
     tox_callback_status_message(tox, onStatusMessageChanged, this);
     tox_callback_user_status(tox, onUserStatusChanged, this);
     tox_callback_connection_status(tox, onConnectionStatusChanged, this);
+    tox_callback_file_send_request(tox, onFileSendRequest, this);
+    tox_callback_file_control(tox, onFileControl, this);
+    tox_callback_file_data(tox, onFileData, this);
 
     uint8_t friendAddress[TOX_FRIEND_ADDRESS_SIZE];
     tox_get_address(tox, friendAddress);
@@ -242,6 +260,10 @@ void Core::start()
     timer->start();
 }
 
+void Core::fileSendRequestReply(int friendId, quint8 filenumber, quint8 message_id)
+{
+    tox_file_send_control(tox, friendId, 1, filenumber, message_id, NULL, 0);
+}
 
 // CData
 

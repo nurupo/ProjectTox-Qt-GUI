@@ -19,6 +19,40 @@
 
 #include <QDebug>
 
+FileTransferState::FileTransferState(int _friendId, int _fileNumber, quint64 _filesize, const QString& _filename)
+    : file(_filename)
+{
+    friendId = _friendId;
+    fileNumber = _fileNumber;
+    filename = _filename;
+    fileSize = _filesize;;
+    transfered = 0;
+
+    if (!file.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("file open error");
+    }
+}
+FileTransferState::~FileTransferState()
+{
+    file.close();
+}
+
+QString FileTransferState::fileName()
+{
+    return filename;
+}
+
+void FileTransferState::writeData(const QByteArray& data)
+{
+    qint64 len = file.write(data.data(), data.length());
+    if (len != data.length()) {
+        throw std::runtime_error("file write error");
+    }
+    transfered += len;
+    emit progressChanged((int)(transfered * 100.0 / fileSize));
+}
+
+// PagesWidget
 PagesWidget::PagesWidget(QWidget* parent) :
     QStackedWidget(parent)
 {
@@ -112,4 +146,20 @@ void PagesWidget::actionResult(int friendId, const QString &action, int success)
         // FIXME: that is one confusing way of reporting a error
         widget(friendId)->messageSentResult(action, success);
     }
+}
+
+void PagesWidget::fileSendRequest(int friendId, quint8 filenumber, quint64 filesize, const QString& filename)
+{
+    quint8 msg_id = widget(friendId)->fileSendRecieved(filenumber, filesize, filename);
+    emit fileSendRequestReply(friendId, filenumber, msg_id);
+}
+
+void PagesWidget::fileControl(int friendId, unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray&)
+{
+    widget(friendId)->fileControlRecieved(receive_send, filenumber, control_type);
+}
+
+void PagesWidget::fileData(int friendId, quint8 filenumber, const QByteArray& data)
+{
+  widget(friendId)->fileDataRecieved(filenumber, data);
 }

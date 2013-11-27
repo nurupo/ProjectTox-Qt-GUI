@@ -133,6 +133,11 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendStatusMessageChanged, friendsWidget, &FriendsWidget::setStatusMessage);
     connect(core, &Core::friendStatusMessageChanged, pages, &PagesWidget::statusMessageChanged);
 
+    connect(core, &Core::fileSendRequestRecieved, pages, &PagesWidget::fileSendRequest);
+    connect(core, &Core::fileControlRecieved, pages, &PagesWidget::fileControl);
+    connect(core, &Core::fileDataRecieved, pages, &PagesWidget::fileData);
+    connect(pages, &PagesWidget::fileSendRequestReply, core, &Core::fileSendRequestReply);
+
     connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
 
     coreThread->start(/*QThread::IdlePriority*/);

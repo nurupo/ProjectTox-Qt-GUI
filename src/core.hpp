@@ -40,6 +40,9 @@ private:
     static void onUserStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
     static void onAction(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFileSendRequest(Tox *m, int, uint8_t, uint64_t, uint8_t *, uint16_t, void *);
+    static void onFileControl(Tox *m, int, uint8_t, uint8_t, uint8_t, uint8_t *, uint16_t, void *);
+    static void onFileData(Tox *m, int, uint8_t, uint8_t *, uint16_t length, void *);
 
     void checkConnection();
 
@@ -55,7 +58,6 @@ private:
     protected:
         explicit CData(const QString& data, uint16_t byteSize);
         virtual ~CData();
-
         static QString toString(uint8_t* cData, uint16_t cDataSize);
 
     private:
@@ -130,6 +132,9 @@ public slots:
 
     void bootstrapDht();
 
+    void fileSendRequestReply(int friendId, quint8 filenumber, quint8 message_id);
+
+
 signals:
     void connected();
     void disconnected();
@@ -162,6 +167,9 @@ signals:
 
     void failedToStart();
 
+    void fileSendRequestRecieved(int friendId, quint8 filenumber, quint64 filesize, const QString& filename);
+    void fileControlRecieved(int friendId, unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data);
+    void fileDataRecieved(int friendId, quint8 filenumber, const QByteArray& data);
 };
 
 #endif // CORE_HPP

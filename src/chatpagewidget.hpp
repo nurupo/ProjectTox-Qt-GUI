@@ -19,11 +19,16 @@
 
 #include "frienditemwidget.hpp"
 #include "inputtextwidget.hpp"
+#include "tox.h"
 
+#include <QFileDialog>
+#include <QMap>
+#include <QMessageBox>
 #include <QTextBrowser>
 #include <QTextEdit>
 #include <QWidget>
 
+class FileTransferState;
 class MessageDisplayWidget;
 class QToolButton;
 
@@ -40,6 +45,7 @@ public:
 private:
     FriendItemWidget* friendItem;
     MessageDisplayWidget *display;
+    QMap<quint8, FileTransferState*> states;
 
     InputTextWidget* input;
     QToolButton *emoticonButton;
@@ -53,6 +59,9 @@ public slots:
     void messageSentResult(const QString& message, int messageId);
     void actionReceived(const QString& message);
     void actionSentResult(const QString& message);
+    quint8 fileSendRecieved(quint8 filenumber, quint64 filesize, const QString& filename);
+    void fileControlRecieved(unsigned int receive_send, quint8 filenumber, quint8 control_type);
+    void fileDataRecieved(quint8 filenumber, const QByteArray& data);
 
 signals:
     void sendMessage(const QString& message);

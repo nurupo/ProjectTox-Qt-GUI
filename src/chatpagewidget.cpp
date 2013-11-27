@@ -109,3 +109,50 @@ void ChatPageWidget::actionSentResult(const QString &message)
 {
     display->appendAction(username, message, true);
 }
+
+quint8 ChatPageWidget::fileSendRecieved(quint8 filenumber, quint64 filesize, const QString& filename)
+{
+  QMessageBox::StandardButton ret = QMessageBox::question(this,
+      tr("File Transfer"),
+      tr("%1 is sending you a file `%2', accept?").arg(username).arg(filename));
+
+  quint8 msg_id = TOX_FILECONTROL_KILL;
+
+  if (ret == QMessageBox::Yes) {
+    QString saveFilename = QFileDialog::getSaveFileName(this,
+        tr("Save file"), filename);
+
+    try {
+      FileTransferState* state = new FileTransferState(friendId, filenumber, filesize, saveFilename);
+      states.insert(filenumber, state);
+      display->appendProgress(saveFilename, state, false);
+    } catch(std::exception e) {
+      QMessageBox::critical(this, tr("Error"),
+          tr("Failed to open `%1' for saving").arg(saveFilename));
+    }
+    msg_id = TOX_FILECONTROL_ACCEPT;
+  }
+  return msg_id;
+}
+
+void ChatPageWidget::fileControlRecieved(unsigned int receive_send, quint8 filenumber, quint8 control_type)
+{
+    if (receive_send == 0 && control_type == TOX_FILECONTROL_FINISHED) {
+        FileTransferState* state = states[filenumber];
+        states.remove(filenumber);
+        delete state;
+    }
+}
+
+void ChatPageWidget::fileDataRecieved(quint8 filenumber, const QByteArray& data)
+{
+  FileTransferState* state = states[filenumber];
+  try {
+    state->writeData(data);
+  } catch(std::runtime_error e) {
+    QMessageBox::critical(this, tr("Error"),
+        tr("failed to write data for `%1'").arg(state->fileName()));
+    states.remove(filenumber);
+    delete state;
+  }
+}
