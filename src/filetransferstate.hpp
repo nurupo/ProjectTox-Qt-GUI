@@ -32,6 +32,8 @@ public:
       SEND
     };
 
+    static bool checkPermission(const QString& filename, int mode = RECEIVE);
+
     FileTransferState(int friendId, int filenumber, quint64 filesize,
         const QString& filename, int mode = RECEIVE);
     ~FileTransferState();
@@ -40,7 +42,7 @@ public:
     int friendId();
     int fileNumber();
 
-    void writeData(const QByteArray& data);
+    int writeData(const QByteArray& data);
     qint64 readData(char* buf, int max_size);
     void readComplete();
 

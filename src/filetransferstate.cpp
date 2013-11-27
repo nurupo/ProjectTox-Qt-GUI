@@ -29,9 +29,7 @@ FileTransferState::FileTransferState(int _friendId, int _filenumber, quint64 _fi
     ack = true;
 
     QIODevice::OpenMode m = (mode == RECEIVE)? QIODevice::WriteOnly: QIODevice::ReadOnly;
-    if (!file.open(m)) {
-        throw std::runtime_error("file open error");
-    }
+    file.open(m);
 }
 
 FileTransferState::~FileTransferState()
@@ -40,6 +38,13 @@ FileTransferState::~FileTransferState()
     if (buf) {
         delete [] buf;
     }
+}
+
+
+bool FileTransferState::checkPermission(const QString& filename, int mode)
+{
+    QIODevice::OpenMode m = (mode == RECEIVE)? QIODevice::WriteOnly: QIODevice::ReadOnly;
+  return QFile(filename).open(m);
 }
 
 QString FileTransferState::fileName()
@@ -57,14 +62,15 @@ int FileTransferState::fileNumber()
     return filenumber;
 }
 
-void FileTransferState::writeData(const QByteArray& data)
+int FileTransferState::writeData(const QByteArray& data)
 {
     qint64 len = file.write(data.data(), data.length());
     if (len != data.length()) {
-        throw std::runtime_error("file write error");
+        return -1;
     }
     transfered += len;
     emit progressChanged((int)(transfered * 100.0 / filesize));
+    return len;
 }
 
 qint64 FileTransferState::readData(char* buf, int max_size)
