@@ -226,7 +226,7 @@ void Core::start()
     tox_callback_action(tox, onAction, this);
 
     uint8_t friendAddress[TOX_FRIEND_ADDRESS_SIZE];
-    tox_add_address(tox, friendAddress);
+    tox_get_address(tox, friendAddress);
 
     emit friendAddressGenerated(CFriendAddress::toString(friendAddress));
 
