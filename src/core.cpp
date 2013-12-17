@@ -219,11 +219,11 @@ void Core::start()
 
     tox_callback_friend_request(tox, onFriendRequest, this);
     tox_callback_friend_message(tox, onFriendMessage, this);
+    tox_callback_friend_action(tox, onAction, this);
     tox_callback_name_change(tox, onFriendNameChange, this);
     tox_callback_status_message(tox, onStatusMessageChanged, this);
     tox_callback_user_status(tox, onUserStatusChanged, this);
     tox_callback_connection_status(tox, onConnectionStatusChanged, this);
-    tox_callback_action(tox, onAction, this);
 
     uint8_t friendAddress[TOX_FRIEND_ADDRESS_SIZE];
     tox_get_address(tox, friendAddress);
