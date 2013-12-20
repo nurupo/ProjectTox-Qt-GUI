@@ -87,7 +87,7 @@ void Core::onAction(Tox*/* tox*/, int friendId, uint8_t *cMessage, uint16_t cMes
 
 void Core::acceptFriendRequest(const QString& userId)
 {
-    int friendId = tox_addfriend_norequest(tox, CUserId(userId).data());
+    int friendId = tox_add_friend_norequest(tox, CUserId(userId).data());
     if (friendId == -1) {
         emit failedToAddFriend(userId);
     } else {
@@ -99,7 +99,7 @@ void Core::requestFriendship(const QString& friendAddress, const QString& messag
 {
     CString cMessage(message);
 
-    int friendId = tox_addfriend(tox, CFriendAddress(friendAddress).data(), cMessage.data(), cMessage.size());
+    int friendId = tox_add_friend(tox, CFriendAddress(friendAddress).data(), cMessage.data(), cMessage.size());
     const QString userId = friendAddress.mid(0, TOX_CLIENT_ID_SIZE * 2);
     // TODO: better error handling
     if (friendId < 0) {
@@ -113,20 +113,20 @@ void Core::sendMessage(int friendId, const QString& message)
 {
     CString cMessage(message);
 
-    int messageId = tox_sendmessage(tox, friendId, cMessage.data(), cMessage.size());
+    int messageId = tox_send_message(tox, friendId, cMessage.data(), cMessage.size());
     emit messageSentResult(friendId, message, messageId);
 }
 
 void Core::sendAction(int friendId, const QString &action)
 {
     CString cMessage(action);
-    int ret = tox_sendaction(tox, friendId, cMessage.data(), cMessage.size());
+    int ret = tox_send_action(tox, friendId, cMessage.data(), cMessage.size());
     emit actionSentResult(friendId, action, ret);
 }
 
 void Core::removeFriend(int friendId)
 {
-    if (tox_delfriend(tox, friendId) == -1) {
+    if (tox_del_friend(tox, friendId) == -1) {
         emit failedToRemoveFriend(friendId);
     } else {
         emit friendRemoved(friendId);
@@ -137,7 +137,7 @@ void Core::setUsername(const QString& username)
 {
     CString cUsername(username);
 
-    if (tox_setname(tox, cUsername.data(), cUsername.size()) == -1) {
+    if (tox_set_name(tox, cUsername.data(), cUsername.size()) == -1) {
         emit failedToSetUsername(username);
     } else {
         emit usernameSet(username);
@@ -148,7 +148,7 @@ void Core::setStatusMessage(const QString& message)
 {
     CString cMessage(message);
 
-    if (tox_set_statusmessage(tox, cMessage.data(), cMessage.size()) == -1) {
+    if (tox_set_status_message(tox, cMessage.data(), cMessage.size()) == -1) {
         emit failedToSetStatusMessage(message);
     } else {
         emit statusMessageSet(message);
@@ -172,7 +172,7 @@ void Core::setStatus(Status status)
             userstatus = TOX_USERSTATUS_INVALID;
             break;
     }
-    tox_set_userstatus(tox, userstatus);
+    tox_set_user_status(tox, userstatus);
 }
 
 void Core::bootstrapDht()
@@ -217,24 +217,24 @@ void Core::start()
         return;
     }
 
-    tox_callback_friendrequest(tox, onFriendRequest, this);
-    tox_callback_friendmessage(tox, onFriendMessage, this);
-    tox_callback_namechange(tox, onFriendNameChange, this);
-    tox_callback_statusmessage(tox, onStatusMessageChanged, this);
-    tox_callback_userstatus(tox, onUserStatusChanged, this);
-    tox_callback_connectionstatus(tox, onConnectionStatusChanged, this);
-    tox_callback_action(tox, onAction, this);
+    tox_callback_friend_request(tox, onFriendRequest, this);
+    tox_callback_friend_message(tox, onFriendMessage, this);
+    tox_callback_friend_action(tox, onAction, this);
+    tox_callback_name_change(tox, onFriendNameChange, this);
+    tox_callback_status_message(tox, onStatusMessageChanged, this);
+    tox_callback_user_status(tox, onUserStatusChanged, this);
+    tox_callback_connection_status(tox, onConnectionStatusChanged, this);
 
     uint8_t friendAddress[TOX_FRIEND_ADDRESS_SIZE];
-    tox_getaddress(tox, friendAddress);
+    tox_get_address(tox, friendAddress);
 
     emit friendAddressGenerated(CFriendAddress::toString(friendAddress));
 
     CString cUsername(Settings::getInstance().getUsername());
-    tox_setname(tox, cUsername.data(), cUsername.size());
+    tox_set_name(tox, cUsername.data(), cUsername.size());
 
     CString cStatusMessage(Settings::getInstance().getStatusMessage());
-    tox_set_statusmessage(tox, cStatusMessage.data(), cStatusMessage.size());
+    tox_set_status_message(tox, cStatusMessage.data(), cStatusMessage.size());
 
     bootstrapDht();
 
