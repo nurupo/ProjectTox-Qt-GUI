@@ -23,7 +23,6 @@
 #include <QDir>
 #include <QApplication>
 
-const QString Settings::FILENAME = "settings.ini";
 
 Settings::Settings() :
     loaded(false)
@@ -48,15 +47,7 @@ void Settings::load()
         return;
     }
 
-    QString sFilename = FILENAME;
-
-    //if no settings file exist -- use the default one
-    QFile sFile(FILENAME);
-    if (!sFile.exists()) {
-        sFilename = ":/texts/" + FILENAME;
-    }
-
-    QSettings s(sFilename, QSettings::IniFormat);
+    QSettings s("tox","tox-qt-qui");
     s.beginGroup("DHT Server");
         int serverListSize = s.beginReadArray("dhtServerList");
         for (int i = 0; i < serverListSize; i ++) {
@@ -107,7 +98,7 @@ void Settings::load()
 
 void Settings::save()
 {
-    QSettings s(FILENAME, QSettings::IniFormat);
+    QSettings s("tox","tox-qt-qui");
 
     s.clear();
 
