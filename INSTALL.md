@@ -2,9 +2,9 @@
 
 ###Linux:
 
-This project depends on Qt5 and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium).
+This project depends on Qt5.2.0 and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium).
 
-You should get and install **Qt5.1.0 or higher**.
+You should get and install **Qt5.2.0 or higher**.
 You can get Qt5 precompiled binaries and source code to compile them yourself from [here](http://qt-project.org/downloads).
 
 You should get and install [libsodium](https://github.com/jedisct1/libsodium):
@@ -31,7 +31,7 @@ make
 On success, this will build a `TOX-Qt-GUI` executable.
 
 Note that `qmake` might not be found by bash, in that case you should use qmake from Qt's installation directory.
-For example, my qmake was located at `/home/nurupo/Qt5.1.0/5.0.1/gcc/bin/qmake`.
+For example, my qmake was located at `/home/nurupo/Qt5.2.0/5.2.0/gcc_64/bin/qmake`.
 
 If Qt complains about missing GL library, install `libgl-dev` package.
 
@@ -42,7 +42,7 @@ If you want to build GUI by using Qt Creator, rather than terminal commands, fol
 
 ###Windows:
 
-You should get and install **MinGW version** of **Qt5.1.0 or higher** from [here](http://qt-project.org/downloads).
+You should get and install **MinGW version** of **Qt5.2.0 or higher** from [here](http://qt-project.org/downloads).
 
 If you don't already have a git shell installed, you can get one [here](http://git-scm.com/download/win).
 

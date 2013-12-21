@@ -24,8 +24,8 @@ defineTest(minQtVersion) {
     return(false)
 }
 
-!minQtVersion(5, 1, 0) {
-    error("Cannot build with Qt version $${QT_VERSION}, this project requires at least Qt 5.1.0")
+!minQtVersion(5, 2, 0) {
+    error("Cannot build with Qt version $${QT_VERSION}, this project requires at least Qt 5.2.0")
 }
 
 QT       += core gui widgets
