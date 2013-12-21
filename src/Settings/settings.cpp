@@ -49,7 +49,7 @@ void Settings::load()
         return;
     }
 
-    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + FILENAME;
+    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + FILENAME;
 
     //if no settings file exist -- use the default one
     QFile file(filePath);
@@ -108,7 +108,7 @@ void Settings::load()
 
 void Settings::save()
 {
-    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + FILENAME;
+    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + FILENAME;
 
     QSettings s(filePath, QSettings::IniFormat);
 

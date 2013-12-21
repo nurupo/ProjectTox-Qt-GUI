@@ -148,7 +148,7 @@ void GuiSettingsPage::searchSmileyPacks()
         it.next();
 
         // Check theme file
-        QFileInfo f(it.filePath()+QDir::separator()+"theme");
+        QFileInfo f(it.filePath() + '/' + "theme");
         if (!f.exists()) {
             continue;
         }
@@ -161,7 +161,7 @@ void GuiSettingsPage::searchSmileyPacks()
 
         // Add new pack to combobox
         QVariant data(newPack.save());
-        smileypackCombobox->addItem(QIcon(it.filePath()+QDir::separator()+newPack.getIcon()), newPack.getName(), data);
+        smileypackCombobox->addItem(QIcon(it.filePath() + '/' + newPack.getIcon()), newPack.getName(), data);
     }
 }
 

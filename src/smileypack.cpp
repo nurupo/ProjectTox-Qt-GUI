@@ -284,7 +284,7 @@ bool Smileypack::parseFile(const QString &filePath)
 
     // Get pack folder path
     QFileInfo info(file);
-    QString path = info.absolutePath() + QDir::separator();
+    QString path = info.absolutePath() + '/';
 
     // Read lines
     ParserStates state = StateHead;
@@ -351,7 +351,7 @@ void Smileypack::processLine(const QString &xLine, const QString &xPath, ParserS
 
 const QString &Smileypack::packDir()
 {
-    static QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + "smileys";
+    static QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + "smileys";
     return path;
 }
 
