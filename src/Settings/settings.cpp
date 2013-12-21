@@ -18,10 +18,11 @@
 #include "settingsdialog.hpp"
 #include "smileypack.hpp"
 
+#include <QApplication>
+#include <QDir>
 #include <QFile>
 #include <QSettings>
-#include <QDir>
-#include <QApplication>
+#include <QStandardPaths>
 
 const QString Settings::FILENAME = "settings.ini";
 
@@ -48,15 +49,15 @@ void Settings::load()
         return;
     }
 
-    QString sFilename = FILENAME;
+    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + FILENAME;
 
     //if no settings file exist -- use the default one
-    QFile sFile(FILENAME);
-    if (!sFile.exists()) {
-        sFilename = ":/texts/" + FILENAME;
+    QFile file(filePath);
+    if (!file.exists()) {
+        filePath = ":/texts/" + FILENAME;
     }
 
-    QSettings s(sFilename, QSettings::IniFormat);
+    QSettings s(filePath, QSettings::IniFormat);
     s.beginGroup("DHT Server");
         int serverListSize = s.beginReadArray("dhtServerList");
         for (int i = 0; i < serverListSize; i ++) {
@@ -107,7 +108,9 @@ void Settings::load()
 
 void Settings::save()
 {
-    QSettings s(FILENAME, QSettings::IniFormat);
+    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QDir::separator() + FILENAME;
+
+    QSettings s(filePath, QSettings::IniFormat);
 
     s.clear();
 
