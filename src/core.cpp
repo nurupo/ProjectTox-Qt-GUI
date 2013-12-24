@@ -444,7 +444,6 @@ int Core::Profile::lock()
         return -1;
 
     tox_kill(pTox);
-    free(pTox);
     pTox = nullptr;
 
     memset(encryptedKey,0,32);
@@ -541,6 +540,9 @@ int Core::Profile::loadFile()
     offset += 8;
     blockTwoOffset = offset;
 
+    file.unmap(rawFile);
+    file.close();
+
     return 0;
 }
 
@@ -560,15 +562,10 @@ int Core::Profile::saveFile()
     memset(blockTwoPlaintext, 0, blockTwoSize);
 
     /* Compose entire file */
-    //determine file size
+    //determine file size & create buffer
     uint16_t nameLength = pName.length();
     totalSize = blockTwoSize + nameLength + 82;
-
-    //resize & mmap file
-    QFile file(pPath);
-    file.open(QFile::WriteOnly);
-    file.resize(totalSize);
-    uint8_t *rawFile = file.map(0,file.size());
+    uint8_t rawFile[totalSize];
 
     //magic
     uint8_t magic2[4] = {0x6c, 0x69, 0x62, 0x65};
@@ -605,6 +602,16 @@ int Core::Profile::saveFile()
     memcpy(rawFile + offset, &blockTwoSize, 8);
     offset += 8;
     memcpy(rawFile + offset, &blockTwoEncrypted, blockTwoSize);
+    offset += blockTwoSize;
+
+    memset(blockTwoPlaintext,0,blockTwoSize);
+
+    //resize & write file
+    QFile file(pPath);
+    file.open(QFile::WriteOnly);
+    file.resize(totalSize);
+    file.write((const char*)rawFile,totalSize);
+    file.close();
 
     return 0;
 }
