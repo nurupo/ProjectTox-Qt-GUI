@@ -483,8 +483,11 @@ int Core::Profile::changePassword(QString oldPassword, QString newPassword)
 
     return 0;
 }
-void changeName(QString newName);
 
+void Core::Profile::changeName(QString newName)
+{
+    pName = newName;
+}
 
 QString Core::Profile::getName()
 {
