@@ -1,3 +1,6 @@
 [submodule "submodules/ProjectTox-Core"]
 	path = submodules/ProjectTox-Core
 	url = https://github.com/irungentoo/ProjectTox-Core.git
+[submodule "submodules/scrypt-jane"]
+	path = submodules/scrypt-jane
+	url = https://github.com/floodyberry/scrypt-jane.git

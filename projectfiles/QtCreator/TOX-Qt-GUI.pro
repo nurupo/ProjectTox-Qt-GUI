@@ -35,7 +35,7 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/
+INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/ ../../submodules/scrypt-jane/
 win32:INCLUDEPATH += ../../libs/sodium/include/
 macx:INCLUDEPATH += /usr/local/include
 
@@ -50,6 +50,7 @@ win32 {
 }
 
 win32:DEFINES += WIN32
+DEFINES += SCRYPT_CHACHA SCRYPT_BLAKE512
 
 SOURCES += \
     ../../src/main.cpp \
@@ -165,6 +166,12 @@ HEADERS  += \
     ../../submodules/ProjectTox-Core/toxcore/tox.h \
     ../../submodules/ProjectTox-Core/toxcore/group_chats.h \
     ../../submodules/ProjectTox-Core/toxcore/assoc.h
+
+SOURCES += \
+    ../../submodules/scrypt-jane/scrypt-jane.c
+
+HEADERS += \
+    ../../submodules/scrypt-jane/scrypt-jane.h
 
 RESOURCES += \
     ../../resources/resources.qrc
