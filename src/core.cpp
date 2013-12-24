@@ -346,3 +346,260 @@ uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
     memcpy(cString, reinterpret_cast<uint8_t*>(byteArray.data()), byteArray.size());
     return byteArray.size() + 1;
 }
+
+Core::Profile::Profile(QString filePath)
+{
+    pPath = filePath;
+    if(loadFile() != 0)
+        throw 0;
+}
+
+Core::Profile::Profile(QString filePath, QString name, QString password)
+{
+    pPath = filePath;
+    pName = name;
+    pTox = tox_new(0);
+
+    if (pTox == nullptr)
+        throw 0;
+
+    //derive new key for saving
+    randombytes(salt, 24);
+    randombytes(nonce, 24);
+    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+    pLocked = false;
+}
+
+Core::Profile::~Profile()
+{
+    if(!pLocked)
+        lock();
+}
+
+int Core::Profile::unlock(QString password)
+{
+    if(!pLocked)
+        return 0;
+
+    QFile file(pPath);
+    file.open(QFile::ReadOnly);
+    uint8_t *rawFile = file.map(0, file.size());
+
+    //derive key from file
+    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+
+    //load encrypted block
+    uint8_t blockTwoEncrypted[blockTwoLength], blockTwoPlaintext[blockTwoLength];
+    memcpy(blockTwoEncrypted, rawFile + blockTwoOffset, blockTwoLength);
+
+    //decrypt block
+    if(crypto_secretbox_open(blockTwoPlaintext,blockTwoEncrypted,blockTwoLength,nonce,encryptedKey) != 0)
+        return -1;
+
+    //check magic
+    char magic[4];
+    memcpy(magic, rawFile, 36);
+    if(strcmp(magic,"rtas") != 0)
+        return -1;
+
+    uint8_t messenger[blockTwoLength - 36];
+    memcpy(messenger, blockTwoPlaintext + 36, blockTwoLength - 36);
+
+    //create this profile's tox instance
+    pTox = tox_new(0);
+    if(pTox == nullptr)
+        return -1;
+    tox_load(pTox, messenger, blockTwoLength - 36);
+
+    //check against loaded scrypt values being too small
+    if(scryptN < 15)
+        scryptN = 15;
+    if(scryptR < 8)
+        scryptR = 8;
+
+    /* Generate a new key for future saving.
+     * This somewhat more secure than keeping the user password around in plaintext in
+     * the ram (keeping in mind, of course, that it's already game-over if the client is
+     * compromised). Still though - it's the thought that counts.
+     */
+    randombytes(salt, 24);
+    randombytes(nonce, 24);
+    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+
+    memset(messenger, 0, blockTwoLength - 36);
+    memset(blockTwoPlaintext, 0, blockTwoLength);
+
+    file.unmap(rawFile);
+    file.close();
+
+    pLocked = false;
+
+    return 0;
+}
+int Core::Profile::lock()
+{
+    if(!pLocked)
+        saveFile();
+    else
+        return -1;
+
+    tox_kill(pTox);
+    free(pTox);
+    pTox = nullptr;
+
+    memset(encryptedKey,0,32);
+
+    pLocked = true;
+    return 0;
+}
+
+int Core::Profile::save()
+{
+    if(!pLocked)
+        saveFile();
+    else
+        return -1;
+    return 0;
+}
+
+int Core::Profile::changePassword(QString oldPassword, QString newPassword)
+{
+    if(pLocked)
+        if(unlock(oldPassword) != 0)
+            return -1;
+
+    uint8_t oldKey[32], newKey[32];
+    scrypt((const uint8_t*)oldPassword.toLocal8Bit().constData(), oldPassword.length(), salt, 24, scryptN, scryptR, scryptP, oldKey, 32);
+
+    /* Check to see if keys match.
+     * Although there's no cryptographic need to do so, it ensures that whomever's using
+     * the profile should have access to it, rather than having stumbled upon an unlocked
+     * computer.
+     */
+    if(strcmp((const char*)oldKey,(const char*)encryptedKey) != 0)
+        return -1;
+
+    scrypt((const uint8_t*)newPassword.toLocal8Bit().constData(), newPassword.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+}
+void changeName(QString newName);
+
+
+QString Core::Profile::getName()
+{
+    return pName;
+}
+
+QDateTime Core::Profile::getSaveTime()
+{
+    return pSavedTime;
+}
+
+bool Core::Profile::isLocked()
+{
+    return pLocked;
+}
+
+int Core::Profile::loadFile()
+{
+    QFile file(pPath);
+    file.open(QFile::ReadOnly);
+    uint8_t *rawFile = file.map(0, file.size());
+
+    //check magic
+    char magic[4];
+    memcpy(magic, rawFile, 4);
+    if(strcmp(magic,"libe") != 0)
+        return -1;
+    size_t offset = 4;
+
+    //read time last saved
+    pSavedTime.fromMSecsSinceEpoch(*(uint64_t*)rawFile+offset);
+    offset += 8;
+
+    //read name
+    pName.fromLocal8Bit((const char*)rawFile+offset+2,*(uint16_t*)rawFile+offset);
+    offset += 2 + *(uint16_t*)rawFile+offset;
+
+    //scrypt vars
+    scryptN = *(uint32_t*)(rawFile + offset);
+    scryptR = *(uint32_t*)(rawFile + offset + 4);
+    scryptP = *(uint32_t*)(rawFile + offset + 8);
+    offset += 12;
+
+    //salt & nonce
+    memcpy(salt, rawFile + offset, 24);
+    memcpy(nonce, rawFile + offset + 24, 24);
+    offset += 24;
+
+    //block two
+    blockTwoLength = *(uint64_t*)(rawFile + offset);
+    offset += 8;
+    blockTwoOffset = offset;
+
+    return 0;
+}
+
+int Core::Profile::saveFile()
+{
+    /* Create block two */
+    size_t blockTwoSize = tox_size(pTox) + 36, totalSize;
+    uint8_t blockTwoPlaintext[blockTwoSize], blockTwoEncrypted[blockTwoSize];
+    uint8_t magic1[4] = {0x72, 0x74, 0x61, 0x73};
+
+    memcpy(blockTwoPlaintext + 32, magic1, 4);
+    tox_save(pTox, blockTwoPlaintext + 32 + 4);
+
+    /* Encrypt block two */
+    if(crypto_secretbox(blockTwoEncrypted, blockTwoPlaintext, blockTwoSize, nonce, encryptedKey) != 0)
+        return -1;
+    memset(blockTwoPlaintext, 0, blockTwoSize);
+
+    /* Compose entire file */
+    //determine file size
+    uint16_t nameLength = pName.length();
+    totalSize = blockTwoSize + nameLength + 82;
+
+    //resize & mmap file
+    QFile file(pPath);
+    file.open(QFile::WriteOnly);
+    file.resize(totalSize);
+    uint8_t *rawFile = file.map(0,file.size());
+
+    //magic
+    uint8_t magic2[4] = {0x6c, 0x69, 0x62, 0x65};
+    memcpy(rawFile,magic2,4);
+    size_t offset = 4;
+
+    //time
+    uint64_t saved = time(NULL);
+    memcpy(rawFile + offset, &saved, 8);
+    offset += 8;
+    pSavedTime.fromMSecsSinceEpoch(saved);
+
+    //profile name
+    memcpy(rawFile + offset, &nameLength, 2);
+    offset += 2;
+    memcpy(rawFile + offset, pName.toLocal8Bit().constData(), nameLength);
+    offset += nameLength;
+
+    //scrypt values
+    memcpy(rawFile + offset, &scryptN, 4);
+    offset += 4;
+    memcpy(rawFile + offset, &scryptR, 4);
+    offset += 4;
+    memcpy(rawFile + offset, &scryptP, 4);
+    offset += 4;
+
+    //salt & nonce
+    memcpy(rawFile + offset, &salt, 24);
+    offset += 24;
+    memcpy(rawFile + offset, &nonce, 24);
+    offset += 24;
+
+    //block two
+    memcpy(rawFile + offset, &blockTwoSize, 8);
+    offset += 8;
+    memcpy(rawFile + offset, &blockTwoEncrypted, blockTwoSize);
+
+    return 0;
+}

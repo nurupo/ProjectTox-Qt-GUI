@@ -20,10 +20,18 @@
 #include "status.hpp"
 
 #include <tox.h>
+#include <util.h>
+#include <sodium.h>
+
+extern "C" {
+#include <scrypt-jane.h>
+}
 
 #include <QObject>
 #include <QTimer>
 #include <QList>
+#include <QFile>
+#include <QDateTime>
 
 class Core : public QObject
 {
@@ -109,6 +117,93 @@ private:
         uint16_t cStringSize;
 
         static uint16_t fromString(const QString& message, uint8_t* cMessage);
+    };
+
+    /* Profile Save Format
+     * ==============
+     *
+     * bytes    name        type        purpose
+     * ----------------------------------------
+     * -- block one [unencrypted] --
+     * 4        magic       uint8       magic,6c:69:62:65 "libe"
+     * 8        saved       uint64      timestamp of when the profile was last used
+     * 2        namelen     uint16      length of name
+     * varies   name        uint8       name of profile
+     * 12       scryptvars  uint32      N,r,p variables for scrypt - in this order
+     * 24       salt        uint8       the salt for scrypt
+     * 24       nonce       uint8       the nonce for nacl
+     * 8        blocklen    uint64      the length of the encrypted block
+     * -- block two [encrypted] --
+     * 32       0           uint8       crypto_secretbox_ZEROBYTES
+     * 4        magic       uint8       magic,72:74:61:73 "rtas"
+     * varies   profile     uint8       the messenger data - this goes to tox_load()
+     */
+
+    class Profile
+    {
+    public:
+        /* Loads a profile from the given path.
+         * Throws an exception (0) if the profile can't be loaded.
+         */
+        Profile(QString filePath);
+        /* Creates a new profile.
+         * This profile isn't saved to disk until lock() or save() are called.
+         */
+        Profile(QString filePath, QString name, QString password);
+        ~Profile();
+
+        /* Attempts to decrypt the profile.
+         * password should be the user input.
+         *
+         * returns 0 if success
+         */
+        int unlock(QString password);
+        /* Locks the profile, requiring an unlock() to again access.
+         * This function also calls save().
+         *
+         * returns 0 if success
+         */
+        int lock();
+        /* Saves the profile do disk.
+         * This does not lock the profile.
+         *
+         * returns 0 if success
+         */
+        int save();
+
+        /* Changes the password for the profile.
+         *
+         * returns 0 if success.
+         */
+        int changePassword(QString oldPassword, QString newPassword);
+        /* Changes the saved name for the profile. */
+        void changeName(QString newName);
+
+        /* Gets the profile name, as saved in the file. */
+        QString getName();
+        /* Gets the last date that the profile was saved, as saved in the file. */
+        QDateTime getSaveTime();
+        /* Checks if the profile is locked. */
+        bool isLocked();
+
+        Tox* pTox = nullptr;
+    private:
+        int loadFile(void);
+        int saveFile(void);
+
+        QString pPath;
+        bool pLocked = true;
+
+        uint8_t encryptedKey[crypto_secretbox_KEYBYTES], //32 bytes
+                nonce[crypto_secretbox_NONCEBYTES], //24 bytes
+                salt[24];
+        uint32_t scryptN = 15, scryptR = 8, scryptP = 1;
+
+        QString pName;
+        QDateTime pSavedTime;
+
+        size_t blockTwoOffset;
+        uint64_t blockTwoLength;
     };
 
 public slots:
