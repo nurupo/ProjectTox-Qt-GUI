@@ -468,7 +468,7 @@ int Core::Profile::changePassword(QString oldPassword, QString newPassword)
         if(unlock(oldPassword) != 0)
             return -1;
 
-    uint8_t oldKey[32], newKey[32];
+    uint8_t oldKey[32];
     scrypt((const uint8_t*)oldPassword.toLocal8Bit().constData(), oldPassword.length(), salt, 24, scryptN, scryptR, scryptP, oldKey, 32);
 
     /* Check to see if keys match.
@@ -480,6 +480,8 @@ int Core::Profile::changePassword(QString oldPassword, QString newPassword)
         return -1;
 
     scrypt((const uint8_t*)newPassword.toLocal8Bit().constData(), newPassword.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+
+    return 0;
 }
 void changeName(QString newName);
 
