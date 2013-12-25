@@ -188,8 +188,8 @@ private:
 
         Tox* pTox = nullptr;
     private:
-        int loadFile(void);
-        int saveFile(void);
+        int loadFile();
+        int saveFile();
 
         QString pPath;
         bool pLocked = true;

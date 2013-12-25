@@ -350,8 +350,11 @@ uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
 Core::Profile::Profile(QString filePath)
 {
     pPath = filePath;
-    if(loadFile() != 0)
+    pTox = tox_new(0);
+    if (pTox == nullptr || loadFile() != 0)
+    {
         throw 0;
+    }
 }
 
 Core::Profile::Profile(QString filePath, QString name, QString password)
@@ -381,16 +384,19 @@ int Core::Profile::unlock(QString password)
     if(!pLocked)
         return 0;
 
+    //load encrypted block
     QFile file(pPath);
     file.open(QFile::ReadOnly);
     uint8_t *rawFile = file.map(0, file.size());
 
-    //derive key from file
-    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
-
-    //load encrypted block
     uint8_t blockTwoEncrypted[blockTwoLength], blockTwoPlaintext[blockTwoLength];
     memcpy(blockTwoEncrypted, rawFile + blockTwoOffset, blockTwoLength);
+
+    file.unmap(rawFile);
+    file.close();
+
+    //derive key from file
+    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
 
     //decrypt block
     if(crypto_secretbox_open(blockTwoPlaintext,blockTwoEncrypted,blockTwoLength,nonce,encryptedKey) != 0)
@@ -398,17 +404,14 @@ int Core::Profile::unlock(QString password)
 
     //check magic
     char magic[4];
-    memcpy(magic, rawFile, 36);
-    if(strcmp(magic,"rtas") != 0)
+    memcpy(magic, blockTwoPlaintext + 32, 4);
+    if(memcmp(magic,&"rtas",4) != 0)
         return -1;
 
     uint8_t messenger[blockTwoLength - 36];
     memcpy(messenger, blockTwoPlaintext + 36, blockTwoLength - 36);
 
     //create this profile's tox instance
-    pTox = tox_new(0);
-    if(pTox == nullptr)
-        return -1;
     tox_load(pTox, messenger, blockTwoLength - 36);
 
     //check against loaded scrypt values being too small
@@ -428,9 +431,6 @@ int Core::Profile::unlock(QString password)
 
     memset(messenger, 0, blockTwoLength - 36);
     memset(blockTwoPlaintext, 0, blockTwoLength);
-
-    file.unmap(rawFile);
-    file.close();
 
     pLocked = false;
 
@@ -512,17 +512,23 @@ int Core::Profile::loadFile()
     //check magic
     char magic[4];
     memcpy(magic, rawFile, 4);
-    if(strcmp(magic,"libe") != 0)
+    if(memcmp(magic,&"libe",4) != 0)
         return -1;
+
     size_t offset = 4;
 
     //read time last saved
-    pSavedTime.fromMSecsSinceEpoch(*(uint64_t*)rawFile+offset);
+    uint64_t savedTime;
+    memcpy(&savedTime, rawFile + offset, 8);
     offset += 8;
+    pSavedTime.fromMSecsSinceEpoch(savedTime);
 
     //read name
-    pName.fromLocal8Bit((const char*)rawFile+offset+2,*(uint16_t*)rawFile+offset);
-    offset += 2 + *(uint16_t*)rawFile+offset;
+    uint16_t nameLength;
+    memcpy(&nameLength, rawFile + offset, 2);
+    offset += 2;
+    pName.fromLocal8Bit((const char*)rawFile + offset, nameLength);
+    offset += nameLength;
 
     //scrypt vars
     scryptN = *(uint32_t*)(rawFile + offset);
@@ -532,11 +538,12 @@ int Core::Profile::loadFile()
 
     //salt & nonce
     memcpy(salt, rawFile + offset, 24);
-    memcpy(nonce, rawFile + offset + 24, 24);
+    offset += 24;
+    memcpy(nonce, rawFile + offset, 24);
     offset += 24;
 
     //block two
-    blockTwoLength = *(uint64_t*)(rawFile + offset);
+    memcpy(&blockTwoLength, rawFile + offset, 8);
     offset += 8;
     blockTwoOffset = offset;
 
@@ -555,6 +562,9 @@ int Core::Profile::saveFile()
 
     memcpy(blockTwoPlaintext + 32, magic1, 4);
     tox_save(pTox, blockTwoPlaintext + 32 + 4);
+
+    //required zerobytes
+    memset(blockTwoPlaintext,0,32);
 
     /* Encrypt block two */
     if(crypto_secretbox(blockTwoEncrypted, blockTwoPlaintext, blockTwoSize, nonce, encryptedKey) != 0)
@@ -593,9 +603,9 @@ int Core::Profile::saveFile()
     offset += 4;
 
     //salt & nonce
-    memcpy(rawFile + offset, &salt, 24);
+    memcpy(rawFile + offset, salt, 24);
     offset += 24;
-    memcpy(rawFile + offset, &nonce, 24);
+    memcpy(rawFile + offset, nonce, 24);
     offset += 24;
 
     //block two
