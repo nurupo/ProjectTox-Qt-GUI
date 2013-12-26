@@ -93,7 +93,8 @@ SOURCES += \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/clickablelabel.cpp \
-    ../../src/esclineedit.cpp
+    ../../src/esclineedit.cpp \
+    ../../src/profile.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -136,7 +137,8 @@ HEADERS  += \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/clickablelabel.hpp \
-    ../../src/esclineedit.hpp
+    ../../src/esclineedit.hpp \
+    ../../src/profile.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \
