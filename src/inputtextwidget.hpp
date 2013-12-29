@@ -20,8 +20,6 @@
 
 #include <QTextEdit>
 
-
-
 class InputTextWidget : public QTextEdit
 {
     Q_OBJECT
