@@ -78,9 +78,10 @@ void EditableLabelWidget::onLabelChangeSubmited()
 
 void EditableLabelWidget::onLabelChangeCancelled()
 {
+    // order of calls matters, since clearFocus() triggers EditableLabelWidget::onLabelChangeSubmited()
+    lineEdit->setText(label->text());
     lineEdit->clearFocus();
     setCurrentWidget(label);
-    lineEdit->setText(label->text());
 }
 
 void EditableLabelWidget::onLabelClicked()
