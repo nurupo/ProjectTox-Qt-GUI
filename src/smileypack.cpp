@@ -79,7 +79,7 @@ QString Smileypack::smilify(QString text)
 
         // check the first smiley alternative representations
         QMapIterator<int, QStringList> first(possibleTexts);
-        if(first.hasNext())
+        if (first.hasNext())
         {
             first.next();
             int length = first.value().first().count();
@@ -180,7 +180,7 @@ QString Smileypack::resizeEmoji(QString text)
     //         except that you used symbols outside the Emoticons range (1F600-1F64F), so we need count for the too
     QStringList foundEmojis({"😀","😁","😂","😃","😄","😅","😆","😇","😈","😉","😊","😋","😌","😍","😎","😏","😐","😑","😒","😓","😔","😕","😖","😗","😘","😙","😚","😛","😜","😝","😞","😟","😠","😡","😢","😣","😤","😥","😦","😧","😨","😩","😪","😫","😬","😭","😮","😯","😰","😱","😲","😳","😴","😵","😶","😷","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙅","🙆","🙇","🙈","🙉","🙊","🙋","🙌","🙍","🙎","🙏","☺","☹","⚇","🐱","♥","☔","☀","♫","☕","★"});
 
-    for(QString emo : foundEmojis) {
+    for (QString emo : foundEmojis) {
         text.replace(emo, QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmojiFontFamily(), QString::number(settings.getEmojiFontPointSize()), emo));
     }
 
@@ -316,7 +316,7 @@ void Smileypack::processLine(const QString &xLine, const QString &xPath, ParserS
 {
     // Trim spaces and exclue comment lines
     QString line = xLine.trimmed();
-    if(line.startsWith('#') || line.isEmpty()) {
+    if (line.startsWith('#') || line.isEmpty()) {
         return;
     }
 

@@ -52,7 +52,7 @@ MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
     mainlayout->setContentsMargins(1,1,1,1);
 
     // Animation
-    if(Settings::getInstance().isAnimationEnabled())
+    if (Settings::getInstance().isAnimationEnabled())
     {
         animation = new QPropertyAnimation(this, "scrollPos");
         animation->setDuration(200);
@@ -95,7 +95,7 @@ void MessageDisplayWidget::setScrollPos(int arg)
 void MessageDisplayWidget::moveScrollBarToBottom(int min, int max)
 {
     Q_UNUSED(min);
-    if(Settings::getInstance().isAnimationEnabled())
+    if (Settings::getInstance().isAnimationEnabled())
     {
         animation->setKeyValueAt(0, verticalScrollBar()->sliderPosition());
         animation->setKeyValueAt(1, max);
@@ -129,7 +129,7 @@ QWidget *MessageDisplayWidget::createNewRow(const QString &name, const QString &
     messageLabel->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop);
     QString messageText = Smileypack::smilify(urlify(message.toHtmlEscaped())).replace('\n', "<br>");
     // Action
-    if(messageId < -1) {
+    if (messageId < -1) {
         QPalette actionPal;
         actionPal.setColor(QPalette::Foreground, Qt::darkGreen);
         messageLabel->setPalette(actionPal);

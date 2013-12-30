@@ -138,7 +138,7 @@ void GuiSettingsPage::searchSmileyPacks()
 {
     // Go to smiley pack folder
     QDir dir(Smileypack::packDir());
-    if(!dir.mkpath(Smileypack::packDir()))
+    if (!dir.mkpath(Smileypack::packDir()))
         return;
 
     // Go through all packs

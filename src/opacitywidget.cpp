@@ -28,7 +28,7 @@ OpacityWidget::OpacityWidget(QWidget *parent) :
     setOpacity(1);
 
     // Animation
-    if(Settings::getInstance().isAnimationEnabled())
+    if (Settings::getInstance().isAnimationEnabled())
     {
         animation = new QPropertyAnimation(this, "opacity");
         animation->setDuration(210);
@@ -51,7 +51,7 @@ void OpacityWidget::setOpacity(qreal arg)
 
 void OpacityWidget::showEvent(QShowEvent *e)
 {
-    if(Settings::getInstance().isAnimationEnabled())
+    if (Settings::getInstance().isAnimationEnabled())
         animation->start();
 
     QWidget::showEvent(e);

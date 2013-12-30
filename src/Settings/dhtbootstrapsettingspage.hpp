@@ -40,7 +40,6 @@ private:
     QHash<int, Settings::DhtServer> serverHash;
     int uniqueKey;
     QStandardItemModel* serverListModel;
-    QSortFilterProxyModel* serverListProxyModel;
     QTreeView* serverListView;
     bool serverListIsDirty;
 

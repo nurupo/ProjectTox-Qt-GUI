@@ -27,7 +27,7 @@ CopyableElideLabel::CopyableElideLabel(QWidget* parent) :
     connect(this, &CopyableElideLabel::customContextMenuRequested, this, &CopyableElideLabel::showContextMenu);
 
     actionCopy  = new QAction(tr("Copy"), this);
-    connect(actionCopy, &QAction::triggered, [this](){
+    connect(actionCopy, &QAction::triggered, [this]() {
         QApplication::clipboard()->setText(text());
     });
 }
