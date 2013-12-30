@@ -14,23 +14,22 @@
     See the COPYING file for more details.
 */
 
-#ifndef CLICKABLELABEL_HPP
-#define CLICKABLELABEL_HPP
+#ifndef COPYABLEELIDELABEL_HPP
+#define COPYABLEELIDELABEL_HPP
 
 #include "elidelabel.hpp"
 
-class ClickableLabel : public ElideLabel
+class CopyableElideLabel : public ElideLabel
 {
-    Q_OBJECT
 public:
-    explicit ClickableLabel(QWidget* parent = 0);
-    
-protected:
-    bool event(QEvent* event) override;
+    explicit CopyableElideLabel(QWidget* parent = 0);
 
-signals:
-    void clicked();
+private:
+    QAction* actionCopy;
+
+private slots:
+    void showContextMenu(const QPoint& pos);
 
 };
 
-#endif // CLICKABLELABEL_HPP
+#endif // COPYABLEELIDELABEL_HPP

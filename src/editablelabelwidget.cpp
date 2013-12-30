@@ -17,20 +17,44 @@
 #include "editablelabelwidget.hpp"
 
 #include <QVBoxLayout>
+#include <QApplication>
+#include <QEvent>
+#include <QMouseEvent>
+
+ClickableCopyableElideLabel::ClickableCopyableElideLabel(QWidget* parent) :
+    CopyableElideLabel(parent)
+{
+}
+
+bool ClickableCopyableElideLabel::event(QEvent* event)
+{
+    if (event->type() == QEvent::MouseButtonRelease) {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::LeftButton) {
+            emit clicked();
+        }
+    } else if (event->type() == QEvent::Enter) {
+        QApplication::setOverrideCursor(QCursor(Qt::PointingHandCursor));
+    } else if (event->type() == QEvent::Leave) {
+        QApplication::restoreOverrideCursor();
+    }
+
+    return CopyableElideLabel::event(event);
+}
 
 EditableLabelWidget::EditableLabelWidget(QWidget* parent) :
     QStackedWidget(parent)
 {
-    label = new ClickableLabel(this);
+    label = new ClickableCopyableElideLabel(this);
 
-    connect(label, &ClickableLabel::clicked,            this, &EditableLabelWidget::onLabelClicked);
+    connect(label, &ClickableCopyableElideLabel::clicked,   this, &EditableLabelWidget::onLabelClicked);
 
     lineEdit = new EscLineEdit(this);
 
-    connect(lineEdit, &EscLineEdit::editingFinished,    this, &EditableLabelWidget::onLabelChangeSubmited);
-    connect(lineEdit, &EscLineEdit::escPressed,         this, &EditableLabelWidget::onLabelChangeCancelled);
+    connect(lineEdit, &EscLineEdit::editingFinished,        this, &EditableLabelWidget::onLabelChangeSubmited);
+    connect(lineEdit, &EscLineEdit::escPressed,             this, &EditableLabelWidget::onLabelChangeCancelled);
 
-    connect(this, &EditableLabelWidget::currentChanged, this, &EditableLabelWidget::onCurrentChanged);
+    connect(this, &EditableLabelWidget::currentChanged,     this, &EditableLabelWidget::onCurrentChanged);
 
     addWidget(label);
     addWidget(lineEdit);

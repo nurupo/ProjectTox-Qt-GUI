@@ -91,8 +91,8 @@ SOURCES += \
     ../../src/Settings/emojifontsettingsdialog.cpp \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
-    ../../src/clickablelabel.cpp \
-    ../../src/esclineedit.cpp
+    ../../src/esclineedit.cpp \
+    ../../src/copyableelidelabel.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -134,8 +134,8 @@ HEADERS  += \
     ../../src/Settings/emojifontsettingsdialog.hpp \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
-    ../../src/clickablelabel.hpp \
-    ../../src/esclineedit.hpp
+    ../../src/esclineedit.hpp \
+    ../../src/copyableelidelabel.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \

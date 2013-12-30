@@ -17,11 +17,25 @@
 #ifndef EDITABLELABELWIDGET_HPP
 #define EDITABLELABELWIDGET_HPP
 
-#include "clickablelabel.hpp"
+#include "copyableelidelabel.hpp"
 #include "esclineedit.hpp"
 
 #include <QLineEdit>
 #include <QStackedWidget>
+
+class ClickableCopyableElideLabel : public CopyableElideLabel
+{
+    Q_OBJECT
+public:
+    explicit ClickableCopyableElideLabel(QWidget* parent = 0);
+
+protected:
+    bool event(QEvent* event) override;
+
+signals:
+    void clicked();
+
+};
 
 class EditableLabelWidget : public QStackedWidget
 {
@@ -29,7 +43,7 @@ class EditableLabelWidget : public QStackedWidget
 public:
     explicit EditableLabelWidget(QWidget* parent = 0);
 
-    ClickableLabel* label;
+    ClickableCopyableElideLabel* label;
     EscLineEdit* lineEdit;
 
     void addWidget(QWidget* w);
