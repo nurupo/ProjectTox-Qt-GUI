@@ -141,17 +141,15 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
 {
     QPoint globalPos = mapToGlobal(pos);
 
-    QMenu *contextMenu = new QMenu(this);
-    contextMenu->addAction(actionUndo);
-    contextMenu->addAction(actionRedo);
-    contextMenu->addSeparator();
-    contextMenu->addAction(actionCut);
-    contextMenu->addAction(actionCopy);
-    contextMenu->addAction(actionPaste);
+    QMenu contextMenu;
+    contextMenu.addAction(actionUndo);
+    contextMenu.addAction(actionRedo);
+    contextMenu.addSeparator();
+    contextMenu.addAction(actionCut);
+    contextMenu.addAction(actionCopy);
+    contextMenu.addAction(actionPaste);
 
     actionPaste->setDisabled(QApplication::clipboard()->text().isEmpty());
 
-    contextMenu->exec(globalPos);
-
-    contextMenu->deleteLater();
+    contextMenu.exec(globalPos);
 }

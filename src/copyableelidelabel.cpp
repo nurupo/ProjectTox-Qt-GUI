@@ -40,10 +40,8 @@ void CopyableElideLabel::showContextMenu(const QPoint& pos)
 
     QPoint globalPos = mapToGlobal(pos);
 
-    QMenu *contextMenu = new QMenu(this);
-    contextMenu->addAction(actionCopy);
+    QMenu contextMenu;
+    contextMenu.addAction(actionCopy);
 
-    contextMenu->exec(globalPos);
-
-    contextMenu->deleteLater();
+    contextMenu.exec(globalPos);
 }
