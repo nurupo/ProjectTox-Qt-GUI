@@ -3,7 +3,6 @@
 Profile::Profile(QString filePath)
 {
     pPath = filePath;
-    //pTox = tox_new(0);
     if (loadFile() != 0)
         throw 0;
 }
@@ -12,10 +11,6 @@ Profile::Profile(QString filePath, QString name, QString password)
 {
     pPath = filePath;
     pName = name;
-    //pTox = tox_new(0);
-
-    //if (pTox == nullptr)
-        //throw 0;
 
     //derive new key for saving
     randombytes(salt, 24);
@@ -66,9 +61,6 @@ int Profile::unlock(QString password)
     pData = (uint8_t*)malloc(pDataLength);
     memcpy(pData, blockTwoPlaintext + 36, pDataLength);
 
-    //create this profile's tox instance
-    //tox_load(pTox, messenger, blockTwoLength - 36);
-
     //check against loaded scrypt values being too small
     if(scryptN < 15)
         scryptN = 15;
@@ -111,16 +103,12 @@ bool Profile::isLocked()
     return pLocked;
 }
 
-
 int Profile::lock()
 {
     if(pLocked)
         return -1;
 
     saveFile();
-
-    //tox_kill(pTox);
-    //pTox = nullptr;
 
     memset(pData,0,pDataLength);
     memset(encryptedKey,0,32);
