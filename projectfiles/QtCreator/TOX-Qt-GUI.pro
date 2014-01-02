@@ -92,8 +92,8 @@ SOURCES += \
     ../../src/Settings/emojifontsettingsdialog.cpp \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
-    ../../src/clickablelabel.cpp \
     ../../src/esclineedit.cpp \
+    ../../src/copyableelidelabel.cpp \
     ../../src/profile.cpp
 
 HEADERS  += \
@@ -136,8 +136,8 @@ HEADERS  += \
     ../../src/Settings/emojifontsettingsdialog.hpp \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
-    ../../src/clickablelabel.hpp \
     ../../src/esclineedit.hpp \
+    ../../src/copyableelidelabel.hpp \
     ../../src/profile.hpp
 
 SOURCES += \

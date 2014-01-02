@@ -20,8 +20,6 @@
 
 #include <QTextEdit>
 
-
-
 class InputTextWidget : public QTextEdit
 {
     Q_OBJECT
@@ -29,14 +27,8 @@ public:
     InputTextWidget(QWidget* parent);
     QSize sizeHint() const;
 
-public slots:
-    void insertHtml(const QString &text);
-
 protected:
     void keyPressEvent(QKeyEvent* event);
-    void focusInEvent(QFocusEvent *e);
-    void focusOutEvent(QFocusEvent *e);
-
 
 signals:
     void sendMessage(const QString& message);
@@ -50,15 +42,12 @@ private slots:
 
 private:
     QString desmile(QString htmlText);
-    void showPlaceholder(bool show);
 
     QAction *actionUndo;
     QAction *actionRedo;
     QAction *actionCut;
     QAction *actionCopy;
     QAction *actionPaste;
-
-    bool placeholder;
 };
 
 #endif // INPUTTEXTWIDGET_HPP

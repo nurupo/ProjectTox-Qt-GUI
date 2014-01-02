@@ -63,13 +63,12 @@ void MessageLabel::showContextMenu(const QPoint &pos)
 {
     QPoint globalPos = mapToGlobal(pos);
 
-    QMenu *contextMenu = new QMenu(this);
+    QMenu contextMenu;
 
-    contextMenu->addAction(copyAction);
-    contextMenu->addAction(copyAllAction);
+    contextMenu.addAction(copyAction);
+    contextMenu.addAction(copyAllAction);
 
     copyAction->setEnabled(hasSelectedText());
 
-    contextMenu->exec(globalPos);
-    contextMenu->deleteLater();
+    contextMenu.exec(globalPos);
 }

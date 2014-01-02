@@ -17,13 +17,13 @@
 
 #include "inputtextwidget.hpp"
 
-#include <QKeyEvent>
-#include <QTextDocumentFragment>
+#include <QAction>
 #include <QApplication>
 #include <QClipboard>
 #include <QIcon>
-#include <QAction>
+#include <QKeyEvent>
 #include <QMenu>
+#include <QTextDocumentFragment>
 
 #include "smileypack.hpp"
 #include "Settings/settings.hpp"
@@ -32,25 +32,46 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
     QTextEdit(parent)
 {
     setMinimumSize(10, 50);
+
+    setPlaceholderText(tr("Type your text here..."));
+
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InputTextWidget::customContextMenuRequested, this, &InputTextWidget::showContextMenu);
-    showPlaceholder(true);
 
     actionUndo  = new QAction(QIcon(":/icons/arrow_undo.png"), tr("Undo"), this);
     actionRedo  = new QAction(QIcon(":/icons/arrow_redo.png"), tr("Redo"), this);
     actionCut   = new QAction(QIcon(":/icons/cut.png"), tr("Cut"), this);
     actionCopy  = new QAction(QIcon(":/icons/page_copy.png"), tr("Copy"), this);
     actionPaste = new QAction(QIcon(":/icons/paste_plain.png"), tr("Paste"), this);
+
     actionUndo->setShortcut(QKeySequence::Undo);
     actionRedo->setShortcut(QKeySequence::Redo);
     actionCut->setShortcut(QKeySequence::Cut);
     actionCopy->setShortcut(QKeySequence::Copy);
     actionPaste->setShortcut(QKeySequence::Paste);
+
+    actionUndo->setEnabled(false);
+    actionRedo->setEnabled(false);
+    actionCut->setEnabled(false);
+    actionCopy->setEnabled(false);
+    actionPaste->setEnabled(!QApplication::clipboard()->text().isEmpty());
+
     connect(actionUndo,  &QAction::triggered, this, &InputTextWidget::undo);
     connect(actionRedo,  &QAction::triggered, this, &InputTextWidget::redo);
     connect(actionCut,   &QAction::triggered, this, &InputTextWidget::cutPlainText);
     connect(actionCopy,  &QAction::triggered, this, &InputTextWidget::copyPlainText);
     connect(actionPaste, &QAction::triggered, this, &InputTextWidget::pastePlainText);
+
+    connect(this, &InputTextWidget::undoAvailable, [this](bool enabled) {
+        actionUndo->setEnabled(enabled);
+    });
+    connect(this, &InputTextWidget::redoAvailable, [this](bool enabled) {
+        actionRedo->setEnabled(enabled);
+    });
+    connect(this, &InputTextWidget::copyAvailable, [this](bool enabled) {
+        actionCut->setEnabled(enabled);
+        actionCopy->setEnabled(enabled);
+    });
 }
 
 /*! Handle keyboard events. */
@@ -66,6 +87,7 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
         } else {
             emit sendMessage(Smileypack::desmilify(toHtml()));
         }
+        // not only clears the text, but also removes undo/redo history
         clear();
 
     // Override default shortcuts
@@ -82,36 +104,16 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     }
 }
 
-// FIXME: Replace Placeholder by Qt5.2 placeholder.
-void InputTextWidget::focusInEvent(QFocusEvent *e)
-{
-    showPlaceholder(false);
-    QTextEdit::focusInEvent(e);
-}
-
-// FIXME: Replace Placeholder by Qt5.2 placeholder.
-void InputTextWidget::focusOutEvent(QFocusEvent *e)
-{
-    showPlaceholder(true);
-    QTextEdit::focusInEvent(e);
-}
-
 QSize InputTextWidget::sizeHint() const
 {
     return QSize(10, 50);
-}
-
-void InputTextWidget::insertHtml(const QString &text)
-{
-    showPlaceholder(false);
-    QTextEdit::insertHtml(text);
 }
 
 /*! Copy text without images, but textual representations of the smileys. */
 void InputTextWidget::copyPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
-    if(!selection.isEmpty()) {
+    if (!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(Smileypack::desmilify(selection.toHtml()));
     }
@@ -128,7 +130,7 @@ void InputTextWidget::pastePlainText()
 void InputTextWidget::cutPlainText()
 {
     QTextDocumentFragment selection = textCursor().selection();
-    if(!selection.isEmpty()) {
+    if (!selection.isEmpty()) {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(Smileypack::desmilify(selection.toHtml()));
         textCursor().removeSelectedText();
@@ -139,48 +141,15 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
 {
     QPoint globalPos = mapToGlobal(pos);
 
-    QMenu *contextMenu = new QMenu(this);
-    contextMenu->addAction(actionUndo);
-    contextMenu->addAction(actionRedo);
-    contextMenu->addSeparator();
-    contextMenu->addAction(actionCut);
-    contextMenu->addAction(actionCopy);
-    contextMenu->addAction(actionPaste);
+    QMenu contextMenu;
+    contextMenu.addAction(actionUndo);
+    contextMenu.addAction(actionRedo);
+    contextMenu.addSeparator();
+    contextMenu.addAction(actionCut);
+    contextMenu.addAction(actionCopy);
+    contextMenu.addAction(actionPaste);
 
-    // Disable cut and copy if nothing to copy
-    if(textCursor().selection().isEmpty()) {
-        actionCut->setDisabled(true);
-        actionCopy->setDisabled(true);
-    }
+    actionPaste->setDisabled(QApplication::clipboard()->text().isEmpty());
 
-    // Disable paste if clipboard is empty
-    if(QApplication::clipboard()->text().isEmpty()) {
-        actionPaste->setDisabled(true);
-    }
-
-    contextMenu->exec(globalPos);
-    contextMenu->deleteLater();
-
-    actionCut->setEnabled(true);
-    actionCopy->setEnabled(true);
-    actionPaste->setEnabled(true);
-}
-
-// FIXME: Replace Placeholder by Qt5.2 placeholder.
-void InputTextWidget::showPlaceholder(bool show)
-{
-    if(show && toPlainText().isEmpty()) {
-        QPalette pal = palette();
-        pal.setColor(QPalette::Text, pal.color(QPalette::Mid));
-        setPalette(pal);
-        setText(tr("Type text here..."));
-        placeholder = true;
-    }
-    else if(!show && placeholder) {
-        QPalette pal = palette();
-        pal.setColor(QPalette::Text, pal.color(QPalette::WindowText));
-        setPalette(pal);
-        clear();
-        placeholder = false;
-    }
+    contextMenu.exec(globalPos);
 }

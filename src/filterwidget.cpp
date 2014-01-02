@@ -21,6 +21,7 @@
 FilterWidget::FilterWidget(QWidget* parent) :
     QLineEdit(parent)
 {
+    setClearButtonEnabled(true);
 }
 
 void FilterWidget::keyPressEvent(QKeyEvent* event)

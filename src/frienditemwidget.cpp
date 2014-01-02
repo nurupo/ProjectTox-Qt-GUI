@@ -26,14 +26,14 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     statusLabel->setScaledContents(true);
     statusLabel->setFixedSize(24, 24);
 
-    usernameLabel = new ElideLabel(this);
+    usernameLabel = new CopyableElideLabel(this);
     usernameLabel->setAlignment(Qt::AlignLeft);
     usernameLabel->setTextElide(true);
     usernameLabel->setTextElideMode(Qt::ElideRight);
     usernameLabel->setShowToolTipOnElide(true);
     usernameLabel->setMinimumSize(10, 10);
 
-    statusMessageLabel = new ElideLabel(this);
+    statusMessageLabel = new CopyableElideLabel(this);
     statusMessageLabel->setAlignment(Qt::AlignLeft);
     statusMessageLabel->setTextElide(true);
     statusMessageLabel->setTextElideMode(Qt::ElideRight);
@@ -60,7 +60,6 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     layout->setSpacing(2);
     layout->addWidget(statusWidget, 0, Qt::AlignTop);
     layout->addWidget(textWidget, 1, Qt::AlignVCenter);
-
 }
 
 void FriendItemWidget::setStatus(Status status)

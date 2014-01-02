@@ -61,8 +61,8 @@ Note the use of `--recursive` in `git clone`. This will automatically initialize
 
 Note that you should not update submodules on your own if you don't know what you are doing. Newer versions of submodules might not be compatible with the project (as in "won't work" or even "won't build"), and may require testing and some code changes.
 
-Next you will need to download and extract [this archive containing precompiled binaries of libsodium 0.4.2 for Windows](https://dl.dropboxusercontent.com/u/20447449/libsodium_4.2.0.zip) at `ProjectTox-Qt-GUI\`, so that `ProjectTox-Qt-GUI\libs\sodium\include` becomes a valid path.
-Alternativly, you can build the library from the [libsodium](https://github.com/jedisct1/libsodium) repo yourself. 0.4.2+ versions should work.
+Next you will need to create `libs` directory in repo's root, then download [a MinGW release of libsodium 0.4.2+](https://download.libsodium.org/libsodium/releases/), extract `libsodium-win32` into previously created `libs`directory and rename `libsodium-win32` into `sodium`. After all those manipulations `ProjectTox-Qt-GUI\libs\sodium\include` should become a valid path.
+Alternatively, instead of downloading the precompiled binaries of libsodium, you can build the library from the [libsodium](https://github.com/jedisct1/libsodium) repo yourself and repeat the steps above using it. 0.4.2+ versions should work.
 
 Then open the Qt Creator, which should have been installed with Qt, select `File -> Open File or Project...` and open the project file at `ProjectTox-Qt-GUI\projectfiles\QtCreator\TOX-Qt-GUI.pro`, select Qt5.2.0+ libraries and click on `Configure Project`.
 
