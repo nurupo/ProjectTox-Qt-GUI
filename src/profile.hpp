@@ -22,7 +22,7 @@ extern "C" {
  * 4        magic       uint8       magic,6c:69:62:65 "libe"
  * 8        saved       uint64      timestamp of when the profile was last used
  * 2        namelen     uint16      length of name
- * varies   name        uint8       name of profile
+ * varies   name        uint8       name of profile, UTF-8
  * 12       scryptvars  uint32      N,r,p variables for scrypt - in this order
  * 24       salt        uint8       the salt for scrypt
  * 24       nonce       uint8       the nonce for nacl

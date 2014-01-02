@@ -15,7 +15,7 @@ Profile::Profile(QString filePath, QString name, QString password)
     //derive new key for saving
     randombytes(salt, 24);
     randombytes(nonce, 24);
-    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+    scrypt((const uint8_t*)password.toUtf8().constData(), password.toUtf8().size(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
     pLocked = false;
 }
 
@@ -42,7 +42,7 @@ int Profile::unlock(QString password)
     file.close();
 
     //derive key from file
-    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+    scrypt((const uint8_t*)password.toUtf8().constData(), password.toUtf8().size(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
 
     //decrypt block
     if(crypto_secretbox_open(blockTwoPlaintext,blockTwoEncrypted,blockTwoLength,nonce,encryptedKey) != 0)
@@ -74,7 +74,7 @@ int Profile::unlock(QString password)
      */
     randombytes(salt, 24);
     randombytes(nonce, 24);
-    scrypt((const uint8_t*)password.toLocal8Bit().constData(), password.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+    scrypt((const uint8_t*)password.toUtf8().constData(), password.toUtf8().size(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
 
     memset(blockTwoPlaintext, 0, blockTwoLength);
 
@@ -124,7 +124,7 @@ int Profile::changePassword(QString oldPassword, QString newPassword)
             return -1;
 
     uint8_t oldKey[32];
-    scrypt((const uint8_t*)oldPassword.toLocal8Bit().constData(), oldPassword.length(), salt, 24, scryptN, scryptR, scryptP, oldKey, 32);
+    scrypt((const uint8_t*)oldPassword.toUtf8().constData(), oldPassword.toUtf8().size(), salt, 24, scryptN, scryptR, scryptP, oldKey, 32);
 
     /* Check to see if keys match.
      * Although there's no cryptographic need to do so, it ensures that whomever's using
@@ -134,7 +134,7 @@ int Profile::changePassword(QString oldPassword, QString newPassword)
     if(strcmp((const char*)oldKey,(const char*)encryptedKey) != 0)
         return -1;
 
-    scrypt((const uint8_t*)newPassword.toLocal8Bit().constData(), newPassword.length(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
+    scrypt((const uint8_t*)newPassword.toUtf8().constData(), newPassword.toUtf8().size(), salt, 24, scryptN, scryptR, scryptP, encryptedKey, 32);
 
     return 0;
 }
@@ -197,7 +197,7 @@ int Profile::loadFile()
     uint16_t nameLength;
     memcpy(&nameLength, rawFile + offset, 2);
     offset += 2;
-    pName.fromLocal8Bit((const char*)rawFile + offset, nameLength);
+    pName = QString::fromUtf8((const char*)rawFile + offset, nameLength);
     offset += nameLength;
 
     //scrypt vars
@@ -243,7 +243,7 @@ int Profile::saveFile()
 
     /* Compose entire file */
     //determine file size & create buffer
-    uint16_t nameLength = pName.length();
+    uint16_t nameLength = pName.toUtf8().size();
     totalLength = blockTwoSize + nameLength + 82;
     uint8_t buffer[totalLength];
 
@@ -261,7 +261,7 @@ int Profile::saveFile()
     //profile name
     memcpy(buffer + offset, &nameLength, 2);
     offset += 2;
-    memcpy(buffer + offset, pName.toLocal8Bit().constData(), nameLength);
+    memcpy(buffer + offset, pName.toUtf8().constData(), nameLength);
     offset += nameLength;
 
     //scrypt values
