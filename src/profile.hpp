@@ -83,7 +83,7 @@ public:
      *
      * returns the size of the buffer - 0, if unsuccessful
      */
-    size_t loadData(uint8_t *buffer);
+    size_t loadData(uint8_t **buffer);
 
     /* Saves the given messenger.
      * This does not lock the profile.

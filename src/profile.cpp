@@ -139,13 +139,13 @@ int Profile::changePassword(QString oldPassword, QString newPassword)
     return 0;
 }
 
-size_t Profile::loadData(uint8_t *buffer)
+size_t Profile::loadData(uint8_t **buffer)
 {
     if(pLocked)
         return -1;
 
-    buffer = (uint8_t*)malloc(pDataLength);
-    memcpy(buffer, pData, pDataLength);
+    *buffer = (uint8_t*)malloc(pDataLength);
+    memcpy(*buffer, pData, pDataLength);
     return pDataLength;
 }
 
@@ -157,6 +157,7 @@ int Profile::saveData(uint8_t *buffer, size_t length)
     if(pData != nullptr)
         free(pData);
 
+    pDataLength = length;
     pData = (uint8_t*)malloc(length);
     memcpy(pData, buffer, length);
     saveFile();
