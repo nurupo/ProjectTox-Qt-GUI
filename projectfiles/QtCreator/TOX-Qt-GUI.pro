@@ -35,7 +35,10 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/ ../../submodules/scrypt-jane/
+INCLUDEPATH += \
+    ../../src/ ../../submodules/ProjectTox-Core/toxcore/ \
+    ../../submodules/ProjectTox-libtoxdata/ \
+    ../../submodules/ProjectTox-libtoxdata/submodules/scrypt-jane/
 win32:INCLUDEPATH += ../../libs/sodium/include/
 macx:INCLUDEPATH += /usr/local/include
 
@@ -170,10 +173,12 @@ HEADERS  += \
     ../../submodules/ProjectTox-Core/toxcore/assoc.h
 
 SOURCES += \
-    ../../submodules/scrypt-jane/scrypt-jane.c
+    ../../submodules/ProjectTox-libtoxdata/tox_data.c \
+    ../../submodules/ProjectTox-libtoxdata/submodules/scrypt-jane/scrypt-jane.c
 
 HEADERS += \
-    ../../submodules/scrypt-jane/scrypt-jane.h
+    ../../submodules/ProjectTox-libtoxdata/tox_data.h \
+    ../../submodules/ProjectTox-libtoxdata/submodules/scrypt-jane/scrypt-jane.h
 
 RESOURCES += \
     ../../resources/resources.qrc

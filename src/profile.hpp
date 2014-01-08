@@ -6,7 +6,7 @@
 #include <sodium.h>
 
 extern "C" {
-#include <scrypt-jane.h>
+#include "tox_data.h"
 }
 
 #include <QObject>
@@ -100,34 +100,7 @@ public:
     int flush();
 
 private:
-    int loadFile();
-    int saveFile();
-
-    //The profile's save path & encryption status.
-    QString pPath;
-    bool pLocked = true;
-
-    uint8_t encryptedKey[crypto_secretbox_KEYBYTES], //Sodium encrypt key, 32 bytes.
-            nonce[crypto_secretbox_NONCEBYTES], //Sodium nonce, 24 bytes.
-            salt[24]; //Scrypt salt, 24 bytes.
-
-    /* These values were sourced from here: https://www.tarsnap.com/scrypt/scrypt-slides.pdf
-     * Percival recommends these values for interactive logins - we can always adjust them later
-     * for increased difficulty.
-     */
-    uint32_t scryptN = 15, scryptR = 8, scryptP = 1;
-
-    //The profile's name and last save time.
-    QString pName;
-    QDateTime pSavedTime;
-
-    //The encrypted block's file offset and length.
-    size_t blockTwoOffset;
-    uint64_t blockTwoLength;
-
-    //The unencrypted messenger data.
-    uint8_t *pData = nullptr;
-    size_t pDataLength;
+    tox_data *pData;
 };
 
 #endif // PROFILE_H
