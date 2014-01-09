@@ -54,7 +54,10 @@ win32 {
 
 win32:DEFINES += WIN32
 DEFINES += SCRYPT_SALSA SCRYPT_SHA256
-QMAKE_CFLAGS += -no-integrated-as
+
+contains(QMAKE_CC, clang) {
+    QMAKE_CFLAGS += -no-integrated-as
+}
 
 SOURCES += \
     ../../src/main.cpp \
