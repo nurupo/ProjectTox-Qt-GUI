@@ -22,6 +22,7 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd ..
+  - git submodule update --init --recursive
 
 script:
   - ~/Qt5.2.0/5.2.0/gcc_64/bin/qmake -v
