@@ -17,6 +17,8 @@ class Profile : public QObject
 {
     Q_OBJECT
 public:
+    /* See tox_data.h for full documentation on function return values & behavior. */
+
     /* Loads a profile from the given path.
      * Throws an exception (0) if the profile can't be loaded.
      */
@@ -27,10 +29,6 @@ public:
     Profile(QString filePath, QString name, QString password);
     ~Profile();
 
-    /* Attempts to decrypt the messenger.
-     *
-     * returns 0 if success
-     */
     int unlock(QString password);
 
     /* Changes the saved name for the profile. */
@@ -45,38 +43,10 @@ public:
 
     /* ------------- REQUIRES UNLOCKING ------------- */
 
-    /* Locks the profile, requiring an unlock() to again access.
-     * This function also flushes data to disk.
-     *
-     * returns 0 if success
-     */
     int lock();
-
-    /* Changes the password for the profile.
-     * This does not lock the profile
-     *
-     * returns 0 if success.
-     */
     int changePassword(QString oldPassword, QString newPassword);
-
-    /* Loads the messenger into the given buffer.
-     *
-     * returns the size of the buffer - 0, if unsuccessful
-     */
     size_t loadData(uint8_t **buffer);
-
-    /* Saves the given messenger.
-     * This does not lock the profile.
-     *
-     * returns 0 if successful
-     */
     int saveData(uint8_t *buffer, size_t length);
-
-    /* Saves the current data to disk.
-     * This does not lock the profile.
-     *
-     * returns 0 if success
-     */
     int flush();
 
 private:
