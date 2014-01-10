@@ -4,14 +4,14 @@ Profile::Profile(QString filePath)
 {
     pData = data_init_load((char*)filePath.toLocal8Bit().constData());
     if (pData == NULL)
-        throw 0;
+        brokenProfile();
 }
 
 Profile::Profile(QString filePath, QString name, QString password)
 { 
     pData = data_init_new((char*)filePath.toLocal8Bit().constData(), (uint8_t*)name.toUtf8().constData(), (uint8_t*)password.toUtf8().constData());
     if (pData == NULL)
-        throw 0;
+        brokenProfile();
 }
 
 Profile::~Profile()
@@ -71,4 +71,11 @@ int Profile::saveData(uint8_t *buffer, size_t length)
 int Profile::flush()
 {
     return data_flush(pData);
+}
+
+void Profile::brokenProfile()
+{
+    //create a profile that won't be unlocked
+    char tmp[L_tmpnam];
+    pData = data_init_new(tmpnam(tmp), "Broken Profile!", "don'tlogin");
 }

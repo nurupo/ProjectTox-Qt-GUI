@@ -50,6 +50,7 @@ public:
     int flush();
 
 private:
+    void brokenProfile();
     tox_data *pData;
 };
 
