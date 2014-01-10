@@ -4,10 +4,7 @@
 #include <tox.h>
 #include <util.h>
 #include <sodium.h>
-
-extern "C" {
-#include "tox_data.h"
-}
+#include <tox_data.h>
 
 #include <QObject>
 #include <QFile>
