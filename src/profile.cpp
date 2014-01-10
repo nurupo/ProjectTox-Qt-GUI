@@ -75,7 +75,7 @@ int Profile::flush()
 
 void Profile::brokenProfile()
 {
-    //create a profile that won't be unlocked
-    char tmp[L_tmpnam];
-    pData = data_init_new(tmpnam(tmp), "Broken Profile!", "don'tlogin");
+    //Create a profile that won't be unlocked. This will probably never be called.
+    char tmp[L_tmpnam + 1];
+    pData = data_init_new(tmpnam(tmp), (uint8_t*)"Broken Profile!", (uint8_t*)"don'tlogin");
 }
