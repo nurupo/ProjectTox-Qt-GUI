@@ -58,14 +58,21 @@ int Profile::changePassword(QString oldPassword, QString newPassword)
     return data_change_key(pData, (uint8_t*)oldPassword.toUtf8().constData(), (uint8_t*)newPassword.toUtf8().constData());
 }
 
-size_t Profile::loadData(uint8_t **buffer)
+int Profile::loadMessenger(Tox *tox)
 {
-    return data_read_messenger(pData, buffer);
+    uint8_t *buffer;
+    size_t size = data_read_messenger(pData, &buffer);
+    if(tox_load(tox, buffer, size) != 0)
+        return -1;
+    return 0;
 }
 
-int Profile::saveData(uint8_t *buffer, size_t length)
+int Profile::saveMessenger(Tox *tox)
 {
-    return data_write_messenger(pData, buffer, length);
+    size_t size = tox_size(tox);
+    uint8_t buffer[size];
+    tox_save(tox, buffer);
+    return data_write_messenger(pData, buffer, size);
 }
 
 int Profile::flush()

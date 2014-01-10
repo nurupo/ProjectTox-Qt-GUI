@@ -45,8 +45,19 @@ public:
 
     int lock();
     int changePassword(QString oldPassword, QString newPassword);
-    size_t loadData(uint8_t **buffer);
-    int saveData(uint8_t *buffer, size_t length);
+
+    /* Loads the given messenger
+     *
+     * returns 0 if success
+     */
+    int loadMessenger(Tox *tox);
+
+    /* Saves the given messenger
+     *
+     * returns 0 if success
+     */
+    int saveMessenger(Tox *tox);
+
     int flush();
 
 private:
