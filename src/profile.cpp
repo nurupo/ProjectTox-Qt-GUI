@@ -8,7 +8,7 @@ Profile::Profile(QString filePath)
 }
 
 Profile::Profile(QString filePath, QString name, QString password)
-{ 
+{
     pData = data_init_new((char*)filePath.toLocal8Bit().constData(), (uint8_t*)name.toUtf8().constData(), (uint8_t*)password.toUtf8().constData());
     if (pData == NULL)
         brokenProfile();
@@ -60,8 +60,9 @@ int Profile::changePassword(QString oldPassword, QString newPassword)
 
 int Profile::loadMessenger(Tox *tox)
 {
-    uint8_t *buffer;
-    size_t size = data_read_messenger(pData, &buffer);
+    size_t size = data_messenger_size(pData);
+    uint8_t buffer[size];
+    data_read_messenger(pData, buffer);
     if(tox_load(tox, buffer, size) != 0)
         return -1;
     return 0;
