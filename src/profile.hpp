@@ -9,6 +9,8 @@
 #include <QObject>
 #include <QFile>
 #include <QDateTime>
+#include <QDir>
+#include <QCoreApplication>
 
 class Profile : public QObject
 {

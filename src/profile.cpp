@@ -84,6 +84,6 @@ int Profile::flush()
 void Profile::brokenProfile()
 {
     //Create a profile that won't be unlocked. This will probably never be called.
-    char tmp[L_tmpnam + 1];
-    pData = data_init_new(tmpnam(tmp), (uint8_t*)"Broken Profile!", (uint8_t*)"don'tlogin");
+    QString path = QDir::tempPath() + "/" + QCoreApplication::applicationName() + "." + QString::number(qrand());
+    pData = data_init_new((char*)path.toLocal8Bit().constData(), (uint8_t*)"Broken Profile!", (uint8_t*)"don'tlogin");
 }
