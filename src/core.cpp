@@ -230,12 +230,12 @@ void Core::sendFiles()
             len = state->readData(buf, chunk_size);
 
             if (len == 0) {
-                tox_file_sendcontrol(tox, fid, 0, fn,
+                tox_file_send_control(tox, fid, 0, fn,
                         TOX_FILECONTROL_FINISHED, NULL, 0);
                 completed = true;
                 break;
             } else {
-                if (!tox_file_senddata(tox, fid, fn, (uint8_t*)buf, len)) {
+                if (!tox_file_send_data(tox, fid, fn, (uint8_t*)buf, len)) {
                     break;
                 }
                 state->readComplete();
@@ -303,13 +303,13 @@ void Core::start()
 
 void Core::fileSendRequest(int friendId, const QString& filename)
 {
-    tox_new_filesender(tox, friendId, QFileInfo(filename).size(),
+    tox_new_file_sender(tox, friendId, QFileInfo(filename).size(),
             (uint8_t*)(const char*)filename.toUtf8(), filename.length() + 1);
 }
 
 void Core::sendFile(int friendId, FileTransferState* state)
 {
-    int chunk_size = tox_filedata_size(tox, friendId);
+    int chunk_size = tox_file_data_size(tox, friendId);
     state->createBuf(chunk_size);
     fileSenders.append(state);
 }
