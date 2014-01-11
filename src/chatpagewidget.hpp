@@ -29,7 +29,6 @@
 #include <QTextBrowser>
 #include <QTextEdit>
 #include <QWidget>
-#include <QPushButton>
 
 class MessageDisplayWidget;
 class QToolButton;
@@ -50,7 +49,7 @@ private:
     QMap<quint8, FileTransferState*> states;
 
     InputTextWidget* input;
-    QPushButton *filesendButton;
+    QToolButton *filesendButton;
     QToolButton *emoticonButton;
 
     int friendId;

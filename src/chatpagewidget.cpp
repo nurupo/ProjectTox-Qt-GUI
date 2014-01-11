@@ -32,12 +32,10 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 {
     friendItem = new FriendItemWidget(this);
     display = new MessageDisplayWidget(this);
-    filesendButton = new QPushButton(tr("Send File"), this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
     connect(input, &InputTextWidget::sendAction,  this, &ChatPageWidget::sendAction);
-    connect(filesendButton, &QPushButton::clicked, this, &ChatPageWidget::promptSendFile);
 
     // Create emoticon menu :)
     CustomHintWidget *inputPanel = new CustomHintWidget(this, QSize(10, 10));
@@ -45,16 +43,25 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     emoticonButton = new QToolButton(inputPanel);
     emoticonButton->setPopupMode(QToolButton::InstantPopup);
     emoticonButton->setIcon(QIcon(":/icons/emoticons/emotion_smile.png"));
-    emoticonButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    emoticonButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     emoticonButton->setMenu(menu);
     connect(menu, &EmoticonMenu::insertEmoticon, input, &InputTextWidget::insertHtml);
+
+    filesendButton = new QToolButton(this);
+    filesendButton->setIcon(QIcon(":/icons/attach.png"));
+    filesendButton->setToolTip(tr("Send file"));
+    filesendButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    connect(filesendButton, &QToolButton::clicked, this, &ChatPageWidget::promptSendFile);
+
+    QVBoxLayout *buttonlayout = new QVBoxLayout();
+    buttonlayout->addWidget(emoticonButton);
+    buttonlayout->addWidget(filesendButton);
 
     QHBoxLayout *inputLayout = new QHBoxLayout(inputPanel);
     inputLayout->setContentsMargins(0,0,0,0);
     inputLayout->setSpacing(2);
     inputLayout->addWidget(input);
-    inputLayout->addWidget(emoticonButton);
-    inputLayout->addWidget(filesendButton);
+    inputLayout->addLayout(buttonlayout);
 
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
