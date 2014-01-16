@@ -23,7 +23,7 @@ See [INSTALL.md](INSTALL.md)
 
 ## Contributing
 
-1. Find a thing to fix/implement in [Issues](https://github.com/nurupo/ProjectTox-Qt-GUI/issues?direction=desc&sort=created&state=open) or came up with your own idea, [create a discussion issue](https://github.com/nurupo/ProjectTox-Qt-GUI/issues/new) for it and get a feedback.
+1. Find a thing to fix/implement in [Issues](https://github.com/nurupo/ProjectTox-Qt-GUI/issues?direction=desc&sort=created&state=open) or come up with your own idea, [create a discussion issue](https://github.com/nurupo/ProjectTox-Qt-GUI/issues/new) for it and get a feedback.
 2. [Fork the repo](https://help.github.com/articles/fork-a-repo)
 3. Create your feature branch (`git checkout -b my-new-feature`)
 4. Commit your changes (`git commit -am 'Add some feature'`)
@@ -32,7 +32,7 @@ See [INSTALL.md](INSTALL.md)
 
 ## Contact
 
-You can usually find me at the following IRC channel channel: [irc://chat.freenode.net:6667/tox-dev](http://webchat.freenode.net/?channels=#tox-dev).
+You can usually find me at the following IRC channel : [irc://chat.freenode.net:6667/tox-dev](http://webchat.freenode.net/?channels=#tox-dev).
 
 ## License
 
