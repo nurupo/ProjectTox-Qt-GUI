@@ -64,6 +64,18 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->addWidget(splitter);
     layout->setSpacing(2);
     layout->setContentsMargins(0, 0, 2, 3);
+
+    model.insertNewMessage("Hallo Welt!", "Schlumpf");
+    model.insertNewMessage("Hallo Welt3!", "Schlumpf");
+
+
+
+    //view = new QTreeView(this);
+    //layout->addWidget(view);
+    //view->setModel(&model);
+
+    cv = new ChatView(&model, this);
+    layout->addWidget(cv);
 }
 
 int ChatPageWidget::getFriendId() const
@@ -74,6 +86,12 @@ int ChatPageWidget::getFriendId() const
 void ChatPageWidget::messageReceived(const QString& message)
 {
     display->appendMessage(username, message, -1, false);
+
+    model.insertNewMessage(message, username);
+
+    for(int i=0; i<10000; i++){
+        model.insertNewMessage(QString::number(i), username);
+    }
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
@@ -98,6 +116,8 @@ void ChatPageWidget::setStatusMessage(const QString& statusMessage)
 void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
     display->appendMessage(Settings::getInstance().getUsername(), message, messageId, true);
+
+    model.insertNewMessage(message, Settings::getInstance().getUsername());
 }
 
 void ChatPageWidget::actionReceived(const QString &message)

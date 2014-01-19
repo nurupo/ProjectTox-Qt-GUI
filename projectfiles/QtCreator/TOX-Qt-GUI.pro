@@ -92,7 +92,17 @@ SOURCES += \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
-    ../../src/copyableelidelabel.cpp
+    ../../src/copyableelidelabel.cpp \
+    ../../src/messages/messagemodel.cpp \
+    ../../src/messages/message.cpp \
+    ../../src/messages/messagemodelitem.cpp \
+    ../../src/messages/chatscene.cpp \
+    ../../src/messages/chatitem.cpp \
+    ../../src/messages/chatline.cpp \
+    ../../src/messages/chatview.cpp \
+    ../../src/messages/clickable.cpp \
+    ../../src/messages/markerlineitem.cpp \
+    ../../src/messages/columnhandleitem.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -135,7 +145,18 @@ HEADERS  += \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
-    ../../src/copyableelidelabel.hpp
+    ../../src/copyableelidelabel.hpp \
+    ../../src/messages/id.hpp \
+    ../../src/messages/messagemodel.hpp \
+    ../../src/messages/message.hpp \
+    ../../src/messages/messagemodelitem.hpp \
+    ../../src/messages/chatscene.hpp \
+    ../../src/messages/chatitem.hpp \
+    ../../src/messages/chatline.hpp \
+    ../../src/messages/chatview.hpp \
+    ../../src/messages/clickable.hpp \
+    ../../src/messages/markerlineitem.hpp \
+    ../../src/messages/columnhandleitem.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \

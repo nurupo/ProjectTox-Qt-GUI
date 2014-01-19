@@ -24,6 +24,10 @@
 #include <QTextEdit>
 #include <QWidget>
 
+#include "messages/messagemodel.hpp"
+#include "QTreeView"
+#include "messages/chatview.hpp"
+
 class MessageDisplayWidget;
 class QToolButton;
 
@@ -47,6 +51,11 @@ private:
     int friendId;
     QString username;
     Status status;
+
+    MessageModel model;
+    QTreeView *view;
+    ChatView *cv;
+
 
 public slots:
     void messageReceived(const QString& message);
