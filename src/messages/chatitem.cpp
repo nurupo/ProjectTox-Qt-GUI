@@ -63,7 +63,7 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setClipRect(boundingRect());
     paintBackground(painter);
 
-    layout()->draw(painter, pos(), QVector<QTextLayout::FormatRange>(), boundingRect());
+    layout()->draw(painter, pos(), additionalFormats(), boundingRect());
 
     painter->restore();
 }
@@ -272,6 +272,40 @@ void ChatItem::paintBackground(QPainter *painter)
     painter->fillRect(boundingRect(), brush);
 }
 
+QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
+{
+    if (!hasSelection())
+        return QVector<QTextLayout::FormatRange>();
+
+    int start, end;
+    if (_selectionMode == FullSelection) {
+        start = 0;
+        end = data(MessageModel::DisplayRole).toString().length();
+    }
+    else {
+        start = qMin(_selectionStart, _selectionEnd);
+        end = qMax(_selectionStart, _selectionEnd);
+    }
+
+    QTextCharFormat format;
+    format.setBackground(Qt::red);
+
+    QTextLayout::FormatRange range;
+    range.start = start;
+    range.length = end - start;
+    range.format = format;
+
+    QVector<QTextLayout::FormatRange> ret;
+    ret.append(range);
+
+    return ret;
+}
+
+QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
+{
+    return selectionFormats();
+}
+
 void ChatItem::setSelection(ChatItem::SelectionMode mode, qint16 start, qint16 end)
 {
     _selectionMode = mode;
@@ -335,7 +369,7 @@ void SenderChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
         QPainter pixPainter(&pixmap);
         pixPainter.setCompositionMode(QPainter::CompositionMode_Source);
-        layout()->draw(&pixPainter, QPointF(qMax(offset, (qreal)0), 0));
+        layout()->draw(&pixPainter, QPointF(qMax(offset, (qreal)0), 0), additionalFormats());
         pixPainter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
         pixPainter.fillRect(0,0, pixmap.size().width(), pixmap.size().height(), gradient);
         pixPainter.end();
@@ -343,7 +377,7 @@ void SenderChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         painter->drawPixmap(pos(), pixmap);
     }
     else {
-        layout()->draw(painter, pos(), QVector<QTextLayout::FormatRange>(), boundingRect());
+        layout()->draw(painter, pos(), additionalFormats(), boundingRect());
     }
     painter->restore();
 }
@@ -480,7 +514,20 @@ void ContentsChatItem::copyLinkToClipboard()
 
 QVector<QTextLayout::FormatRange> ContentsChatItem::additionalFormats() const
 {
-    QVector<QTextLayout::FormatRange> fmt;
+    QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
+
+    // coloring links
+    for (int i = 0; i < privateData()->clickables.count(); i++) {
+        Clickable click = privateData()->clickables.at(i);
+        if (click.type() == Clickable::Url) {
+            QTextLayout::FormatRange f;
+            f.start = click.start();
+            f.length = click.length();
+            f.format.setForeground(Qt::blue);
+            fmt.append(f);
+        }
+    }
+
     // mark a clickable if hovered upon
     if (privateData()->currentClickable.isValid()) {
         Clickable click = privateData()->currentClickable;
@@ -488,6 +535,7 @@ QVector<QTextLayout::FormatRange> ContentsChatItem::additionalFormats() const
         f.start = click.start();
         f.length = click.length();
         f.format.setFontUnderline(true);
+        f.format.setBackground(Qt::yellow);
         fmt.append(f);
     }
     return fmt;
@@ -680,7 +728,7 @@ void TimestampChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->drawPixmap(pos(), pixmap);
     }
     else {
-        layout()->draw(painter, pos(), QVector<QTextLayout::FormatRange>(), boundingRect());
+        layout()->draw(painter, pos(), additionalFormats(), boundingRect());
     }
     painter->restore();
 }

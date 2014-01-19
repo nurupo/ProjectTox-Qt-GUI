@@ -66,6 +66,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->setContentsMargins(0, 0, 2, 3);
 
     model.insertNewMessage("Hallo Welt!", "Schlumpf");
+    model.insertNewMessage("http://web.de", "Schlumpf");
     model.insertNewMessage("Hallo Welt3!", "Schlumpf");
 
 
@@ -88,10 +89,6 @@ void ChatPageWidget::messageReceived(const QString& message)
     display->appendMessage(username, message, -1, false);
 
     model.insertNewMessage(message, username);
-
-    for(int i=0; i<10000; i++){
-        model.insertNewMessage(QString::number(i), username);
-    }
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)

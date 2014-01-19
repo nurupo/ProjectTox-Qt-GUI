@@ -87,6 +87,8 @@ protected:
     virtual void doLayout(QTextLayout *layout) const;
 
     void paintBackground(QPainter *painter);
+    QVector<QTextLayout::FormatRange> selectionFormats() const;
+    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 
     inline qint16 selectionStart() const { return _selectionStart; }
     inline void setSelectionStart(qint16 start) { _selectionStart = start; }
