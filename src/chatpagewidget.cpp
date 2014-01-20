@@ -66,8 +66,8 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->setContentsMargins(0, 0, 2, 3);
 
     model.insertNewMessage("Hallo Welt!", "Schlumpf");
-    model.insertNewMessage("http://web.de", "Schlumpf");
-    model.insertNewMessage("Hallo Welt3!", "Schlumpf");
+    //model.insertNewMessage("http://web.de", "Schlumpf");
+    //model.insertNewMessage("Hallo Welt3!", "Schlumpf");
 
 
 

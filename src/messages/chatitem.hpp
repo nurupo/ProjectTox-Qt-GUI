@@ -86,7 +86,6 @@ protected:
     virtual void initLayout(QTextLayout *layout) const;
     virtual void doLayout(QTextLayout *layout) const;
 
-    void paintBackground(QPainter *painter);
     QVector<QTextLayout::FormatRange> selectionFormats() const;
     virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 
@@ -132,7 +131,7 @@ public:
     virtual inline MessageModel::ColumnType column() const { return MessageModel::TimestampColumn; }
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 };
 
 // ************************************************************
@@ -146,9 +145,10 @@ public:
     virtual inline MessageModel::ColumnType column() const { return MessageModel::SenderColumn; }
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    //virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     virtual inline int type() const { return ChatScene::SenderChatItemType; }
     virtual void initLayout(QTextLayout *layout) const;
+    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 };
 
 // ************************************************************

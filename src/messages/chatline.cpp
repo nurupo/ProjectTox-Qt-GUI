@@ -2,6 +2,7 @@
 #include "chatview.hpp"
 #include "chatitem.hpp"
 #include <QGraphicsSceneMouseEvent>
+#include <QApplication>
 
 ChatLine::ChatLine(int row, QAbstractItemModel *model, const qreal &width, const qreal &timestampWidth, const qreal &senderWidth, const qreal &contentsWidth, const QPointF &senderPos, const QPointF &contentsPos, QGraphicsItem *parent) :
     QGraphicsItem(parent),
@@ -65,7 +66,7 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     if (_selection & Selected) {
         qreal left = item((MessageModel::ColumnType)(_selection & ItemMask))->pos().x();
         QRectF selectRect(left, 0, width() - left, height());
-        painter->fillRect(selectRect, Qt::green);
+        painter->fillRect(selectRect, QApplication::palette().highlight());
     }
 
     // draw chatitems

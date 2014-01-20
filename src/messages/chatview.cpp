@@ -140,6 +140,12 @@ bool ChatView::event(QEvent *event)
         default:
             break;
         }
+
+        // enable ctrl+c even when contextmenu is hidden
+        if (keyEvent == QKeySequence::Copy) {
+            scene()->selectionToClipboard();
+            return true;
+        }
     }
 
     if (event->type() == QEvent::Wheel) {

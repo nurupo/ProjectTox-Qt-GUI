@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QMenu>
 #include <QFontMetricsF>
+#include <QApplication>
 
 ChatItem::ChatItem(const QRectF &boundingRect, ChatLine *parent) :
     _parent(parent),
@@ -61,7 +62,6 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option); Q_UNUSED(widget);
     painter->save();
     painter->setClipRect(boundingRect());
-    paintBackground(painter);
 
     layout()->draw(painter, pos(), additionalFormats(), boundingRect());
 
@@ -261,17 +261,6 @@ void ChatItem::doLayout(QTextLayout *layout) const
     layout->endLayout();
 }
 
-void ChatItem::paintBackground(QPainter *painter)
-{
-    QBrush brush;
-    if (_selectionMode == FullSelection)
-        brush.setColor(Qt::red);
-    else
-        brush.setColor(Qt::yellow);
-
-    painter->fillRect(boundingRect(), brush);
-}
-
 QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
 {
     if (!hasSelection())
@@ -288,7 +277,8 @@ QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
     }
 
     QTextCharFormat format;
-    format.setBackground(Qt::red);
+    format.setBackground(QApplication::palette().highlight());
+    format.setForeground(QApplication::palette().highlightedText());
 
     QTextLayout::FormatRange range;
     range.start = start;
@@ -334,13 +324,12 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
 // ************************************************************
 // SenderChatItem
 // ************************************************************
-
+/*
 void SenderChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option); Q_UNUSED(widget);
     painter->save();
     painter->setClipRect(boundingRect());
-    paintBackground(painter);
 
     qreal layoutWidth = layout()->minimumWidth();
     qreal offset = 0;
@@ -381,11 +370,71 @@ void SenderChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     }
     painter->restore();
 }
-
+*/
 void SenderChatItem::initLayout(QTextLayout *layout) const
 {
-    initLayoutHelper(layout, QTextOption::ManualWrap, Qt::AlignRight);
+    initLayoutHelper(layout, QTextOption::ManualWrap);
     doLayout(layout);
+}
+
+QVector<QTextLayout::FormatRange> SenderChatItem::additionalFormats() const
+{
+    QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
+
+    // Paint a gradient if the text is too long
+    if (layout()->minimumWidth() > width()) {
+
+        QLinearGradient gradient;
+        gradient.setStart(width()-10, 0);
+        gradient.setFinalStop(width(), 0);
+        gradient.setColorAt(0, QApplication::palette().windowText().color());
+        gradient.setColorAt(1, Qt::transparent);
+
+        qDebug() << width();
+
+        // add gradient to all existing formats
+        for (int i=0; i<fmt.count(); i++) {
+            QLinearGradient g(gradient);
+            g.setColorAt(0, fmt.at(i).format.foreground().color());
+            fmt[i].format.setForeground(QBrush(Qt::blue));
+            fmt[i].format.setForeground(QBrush(g));
+            qDebug() << fmt.at(i).format.foreground();
+
+        }
+
+        // Create new formats for formatfree sections
+        QVector<QTextLayout::FormatRange> newFmts;
+        int length = data(MessageModel::DisplayRole).toString().length();
+        int start = 0;
+        for (int i=0; i<length; i++) {
+            foreach (QTextLayout::FormatRange r, fmt) {
+                if (i==r.start) { // End of formatfree area reached
+                    QTextLayout::FormatRange f;
+                    f.start = start;
+                    f.length = i - start;
+                    //f.format.setForeground(QBrush(gradient));
+                    f.format.setForeground(QBrush(Qt::green));
+                    newFmts.append(f);
+                }
+                if (i==r.start+(r.length-1)) {
+                    start = i+1;
+                    newFmts.append(r);
+                }
+            }
+        }
+        if(start < length) {
+            QTextLayout::FormatRange f;
+            f.start = start;
+            f.length = length - start;
+            //f.format.setForeground(QBrush(gradient));
+            f.format.setForeground(QBrush(Qt::red));
+            newFmts.append(f);
+        }
+
+        fmt = newFmts;
+    }
+
+    return fmt;
 }
 
 // ************************************************************
@@ -516,7 +565,7 @@ QVector<QTextLayout::FormatRange> ContentsChatItem::additionalFormats() const
 {
     QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
 
-    // coloring links
+    // coloring clickables
     for (int i = 0; i < privateData()->clickables.count(); i++) {
         Clickable click = privateData()->clickables.at(i);
         if (click.type() == Clickable::Url) {
@@ -699,36 +748,56 @@ qint16 ContentsChatItem::WrapColumnFinder::nextWrapColumn(qreal width)
 // TimestampChatItem
 // ************************************************************
 
-void TimestampChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+QVector<QTextLayout::FormatRange> TimestampChatItem::additionalFormats() const
 {
-    Q_UNUSED(option); Q_UNUSED(widget);
-    painter->save();
-    painter->setClipRect(boundingRect());
-    paintBackground(painter);
+    QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
 
-    qreal layoutWidth = layout()->minimumWidth();
+    // Paint a gradient if the text is too long
+    if (layout()->minimumWidth() > width()) {
 
-    if (layoutWidth > width()) {
         QLinearGradient gradient;
-            gradient.setStart(width()-10, 0);
-            gradient.setFinalStop(width(), 0);
-            gradient.setColorAt(0, Qt::white);
-            gradient.setColorAt(1, Qt::transparent);
+        gradient.setStart(width()-10, 0);
+        gradient.setFinalStop(width(), 0);
+        gradient.setColorAt(0, QApplication::palette().windowText().color());
+        gradient.setColorAt(1, Qt::transparent);
 
-        QPixmap pixmap(layout()->boundingRect().toRect().size());
-        pixmap.fill(Qt::transparent);
+        // add gradient to all existing formats
+        for (int i=0; i<fmt.count(); i++) {
+            QLinearGradient g(gradient);
+            g.setColorAt(0, fmt.at(i).format.foreground().color());
+            fmt[i].format.setForeground(QBrush(g));
+        }
 
-        QPainter pixPainter(&pixmap);
-        pixPainter.setCompositionMode(QPainter::CompositionMode_Source);
-        layout()->draw(&pixPainter, QPointF(0, 0));
-        pixPainter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-        pixPainter.fillRect(0,0, pixmap.size().width(), pixmap.size().height(), gradient);
-        pixPainter.end();
+        // Create new formats for formatfree sections
+        QVector<QTextLayout::FormatRange> newFmts;
+        int length = data(MessageModel::DisplayRole).toString().length();
+        int start = 0;
+        for (int i=0; i<length; i++) {
+            foreach (QTextLayout::FormatRange r, fmt) {
+                if (i==r.start) { // End of formatfree area reached
+                    QTextLayout::FormatRange f;
+                    f.start = start;
+                    f.length = i - start;
+                    f.format.setForeground(QBrush(gradient));
+                    newFmts.append(f);
+                }
+                if (i==r.start+(r.length-1)) {
+                    start = i+1;
+                    newFmts.append(r);
+                }
+            }
+        }
+        if(start < length) {
+            QTextLayout::FormatRange f;
+            f.start = start;
+            f.length = length - start;
+            f.format.setForeground(QBrush(gradient));
+            //f.format.setForeground(QBrush(Qt::red));
+            newFmts.append(f);
+        }
 
-        painter->drawPixmap(pos(), pixmap);
+        fmt = newFmts;
     }
-    else {
-        layout()->draw(painter, pos(), additionalFormats(), boundingRect());
-    }
-    painter->restore();
+
+    return fmt;
 }
