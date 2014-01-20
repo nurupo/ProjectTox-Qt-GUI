@@ -131,7 +131,6 @@ public:
     virtual inline MessageModel::ColumnType column() const { return MessageModel::TimestampColumn; }
 
 protected:
-    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 };
 
 // ************************************************************
@@ -142,13 +141,12 @@ class SenderChatItem : public ChatItem
 {
 public:
     SenderChatItem(const QRectF &boundingRect, ChatLine *parent) : ChatItem(boundingRect, parent) {}
+    virtual inline int type() const { return ChatScene::SenderChatItemType; }
     virtual inline MessageModel::ColumnType column() const { return MessageModel::SenderColumn; }
 
+
 protected:
-    //virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    virtual inline int type() const { return ChatScene::SenderChatItemType; }
     virtual void initLayout(QTextLayout *layout) const;
-    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 };
 
 // ************************************************************
