@@ -31,6 +31,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 {
     friendItem = new FriendItemWidget(this);
     display = new MessageDisplayWidget(this);
+    cv = new ChatView(&model, this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
@@ -55,7 +56,8 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
     splitter->setChildrenCollapsible(false);
-    splitter->addWidget(display);
+    //splitter->addWidget(display);
+    splitter->addWidget(cv);
     splitter->addWidget(inputPanel);
     splitter->setStretchFactor(0, 3);
 
@@ -65,7 +67,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     layout->setSpacing(2);
     layout->setContentsMargins(0, 0, 2, 3);
 
-    model.insertNewMessage("Hallo Welt!", "Schlumpf");
+    //model.insertNewMessage("Hallo Welt!", "Schlumpf");
     //model.insertNewMessage("http://web.de", "Schlumpf");
     //model.insertNewMessage("Hallo Welt3!", "Schlumpf");
 
@@ -75,8 +77,10 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     //layout->addWidget(view);
     //view->setModel(&model);
 
-    cv = new ChatView(&model, this);
-    layout->addWidget(cv);
+    display->hide();
+
+
+
 }
 
 int ChatPageWidget::getFriendId() const
