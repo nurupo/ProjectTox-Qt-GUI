@@ -76,11 +76,23 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     timestampItem()->paint(painter, option, widget);
 }
 
-void ChatLine::setFirstColumn(const qreal &firstWidth, const qreal &secondwidth, const QPointF &secondPos)
+void ChatLine::setFirstColumn(const qreal &firstWidth, const qreal &secondwidth, const QPointF &secondPos, qreal &linePos)
 {
-    _senderItem.setGeometry(firstWidth, _height);
-    _contentsItem.setGeometry(secondwidth, _height);
+    // linepos is the *bottom* position for the line
+    qreal height = _contentsItem.setGeometryByWidth(secondwidth);
     _contentsItem.setPos(secondPos);
+    linePos -= height;
+    bool needGeometryChange = (height != _height);
+
+    _senderItem.setGeometry(firstWidth, _height);
+    _timestampItem.setHeight(height);
+
+    if (needGeometryChange)
+        prepareGeometryChange();
+
+    _height = height;
+
+    setPos(0, linePos);
 }
 
 void ChatLine::setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos)

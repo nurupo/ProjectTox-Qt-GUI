@@ -43,7 +43,7 @@ public:
     virtual inline int type() const { return Type; }
 
     // pos is relative to the parent ChatLine
-    void setFirstColumn(const qreal &firstWidth, const qreal &secondwidth, const QPointF &secondPos);
+    void setFirstColumn(const qreal &firstWidth, const qreal &secondwidth, const QPointF &secondPos, qreal &linePos);
     // setSecondColumn and setGeometryByWidth both also relocate the chatline.
     // the _bottom_ position is passed via linePos. linePos is updated to the top of the chatLine.
     void setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos);

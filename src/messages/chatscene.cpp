@@ -739,13 +739,14 @@ void ChatScene::firstHandlePositionChanged(qreal xpos)
 
         QList<ChatLine *>::iterator lineIter = _lines.end();
         QList<ChatLine *>::iterator lineIterBegin = _lines.begin();
+        qreal linePos = _sceneRect.y() + _sceneRect.height();
         qreal firstColumnWidth = firstColumnHandle()->sceneLeft();
         qreal secondColumnWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
         QPointF secondColumnPos(firstColumnHandle()->sceneRight(), 0);
 
         while (lineIter != lineIterBegin) {
             lineIter--;
-            (*lineIter)->setFirstColumn(firstColumnWidth, secondColumnWidth, secondColumnPos);
+            (*lineIter)->setFirstColumn(firstColumnWidth, secondColumnWidth, secondColumnPos, linePos);
         }
         //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
 
