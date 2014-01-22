@@ -102,7 +102,7 @@ protected:
     inline void setGeometry(qreal width, qreal height) { clearCache(); _boundingRect.setSize(QSizeF(width, height)); }
     inline void setHeight(const qreal &height) { clearCache(); _boundingRect.setHeight(height); }
     inline void setWidth(const qreal &width) { clearCache(); _boundingRect.setWidth(width); }
-    inline void setPos(const QPointF &pos) { _boundingRect.moveTopLeft(pos); }
+    inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
 
 private:
 
@@ -131,6 +131,9 @@ public:
     virtual inline MessageModel::ColumnType column() const { return MessageModel::TimestampColumn; }
 
 protected:
+    virtual void initLayout(QTextLayout *layout) const;
+
+protected:
 };
 
 // ************************************************************
@@ -143,10 +146,6 @@ public:
     SenderChatItem(const QRectF &boundingRect, ChatLine *parent) : ChatItem(boundingRect, parent) {}
     virtual inline int type() const { return ChatScene::SenderChatItemType; }
     virtual inline MessageModel::ColumnType column() const { return MessageModel::SenderColumn; }
-
-
-protected:
-    virtual void initLayout(QTextLayout *layout) const;
 };
 
 // ************************************************************

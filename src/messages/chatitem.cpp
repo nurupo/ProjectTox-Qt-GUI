@@ -325,12 +325,6 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
 // SenderChatItem
 // ************************************************************
 
-void SenderChatItem::initLayout(QTextLayout *layout) const
-{
-    initLayoutHelper(layout, QTextOption::ManualWrap, Qt::AlignRight);
-    doLayout(layout);
-}
-
 
 // ************************************************************
 // ContentsChatItem
@@ -642,3 +636,10 @@ qint16 ContentsChatItem::WrapColumnFinder::nextWrapColumn(qreal width)
 // ************************************************************
 // TimestampChatItem
 // ************************************************************
+
+
+void TimestampChatItem::initLayout(QTextLayout *layout) const
+{
+        initLayoutHelper(layout, QTextOption::ManualWrap, Qt::AlignRight);
+        doLayout(layout);
+}

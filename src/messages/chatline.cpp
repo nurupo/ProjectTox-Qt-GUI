@@ -4,13 +4,13 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QApplication>
 
-ChatLine::ChatLine(int row, QAbstractItemModel *model, const qreal &width, const qreal &timestampWidth, const qreal &senderWidth, const qreal &contentsWidth, const QPointF &senderPos, const QPointF &contentsPos, QGraphicsItem *parent) :
+ChatLine::ChatLine(int row, QAbstractItemModel *model, const qreal &width, const qreal &firstWidth, const qreal &secondWidth, const qreal &thirdWidth, const QPointF &secondPos, const QPointF &thirdPos, QGraphicsItem *parent) :
     QGraphicsItem(parent),
     _row(row), // needs to be set before the items
     _model(model),
-    _contentsItem(contentsPos, contentsWidth, this),
-    _senderItem(QRectF(senderPos, QSizeF(senderWidth, _contentsItem.height())), this),
-    _timestampItem(QRectF(0, 0, timestampWidth, _contentsItem.height()), this),
+    _contentsItem(secondPos, secondWidth, this),
+    _senderItem(QRectF(0, 0, firstWidth, _contentsItem.height()), this),
+    _timestampItem(QRectF(thirdPos, QSizeF(thirdWidth, _contentsItem.height())), this),
     _width(width),
     _height(_contentsItem.height()),
     _selection(0),
@@ -71,28 +71,28 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     // draw chatitems
     // the items draw themselves at the correct position
-    timestampItem()->paint(painter, option, widget);
     senderItem()->paint(painter, option, widget);
     contentsItem()->paint(painter, option, widget);
+    timestampItem()->paint(painter, option, widget);
 }
 
-void ChatLine::setFirstColumn(const qreal &timestampWidth, const qreal &senderWidth, const QPointF &senderPos)
+void ChatLine::setFirstColumn(const qreal &firstWidth, const qreal &secondwidth, const QPointF &secondPos)
 {
-    _timestampItem.setGeometry(timestampWidth, _height);
-    _senderItem.setGeometry(senderWidth, _height);
-    _senderItem.setPos(senderPos);
+    _senderItem.setGeometry(firstWidth, _height);
+    _contentsItem.setGeometry(secondwidth, _height);
+    _contentsItem.setPos(secondPos);
 }
 
-void ChatLine::setSecondColumn(const qreal &senderWidth, const qreal &contentsWidth, const QPointF &contentsPos, qreal &linePos)
+void ChatLine::setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos)
 {
     // linepos is the *bottom* position for the line
-    qreal height = _contentsItem.setGeometryByWidth(contentsWidth);
+    qreal height = _contentsItem.setGeometryByWidth(secondWidth);
     linePos -= height;
     bool needGeometryChange = (height != _height);
 
-    _timestampItem.setHeight(height);
-    _senderItem.setGeometry(senderWidth, height);
-    _contentsItem.setPos(contentsPos);
+    _senderItem.setHeight(height);
+    _timestampItem.setGeometry(thirdWidth, height);
+    _timestampItem.setPos(thirdPos);
 
     if (needGeometryChange)
         prepareGeometryChange();
@@ -102,25 +102,26 @@ void ChatLine::setSecondColumn(const qreal &senderWidth, const qreal &contentsWi
     setPos(0, linePos);
 }
 
-void ChatLine::setGeometryByWidth(const qreal &width, const qreal &contentsWidth, qreal &linePos)
+void ChatLine::setGeometryByWidth(const qreal &width, const qreal &thirdWidth, qreal &linePos)
 {
     // linepos is the *bottom* position for the line
-    qreal height = _contentsItem.setGeometryByWidth(contentsWidth);
-    linePos -= height;
-    bool needGeometryChange = (height != _height || width != _width);
+    _timestampItem.setWidth(thirdWidth);
+        /*qreal height = _contentsItem.setGeometryByWidth(contentsWidth);
+        linePos -= height;
+        bool needGeometryChange = (height != _height || width != _width);
 
-    if (height != _height) {
-        _timestampItem.setHeight(height);
-        _senderItem.setHeight(height);
-    }
+        if (height != _height) {
+            _timestampItem.setHeight(height);
+            _senderItem.setHeight(height);
+        }
 
-    if (needGeometryChange) {
-        prepareGeometryChange();
-        _height = height;
-        _width = width;
-    }
+        if (needGeometryChange) {
+            prepareGeometryChange();
+            _height = height;
+            _width = width;
+        }
 
-    setPos(0, linePos); // set pos is _very_ cheap if nothing changes.
+        setPos(0, linePos); // set pos is _very_ cheap if nothing changes.*/
 }
 
 void ChatLine::setSelected(bool selected, MessageModel::ColumnType minColumn)

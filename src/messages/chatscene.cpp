@@ -13,7 +13,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include "chatview.hpp"
 
-const qreal minContentsWidth = 200;
+const qreal minContentsWidth = 100;
 
 ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     QGraphicsScene(0, 0, width, 0, (QObject *)parent),
@@ -38,7 +38,7 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     connect(this, SIGNAL(sceneRectChanged(const QRectF &)), _markerLine, SLOT(sceneRectChanged(const QRectF &)));
 
     int defaultFirstColHandlePos = 50;
-    int defaultSecondColHandlePos = 100;
+    int defaultSecondColHandlePos = 250;
 
     _firstColHandlePos = defaultFirstColHandlePos;
     _secondColHandlePos = defaultSecondColHandlePos;
@@ -260,9 +260,9 @@ void ChatScene::layout(int start, int end, qreal width)
     if (end >= 0) {
         int row = end;
         qreal linePos = _lines.at(row)->scenePos().y() + _lines.at(row)->height();
-        qreal contentsWidth = width - secondColumnHandle()->sceneRight();
+        qreal thirdWidth = width - secondColumnHandle()->sceneRight();
         while (row >= start) {
-            _lines.at(row--)->setGeometryByWidth(width, contentsWidth, linePos);
+            _lines.at(row--)->setGeometryByWidth(width, thirdWidth, linePos);
         }
 
         if (row >= 0) {
@@ -739,13 +739,13 @@ void ChatScene::firstHandlePositionChanged(qreal xpos)
 
         QList<ChatLine *>::iterator lineIter = _lines.end();
         QList<ChatLine *>::iterator lineIterBegin = _lines.begin();
-        qreal timestampWidth = firstColumnHandle()->sceneLeft();
-        qreal senderWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
-        QPointF senderPos(firstColumnHandle()->sceneRight(), 0);
+        qreal firstColumnWidth = firstColumnHandle()->sceneLeft();
+        qreal secondColumnWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
+        QPointF secondColumnPos(firstColumnHandle()->sceneRight(), 0);
 
         while (lineIter != lineIterBegin) {
             lineIter--;
-            (*lineIter)->setFirstColumn(timestampWidth, senderWidth, senderPos);
+            (*lineIter)->setFirstColumn(firstColumnWidth, secondColumnWidth, secondColumnPos);
         }
         //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
 
@@ -767,12 +767,12 @@ void ChatScene::secondHandlePositionChanged(qreal xpos)
     QList<ChatLine *>::iterator lineIter = _lines.end();
     QList<ChatLine *>::iterator lineIterBegin = _lines.begin();
     qreal linePos = _sceneRect.y() + _sceneRect.height();
-    qreal senderWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
-    qreal contentsWidth = _sceneRect.width() - secondColumnHandle()->sceneRight();
-    QPointF contentsPos(secondColumnHandle()->sceneRight(), 0);
+    qreal secondColumnWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
+    qreal thirdColumnWidth = _sceneRect.width() - secondColumnHandle()->sceneRight();
+    QPointF thirdColumnPos(secondColumnHandle()->sceneRight(), 0);
     while (lineIter != lineIterBegin) {
         lineIter--;
-        (*lineIter)->setSecondColumn(senderWidth, contentsWidth, contentsPos, linePos);
+        (*lineIter)->setSecondColumn(secondColumnWidth, thirdColumnWidth, thirdColumnPos, linePos);
     }
     //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
 
@@ -795,8 +795,8 @@ void ChatScene::clickTimeout()
 
 void ChatScene::setHandleXLimits()
 {
-    _firstColHandle->setXLimits(0, _secondColHandle->sceneLeft());
-    _secondColHandle->setXLimits(_firstColHandle->sceneRight(), width() - minContentsWidth);
+    _firstColHandle->setXLimits(0, _secondColHandle->sceneLeft() - minContentsWidth);
+    _secondColHandle->setXLimits(_firstColHandle->sceneRight() + minContentsWidth, width());
     update();
 }
 
