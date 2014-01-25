@@ -101,6 +101,8 @@ void Settings::load()
         customEmojiFont = s.value("customEmojiFont", true).toBool();
         emojiFontFamily = s.value("emojiFontFamily", "DejaVu Sans").toString();
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
+        firstColumnHandlePos = s.value("firstColumnHandlePos", 50).toInt();
+        secondColumnHandlePos = s.value("SecondColumnHandlePos", 250).toInt();
     s.endGroup();
 
     loaded = true;
@@ -155,6 +157,8 @@ void Settings::save()
         s.setValue("customEmojiFont", customEmojiFont);
         s.setValue("emojiFontFamily", emojiFontFamily);
         s.setValue("emojiFontPointSize", emojiFontPointSize);
+        s.setValue("firstColumnHandlePos", firstColumnHandlePos);
+        s.setValue("SecondColumnHandlePos", secondColumnHandlePos);
     s.endGroup();
 }
 
@@ -276,6 +280,26 @@ void Settings::setEmojiFontPointSize(int value)
 {
     emojiFontPointSize = value;
     emit emojiFontChanged();
+}
+
+int Settings::getFirstColumnHandlePos() const
+{
+    return firstColumnHandlePos;
+}
+
+void Settings::setFirstColumnHandlePos(const int pos)
+{
+    firstColumnHandlePos = pos;
+}
+
+int Settings::getSecondColumnHandlePos() const
+{
+    return secondColumnHandlePos;
+}
+
+void Settings::setSecondColumnHandlePos(const int pos)
+{
+    secondColumnHandlePos = pos;
 }
 
 QString Settings::getEmojiFontFamily() const

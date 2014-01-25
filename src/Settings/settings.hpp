@@ -71,6 +71,13 @@ public:
     int getEmojiFontPointSize() const;
     void setEmojiFontPointSize(int value);
 
+    // ChatView
+    int getFirstColumnHandlePos() const;
+    void setFirstColumnHandlePos(const int pos);
+
+    int getSecondColumnHandlePos() const;
+    void setSecondColumnHandlePos(const int pos);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -107,6 +114,10 @@ private:
     bool customEmojiFont;
     QString emojiFontFamily;
     int     emojiFontPointSize;
+
+    // ChatView
+    int firstColumnHandlePos;
+    int secondColumnHandlePos;
 
 signals:
     //void dataChanged();

@@ -42,7 +42,7 @@ public:
         };
 
     ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent);
-    virtual ~ChatScene() {}
+    virtual ~ChatScene();
 
     inline QAbstractItemModel *model() const { return _model; }
 

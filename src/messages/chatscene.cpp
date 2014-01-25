@@ -13,6 +13,8 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include "chatview.hpp"
 
+#include "Settings/settings.hpp"
+
 const qreal minContentsWidth = 100;
 
 ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
@@ -37,11 +39,10 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     addItem(_markerLine);
     connect(this, SIGNAL(sceneRectChanged(const QRectF &)), _markerLine, SLOT(sceneRectChanged(const QRectF &)));
 
-    int defaultFirstColHandlePos = 50;
-    int defaultSecondColHandlePos = 250;
-
-    _firstColHandlePos = defaultFirstColHandlePos;
-    _secondColHandlePos = defaultSecondColHandlePos;
+    // Load handle positions
+    Settings &s = Settings::getInstance();
+    _firstColHandlePos = s.getFirstColumnHandlePos();
+    _secondColHandlePos = s.getSecondColumnHandlePos();
 
     _firstColHandle = new ColumnHandleItem(6);
     addItem(_firstColHandle);
@@ -74,6 +75,14 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     connect(&_clickTimer, SIGNAL(timeout()), SLOT(clickTimeout()));
 
     setItemIndexMethod(QGraphicsScene::NoIndex);
+}
+
+ChatScene::~ChatScene()
+{
+    // Save handle positions
+    Settings &s = Settings::getInstance();
+    s.setFirstColumnHandlePos(_firstColHandlePos);
+    s.setSecondColumnHandlePos(_secondColHandlePos);
 }
 
 int ChatScene::rowByScenePos(qreal y) const
