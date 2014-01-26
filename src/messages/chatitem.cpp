@@ -325,6 +325,25 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
 // SenderChatItem
 // ************************************************************
 
+QVector<QTextLayout::FormatRange> SenderChatItem::additionalFormats() const
+{
+    QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
+
+    // TODO MKO Move format to formatrole in Model
+    // TODO MKO Format merging (see Quassel)
+    if (data(MessageModel::FlagsRole).toInt() & Message::Self) {
+        QTextCharFormat format;
+        format.setForeground(QApplication::palette().mid());
+
+        QTextLayout::FormatRange range;
+        range.start = 0;
+        range.length = data(MessageModel::DisplayRole).toString().count();
+        range.format = format;
+        fmt.append(range);
+    }
+
+    return fmt;
+}
 
 // ************************************************************
 // ContentsChatItem

@@ -118,7 +118,7 @@ void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
     display->appendMessage(Settings::getInstance().getUsername(), message, messageId, true);
 
-    model.insertNewMessage(message, Settings::getInstance().getUsername());
+    model.insertNewMessage(message, Settings::getInstance().getUsername(), Message::Self);
 }
 
 void ChatPageWidget::actionReceived(const QString &message)

@@ -37,12 +37,22 @@ QModelIndex MessageModel::index(int row, int column, const QModelIndex &parent) 
 
 QVariant MessageModel::data(const QModelIndex &index, int role) const
 {
-    int row = index.row(); int column = index.column();
+    int row = index.row();
+    int column = index.column();
+
     if (row < 0 || row >= messageCount() || column < 0)
         return QVariant();
 
     if (role == ColumnTypeRole)
         return column;
+
+    // Hide repeating sender names
+    if (column == SenderColumn && role == DisplayRole && messageItemAt(row)->msgType() == Message::Plain) {
+        if( row-1 >= 0 &&
+            (data(index.sibling(row-1, column), FlagsRole).toInt() & Message::Self) == (messageItemAt(row)->msgFlags() & Message::Self)) {
+            return QVariant(QString(""));
+        }
+    }
 
     return messageItemAt(row)->data(index.column(), role);
 }
@@ -100,11 +110,12 @@ void MessageModel::insertMessages(const QList<Message> &msglist)
     }
 }
 
-void MessageModel::insertNewMessage(const QString &content, const QString &sender)
+void MessageModel::insertNewMessage(const QString &content, const QString &sender, Message::Flag flag)
 {
     int idx = messageCount();
     beginInsertRows(QModelIndex(), idx, idx);
     Message msg(Message::Plain, content, sender);
+    msg.setFlags(flag);
     if (!messagesIsEmpty())
         msg.setMsgId(messageItemAt(idx-1)->msgId());
     else

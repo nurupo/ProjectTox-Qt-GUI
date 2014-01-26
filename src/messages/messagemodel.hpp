@@ -46,7 +46,7 @@ public:
 
     bool insertMessage(const Message &);
     void insertMessages(const QList<Message> &);
-    void insertNewMessage(const QString& content, const QString& sender);
+    void insertNewMessage(const QString& content, const QString& sender, Message::Flag flag = Message::None);
 
     inline const MessageModelItem *messageItemAt(int i) const { return &_messageList[i]; }
 

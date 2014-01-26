@@ -146,6 +146,9 @@ public:
     SenderChatItem(const QRectF &boundingRect, ChatLine *parent) : ChatItem(boundingRect, parent) {}
     virtual inline int type() const { return ChatScene::SenderChatItemType; }
     virtual inline MessageModel::ColumnType column() const { return MessageModel::SenderColumn; }
+
+protected:
+    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 };
 
 // ************************************************************
