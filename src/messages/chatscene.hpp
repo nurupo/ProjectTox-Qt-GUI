@@ -19,27 +19,27 @@ class ChatScene : public QGraphicsScene
     Q_OBJECT
 public:
     enum CutoffMode {
-            CutoffLeft,
-            CutoffRight
-        };
+        CutoffLeft,
+        CutoffRight
+    };
 
     enum ItemType {
-            ChatLineType = QGraphicsItem::UserType + 1,
-            ChatItemType,
-            TimestampChatItemType,
-            SenderChatItemType,
-            ContentsChatItemType,
-            ColumnHandleType,
-            MarkerLineType
-        };
+        ChatLineType = QGraphicsItem::UserType + 1,
+        ChatItemType,
+        TimestampChatItemType,
+        SenderChatItemType,
+        ContentsChatItemType,
+        ColumnHandleType,
+        MarkerLineType
+    };
 
     enum ClickMode {
-            NoClick,
-            DragStartClick,
-            SingleClick,
-            DoubleClick,
-            TripleClick
-        };
+        NoClick,
+        DragStartClick,
+        SingleClick,
+        DoubleClick,
+        TripleClick
+    };
 
     ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent);
     virtual ~ChatScene();

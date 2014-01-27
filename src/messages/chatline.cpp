@@ -61,6 +61,8 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    const QAbstractItemModel *model_ = model();
+    QModelIndex myIdx = model_->index(row(), 0);
     // TODO MKO einiges gelöscht
 
     if (_selection & Selected) {
@@ -74,6 +76,18 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     senderItem()->paint(painter, option, widget);
     contentsItem()->paint(painter, option, widget);
     timestampItem()->paint(painter, option, widget);
+
+    // draw seperator line
+    // TODO MKO is this the right place for drawing the line?
+    if(row()-1 >= 0) {
+        QModelIndex lastIdx = model_->index(row()-1, 0);
+        if ((model_->data(lastIdx, MessageModel::FlagsRole).toInt() & Message::Self) != (model_->data(myIdx, MessageModel::FlagsRole).toInt() & Message::Self)) {
+            painter->save();
+            painter->setPen(QApplication::palette().midlight().color());
+            painter->drawLine(0, 0, width(), 0);
+            painter->restore();
+        }
+    }
 }
 
 void ChatLine::setFirstColumn(const qreal &firstWidth, const qreal &secondwidth, const QPointF &secondPos, qreal &linePos)

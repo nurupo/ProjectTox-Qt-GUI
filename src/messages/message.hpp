@@ -25,15 +25,15 @@ public:
     };
 
     // DO NOT CHANGE without knowing what you do, some of these flags are stored in the database
-        enum Flag {
-            None = 0x00,
-            Self = 0x01,
-            Highlight = 0x02,
-            Redirected = 0x04,
-            ServerMsg = 0x08,
-            Backlog = 0x80
-        };
-        Q_DECLARE_FLAGS(Flags, Flag)
+    enum Flag {
+        None = 0x00,
+        Self = 0x01,
+        Highlight = 0x02,
+        Redirected = 0x04,
+        ServerMsg = 0x08,
+        Backlog = 0x80
+    };
+    Q_DECLARE_FLAGS(Flags, Flag)
 
     Message(Message::Type type = Plain, const QString &contents = "", const QString &sender = "", Flags flags = None);
     Message(const QDateTime &ts, Type type = Plain, const QString &contents = "", const QString &sender = "", Flags flags = None);
