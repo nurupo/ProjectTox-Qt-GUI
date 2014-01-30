@@ -79,10 +79,6 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
 
 ChatScene::~ChatScene()
 {
-    // Save handle positions
-    Settings &s = Settings::getInstance();
-    s.setFirstColumnHandlePos(_firstColHandlePos);
-    s.setSecondColumnHandlePos(_secondColHandlePos);
 }
 
 int ChatScene::rowByScenePos(qreal y) const
@@ -101,11 +97,11 @@ int ChatScene::rowByScenePos(qreal y) const
 MessageModel::ColumnType ChatScene::columnByScenePos(qreal x) const
 {
     if (x < _firstColHandle->x())
-        return MessageModel::TimestampColumn;
-    if (x < _secondColHandle->x())
         return MessageModel::SenderColumn;
+    if (x < _secondColHandle->x())
+        return MessageModel::ContentsColumn;
 
-    return MessageModel::ContentsColumn;
+    return MessageModel::TimestampColumn;
 }
 
 ChatItem *ChatScene::chatItemAt(const QPointF &scenePos) const
@@ -306,7 +302,7 @@ void ChatScene::setMarkerLineVisible(bool visible)
 
 void ChatScene::setMarkerLine(MsgId msgId)
 {
-    // TODO MKO
+    // TODO MKO markerline
     /*
     if (!msgId.isValid())
         msgId = Client::markerLine(singleBufferId());
@@ -412,10 +408,11 @@ void ChatScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     QPointF pos = event->scenePos();
     QMenu menu;
 
-    if (isPosOverSelection(pos))
+    if (isPosOverSelection(pos)) {
         menu.addAction(tr("Copy Selection"),
                        this, SLOT(selectionToClipboard()),
                        QKeySequence::Copy);
+    }
 
     // item-specific options (select link etc)
     ChatItem *item = chatItemAt(pos);
@@ -739,27 +736,32 @@ void ChatScene::firstHandlePositionChanged(qreal xpos)
     if (_firstColHandlePos == xpos)
             return;
 
-        _firstColHandlePos = xpos >= 0 ? xpos : 0;
-        // clock_t startT = clock();
+    _firstColHandlePos = xpos >= 0 ? xpos : 0;
 
-        // disabling the index while doing this complex updates is about
-        // 2 to 10 times faster!
-        //setItemIndexMethod(QGraphicsScene::NoIndex);
+    // Save handle positions
+    Settings &s = Settings::getInstance();
+    s.setFirstColumnHandlePos(_firstColHandlePos);
 
-        QList<ChatLine *>::iterator lineIter = _lines.end();
-        QList<ChatLine *>::iterator lineIterBegin = _lines.begin();
-        qreal linePos = _sceneRect.y() + _sceneRect.height();
-        qreal firstColumnWidth = firstColumnHandle()->sceneLeft();
-        qreal secondColumnWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
-        QPointF secondColumnPos(firstColumnHandle()->sceneRight(), 0);
+    // clock_t startT = clock();
 
-        while (lineIter != lineIterBegin) {
-            lineIter--;
-            (*lineIter)->setFirstColumn(firstColumnWidth, secondColumnWidth, secondColumnPos, linePos);
-        }
-        //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+    // disabling the index while doing this complex updates is about
+    // 2 to 10 times faster!
+    //setItemIndexMethod(QGraphicsScene::NoIndex);
 
-        setHandleXLimits();
+    QList<ChatLine *>::iterator lineIter = _lines.end();
+    QList<ChatLine *>::iterator lineIterBegin = _lines.begin();
+    qreal linePos = _sceneRect.y() + _sceneRect.height();
+    qreal firstColumnWidth = firstColumnHandle()->sceneLeft();
+    qreal secondColumnWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
+    QPointF secondColumnPos(firstColumnHandle()->sceneRight(), 0);
+
+    while (lineIter != lineIterBegin) {
+        lineIter--;
+        (*lineIter)->setFirstColumn(firstColumnWidth, secondColumnWidth, secondColumnPos, linePos);
+    }
+    //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+
+    setHandleXLimits();
 }
 
 void ChatScene::secondHandlePositionChanged(qreal xpos)
@@ -768,6 +770,11 @@ void ChatScene::secondHandlePositionChanged(qreal xpos)
         return;
 
     _secondColHandlePos = xpos;
+
+    // Save handle positions
+    Settings &s = Settings::getInstance();
+    s.setSecondColumnHandlePos(_secondColHandlePos);
+
     // clock_t startT = clock();
 
     // disabling the index while doing this complex updates is about
@@ -844,6 +851,7 @@ void ChatScene::updateSelection(const QPointF &pos)
         _selectionStart = newstart;
         _selectionEnd = newend;
 
+        // MKO TODO Selecting column
         if (newstart == newend && minColumn == MessageModel::ContentsColumn) {
             if (!_selectingItem) {
                 // _selectingItem has been removed already

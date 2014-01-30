@@ -71,6 +71,9 @@ private:
     QTimer _scrollTimer;
     int _scrollOffset;
     QSet<ChatLine *> _linesWithCache;
+
+    // TODO Quick and Dirty message style initializing
+    QString qnd;
 };
 
 #endif // CHATVIEW_H

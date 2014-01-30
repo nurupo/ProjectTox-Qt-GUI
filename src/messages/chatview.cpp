@@ -4,6 +4,7 @@
 #include <QAbstractSlider>
 #include <QScrollBar>
 #include <QApplication>
+#include "style.hpp"
 
 ChatView::ChatView(MessageModel *model, QWidget *parent) :
     QGraphicsView(parent)
@@ -30,6 +31,9 @@ ChatView::ChatView(MessageModel *model, QWidget *parent) :
 
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(verticalScrollbarChanged(int)));
     _lastScrollbarPos = verticalScrollBar()->value();
+
+    // TODO Quick and Dirty message style initializing
+    qnd = UiStyle::getInstance().timestampFormatString();
 }
 
 MsgId ChatView::lastMsgId() const

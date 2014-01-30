@@ -47,8 +47,10 @@ QVariant MessageModel::data(const QModelIndex &index, int role) const
         return column;
 
     // Hide repeating sender names
+    // TODO Is this the right place?
     if (column == SenderColumn && role == DisplayRole && messageItemAt(row)->msgType() == Message::Plain) {
         if( row-1 >= 0 &&
+            messageItemAt(row-1)->msgType() == Message::Plain &&
             (data(index.sibling(row-1, column), FlagsRole).toInt() & Message::Self) == (messageItemAt(row)->msgFlags() & Message::Self)) {
             return QVariant(QString(""));
         }
@@ -110,11 +112,11 @@ void MessageModel::insertMessages(const QList<Message> &msglist)
     }
 }
 
-void MessageModel::insertNewMessage(const QString &content, const QString &sender, Message::Flag flag)
+void MessageModel::insertNewMessage(const QString &content, const QString &sender, Message::Type type, Message::Flag flag)
 {
     int idx = messageCount();
     beginInsertRows(QModelIndex(), idx, idx);
-    Message msg(Message::Plain, content, sender);
+    Message msg(type, content, sender);
     msg.setFlags(flag);
     if (!messagesIsEmpty())
         msg.setMsgId(messageItemAt(idx-1)->msgId());

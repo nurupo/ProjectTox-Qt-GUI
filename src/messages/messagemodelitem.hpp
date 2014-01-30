@@ -2,6 +2,7 @@
 #define MESSAGEMODELITEM_HPP
 
 #include "message.hpp"
+#include "style.hpp"
 
 class MessageModelItem
 {
@@ -45,10 +46,13 @@ private:
     QVariant senderData(int role) const;
     QVariant contentsData(int role) const;
 
+    QVariant backgroundBrush(UiStyle::FormatType subelement, bool selected = false) const;
+    quint32 messageLabel() const;
+
     void computeWrapList() const;
 
     mutable WrapList _wrapList;
-    Message _styledMsg;
+    UiStyle::StyledMessage _styledMsg;
 
     static unsigned char *TextBoundaryFinderBuffer;
     static int TextBoundaryFinderBufferSize;

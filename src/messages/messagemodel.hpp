@@ -14,6 +14,7 @@ public:
     enum MessageModelRole {
         DisplayRole = Qt::DisplayRole,
         EditRole = Qt::EditRole,
+        BackgroundRole = Qt::BackgroundRole,
         MessageRole = Qt::UserRole,
         MsgIdRole,
         TypeRole,
@@ -22,13 +23,15 @@ public:
         FormatRole,
         ColumnTypeRole,
         UserRole,
-        WrapListRole
+        WrapListRole,
+        MsgLabelRole,
+        SelectedBackgroundRole
         };
 
     enum ColumnType {
-        TimestampColumn,
         SenderColumn,
-        ContentsColumn
+        ContentsColumn,
+        TimestampColumn
         };
 
     typedef MessageModelItem::Word Word;
@@ -46,7 +49,7 @@ public:
 
     bool insertMessage(const Message &);
     void insertMessages(const QList<Message> &);
-    void insertNewMessage(const QString& content, const QString& sender, Message::Flag flag = Message::None);
+    void insertNewMessage(const QString& content, const QString& sender, Message::Type type, Message::Flag flag = Message::None);
 
     inline const MessageModelItem *messageItemAt(int i) const { return &_messageList[i]; }
 

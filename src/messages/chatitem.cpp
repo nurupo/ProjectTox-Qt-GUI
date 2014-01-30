@@ -57,11 +57,25 @@ QPointF ChatItem::mapFromScene(const QPointF &p) const
     return chatLine()->mapFromScene(p) /* - pos() */;
 }
 
+void ChatItem::paintBackground(QPainter *painter)
+{
+    QVariant bgBrush;
+    if (_selectionMode == FullSelection)
+        bgBrush = data(MessageModel::SelectedBackgroundRole);
+    else
+        bgBrush = data(MessageModel::BackgroundRole);
+    if (bgBrush.isValid())
+        painter->fillRect(boundingRect(), bgBrush.value<QBrush>());
+}
+
+// NOTE: This is not the most time-efficient implementation, but it saves space by not caching unnecessary data
+//       This is a deliberate trade-off. (-> selectFmt creation, data() call)
 void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option); Q_UNUSED(widget);
     painter->save();
     painter->setClipRect(boundingRect());
+    paintBackground(painter);
 
     layout()->draw(painter, pos(), additionalFormats(), boundingRect());
 
@@ -185,6 +199,9 @@ void ChatItem::initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapM
     option.setWrapMode(wrapMode);
     option.setAlignment(alignment);
     layout->setTextOption(option);
+
+    QList<QTextLayout::FormatRange> formatRanges = UiStyle::getInstance().toTextLayoutList(formatList(), layout->text().length(), data(MessageModel::MsgLabelRole).toUInt());
+    layout->setAdditionalFormats(formatRanges);
 }
 
 void ChatItem::clearCache()
@@ -261,39 +278,67 @@ void ChatItem::doLayout(QTextLayout *layout) const
     layout->endLayout();
 }
 
+UiStyle::FormatList ChatItem::formatList() const
+{
+    return data(MessageModel::FormatRole).value<UiStyle::FormatList>();
+}
+
 QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
 {
     if (!hasSelection())
-        return QVector<QTextLayout::FormatRange>();
+            return QVector<QTextLayout::FormatRange>();
 
-    int start, end;
-    if (_selectionMode == FullSelection) {
-        start = 0;
-        end = data(MessageModel::DisplayRole).toString().length();
-    }
-    else {
-        start = qMin(_selectionStart, _selectionEnd);
-        end = qMax(_selectionStart, _selectionEnd);
-    }
+        int start, end;
+        if (_selectionMode == FullSelection) {
+            start = 0;
+            end = data(MessageModel::DisplayRole).toString().length();
+        }
+        else {
+            start = qMin(_selectionStart, _selectionEnd);
+            end = qMax(_selectionStart, _selectionEnd);
+        }
 
-    QTextCharFormat format;
-    format.setBackground(QApplication::palette().highlight());
-    format.setForeground(QApplication::palette().highlightedText());
+        UiStyle::FormatList fmtList = formatList();
 
-    QTextLayout::FormatRange range;
-    range.start = start;
-    range.length = end - start;
-    range.format = format;
+        while (fmtList.count() > 1 && fmtList.at(1).first <= start)
+            fmtList.removeFirst();
 
-    QVector<QTextLayout::FormatRange> ret;
-    ret.append(range);
+        fmtList.first().first = start;
 
-    return ret;
+        while (fmtList.count() > 1 && fmtList.last().first >= end)
+            fmtList.removeLast();
+
+        return UiStyle::getInstance().toTextLayoutList(fmtList, end, UiStyle::Selected|data(MessageModel::MsgLabelRole).toUInt()).toVector();
 }
 
 QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
 {
     return selectionFormats();
+}
+
+void ChatItem::overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const
+{
+    for (int i = 0; i < fmtList.count(); i++) {
+        int fmtStart = fmtList.at(i).first;
+        int fmtEnd = (i < fmtList.count()-1 ? fmtList.at(i+1).first : data(MessageModel::DisplayRole).toString().length());
+
+        if (fmtEnd <= start)
+            continue;
+        if (fmtStart >= end)
+            break;
+
+        // split the format if necessary
+        if (fmtStart < start) {
+            fmtList.insert(i, fmtList.at(i));
+            fmtList[++i].first = start;
+        }
+        if (end < fmtEnd) {
+            fmtList.insert(i, fmtList.at(i));
+            fmtList[i+1].first = end;
+        }
+
+        fmtList[i].second |= overlayFmt;
+    }
 }
 
 void ChatItem::setSelection(ChatItem::SelectionMode mode, qint16 start, qint16 end)
@@ -325,26 +370,6 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
 // SenderChatItem
 // ************************************************************
 
-QVector<QTextLayout::FormatRange> SenderChatItem::additionalFormats() const
-{
-    QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
-
-    // TODO MKO Move format to formatrole in Model
-    // TODO MKO Format merging (see Quassel)
-    if (data(MessageModel::FlagsRole).toInt() & Message::Self) {
-        QTextCharFormat format;
-        format.setForeground(QApplication::palette().mid());
-
-        QTextLayout::FormatRange range;
-        range.start = 0;
-        range.length = data(MessageModel::DisplayRole).toString().count();
-        range.format = format;
-        fmt.append(range);
-    }
-
-    return fmt;
-}
-
 // ************************************************************
 // ContentsChatItem
 // ************************************************************
@@ -362,6 +387,11 @@ ContentsChatItem::ContentsChatItem(const QPointF &pos, const qreal &width, ChatL
 ContentsChatItem::~ContentsChatItem()
 {
     delete _data;
+}
+
+QFontMetricsF *ContentsChatItem::fontMetrics() const
+{
+    return UiStyle::getInstance().fontMetrics(data(MessageModel::FormatRole).value<UiStyle::FormatList>().at(0).second, 0);
 }
 
 void ContentsChatItem::clearCache()
@@ -473,18 +503,6 @@ QVector<QTextLayout::FormatRange> ContentsChatItem::additionalFormats() const
 {
     QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
 
-    // coloring clickables
-    for (int i = 0; i < privateData()->clickables.count(); i++) {
-        Clickable click = privateData()->clickables.at(i);
-        if (click.type() == Clickable::Url) {
-            QTextLayout::FormatRange f;
-            f.start = click.start();
-            f.length = click.length();
-            f.format.setForeground(Qt::blue);
-            fmt.append(f);
-        }
-    }
-
     // mark a clickable if hovered upon
     if (privateData()->currentClickable.isValid()) {
         Clickable click = privateData()->currentClickable;
@@ -492,7 +510,6 @@ QVector<QTextLayout::FormatRange> ContentsChatItem::additionalFormats() const
         f.start = click.start();
         f.length = click.length();
         f.format.setFontUnderline(true);
-        f.format.setBackground(Qt::yellow);
         fmt.append(f);
     }
     return fmt;
@@ -510,8 +527,7 @@ void ContentsChatItem::doLayout(QTextLayout *layout) const
     if (!wrapList.count()) return;  // empty chatitem
 
     qreal h = 0;
-    QFontMetricsF fm = QFontMetricsF(QFont()); // TODO MKO
-    qreal spacing = qMax(fm.lineSpacing(), fm.height()); // cope with negative leading()
+    qreal spacing = qMax(fontMetrics()->lineSpacing(), fontMetrics()->height()); // cope with negative leading()
     WrapColumnFinder finder(this);
     layout->beginLayout();
     forever {
@@ -541,6 +557,18 @@ void ContentsChatItem::doLayout(QTextLayout *layout) const
         h += spacing;
     }
     layout->endLayout();
+}
+
+UiStyle::FormatList ContentsChatItem::formatList() const
+{
+    UiStyle::FormatList fmtList = ChatItem::formatList();
+    for (int i = 0; i < privateData()->clickables.count(); i++) {
+        Clickable click = privateData()->clickables.at(i);
+        if (click.type() == Clickable::Url) {
+            overlayFormat(fmtList, click.start(), click.start() + click.length(), UiStyle::Url);
+        }
+    }
+    return fmtList;
 }
 
 ContentsChatItemPrivate *ContentsChatItem::privateData() const
@@ -578,8 +606,7 @@ qreal ContentsChatItem::setGeometryByWidth(qreal w)
     while (finder.nextWrapColumn(w) > 0)
         lines++;
 
-    QFontMetricsF fm = QFontMetricsF(QFont()); // TODO MKO
-    qreal spacing = qMax(fm.lineSpacing(), fm.height()); // cope with negative leading()
+    qreal spacing = qMax(fontMetrics()->lineSpacing(), fontMetrics()->height()); // cope with negative leading()
     qreal h = lines * spacing;
     delete _data;
     _data = 0;

@@ -70,9 +70,11 @@ QVariant MessageModelItem::data(int column, int role) const
 bool MessageModelItem::setData(int column, const QVariant &value, int role)
 {
     Q_UNUSED(column);
-    Q_UNUSED(value);
 
     switch (role) {
+    case MessageModel::FlagsRole:
+        _styledMsg.setFlags((Message::Flags)value.toUInt());
+        return true;
     default:
         return false;
     }
@@ -91,45 +93,83 @@ QVariant MessageModelItem::timestampData(int role) const
             return _styledMsg.decoratedTimestamp();
         case MessageModel::EditRole:
             return _styledMsg.timestamp();
+        case MessageModel::BackgroundRole:
+            return backgroundBrush(UiStyle::Timestamp);
+        case MessageModel::SelectedBackgroundRole:
+            return backgroundBrush(UiStyle::Timestamp, true);
+        case MessageModel::FormatRole:
+            return QVariant::fromValue<UiStyle::FormatList>(UiStyle::FormatList()
+                                                            << qMakePair((quint16)0, (quint32) UiStyle::formatType(_styledMsg.type()) | UiStyle::Timestamp));
         }
-    return QVariant();
+        return QVariant();
 }
 
 QVariant MessageModelItem::senderData(int role) const
 {
     switch (role) {
-       case MessageModel::DisplayRole:
-           return _styledMsg.sender();
-       case MessageModel::EditRole:
-           return _styledMsg.sender();
-    }
-    return QVariant();
+        case MessageModel::DisplayRole:
+            return _styledMsg.decoratedSender();
+        case MessageModel::EditRole:
+            return _styledMsg.plainSender();
+        case MessageModel::BackgroundRole:
+            return backgroundBrush(UiStyle::Sender);
+        case MessageModel::SelectedBackgroundRole:
+            return backgroundBrush(UiStyle::Sender, true);
+        case MessageModel::FormatRole:
+            return QVariant::fromValue<UiStyle::FormatList>(UiStyle::FormatList()
+                                                            << qMakePair((quint16)0, (quint32) UiStyle::formatType(_styledMsg.type()) | UiStyle::Sender));
+        }
+        return QVariant();
 }
 
 QVariant MessageModelItem::contentsData(int role) const
 {
     switch (role) {
         case MessageModel::DisplayRole:
-            return _styledMsg.contents(); // TODO MKO entfernen!
         case MessageModel::EditRole:
-            return _styledMsg.contents();
+            return _styledMsg.plainContents();
+        case MessageModel::BackgroundRole:
+            return backgroundBrush(UiStyle::Contents);
+        case MessageModel::SelectedBackgroundRole:
+            return backgroundBrush(UiStyle::Contents, true);
+        case MessageModel::FormatRole:
+            return QVariant::fromValue<UiStyle::FormatList>(_styledMsg.contentsFormatList());
         case MessageModel::WrapListRole:
             if (_wrapList.isEmpty())
                 computeWrapList();
             return QVariant::fromValue<MessageModel::WrapList>(_wrapList);
         }
+        return QVariant();
+}
+
+QVariant MessageModelItem::backgroundBrush(UiStyle::FormatType subelement, bool selected) const
+{
+    QTextCharFormat fmt =  UiStyle::getInstance().format(UiStyle::formatType(_styledMsg.type()) | subelement, messageLabel() | (selected ? UiStyle::Selected : 0));
+    if (fmt.hasProperty(QTextFormat::BackgroundBrush))
+        return QVariant::fromValue<QBrush>(fmt.background());
     return QVariant();
+}
+
+// TODO MKO SY Was ist das label?
+quint32 MessageModelItem::messageLabel() const
+{
+    quint32 label = _styledMsg.senderHash() << 16;
+    if (_styledMsg.flags() & Message::Self)
+        label |= UiStyle::OwnMsg;
+    if (_styledMsg.flags() & Message::Highlight)
+        label |= UiStyle::Highlight;
+    return label;
 }
 
 void MessageModelItem::computeWrapList() const
 {
-    QString text = _styledMsg.contents();
+    QString text = _styledMsg.plainContents();
     int length = text.length();
     if (!length)
         return;
 
     QList<MessageModel::Word> wplist; // use a temp list which we'll later copy into a QVector for efficiency
-    QTextBoundaryFinder finder(QTextBoundaryFinder::Line, _styledMsg.contents().unicode(), length,
+    QTextBoundaryFinder finder(QTextBoundaryFinder::Line, _styledMsg.plainContents().unicode(), length,
                                TextBoundaryFinderBuffer, TextBoundaryFinderBufferSize);
 
     int idx;
@@ -138,11 +178,12 @@ void MessageModelItem::computeWrapList() const
     word.start = 0;
     qreal wordstartx = 0;
 
-    QTextLayout layout(_styledMsg.contents());
+    QTextLayout layout(_styledMsg.plainContents());
     QTextOption option;
     option.setWrapMode(QTextOption::NoWrap);
     layout.setTextOption(option);
 
+    layout.setAdditionalFormats(UiStyle::getInstance().toTextLayoutList(_styledMsg.contentsFormatList(), length, messageLabel()));
     layout.beginLayout();
     QTextLine line = layout.createLine();
     line.setNumColumns(length);

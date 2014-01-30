@@ -102,7 +102,8 @@ SOURCES += \
     ../../src/messages/chatview.cpp \
     ../../src/messages/clickable.cpp \
     ../../src/messages/markerlineitem.cpp \
-    ../../src/messages/columnhandleitem.cpp
+    ../../src/messages/columnhandleitem.cpp \
+    ../../src/messages/style.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -156,7 +157,8 @@ HEADERS  += \
     ../../src/messages/chatview.hpp \
     ../../src/messages/clickable.hpp \
     ../../src/messages/markerlineitem.hpp \
-    ../../src/messages/columnhandleitem.hpp
+    ../../src/messages/columnhandleitem.hpp \
+    ../../src/messages/style.hpp
 
 SOURCES += \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \

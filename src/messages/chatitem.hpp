@@ -8,6 +8,7 @@
 #include "messagemodel.hpp"
 #include "chatscene.hpp"
 #include "clickable.hpp"
+#include "style.hpp"
 
 class ChatLine;
 class ChatView;
@@ -85,9 +86,12 @@ protected:
     QTextLayout *layout() const;
     virtual void initLayout(QTextLayout *layout) const;
     virtual void doLayout(QTextLayout *layout) const;
+    virtual UiStyle::FormatList formatList() const;
 
+    void paintBackground(QPainter *painter);
     QVector<QTextLayout::FormatRange> selectionFormats() const;
     virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
+    void overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const;
 
     inline qint16 selectionStart() const { return _selectionStart; }
     inline void setSelectionStart(qint16 start) { _selectionStart = start; }
@@ -146,9 +150,6 @@ public:
     SenderChatItem(const QRectF &boundingRect, ChatLine *parent) : ChatItem(boundingRect, parent) {}
     virtual inline int type() const { return ChatScene::SenderChatItemType; }
     virtual inline MessageModel::ColumnType column() const { return MessageModel::SenderColumn; }
-
-protected:
-    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 };
 
 // ************************************************************
@@ -168,6 +169,7 @@ public:
     virtual inline int type() const { return ChatScene::ContentsChatItemType; }
 
     inline MessageModel::ColumnType column() const { return MessageModel::ContentsColumn; }
+    QFontMetricsF *fontMetrics() const;
 
     virtual void clearCache();
 
@@ -184,6 +186,7 @@ protected:
 
     virtual void initLayout(QTextLayout *layout) const;
     virtual void doLayout(QTextLayout *layout) const;
+    virtual UiStyle::FormatList formatList() const;
 
 private:
     class ActionProxy;

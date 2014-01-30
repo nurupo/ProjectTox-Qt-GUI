@@ -47,7 +47,6 @@ public:
     inline Flags flags() const { return _flags; }
     inline void setFlags(Flags flags) { _flags = flags; }
     inline const QDateTime &timestamp() const { return _timestamp; }
-    inline QString decoratedTimestamp() const { return timestamp().toLocalTime().toString("hh:mm:ss"); }
     inline bool isValid() const { return _msgId.isValid(); }
 
     inline bool operator<(const Message &other) const { return _msgId < other._msgId; }

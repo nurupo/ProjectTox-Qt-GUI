@@ -92,11 +92,14 @@ void ChatPageWidget::messageReceived(const QString& message)
 {
     display->appendMessage(username, message, -1, false);
 
-    model.insertNewMessage(message, username);
+    model.insertNewMessage(message, username, Message::Plain);
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
 {
+    if(!username.isEmpty() && username != newUsername)
+        model.insertNewMessage(newUsername, username, Message::Nick);
+
     username = newUsername;
     friendItem->setUsername(username);
 }
@@ -118,15 +121,17 @@ void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
     display->appendMessage(Settings::getInstance().getUsername(), message, messageId, true);
 
-    model.insertNewMessage(message, Settings::getInstance().getUsername(), Message::Self);
+    model.insertNewMessage(message, Settings::getInstance().getUsername(), Message::Plain, Message::Self);
 }
 
 void ChatPageWidget::actionReceived(const QString &message)
 {
     display->appendAction(username, message, false);
+    model.insertNewMessage(message, username, Message::Action);
 }
 
 void ChatPageWidget::actionSentResult(const QString &message)
 {
     display->appendAction(username, message, true);
+    model.insertNewMessage(message, Settings::getInstance().getUsername(), Message::Action, Message::Self);
 }

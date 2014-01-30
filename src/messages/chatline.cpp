@@ -63,12 +63,21 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     const QAbstractItemModel *model_ = model();
     QModelIndex myIdx = model_->index(row(), 0);
-    // TODO MKO einiges gelöscht
+    Message::Type type = (Message::Type)myIdx.data(MessageModel::TypeRole).toInt();
+    UiStyle::MessageLabel label = (UiStyle::MessageLabel)myIdx.data(MessageModel::MsgLabelRole).toInt();
+
+    QTextCharFormat msgFmt = UiStyle::getInstance().format(UiStyle::formatType(type), label);
+    if (msgFmt.hasProperty(QTextFormat::BackgroundBrush)) {
+        painter->fillRect(boundingRect(), msgFmt.background());
+    }
 
     if (_selection & Selected) {
-        qreal left = item((MessageModel::ColumnType)(_selection & ItemMask))->pos().x();
-        QRectF selectRect(left, 0, width() - left, height());
-        painter->fillRect(selectRect, QApplication::palette().highlight());
+        QTextCharFormat selFmt = UiStyle::getInstance().format(UiStyle::formatType(type), label | UiStyle::Selected);
+        if (selFmt.hasProperty(QTextFormat::BackgroundBrush)) {
+            qreal left = item((MessageModel::ColumnType)(_selection & ItemMask))->pos().x();
+            QRectF selectRect(left, 0, width() - left, height());
+            painter->fillRect(selectRect, selFmt.background());
+        }
     }
 
     // draw chatitems
@@ -78,7 +87,7 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     timestampItem()->paint(painter, option, widget);
 
     // draw seperator line
-    // TODO MKO is this the right place for drawing the line?
+    // TODO MKO is this the right place for drawing the line? Maybe it's better to have a "seperatorline" object.
     if(row()-1 >= 0) {
         QModelIndex lastIdx = model_->index(row()-1, 0);
         if ((model_->data(lastIdx, MessageModel::FlagsRole).toInt() & Message::Self) != (model_->data(myIdx, MessageModel::FlagsRole).toInt() & Message::Self)) {
@@ -130,6 +139,8 @@ void ChatLine::setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth
 
 void ChatLine::setGeometryByWidth(const qreal &width, const qreal &thirdWidth, qreal &linePos)
 {
+    Q_UNUSED(width)
+    Q_UNUSED(linePos)
     // linepos is the *bottom* position for the line
     _timestampItem.setWidth(thirdWidth);
         /*qreal height = _contentsItem.setGeometryByWidth(contentsWidth);
