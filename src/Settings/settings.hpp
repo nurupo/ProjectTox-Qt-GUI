@@ -78,6 +78,9 @@ public:
     int getSecondColumnHandlePos() const;
     void setSecondColumnHandlePos(const int pos);
 
+    const QString &getTimestampFormat() const;
+    void setTimestampFormat(const QString &format);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -118,6 +121,7 @@ private:
     // ChatView
     int firstColumnHandlePos;
     int secondColumnHandlePos;
+    QString timestampFormat;
 
 signals:
     //void dataChanged();
@@ -125,6 +129,7 @@ signals:
     void logStorageOptsChanged();
     void smileyPackChanged();
     void emojiFontChanged();
+    void timestampFormatChanged();
 };
 
 #endif // SETTINGS_HPP

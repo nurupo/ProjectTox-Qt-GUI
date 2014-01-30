@@ -51,7 +51,6 @@ public:
         Sender          = 0x00002000,
         Contents        = 0x00004000,
         Nick            = 0x00008000,
-        Hostmask        = 0x00010000,
         ChannelName     = 0x00020000,
         ModeFlags       = 0x00040000,
 
@@ -93,6 +92,9 @@ public:
     QVariant bufferViewItemData(const QModelIndex &networkModelIndex, int role) const;
     QVariant nickViewItemData(const QModelIndex &networkModelIndex, int role) const;
 
+public slots:
+    static void updateTimestampFormatString();
+
 signals:
     void changed();
 
@@ -105,7 +107,7 @@ protected:
 
     static FormatType formatType(const QString &code);
     static QString formatCode(FormatType);
-    static void setTimestampFormatString(const QString &format);
+
 
 private:
     UiStyle(QObject *parent = 0);

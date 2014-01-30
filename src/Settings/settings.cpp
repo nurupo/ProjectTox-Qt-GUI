@@ -103,6 +103,7 @@ void Settings::load()
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
         firstColumnHandlePos = s.value("firstColumnHandlePos", 50).toInt();
         secondColumnHandlePos = s.value("SecondColumnHandlePos", 250).toInt();
+        timestampFormat = s.value("timestampFormat", "hh:mm").toString();
     s.endGroup();
 
     loaded = true;
@@ -159,6 +160,7 @@ void Settings::save()
         s.setValue("emojiFontPointSize", emojiFontPointSize);
         s.setValue("firstColumnHandlePos", firstColumnHandlePos);
         s.setValue("SecondColumnHandlePos", secondColumnHandlePos);
+        s.setValue("timestampFormat", timestampFormat);
     s.endGroup();
 }
 
@@ -300,6 +302,17 @@ int Settings::getSecondColumnHandlePos() const
 void Settings::setSecondColumnHandlePos(const int pos)
 {
     secondColumnHandlePos = pos;
+}
+
+const QString &Settings::getTimestampFormat() const
+{
+    return timestampFormat;
+}
+
+void Settings::setTimestampFormat(const QString &format)
+{
+    timestampFormat = format;
+    emit timestampFormatChanged();
 }
 
 QString Settings::getEmojiFontFamily() const

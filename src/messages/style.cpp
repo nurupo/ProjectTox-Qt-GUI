@@ -4,6 +4,7 @@
 #include <QFontMetricsF>
 #include <QApplication>
 #include <QPalette>
+#include "Settings/settings.hpp"
 
 QHash<QString, UiStyle::FormatType> UiStyle::_formatCodes;
 QString UiStyle::_timestampFormatString;
@@ -22,7 +23,6 @@ UiStyle::UiStyle(QObject *parent) :
     _uiStylePalette = QVector<QBrush>(NumRoles, QBrush());
 
     // Now initialize the mapping between FormatCodes and FormatTypes...
-    // TODO MKO SY brauch ich das?
     _formatCodes["%O"] = Base;
     _formatCodes["%B"] = Bold;
     _formatCodes["%S"] = Italic;
@@ -30,15 +30,11 @@ UiStyle::UiStyle(QObject *parent) :
     _formatCodes["%R"] = Reverse;
 
     _formatCodes["%DN"] = Nick;
-    _formatCodes["%DH"] = Hostmask;
     _formatCodes["%DC"] = ChannelName;
     _formatCodes["%DM"] = ModeFlags;
     _formatCodes["%DU"] = Url;
 
-    // TODO MKO SY einstellbar Settings
-    setTimestampFormatString("[hh:mm:ss]");
-
-    // TODO MKO SY loadStylesheet gelöscht, eventuell Standardwerte angeben
+    // Create default style
     createFormat(Base,         Default,   QApplication::palette().text());
     createFormat(Base,         Highlight, Qt::black, Qt::green);
     createFormat(Base,         Selected,  QApplication::palette().highlightedText(), QApplication::palette().highlight());
@@ -48,6 +44,10 @@ UiStyle::UiStyle(QObject *parent) :
     createFormat(ActionMsg,    Default,   QColor("#4E9A06"));
     createFormat(NickMsg,      Default,   QColor("#204A87"));
     createFormat(DayChangeMsg, Default,   QColor("#AD7FA8"));
+
+    // Get the timestamp format from the settings
+    updateTimestampFormatString();
+    connect(&Settings::getInstance(), &Settings::timestampFormatChanged, this, &UiStyle::updateTimestampFormatString);
 }
 
 /*! Create a new Format for the Style. */
@@ -75,11 +75,11 @@ UiStyle::~UiStyle()
     qDeleteAll(_metricsCache);
 }
 
-void UiStyle::setTimestampFormatString(const QString &format)
+void UiStyle::updateTimestampFormatString()
 {
+    QString format = Settings::getInstance().getTimestampFormat();
     if (_timestampFormatString != format) {
         _timestampFormatString = format;
-        // TODO MKO SY emit changed?
     }
 }
 
