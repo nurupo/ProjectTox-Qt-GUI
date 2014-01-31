@@ -30,7 +30,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Offline).iconPath), QSize(24, 24), "Change Status");
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
-    QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy Friend Address");
+    QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy my Friend Address");
     connect(copyFriendAddressButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyFriendAddressButtonClicked);
 
     QMenu* statusMenu = new QMenu(statusButton);
