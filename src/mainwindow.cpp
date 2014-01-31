@@ -85,16 +85,16 @@ MainWindow::MainWindow(QWidget* parent)
 
     QToolButton *menuButton = new QToolButton(toolBar);
     menuButton->setIcon(QIcon("://icons/cog.png"));
-    menuButton->setToolTip(tr("Mainmenu"));
+    menuButton->setToolTip(tr("Menu"));
     menuButton->setPopupMode(QToolButton::InstantPopup);
-    QMenu *mainmenu = new QMenu(menuButton);
-    mainmenu->addAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this, SLOT(onSettingsActionTriggered()));
-    mainmenu->addSeparator();
-    mainmenu->addAction(tr("About %1").arg(AppInfo::name), this, SLOT(onAboutAppActionTriggered()));
-    mainmenu->addAction(tr("About Qt"), qApp, SLOT(aboutQt()));
-    mainmenu->addSeparator();
-    mainmenu->addAction(tr("Quit"), this, SLOT(onQuitApplicationTriggered()), QKeySequence::Quit);
-    menuButton->setMenu(mainmenu);
+    QMenu *menu = new QMenu(menuButton);
+    menu->addAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this, SLOT(onSettingsActionTriggered()));
+    menu->addSeparator();
+    menu->addAction(tr("About %1").arg(AppInfo::name), this, SLOT(onAboutAppActionTriggered()));
+    menu->addAction(tr("About Qt"), qApp, SLOT(aboutQt()));
+    menu->addSeparator();
+    menu->addAction(tr("Quit"), this, SLOT(onQuitApplicationTriggered()), QKeySequence::Quit);
+    menuButton->setMenu(menu);
 
     toolBar->addWidget(addFriendButton);
     toolBar->addWidget(spacer);
