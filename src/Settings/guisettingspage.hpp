@@ -18,6 +18,7 @@
 #define GUISETTINGSPAGE_HPP
 
 #include "abstractsettingspage.hpp"
+#include <QDebug>
 
 class QGroupBox;
 class QCheckBox;
@@ -43,7 +44,7 @@ private:
     QGroupBox* buildAnimationGroup();
     QGroupBox* buildSmileypackGroup();
 
-    void searchSmileyPacks();
+    void searchSmileyPacks(bool defaultPackDir);
 
 
     EmojiFontSettingsDialog *emojiSettings;

@@ -6,10 +6,10 @@
 # - multiple textual representations of the same emoticon shall be separated by 
 #   at least one space, i.e ' '. 
 
- Name        =defaultNameTheme
- Author      =author 
+ Name        =TOX Qt GUI Smileys
+ Author      =FatCow 
  Description =description 
- Version     = version    
+ Version     = 1.0    
  Website     =website     
  Icon        =/emoticons/emotion_smile.png        
 

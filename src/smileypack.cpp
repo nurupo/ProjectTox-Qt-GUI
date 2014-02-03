@@ -240,28 +240,6 @@ const Smileypack::SmileyList Smileypack::emojiList()
     return tmpList;
 }
 
-const Smileypack::SmileyList Smileypack::defaultList()
-{
-    static const SmileyList tmpList =
-    {
-        {":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)"}},
-        {":/icons/emoticons/emotion_sad.png",      {":(", ":-("}},
-        {":/icons/emoticons/emotion_grin.png",     {":D", ":-D"}},
-        {":/icons/emoticons/emotion_cool.png",     {"8)", "8-)"}},
-        {":/icons/emoticons/emotion_suprised.png", {":O", ":-O"}},
-        {":/icons/emoticons/emotion_wink.png",     {";)", ";-)"}},
-        {":/icons/emoticons/emotion_cry.png",      {";(", ";-("}},
-        {":/icons/emoticons/emotion_sweat.png",    {"(:|"}},
-        {":/icons/emoticons/emotion_kiss.png",     {":*", ":-*"}},
-        {":/icons/emoticons/emotion_tongue.png",   {":P", ":-P"}},
-        {":/icons/emoticons/emotion_doubt.png",    {":^)", ":^-)"}},
-        {":/icons/emoticons/emotion_love.png",     {"(inlove)"}},
-        {":/icons/emoticons/emotion_evilgrin.png", {"]:)", "]:-)"}},
-        {":/icons/emoticons/emotion_angel.png",    {"O:)", "O:-)", "o:)", "o:-)", "(angel)"}}
-    };
-    return tmpList;
-}
-
 bool Smileypack::parseFile(const QString &filePath)
 {
     // Open file
@@ -352,6 +330,12 @@ void Smileypack::processLine(const QString &xLine, const QString &xPath, ParserS
 const QString &Smileypack::packDir()
 {
     static QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + "smileys";
+    return path;
+}
+
+const QString &Smileypack::defaultPackDirRelative()
+{
+    static QString path = QString("../resources") + '/' + "icons";
     return path;
 }
 
