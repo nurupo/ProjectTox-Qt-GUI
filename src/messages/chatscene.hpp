@@ -149,6 +149,7 @@ private:
     ChatItem *_selectingItem;
     int  _selectionStartCol;
     int  _selectionMinCol;
+    int  _selectionMaxCol;
     int  _selectionStart;
     int  _selectionEnd;
     int  _firstSelectionRow;

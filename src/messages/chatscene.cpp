@@ -739,8 +739,7 @@ void ChatScene::firstHandlePositionChanged(qreal xpos)
     _firstColHandlePos = xpos >= 0 ? xpos : 0;
 
     // Save handle positions
-    Settings &s = Settings::getInstance();
-    s.setFirstColumnHandlePos(_firstColHandlePos);
+    Settings::getInstance().setFirstColumnHandlePos(_firstColHandlePos);
 
     // clock_t startT = clock();
 
@@ -823,6 +822,8 @@ void ChatScene::updateSelection(const QPointF &pos)
         if (curRow < 0) return;
         int curColumn = (int)columnByScenePos(pos);
         MessageModel::ColumnType minColumn = (MessageModel::ColumnType)qMin(curColumn, _selectionStartCol);
+        MessageModel::ColumnType maxColumn = (MessageModel::ColumnType)qMax(curColumn, _selectionStartCol);
+        // TODO MKO Hier dran! maxColumn einbauen, um richtigen text kopieren zu können.
         if (minColumn != _selectionMinCol) {
             _selectionMinCol = minColumn;
             for (int l = qMin(_selectionStart, _selectionEnd); l <= qMax(_selectionStart, _selectionEnd); l++) {
@@ -852,7 +853,7 @@ void ChatScene::updateSelection(const QPointF &pos)
         _selectionEnd = newend;
 
         // MKO TODO Selecting column
-        if (newstart == newend && minColumn == MessageModel::ContentsColumn) {
+        if (newstart == newend && minColumn == MessageModel::TimestampColumn) {
             if (!_selectingItem) {
                 // _selectingItem has been removed already
                 return;

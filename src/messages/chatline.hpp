@@ -49,7 +49,7 @@ public:
     void setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos);
     void setGeometryByWidth(const qreal &width, const qreal &thirdWidth, qreal &linePos);
 
-    void setSelected(bool selected, MessageModel::ColumnType minColumn = MessageModel::ContentsColumn);
+    void setSelected(bool selected, MessageModel::ColumnType minColumn = MessageModel::TimestampColumn);
     void setHighlighted(bool highlighted);
 
     void clearCache();

@@ -169,7 +169,7 @@ void ChatLine::setSelected(bool selected, MessageModel::ColumnType minColumn)
             _selection = sel;
             for (int i = 0; i < minColumn; i++)
                 item((MessageModel::ColumnType)i)->clearSelection();
-            for (int i = minColumn; i <= MessageModel::ContentsColumn; i++)
+            for (int i = minColumn; i <= MessageModel::TimestampColumn; i++)
                 item((MessageModel::ColumnType)i)->setFullSelection();
             update();
         }
@@ -178,7 +178,7 @@ void ChatLine::setSelected(bool selected, MessageModel::ColumnType minColumn)
         quint8 sel = _selection & Highlighted;
         if (sel != _selection) {
             _selection = sel;
-            for (int i = 0; i <= MessageModel::ContentsColumn; i++)
+            for (int i = 0; i <= MessageModel::TimestampColumn; i++)
                 item((MessageModel::ColumnType)i)->clearSelection();
             update();
         }
