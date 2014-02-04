@@ -67,17 +67,13 @@ void GuiSettingsPage::setGui()
     emojiPack.setEmoji(true);
     smileypackCombobox->addItem("☺ "+emojiPack.getName(), emojiPack.save());
 
-    // Insert Default pack
-    Smileypack defaultPack;
-    defaultPack.setName("TOX Qt GUI Smileys");
-    defaultPack.setAuthor("FatCow");
-    defaultPack.setDescription("TODO: Design a default smileypack for TOX Qt GUI.");
-    defaultPack.setIcon(":/icons/emoticons/emotion_smile.png");
-    defaultPack.setList(Smileypack::defaultList());
-    smileypackCombobox->addItem(QIcon(defaultPack.getIcon()), defaultPack.getName(), defaultPack.save());
-
     // Insert smileypacks
-    searchSmileyPacks();
+    // User defined smileypacks:
+    bool defaultSmileyPacks = false;
+    searchSmileyPacks(defaultSmileyPacks);
+    // Default smileypacks:
+    defaultSmileyPacks = true;
+    searchSmileyPacks(defaultSmileyPacks);
 
     // Load smileypack
     int index = smileypackCombobox->findData(settings.getSmileyPack());
@@ -134,34 +130,34 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
     return group;
 }
 
-void GuiSettingsPage::searchSmileyPacks()
+void GuiSettingsPage::searchSmileyPacks(bool defaultPackDir)
 {
-    // Go to smiley pack folder
-    QDir dir(Smileypack::packDir());
-    if (!dir.mkpath(Smileypack::packDir()))
-        return;
 
-    // Go through all packs
-    dir.setFilter(QDir::Dirs|QDir::NoDot|QDir::NoDotDot);
-    QDirIterator it(dir);
-    while (it.hasNext()) {
-        it.next();
+    QDir themeFileDirectory;
 
-        // Check theme file
-        QFileInfo f(it.filePath() + '/' + "theme");
-        if (!f.exists()) {
-            continue;
-        }
-
-        // Parse theme file
+    if(defaultPackDir){
+        themeFileDirectory = QDir(Smileypack::defaultPackDirRelative());
+    }
+    else{
+        themeFileDirectory = QDir(Smileypack::packDir());
+    }
+    // find theme files:
+    QStringList themeFiles;
+    QString themeFileSuffix = "*.th";
+    themeFiles = themeFileDirectory.entryList(QStringList(themeFileSuffix),
+                                               QDir::Files | QDir::NoSymLinks);
+    // parse theme files:
+    for( auto themeFileName : themeFiles)
+    {
+        QString filePathToThemeFile = themeFileDirectory.absolutePath() + '/' + themeFileName;
+        // Parse theme file, fileInfo.absoluteFilePath()
         Smileypack newPack;
-        if (!newPack.parseFile(f.absoluteFilePath())) {
+        if (!newPack.parseFile(filePathToThemeFile)) { // not used by default since it's relative path
             continue;
         }
-
         // Add new pack to combobox
         QVariant data(newPack.save());
-        smileypackCombobox->addItem(QIcon(it.filePath() + '/' + newPack.getIcon()), newPack.getName(), data);
+        smileypackCombobox->addItem(QIcon(themeFileDirectory.absolutePath() + newPack.getIcon()), newPack.getName(), data);
     }
 }
 

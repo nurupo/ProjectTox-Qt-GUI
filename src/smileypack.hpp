@@ -57,12 +57,13 @@ public:
     void setEmoji(bool x)                           { emoji = x;          }
 
     static const QString& packDir();
+    static const QString& defaultPackDirRelative();
     static QString smilify(QString text);
     static QString desmilify(QString htmlText);
     static QString deemojify(QString text);
     static QString resizeEmoji(QString text);
     static const SmileyList emojiList();
-    static const SmileyList defaultList();
+//    static const SmileyList defaultList();
 
 private:
     QString themeFile;

@@ -1,0 +1,31 @@
+
+# theme file format:
+# - paths to emoticon picture files must be relative to where this theme file is stored.
+# - paths must start with a '/'.
+# - enter emoticon after the [theme] line, one line per emoticon.
+# - multiple textual representations of the same emoticon shall be separated by 
+#   at least one space, i.e ' '. 
+
+ Name        =TOX Qt GUI Smileys
+ Author      =FatCow 
+ Description =description 
+ Version     = 1.0    
+ Website     =website     
+ Icon        =/emoticons/emotion_smile.png        
+
+[theme]
+/emoticons/emotion_smile.png    :) :-) :o)                         
+/emoticons/emotion_sad.png      :( :-(                                
+/emoticons/emotion_grin.png     :D :-D                                
+/emoticons/emotion_cool.png     8) 8-)                                
+/emoticons/emotion_suprised.png :O :-O                                
+/emoticons/emotion_wink.png     ;) ;-)                                
+/emoticons/emotion_cry.png      ;( ;-(                                
+/emoticons/emotion_sweat.png    (:|                                      
+/emoticons/emotion_kiss.png     :* :-*                                
+/emoticons/emotion_tongue.png   :P :-P                                
+/emoticons/emotion_doubt.png    :^) :^-)                              
+/emoticons/emotion_love.png     (inlove)                                 
+/emoticons/emotion_evilgrin.png ]:) ]:-)                              
+/emoticons/emotion_angel.png    O:) O:-) o:) o:-) (angel)
+
