@@ -31,35 +31,33 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     usernameLabel->setTextElide(true);
     usernameLabel->setTextElideMode(Qt::ElideRight);
     usernameLabel->setShowToolTipOnElide(true);
-    usernameLabel->setMinimumSize(10, 10);
+    usernameLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    usernameLabel->setMinimumHeight(usernameLabel->fontMetrics().lineSpacing() + LINE_SPACING_OFFSET);
 
     statusMessageLabel = new CopyableElideLabel(this);
     statusMessageLabel->setAlignment(Qt::AlignLeft);
     statusMessageLabel->setTextElide(true);
     statusMessageLabel->setTextElideMode(Qt::ElideRight);
     statusMessageLabel->setShowToolTipOnElide(true);
-    statusMessageLabel->setMinimumSize(10, 10);
+    statusMessageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    statusMessageLabel->setMinimumHeight(usernameLabel->fontMetrics().lineSpacing() + LINE_SPACING_OFFSET);
     QPalette palette;
     palette.setColor(QPalette::Foreground, Qt::gray);
     statusMessageLabel->setPalette(palette);
 
-    QWidget* statusWidget = new QWidget(this);
-    QVBoxLayout* statusLayout = new QVBoxLayout(statusWidget);
-    statusLayout->setContentsMargins(0, 4, 0, 0);
-    statusLayout->addWidget(statusLabel);
-
     QWidget* textWidget = new QWidget(this);
+    textWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QVBoxLayout* textLayout = new QVBoxLayout(textWidget);
-    textLayout->setContentsMargins(0, 2, 0, 0);
-    textLayout->setSpacing(2);
+    textLayout->setContentsMargins(0, 1, 0, 0);
+    textLayout->setSpacing(0);
     textLayout->addWidget(usernameLabel);
     textLayout->addWidget(statusMessageLabel);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(2, 1, 2, 0);
     layout->setSpacing(2);
-    layout->addWidget(statusWidget, 0, Qt::AlignTop);
-    layout->addWidget(textWidget, 1, Qt::AlignVCenter);
+    layout->addWidget(statusLabel, 0, Qt::AlignVCenter);
+    layout->addWidget(textWidget);
 }
 
 void FriendItemWidget::setStatus(Status status)
