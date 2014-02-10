@@ -17,7 +17,6 @@
 #ifndef FRIENDSWIDGET_HPP
 #define FRIENDSWIDGET_HPP
 
-#include "customhinttreeview.hpp"
 #include "filterwidget.hpp"
 #include "friendproxymodel.hpp"
 #include "status.hpp"
@@ -38,7 +37,7 @@ public:
 
 private:
     FilterWidget* filterEdit;
-    CustomHintTreeView* friendView;
+    QTreeView* friendView;
     QStandardItemModel* friendModel;
     FriendProxyModel* friendProxyModel;
     QMenu* friendContextMenu;
