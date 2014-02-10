@@ -67,7 +67,7 @@ void FriendItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
     painter->setFont(usernameFont);
     QString elidedUsername = painter->fontMetrics().elidedText(username, Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET));
-    painter->drawText(ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET, option.rect.top() + hint.height()/2 + ((statusMessageIsVisible ? 0 : painter->fontMetrics().ascent()) - painter->fontMetrics().descent())/2 + USERNAME_Y_OFFSET, elidedUsername);
+    painter->drawText(ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET, option.rect.top() + hint.height()/2 + ((statusMessageIsVisible ? 0 : painter->fontMetrics().ascent()) - painter->fontMetrics().descent())/2 + (statusMessageIsVisible ? USERNAME_Y_OFFSET : 0), elidedUsername);
 
     if (statusMessageIsVisible) {
         //Status Message
