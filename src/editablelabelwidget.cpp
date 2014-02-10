@@ -16,10 +16,11 @@
 
 #include "editablelabelwidget.hpp"
 
-#include <QVBoxLayout>
 #include <QApplication>
 #include <QEvent>
+#include <QFontMetrics>
 #include <QMouseEvent>
+#include <QVBoxLayout>
 
 ClickableCopyableElideLabel::ClickableCopyableElideLabel(QWidget* parent) :
     CopyableElideLabel(parent)
@@ -46,15 +47,16 @@ EditableLabelWidget::EditableLabelWidget(QWidget* parent) :
     QStackedWidget(parent)
 {
     label = new ClickableCopyableElideLabel(this);
+    label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     connect(label, &ClickableCopyableElideLabel::clicked,   this, &EditableLabelWidget::onLabelClicked);
 
     lineEdit = new EscLineEdit(this);
+    lineEdit->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    lineEdit->setMinimumHeight(label->fontMetrics().lineSpacing() + LINE_SPACING_OFFSET);
 
     connect(lineEdit, &EscLineEdit::editingFinished,        this, &EditableLabelWidget::onLabelChangeSubmited);
     connect(lineEdit, &EscLineEdit::escPressed,             this, &EditableLabelWidget::onLabelChangeCancelled);
-
-    connect(this, &EditableLabelWidget::currentChanged,     this, &EditableLabelWidget::onCurrentChanged);
 
     addWidget(label);
     addWidget(lineEdit);
@@ -66,25 +68,6 @@ void EditableLabelWidget::setText(const QString& text)
 {
     label->setText(text);
     lineEdit->setText(text);
-}
-
-void EditableLabelWidget::addWidget(QWidget* w)
-{
-    w->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    QStackedWidget::addWidget(w);
-}
-
-void EditableLabelWidget::onCurrentChanged(int index)
-{
-    QWidget* w = widget(index);
-    if (w == label) {
-        lineEdit->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    } else {
-        label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    }
-    w->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    w->adjustSize();
-    adjustSize();
 }
 
 void EditableLabelWidget::onLabelChangeSubmited()
