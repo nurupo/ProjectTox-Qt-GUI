@@ -378,6 +378,7 @@ void SenderChatItem::initLayout(QTextLayout *layout) const
     QModelIndex lastIndex = model()->index(row()-1, column());
     if (lastIndex.isValid()
             && data(MessageModel::TypeRole).toInt() == Message::Plain
+            && model()->data(lastIndex, MessageModel::TypeRole).toInt() == Message::Plain
             && (data(MessageModel::FlagsRole).toInt() & Message::Self) == (model()->data(lastIndex, MessageModel::FlagsRole).toInt() & Message::Self)) {
         layout->setText("");
     }

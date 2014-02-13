@@ -96,7 +96,7 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         QModelIndex lastIdx = model_->index(row()-1, 0);
         if ((model_->data(lastIdx, MessageModel::FlagsRole).toInt() & Message::Self) != (model_->data(myIdx, MessageModel::FlagsRole).toInt() & Message::Self)) {
             painter->save();
-            painter->setPen(QApplication::palette().midlight().color());
+            painter->setPen(QApplication::palette().button().color());
             painter->drawLine(0, 0, width(), 0);
             painter->restore();
         }

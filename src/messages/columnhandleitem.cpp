@@ -50,16 +50,14 @@ void ColumnHandleItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    QLinearGradient gradient(boundingRect().topLeft(), boundingRect().topRight());
-    QColor color = Qt::red;
+    QColor color = QApplication::palette().mid().color();
     color.setAlphaF(_opacity);
-    gradient.setColorAt(0, Qt::transparent);
-    gradient.setColorAt(0.45, color);
-    gradient.setColorAt(0.55, color);
-    gradient.setColorAt(1, Qt::transparent);
-    //painter->fillRect(boundingRect(), gradient);
 
-    painter->fillRect(-1, 0, 2, boundingRect().height(), color);
+    QRectF rect = boundingRect();
+    rect.setX(boundingRect().x()+2);
+    rect.setWidth(2);
+
+    painter->fillRect(rect, color);
 }
 
 void ColumnHandleItem::sceneRectChanged(const QRectF &rect)
