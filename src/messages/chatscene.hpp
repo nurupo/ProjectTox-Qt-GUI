@@ -69,7 +69,7 @@ public:
 
     QString selection() const;
     bool hasSelection() const;
-    bool hasGlobalSelection() const { return _selectionStart >= 0; }
+    bool hasGlobalSelection() const { return _selectionStartRow >= 0; }
     bool isPosOverSelection(const QPointF &pos) const;
     bool isGloballySelecting() const { return _isSelecting; }
     void initiateDrag(QWidget *source);
@@ -150,8 +150,8 @@ private:
     int  _selectionStartCol;
     int  _selectionMinCol;
     int  _selectionMaxCol;
-    int  _selectionStart;
-    int  _selectionEnd;
+    int  _selectionStartRow;
+    int  _selectionEndRow;
     int  _firstSelectionRow;
     bool _isSelecting;
 

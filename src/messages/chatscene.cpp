@@ -30,7 +30,7 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     _markerLineJumpPending(false),
     _cutoffMode(CutoffRight),
     _selectingItem(0),
-    _selectionStart(-1),
+    _selectionStartRow(-1),
     _isSelecting(false),
     _clickMode(NoClick),
     _clickHandled(true),
@@ -187,19 +187,24 @@ QString ChatScene::selection() const
 {
     //TODO Make selection format configurable!
     if (hasGlobalSelection()) {
-        int start = qMin(_selectionStart, _selectionEnd);
-        int end = qMax(_selectionStart, _selectionEnd);
+        int start = qMin(_selectionStartRow, _selectionEndRow);
+        int end = qMax(_selectionStartRow, _selectionEndRow);
         if (start < 0 || end >= _lines.count()) {
             qDebug() << "Invalid selection range:" << start << end;
             return QString();
         }
         QString result;
         for (int l = start; l <= end; l++) {
-            if (_selectionMinCol == MessageModel::TimestampColumn)
-                result += _lines[l]->item(MessageModel::TimestampColumn)->data(MessageModel::DisplayRole).toString() + " ";
+            if (_selectionMaxCol == MessageModel::TimestampColumn)
+                result += QString("[%1] ").arg(_lines[l]->item(MessageModel::TimestampColumn)->data(MessageModel::DisplayRole).toString());
+
             if (_selectionMinCol <= MessageModel::SenderColumn)
-                result += _lines[l]->item(MessageModel::SenderColumn)->data(MessageModel::DisplayRole).toString() + " ";
-            result += _lines[l]->item(MessageModel::ContentsColumn)->data(MessageModel::DisplayRole).toString() + "\n";
+                result += QString("%1: ").arg(_lines[l]->item(MessageModel::SenderColumn)->data(MessageModel::DisplayRole).toString());
+
+            if (_selectionMinCol <= MessageModel::ContentsColumn && _selectionMaxCol >= MessageModel::ContentsColumn)
+                result += _lines[l]->item(MessageModel::ContentsColumn)->data(MessageModel::DisplayRole).toString();
+
+            result += "\n";
         }
         return result;
     }
@@ -220,8 +225,8 @@ bool ChatScene::isPosOverSelection(const QPointF &pos) const
         return false;
     if (hasGlobalSelection()) {
         int row = chatItem->row();
-        if (row >= qMin(_selectionStart, _selectionEnd) && row <= qMax(_selectionStart, _selectionEnd))
-            return columnByScenePos(pos) >= _selectionMinCol;
+        if (row >= qMin(_selectionStartRow, _selectionEndRow) && row <= qMax(_selectionStartRow, _selectionEndRow))
+            return (columnByScenePos(pos) >= _selectionMinCol && columnByScenePos(pos) <= _selectionMaxCol);
     }
     else {
         return chatItem->isPosOverSelection(chatItem->mapFromScene(pos));
@@ -351,20 +356,20 @@ void ChatScene::setSelectingItem(ChatItem *item)
 
 void ChatScene::startGlobalSelection(ChatItem *item, const QPointF &itemPos)
 {
-    _selectionStart = _selectionEnd = _firstSelectionRow = item->row();
-    _selectionStartCol = _selectionMinCol = item->column();
+    _selectionStartRow = _selectionEndRow = _firstSelectionRow = item->row();
+    _selectionStartCol = _selectionMinCol = _selectionMaxCol = item->column();
     _isSelecting = true;
-    _lines[_selectionStart]->setSelected(true, (MessageModel::ColumnType)_selectionMinCol);
+    _lines[_selectionStartRow]->setSelected(true, (MessageModel::ColumnType)_selectionMinCol, (MessageModel::ColumnType)_selectionMaxCol);
     updateSelection(item->mapToScene(itemPos));
 }
 
 void ChatScene::clearGlobalSelection()
 {
     if (hasGlobalSelection()) {
-        for (int l = qMin(_selectionStart, _selectionEnd); l <= qMax(_selectionStart, _selectionEnd); l++)
+        for (int l = qMin(_selectionStartRow, _selectionEndRow); l <= qMax(_selectionStartRow, _selectionEndRow); l++)
             _lines[l]->setSelected(false);
         _isSelecting = false;
-        _selectionStart = -1;
+        _selectionStartRow = -1;
     }
 }
 
@@ -582,14 +587,14 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
     }
 
     // update selection
-    if (_selectionStart >= 0) {
+    if (_selectionStartRow >= 0) {
         int offset = end - start + 1;
-        int oldStart = _selectionStart;
-        if (_selectionStart >= start)
-            _selectionStart += offset;
-        if (_selectionEnd >= start) {
-            _selectionEnd += offset;
-            if (_selectionStart == oldStart)
+        int oldStart = _selectionStartRow;
+        if (_selectionStartRow >= start)
+            _selectionStartRow += offset;
+        if (_selectionEndRow >= start) {
+            _selectionEndRow += offset;
+            if (_selectionStartRow == oldStart)
                 for (int i = start; i < start + offset; i++)
                     _lines[i]->setSelected(true);
         }
@@ -666,18 +671,18 @@ void ChatScene::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int e
     }
 
     // update selection
-    if (_selectionStart >= 0) {
+    if (_selectionStartRow >= 0) {
         int offset = end - start + 1;
-        if (_selectionStart >= start)
-            _selectionStart = qMax(_selectionStart - offset, start);
-        if (_selectionEnd >= start)
-            _selectionEnd -= offset;
+        if (_selectionStartRow >= start)
+            _selectionStartRow = qMax(_selectionStartRow - offset, start);
+        if (_selectionEndRow >= start)
+            _selectionEndRow -= offset;
         if (_firstSelectionRow >= start)
             _firstSelectionRow -= offset;
 
-        if (_selectionEnd < _selectionStart) {
+        if (_selectionEndRow < _selectionStartRow) {
             _isSelecting = false;
-            _selectionStart = -1;
+            _selectionStartRow = -1;
         }
     }
 
@@ -823,44 +828,46 @@ void ChatScene::updateSelection(const QPointF &pos)
         int curColumn = (int)columnByScenePos(pos);
         MessageModel::ColumnType minColumn = (MessageModel::ColumnType)qMin(curColumn, _selectionStartCol);
         MessageModel::ColumnType maxColumn = (MessageModel::ColumnType)qMax(curColumn, _selectionStartCol);
-        // TODO MKO Hier dran! maxColumn einbauen, um richtigen text kopieren zu können.
-        if (minColumn != _selectionMinCol) {
+
+        // cursor moves more to left or right than the current selection
+        if (minColumn != _selectionMinCol || maxColumn != _selectionMaxCol) {
+            _selectionMaxCol = maxColumn;
             _selectionMinCol = minColumn;
-            for (int l = qMin(_selectionStart, _selectionEnd); l <= qMax(_selectionStart, _selectionEnd); l++) {
-                _lines[l]->setSelected(true, minColumn);
-            }
+            for (int l = qMin(_selectionStartRow, _selectionEndRow); l <= qMax(_selectionStartRow, _selectionEndRow); l++)
+                _lines[l]->setSelected(true, minColumn, maxColumn);
         }
-        int newstart = qMin(curRow, _firstSelectionRow);
+
+
+        int newstartRow = qMin(curRow, _firstSelectionRow);
         int newend = qMax(curRow, _firstSelectionRow);
-        if (newstart < _selectionStart) {
-            for (int l = newstart; l < _selectionStart; l++)
-                _lines[l]->setSelected(true, minColumn);
+        if (newstartRow < _selectionStartRow) {
+            for (int l = newstartRow; l < _selectionStartRow; l++)
+                _lines[l]->setSelected(true, minColumn, maxColumn);
         }
-        if (newstart > _selectionStart) {
-            for (int l = _selectionStart; l < newstart; l++)
+        if (newstartRow > _selectionStartRow) {
+            for (int l = _selectionStartRow; l < newstartRow; l++)
                 _lines[l]->setSelected(false);
         }
-        if (newend > _selectionEnd) {
-            for (int l = _selectionEnd+1; l <= newend; l++)
-                _lines[l]->setSelected(true, minColumn);
+        if (newend > _selectionEndRow) {
+            for (int l = _selectionEndRow+1; l <= newend; l++)
+                _lines[l]->setSelected(true, minColumn, maxColumn);
         }
-        if (newend < _selectionEnd) {
-            for (int l = newend+1; l <= _selectionEnd; l++)
+        if (newend < _selectionEndRow) {
+            for (int l = newend+1; l <= _selectionEndRow; l++)
                 _lines[l]->setSelected(false);
         }
 
-        _selectionStart = newstart;
-        _selectionEnd = newend;
+        _selectionStartRow = newstartRow;
+        _selectionEndRow = newend;
 
-        // MKO TODO Selecting column
-        if (newstart == newend && minColumn == MessageModel::TimestampColumn) {
+        if (newstartRow == newend && minColumn == MessageModel::TimestampColumn) {
             if (!_selectingItem) {
                 // _selectingItem has been removed already
                 return;
             }
             _lines[curRow]->setSelected(false);
             _isSelecting = false;
-            _selectionStart = -1;
+            _selectionStartRow = -1;
             _selectingItem->continueSelecting(_selectingItem->mapFromScene(pos));
         }
 }

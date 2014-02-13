@@ -71,11 +71,15 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->fillRect(boundingRect(), msgFmt.background());
     }
 
+    // Draw a rect for the whole selection (all colums with seperators).
+    // TODO MKO Double selection drawing? See ChatItem::paintBackground.
     if (_selection & Selected) {
         QTextCharFormat selFmt = UiStyle::getInstance().format(UiStyle::formatType(type), label | UiStyle::Selected);
         if (selFmt.hasProperty(QTextFormat::BackgroundBrush)) {
-            qreal left = item((MessageModel::ColumnType)(_selection & ItemMask))->pos().x();
-            QRectF selectRect(left, 0, width() - left, height());
+            ChatItem *rightItem = item((MessageModel::ColumnType)((_selection & 0x0C)>>2));
+            qreal right = rightItem->pos().x() + rightItem->width();
+            qreal left  = item((MessageModel::ColumnType)(_selection & 0x03))->pos().x();
+            QRectF selectRect(left, 0, right - left, height());
             painter->fillRect(selectRect, selFmt.background());
         }
     }
@@ -161,16 +165,23 @@ void ChatLine::setGeometryByWidth(const qreal &width, const qreal &thirdWidth, q
         setPos(0, linePos); // set pos is _very_ cheap if nothing changes.*/
 }
 
-void ChatLine::setSelected(bool selected, MessageModel::ColumnType minColumn)
+void ChatLine::setSelected(bool selected, MessageModel::ColumnType minColumn, MessageModel::ColumnType maxColumn)
 {
     if (selected) {
-        quint8 sel = (_selection & Highlighted) | Selected | minColumn;
+        quint8 sel = (_selection & Highlighted) | Selected | minColumn | (maxColumn<<2);
         if (sel != _selection) {
             _selection = sel;
-            for (int i = 0; i < minColumn; i++)
+            for (int i = 0; i < minColumn; i++) {
                 item((MessageModel::ColumnType)i)->clearSelection();
-            for (int i = minColumn; i <= MessageModel::TimestampColumn; i++)
+
+            }
+            for (int i = minColumn; i <= maxColumn; i++) {
                 item((MessageModel::ColumnType)i)->setFullSelection();
+
+            }
+            for(int i = maxColumn+1; i<= MessageModel::TimestampColumn; i++) {
+                item((MessageModel::ColumnType)i)->clearSelection();
+            }
             update();
         }
     }

@@ -49,7 +49,7 @@ public:
     void setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos);
     void setGeometryByWidth(const qreal &width, const qreal &thirdWidth, qreal &linePos);
 
-    void setSelected(bool selected, MessageModel::ColumnType minColumn = MessageModel::TimestampColumn);
+    void setSelected(bool selected, MessageModel::ColumnType minColumn = MessageModel::SenderColumn, MessageModel::ColumnType maxColumn = MessageModel::TimestampColumn);
     void setHighlighted(bool highlighted);
 
     void clearCache();
@@ -79,11 +79,11 @@ private:
     qreal _width;
     qreal _height;
 
-    enum { ItemMask = 0x3f,
-           Selected = 0x40,
+    enum { Selected = 0x40,
            Highlighted = 0x80 };
     // _selection[1..0] ... Min Selected Column (See MessageModel::ColumnType)
-    // _selection[5..2] ... reserved for new column types
+    // _selection[2..3] ... Max Selected Column (shifted MessageModel::ColumnType)
+    // _selection[4..5] ... reserved for new column types
     // _selection[6] ...... Selected
     // _selection[7] ...... Highlighted
     quint8 _selection; // save space, so we put both the col and the flags into one byte

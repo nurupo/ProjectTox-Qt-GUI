@@ -46,16 +46,6 @@ QVariant MessageModel::data(const QModelIndex &index, int role) const
     if (role == ColumnTypeRole)
         return column;
 
-    // Hide repeating sender names
-    // TODO Is this the right place?
-    if (column == SenderColumn && role == DisplayRole && messageItemAt(row)->msgType() == Message::Plain) {
-        if( row-1 >= 0 &&
-            messageItemAt(row-1)->msgType() == Message::Plain &&
-            (data(index.sibling(row-1, column), FlagsRole).toInt() & Message::Self) == (messageItemAt(row)->msgFlags() & Message::Self)) {
-            return QVariant(QString(""));
-        }
-    }
-
     return messageItemAt(row)->data(index.column(), role);
 }
 

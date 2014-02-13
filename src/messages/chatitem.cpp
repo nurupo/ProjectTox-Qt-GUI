@@ -370,6 +370,20 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
 // SenderChatItem
 // ************************************************************
 
+void SenderChatItem::initLayout(QTextLayout *layout) const
+{
+    initLayoutHelper(layout, QTextOption::NoWrap);
+
+    // Hide Sender if is same as before
+    QModelIndex lastIndex = model()->index(row()-1, column());
+    if (lastIndex.isValid()
+            && data(MessageModel::TypeRole).toInt() == Message::Plain
+            && (data(MessageModel::FlagsRole).toInt() & Message::Self) == (model()->data(lastIndex, MessageModel::FlagsRole).toInt() & Message::Self)) {
+        layout->setText("");
+    }
+    doLayout(layout);
+}
+
 // ************************************************************
 // ContentsChatItem
 // ************************************************************
