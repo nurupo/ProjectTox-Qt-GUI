@@ -25,7 +25,7 @@ namespace AppInfo {
     static const QString version = "0.1.0+";
     static const QString buildDate = __DATE__;
     static const QString author = name + " Project";
-    static const QString years = "2013";
+    static const QString years = "2013-2014";
     static const QString Url = "https://github.com/nurupo/ProjectTox-Qt-GUI";
     static const QString license = "GPLv3";
 
