@@ -40,7 +40,8 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     friendContextMenu = new QMenu(this);
     friendContextMenu->addActions(QList<QAction*>() << copyUserIdAction << removeFriendAction);
 
-    friendView = new CustomHintTreeView(this, QSize(100, 100));
+    friendView = new QTreeView(this);
+    friendView->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
     friendView->setIconSize(QSize(32, 32));
     friendView->setSortingEnabled(true);
     friendView->setIndentation(0);
@@ -62,6 +63,7 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
 
     filterEdit = new FilterWidget(this);
     filterEdit->setPlaceholderText("Search");
+    filterEdit->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     connect(filterEdit, &FilterWidget::textChanged, friendProxyModel, &FriendProxyModel::setFilterFixedString);
 
     layout->addWidget(filterEdit);

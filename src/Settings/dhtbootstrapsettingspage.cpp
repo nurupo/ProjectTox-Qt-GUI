@@ -73,6 +73,7 @@ void DhtBootstrapSettingsPage::setGui()
     uniqueKey = 0;
     for (const Settings::DhtServer& server : serverList) {
         QStandardItem* serverItem = new QStandardItem(server.name);
+        serverItem->setEditable(false);
         serverItem->setData(uniqueKey);
         serverListModel->appendRow(serverItem);
 
@@ -106,6 +107,7 @@ void DhtBootstrapSettingsPage::serverAddButtonClicked()
     if (serverInfoDialog.exec() == QDialog::Accepted) {
         Settings::DhtServer serverInfo = serverInfoDialog.getServerInformation();
         QStandardItem* name = new QStandardItem(serverInfo.name);
+        name->setEditable(false);
         name->setData(uniqueKey);
         serverHash[uniqueKey] = serverInfo;
         uniqueKey++;

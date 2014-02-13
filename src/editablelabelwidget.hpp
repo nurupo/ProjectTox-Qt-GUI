@@ -46,12 +46,12 @@ public:
     ClickableCopyableElideLabel* label;
     EscLineEdit* lineEdit;
 
-    void addWidget(QWidget* w);
-
     void setText(const QString& text);
 
+private:
+    static const int LINE_SPACING_OFFSET = 2;
+
 private slots:
-    void onCurrentChanged(int index);
     void onLabelChangeSubmited();
     void onLabelChangeCancelled();
     void onLabelClicked();

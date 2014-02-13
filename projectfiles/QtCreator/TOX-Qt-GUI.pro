@@ -160,34 +160,44 @@ HEADERS  += \
     ../../src/messages/columnhandleitem.hpp \
     ../../src/messages/style.hpp
 
+### ToxCore section. Please keep it alphabetical ###
+
 SOURCES += \
+    ../../submodules/ProjectTox-Core/toxcore/assoc.c \
     ../../submodules/ProjectTox-Core/toxcore/DHT.c \
+    ../../submodules/ProjectTox-Core/toxcore/friend_requests.c \
+    ../../submodules/ProjectTox-Core/toxcore/group_chats.c \
+    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.c \
     ../../submodules/ProjectTox-Core/toxcore/Lossless_UDP.c \
     ../../submodules/ProjectTox-Core/toxcore/Messenger.c \
     ../../submodules/ProjectTox-Core/toxcore/net_crypto.c \
     ../../submodules/ProjectTox-Core/toxcore/network.c \
-    ../../submodules/ProjectTox-Core/toxcore/friend_requests.c \
-    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.c \
+    ../../submodules/ProjectTox-Core/toxcore/onion.c \
+    ../../submodules/ProjectTox-Core/toxcore/onion_announce.c \
+    ../../submodules/ProjectTox-Core/toxcore/onion_client.c \
     ../../submodules/ProjectTox-Core/toxcore/ping.c \
-    ../../submodules/ProjectTox-Core/toxcore/util.c \
     ../../submodules/ProjectTox-Core/toxcore/tox.c \
-    ../../submodules/ProjectTox-Core/toxcore/group_chats.c \
-    ../../submodules/ProjectTox-Core/toxcore/assoc.c
+    ../../submodules/ProjectTox-Core/toxcore/util.c
+
 
 HEADERS  += \
+    ../../submodules/ProjectTox-Core/toxcore/assoc.h \
     ../../submodules/ProjectTox-Core/toxcore/DHT.h \
+    ../../submodules/ProjectTox-Core/toxcore/friend_requests.h \
+    ../../submodules/ProjectTox-Core/toxcore/group_chats.h \
+    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.h \
     ../../submodules/ProjectTox-Core/toxcore/Lossless_UDP.h \
     ../../submodules/ProjectTox-Core/toxcore/Messenger.h \
+    ../../submodules/ProjectTox-Core/toxcore/misc_tools.h \
     ../../submodules/ProjectTox-Core/toxcore/net_crypto.h \
     ../../submodules/ProjectTox-Core/toxcore/network.h \
-    ../../submodules/ProjectTox-Core/toxcore/friend_requests.h \
-    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.h \
+    ../../submodules/ProjectTox-Core/toxcore/onion.h \
+    ../../submodules/ProjectTox-Core/toxcore/onion_announce.h \
+    ../../submodules/ProjectTox-Core/toxcore/onion_client.h \
     ../../submodules/ProjectTox-Core/toxcore/ping.h \
-    ../../submodules/ProjectTox-Core/toxcore/util.h \
-    ../../submodules/ProjectTox-Core/toxcore/misc_tools.h \
     ../../submodules/ProjectTox-Core/toxcore/tox.h \
-    ../../submodules/ProjectTox-Core/toxcore/group_chats.h \
-    ../../submodules/ProjectTox-Core/toxcore/assoc.h
+    ../../submodules/ProjectTox-Core/toxcore/util.h
+
 
 RESOURCES += \
     ../../resources/resources.qrc

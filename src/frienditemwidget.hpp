@@ -34,6 +34,8 @@ private:
     CopyableElideLabel* usernameLabel;
     CopyableElideLabel* statusMessageLabel;
 
+    static const int LINE_SPACING_OFFSET = 2;
+
 public slots:
     void setStatus(Status status);
     void setUsername(const QString& username);

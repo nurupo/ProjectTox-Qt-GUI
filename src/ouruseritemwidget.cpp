@@ -30,7 +30,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Offline).iconPath), QSize(24, 24), "Change Status");
     statusButton->setPopupMode(QToolButton::InstantPopup);
 
-    QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy Friend Address");
+    QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy my Friend Address");
     connect(copyFriendAddressButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyFriendAddressButtonClicked);
 
     QMenu* statusMenu = new QMenu(statusButton);
@@ -51,6 +51,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameWidget->label->setTextElideMode(Qt::ElideRight);
     usernameWidget->label->setShowToolTipOnElide(true);
     usernameWidget->setMinimumWidth(10);
+    usernameWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     connect(usernameWidget, &EditableLabelWidget::textChanged, this, &OurUserItemWidget::onUsernameChanged);
 
     statusMessageWidget = new EditableLabelWidget(this);
@@ -59,17 +60,19 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusMessageWidget->label->setTextElideMode(Qt::ElideRight);
     statusMessageWidget->label->setShowToolTipOnElide(true);
     statusMessageWidget->setMinimumWidth(10);
+    statusMessageWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     QPalette palette;
     palette.setColor(QPalette::Foreground, Qt::gray);
     statusMessageWidget->label->setPalette(palette);
     connect(statusMessageWidget, &EditableLabelWidget::textChanged, this, &OurUserItemWidget::onStatusMessageChanged);
 
     QWidget* userInformationWidget = new QWidget(this);
+    userInformationWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QVBoxLayout* userInformationLayout = new QVBoxLayout(userInformationWidget);
     userInformationLayout->setContentsMargins(0, 0, 0, 0);
     userInformationLayout->setSpacing(0);
-    userInformationLayout->addWidget(usernameWidget, 0, Qt::AlignVCenter);
-    userInformationLayout->addWidget(statusMessageWidget, 0, Qt::AlignVCenter);
+    userInformationLayout->addWidget(usernameWidget);
+    userInformationLayout->addWidget(statusMessageWidget);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(2, 2, 2, 0);

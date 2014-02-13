@@ -50,7 +50,7 @@ DhtServerDialog::DhtServerDialog(QWidget* parent) :
     portSpinBox->setValue(33445);
     portSpinBox->setMinimumWidth(64);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok , Qt::Horizontal, this);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DhtServerDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DhtServerDialog::reject);
