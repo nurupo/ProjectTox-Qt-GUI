@@ -51,7 +51,6 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     usernameWidget->label->setTextElideMode(Qt::ElideRight);
     usernameWidget->label->setShowToolTipOnElide(true);
     usernameWidget->setMinimumWidth(10);
-    usernameWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     connect(usernameWidget, &EditableLabelWidget::textChanged, this, &OurUserItemWidget::onUsernameChanged);
 
     statusMessageWidget = new EditableLabelWidget(this);
@@ -60,7 +59,6 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     statusMessageWidget->label->setTextElideMode(Qt::ElideRight);
     statusMessageWidget->label->setShowToolTipOnElide(true);
     statusMessageWidget->setMinimumWidth(10);
-    statusMessageWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     QPalette palette;
     palette.setColor(QPalette::Foreground, Qt::gray);
     statusMessageWidget->label->setPalette(palette);

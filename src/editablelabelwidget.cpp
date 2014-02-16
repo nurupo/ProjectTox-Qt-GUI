@@ -47,7 +47,6 @@ EditableLabelWidget::EditableLabelWidget(QWidget* parent) :
     QStackedWidget(parent)
 {
     label = new ClickableCopyableElideLabel(this);
-    label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     connect(label, &ClickableCopyableElideLabel::clicked,   this, &EditableLabelWidget::onLabelClicked);
 
