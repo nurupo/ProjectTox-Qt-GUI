@@ -19,21 +19,21 @@
 #include "aboutdialog.hpp"
 #include "addfrienddialog.hpp"
 #include "appinfo.hpp"
+#include "closeapplicationdialog.hpp"
 #include "friendrequestdialog.hpp"
 #include "pageswidget.hpp"
 #include "Settings/settings.hpp"
-#include "closeapplicationdialog.hpp"
 
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QDockWidget>
+#include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QSplitter>
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QToolButton>
-#include <QFontDatabase>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -53,21 +53,15 @@ MainWindow::MainWindow(QWidget* parent)
     // install Unicode 6.1 supporting font
     QFontDatabase::addApplicationFont("://DejaVuSans.ttf");
 
-    QDockWidget* friendDock = new QDockWidget(this);
-    friendDock->setObjectName("FriendDock");
-    friendDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    friendDock->setTitleBarWidget(new QWidget(friendDock));
-    friendDock->setContextMenuPolicy(Qt::PreventContextMenu);
-    addDockWidget(Qt::LeftDockWidgetArea, friendDock);
+    QSplitter *splitterWidget = new QSplitter(Qt::Horizontal, this);
 
-    QWidget* friendDockWidget = new QWidget(friendDock);
-    QVBoxLayout* layout = new QVBoxLayout(friendDockWidget);
+    QWidget* friendsLayout = new QWidget(this);
+    QVBoxLayout* layout = new QVBoxLayout(friendsLayout);
     layout->setMargin(0);
     layout->setSpacing(0);
-    friendDock->setWidget(friendDockWidget);
 
     ourUserItem = new OurUserItemWidget(this);
-    friendsWidget = new FriendsWidget(friendDockWidget);
+    friendsWidget = new FriendsWidget(friendsLayout);
 
     // Create toolbar
     QToolBar *toolBar = new QToolBar(this);
@@ -81,7 +75,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(addFriendButton, &QToolButton::clicked, this, &MainWindow::onAddFriendButtonClicked);
 
     QWidget *spacer = new QWidget(toolBar);
-    spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     QToolButton *menuButton = new QToolButton(toolBar);
     menuButton->setIcon(QIcon("://icons/cog.png"));
@@ -160,7 +154,11 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(friendsWidget, &FriendsWidget::friendRemoved, core, &Core::removeFriend);
 
-    setCentralWidget(pages);
+    splitterWidget->addWidget(friendsLayout);
+    splitterWidget->addWidget(pages);
+    splitterWidget->setStretchFactor(0, 0);
+    splitterWidget->setStretchFactor(1, 1);
+    setCentralWidget(splitterWidget);
 
     Settings::getInstance().loadWindow(this);
 }
