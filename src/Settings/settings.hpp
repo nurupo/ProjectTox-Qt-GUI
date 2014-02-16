@@ -17,8 +17,9 @@
 #ifndef SETTINGS_HPP
 #define SETTINGS_HPP
 
-#include <QMainWindow>
 #include <QHash>
+#include <QMainWindow>
+#include <QSplitter>
 
 class Settings : public QObject
 {
@@ -52,9 +53,27 @@ public:
     bool getEncryptLogs() const;
     void setEncryptLogs(bool newValue);
 
-    void loadWindow(QMainWindow* window) const;
-    // Assumes all windows have unique objectName set
-    void saveWindow(const QMainWindow* window);
+    // Assume all widgets have unique names
+    // Don't use it to save every single thing you want to save, use it
+    // for some general purpose widgets, such as MainWindows or Splitters,
+    // which have widget->saveX() and widget->loadX() methods.
+    QByteArray getWidgetData(const QString& uniqueName) const;
+    void setWidgetData(const QString& uniqueName, const QByteArray& data);
+
+    // Wrappers around getWidgetData() and setWidgetData()
+    // Assume widget has a unique objectName set
+    template <class T>
+    void restoreGeometryState(T* widget) const
+    {
+        widget->restoreGeometry(getWidgetData(widget->objectName() + "Geometry"));
+        widget->restoreState(getWidgetData(widget->objectName() + "State"));
+    }
+    template <class T>
+    void saveGeometryState(const T* widget)
+    {
+        setWidgetData(widget->objectName() + "Geometry", widget->saveGeometry());
+        setWidgetData(widget->objectName() + "State", widget->saveState());
+    }
 
     bool isAnimationEnabled() const;
     void setAnimationEnabled(bool newValue);
@@ -93,13 +112,7 @@ private:
     bool enableLogging;
     bool encryptLogs;
 
-    struct WindowSettings
-    {
-        QByteArray geometry;
-        QByteArray state;
-    };
-
-    QHash<QString, WindowSettings> windowSettings;
+    QHash<QString, QByteArray> widgetSettings;
 
     // GUI
     bool enableSmoothAnimation;

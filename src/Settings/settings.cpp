@@ -85,13 +85,10 @@ void Settings::load()
         statusMessage = s.value("statusMessage", "My status").toString();
     s.endGroup();
 
-    s.beginGroup("WindowSettings");
-        QList<QString> windowNames = s.childGroups();
-        for (const QString& name : windowNames) {
-            s.beginGroup(name);
-                windowSettings[name].geometry = s.value("geometry").toByteArray();
-                windowSettings[name].state = s.value("state").toByteArray();
-            s.endGroup();
+    s.beginGroup("Widgets");
+        QList<QString> objectNames = s.childKeys();
+        for (const QString& name : objectNames) {
+            widgetSettings[name] = s.value(name).toByteArray();
         }
     s.endGroup();
 
@@ -139,13 +136,10 @@ void Settings::save()
         s.setValue("statusMessage", statusMessage);
     s.endGroup();
 
-    s.beginGroup("WindowSettings");
-    const QList<QString> windowNames = windowSettings.keys();
-    for (const QString& name : windowNames) {
-        s.beginGroup(name);
-            s.setValue("geometry", windowSettings.value(name).geometry);
-            s.setValue("state", windowSettings.value(name).state);
-        s.endGroup();
+    s.beginGroup("Widgets");
+    const QList<QString> widgetNames = widgetSettings.keys();
+    for (const QString& name : widgetNames) {
+        s.setValue(name, widgetSettings.value(name));
     }
     s.endGroup();
 
@@ -218,21 +212,14 @@ void Settings::setEncryptLogs(bool newValue)
     encryptLogs = newValue;
 }
 
-void Settings::saveWindow(const QMainWindow* window)
+void Settings::setWidgetData(const QString& uniqueName, const QByteArray& data)
 {
-    windowSettings[window->objectName()].geometry = window->saveGeometry();
-    windowSettings[window->objectName()].state = window->saveState();
+    widgetSettings[uniqueName] = data;
 }
 
-void Settings::loadWindow(QMainWindow* window) const
+QByteArray Settings::getWidgetData(const QString& uniqueName) const
 {
-    QHash<QString, WindowSettings>::const_iterator i = windowSettings.constFind(window->objectName());
-    if (i == windowSettings.constEnd()) {
-        return;
-    }
-
-    window->restoreGeometry(i.value().geometry);
-    window->restoreState(i.value().state);
+    return widgetSettings.value(uniqueName);
 }
 
 bool Settings::isAnimationEnabled() const

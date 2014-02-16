@@ -26,6 +26,7 @@
 #include <QMainWindow>
 #include <QTextBrowser>
 #include <QThread>
+#include <QSplitter>
 
 class MainWindow : public QMainWindow
 {
@@ -43,6 +44,7 @@ private:
     QThread* coreThread;
     FriendsWidget* friendsWidget;
     OurUserItemWidget* ourUserItem;
+    QSplitter* splitterWidget;
 
 private slots:
     void onAddFriendButtonClicked();

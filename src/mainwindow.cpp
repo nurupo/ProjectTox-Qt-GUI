@@ -30,7 +30,6 @@
 #include <QHBoxLayout>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QSplitter>
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QToolButton>
@@ -45,7 +44,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     setGeometry((screenWidth - appWidth) / 2, (screenHeight - appHeight) / 2, appWidth, appHeight);
 
-    setObjectName("mainwindow");
+    setObjectName("MainWindow");
     setWindowTitle("developers' test version, not for public use");
     setWindowIcon(QIcon(":/icons/icon64.png"));
     setContextMenuPolicy(Qt::PreventContextMenu);
@@ -53,7 +52,8 @@ MainWindow::MainWindow(QWidget* parent)
     // install Unicode 6.1 supporting font
     QFontDatabase::addApplicationFont("://DejaVuSans.ttf");
 
-    QSplitter *splitterWidget = new QSplitter(Qt::Horizontal, this);
+    splitterWidget = new QSplitter(Qt::Horizontal, this);
+    splitterWidget->setObjectName("FriendsSplitter");
 
     QWidget* friendsLayout = new QWidget(this);
     QVBoxLayout* layout = new QVBoxLayout(friendsLayout);
@@ -160,7 +160,8 @@ MainWindow::MainWindow(QWidget* parent)
     splitterWidget->setStretchFactor(1, 1);
     setCentralWidget(splitterWidget);
 
-    Settings::getInstance().loadWindow(this);
+    Settings::getInstance().restoreGeometryState(splitterWidget);
+    Settings::getInstance().restoreGeometryState(this);
 }
 
 MainWindow::~MainWindow()
@@ -172,7 +173,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    Settings::getInstance().saveWindow(this);
+    Settings::getInstance().saveGeometryState(this);
+    Settings::getInstance().saveGeometryState(splitterWidget);
     QMainWindow::closeEvent(event);
 }
 
