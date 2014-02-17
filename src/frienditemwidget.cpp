@@ -48,13 +48,13 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     QWidget* textWidget = new QWidget(this);
     textWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QVBoxLayout* textLayout = new QVBoxLayout(textWidget);
-    textLayout->setContentsMargins(0, 1, 0, 0);
+    textLayout->setContentsMargins(0, 0, 0, 0);
     textLayout->setSpacing(0);
     textLayout->addWidget(usernameLabel);
     textLayout->addWidget(statusMessageLabel);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(2, 1, 2, 0);
+    layout->setContentsMargins(2, 2, 2, 0);
     layout->setSpacing(2);
     layout->addWidget(statusLabel, 0, Qt::AlignVCenter);
     layout->addWidget(textWidget);

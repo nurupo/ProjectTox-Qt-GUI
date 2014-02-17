@@ -29,9 +29,15 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
 {
     statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Offline).iconPath), QSize(24, 24), "Change Status");
     statusButton->setPopupMode(QToolButton::InstantPopup);
+    QHBoxLayout* statusButtonLayout = new QHBoxLayout();
+    statusButtonLayout->setContentsMargins(0, 1, 0, 0);
+    statusButtonLayout->addWidget(statusButton, 0, Qt::AlignVCenter);
 
     QToolButton* copyFriendAddressButton = createToolButton(QIcon(":/icons/page_copy.png"), QSize(16, 16), "Copy my Friend Address");
     connect(copyFriendAddressButton, &QToolButton::clicked, this, &OurUserItemWidget::onCopyFriendAddressButtonClicked);
+    QHBoxLayout* copyFriendAddressButtonLayout = new QHBoxLayout();
+    copyFriendAddressButtonLayout->setContentsMargins(0, 1, 0, 0);
+    copyFriendAddressButtonLayout->addWidget(copyFriendAddressButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 
     QMenu* statusMenu = new QMenu(statusButton);
     QList<QAction*> statusActions;
@@ -73,11 +79,11 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     userInformationLayout->addWidget(statusMessageWidget);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(2, 2, 2, 0);
+    layout->setContentsMargins(2, 1, 2, 0);
     layout->setSpacing(2);
-    layout->addWidget(statusButton, 0, Qt::AlignVCenter);
+    layout->addLayout(statusButtonLayout, 0);
     layout->addWidget(userInformationWidget);
-    layout->addWidget(copyFriendAddressButton, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addLayout(copyFriendAddressButtonLayout, 0);
 
     setFocusPolicy(Qt::ClickFocus);
 }
