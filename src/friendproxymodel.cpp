@@ -28,10 +28,10 @@ FriendProxyModel::FriendProxyModel(QObject* parent) :
 bool FriendProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
     Status leftStatus = FriendItemDelegate::getStatus(left);
-    QString leftName = left.data().toString();
+    QString leftName = FriendItemDelegate::getUsername(left);
 
     Status rightStatus = FriendItemDelegate::getStatus(right);
-    QString rightName = right.data().toString();
+    QString rightName = FriendItemDelegate::getUsername(right);
 
     if (leftStatus == rightStatus) {
         return leftName.localeAwareCompare(rightName) > 0;

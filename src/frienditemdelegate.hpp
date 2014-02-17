@@ -30,6 +30,7 @@ public:
     enum {UsernameRole = Qt::UserRole, StatusRole, StatusMessageRole, UserIdRole, FriendIdRole};
 
     static Status getStatus(const QModelIndex& index);
+    static QString getUsername(const QModelIndex& index);
 
 };
 

@@ -27,7 +27,7 @@ FriendItemDelegate::FriendItemDelegate(QObject* parent) :
 {
 }
 
-QSize FriendItemDelegate::sizeHint(const QStyleOptionViewItem&  option, const QModelIndex& index) const
+QSize FriendItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     QIcon statusIcon = QIcon(StatusHelper::getInfo(getStatus(index)).iconPath);
     QSize statusIconSize = statusIcon.actualSize(option.decorationSize);
@@ -93,4 +93,9 @@ Status FriendItemDelegate::getStatus(const QModelIndex& index)
         qDebug() << "Couldn't convert status for" << index.data(UsernameRole).toString() << "with friendId" << index.data(FriendIdRole).toInt();
         return Status::Offline;
     }
+}
+
+QString FriendItemDelegate::getUsername(const QModelIndex& index)
+{
+    return index.data(UsernameRole).toString();
 }
