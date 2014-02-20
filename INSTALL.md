@@ -73,3 +73,36 @@ If you want to speed up the building process a little, click on `Projects` on th
 Close the `Details` and hit the big green arrow on bottom left (or press Ctlr+R), that should build and run the GUI in Release mode.
 
 You might also need to install [Windows SDK for your version of Windows OS](https://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions).
+
+###Mac:
+
+This project depends on Qt5.2.0 and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium). You will need a compiler that implements C++11.
+
+You should get and install **Qt5.2.0 or higher**.
+You can get Qt5 precompiled binaries and source code to compile them yourself from [qt-project website](http://qt-project.org/downloads).
+
+You should get and install [libsodium](https://github.com/jedisct1/libsodium):
+
+```bash
+brew install libsodium
+```
+
+Then get this repo and build the GUI:
+```bash
+git clone --recursive https://github.com/nurupo/ProjectTox-Qt-GUI.git
+cd ProjectTox-Qt-GUI
+mkdir build && cd build
+/Users/<username>/Qt5.2.1/5.2.1/clang_64/bin/qmake -Wall ../projectfiles/QtCreator/TOX-Qt-GUI.pro
+make
+```
+On success, this will build a `TOX-Qt-GUI` executable. You may get a warning while running qmake `WARNING: Could not resolve Info.plist: 'Info.plist.app'. Check if QMAKE_INFO_PLIST points to a valid file.` but disregard it and run make.
+
+Note the use of `--recursive` in `git clone`. This will automatically initialize and update all submodules.
+
+Note that you should not update submodules on your own if you don't know what you are doing. Newer versions of submodules might not be compatible with the project (as in "won't work" or even "won't build"), and may require testing and some code changes.
+
+Note that `qmake` might not be found by bash or it might be found, but it's from Qt4 installation. In the case of qmake not working, make sure you use the right qmake.
+If you have installed Qt5 from the precompiled binaries provided on qt-project website, you should use qmake from Qt5's installation directory.
+For example, my qmake was located at `/Users/<username>/Qt5.2.1/5.2.1/clang_64/bin/qmake`.
+
+If you want to build the GUI by using Qt Creator, rather than terminal commands, follow the Windows guide starting at "Then open the Qt Creator...".
