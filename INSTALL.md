@@ -75,6 +75,7 @@ Close the `Details` and hit the big green arrow on bottom left (or press Ctlr+R)
 You might also need to install [Windows SDK for your version of Windows OS](https://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions).
 
 ###Mac:
+
 This project depends on Qt5.2.0 and [ProjectTox-Core](http://github.com/irungentoo/ProjectTox-Core), which in turn depends on [libsodium](http://github.com/jedisct1/libsodium). You will need a compiler that implements C++11.
 
 You should get and install **Qt5.2.0 or higher**.
@@ -82,7 +83,8 @@ You can get Qt5 precompiled binaries and source code to compile them yourself fr
 
 You should get and install [libsodium](https://github.com/jedisct1/libsodium):
 
-```brew install libsodium
+```bash
+brew install libsodium
 ```
 
 Then get this repo and build the GUI:
@@ -93,7 +95,7 @@ mkdir build && cd build
 /Users/<username>/Qt5.2.1/5.2.1/clang_64/bin/qmake -Wall ../projectfiles/QtCreator/TOX-Qt-GUI.pro
 make
 ```
-On success, this will build a `TOX-Qt-GUI` executable. You may get a warning while running qmake `WARNING: Could not resolve Info.plist: '../../../../Qt5.2.1/5.2.1/clang_64/mkspecs/macx-clang/Info.plist.app'. Check if QMAKE_INFO_PLIST points to a valid file.` but disregard it and run make.
+On success, this will build a `TOX-Qt-GUI` executable. You may get a warning while running qmake `WARNING: Could not resolve Info.plist: 'Info.plist.app'. Check if QMAKE_INFO_PLIST points to a valid file.` but disregard it and run make.
 
 Note the use of `--recursive` in `git clone`. This will automatically initialize and update all submodules.
 
