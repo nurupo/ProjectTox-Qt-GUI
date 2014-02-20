@@ -26,8 +26,6 @@
 #include <QTimer>
 #include <QList>
 
-#define MAX_TRANSFER 100
-
 class Core : public QObject
 {
     Q_OBJECT

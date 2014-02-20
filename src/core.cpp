@@ -226,7 +226,7 @@ void Core::sendFiles()
         int fid = state->friendId();
         bool completed = false;
 
-        for (int j = 0; j < MAX_TRANSFER; ++j) {
+        while (true) {
             len = state->readData(buf, chunk_size);
 
             if (len == 0) {
@@ -235,7 +235,7 @@ void Core::sendFiles()
                 completed = true;
                 break;
             } else {
-                if (!tox_file_send_data(tox, fid, fn, (uint8_t*)buf, len)) {
+                if (tox_file_send_data(tox, fid, fn, (uint8_t*)buf, len)) {
                     break;
                 }
                 state->readComplete();
