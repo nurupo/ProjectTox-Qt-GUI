@@ -63,7 +63,7 @@ AddFriendDialog::AddFriendDialog(QWidget* parent) :
 
 QString AddFriendDialog::getFriendAddress() const
 {
-    return friendAddressEdit->text();
+    return friendAddressEdit->text().trimmed();
 }
 
 QString AddFriendDialog::getMessage() const
@@ -75,12 +75,14 @@ void AddFriendDialog::accept()
 {
     const QRegularExpression hexRegExp("^[A-Fa-f0-9]+$");
 
-    if (friendAddressEdit->text().length() == 0 || messageEdit->toPlainText().length() == 0) {
+    QString trimmedFriendAddress = friendAddressEdit->text().trimmed();
+
+    if (trimmedFriendAddress.length() == 0 || messageEdit->toPlainText().length() == 0) {
         QMessageBox warning(this);
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
-    } else if (friendAddressEdit->text().length() != (TOX_FRIEND_ADDRESS_SIZE * 2) || !friendAddressEdit->text().contains(hexRegExp)) {
+    } else if (trimmedFriendAddress.length() != (TOX_FRIEND_ADDRESS_SIZE * 2) || !friendAddressEdit->text().contains(hexRegExp)) {
         QMessageBox warning(this);
         warning.setText("Please enter a valid Friend address.");
         warning.setIcon(QMessageBox::Warning);

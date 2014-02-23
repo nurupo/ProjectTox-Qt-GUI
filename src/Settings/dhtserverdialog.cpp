@@ -85,9 +85,9 @@ Settings::DhtServer DhtServerDialog::getServerInformation() const
 {
     Settings::DhtServer server;
 
-    server.name = nameEdit->text();
-    server.userId = userIdEdit->text();
-    server.address = addressEdit->text();
+    server.name = nameEdit->text().trimmed();
+    server.userId = userIdEdit->text().trimmed();
+    server.address = addressEdit->text().trimmed();
     server.port = portSpinBox->value();
 
     return server;
@@ -97,12 +97,16 @@ void DhtServerDialog::accept()
 {
     const QRegularExpression hexRegExp("^[A-Fa-f0-9]+$");
 
-    if (nameEdit->text().length() == 0 || userIdEdit->text().length() == 0 || addressEdit->text().length() == 0) {
+    QString trimmedName = nameEdit->text().trimmed();
+    QString trimmedUserId = userIdEdit->text().trimmed();
+    QString trimmedAddress = addressEdit->text().trimmed();
+
+    if (trimmedName.length() == 0 || trimmedUserId.length() == 0 || trimmedAddress.length() == 0) {
         QMessageBox warning(this);
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
-    } else if (userIdEdit->text().length() != (TOX_CLIENT_ID_SIZE * 2) || !userIdEdit->text().contains(hexRegExp)) {
+    } else if (trimmedUserId.length() != (TOX_CLIENT_ID_SIZE * 2) || !trimmedUserId.contains(hexRegExp)) {
         QMessageBox warning(this);
         warning.setText("Please enter a valid User ID.");
         warning.setIcon(QMessageBox::Warning);
