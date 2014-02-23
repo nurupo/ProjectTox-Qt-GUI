@@ -103,7 +103,8 @@ SOURCES += \
     ../../src/messages/clickable.cpp \
     ../../src/messages/markerlineitem.cpp \
     ../../src/messages/columnhandleitem.cpp \
-    ../../src/messages/style.cpp
+    ../../src/messages/style.cpp \
+    ../../src/messages/smileytextobject.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -158,7 +159,8 @@ HEADERS  += \
     ../../src/messages/clickable.hpp \
     ../../src/messages/markerlineitem.hpp \
     ../../src/messages/columnhandleitem.hpp \
-    ../../src/messages/style.hpp
+    ../../src/messages/style.hpp \
+    ../../src/messages/smileytextobject.hpp
 
 ### ToxCore section. Please keep it alphabetical ###
 

@@ -10,6 +10,8 @@
 #include "clickable.hpp"
 #include "style.hpp"
 
+#include <QAbstractTextDocumentLayout>
+
 class ChatLine;
 class ChatView;
 
@@ -90,6 +92,7 @@ protected:
 
     void paintBackground(QPainter *painter);
     QVector<QTextLayout::FormatRange> selectionFormats() const;
+    QAbstractTextDocumentLayout::Selection selectionLayout() const;
     virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
     void overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const;
 
@@ -101,12 +104,14 @@ protected:
     inline void setSelectionMode(SelectionMode mode) { _selectionMode = mode; }
     void setSelection(SelectionMode mode, qint16 start, qint16 end);
 
-    qint16 posToCursor(const QPointF &posInLine) const;
+    virtual qint16 posToCursor(const QPointF &posInLine) const;
 
     inline void setGeometry(qreal width, qreal height) { clearCache(); _boundingRect.setSize(QSizeF(width, height)); }
     inline void setHeight(const qreal &height) { clearCache(); _boundingRect.setHeight(height); }
     inline void setWidth(const qreal &width) { clearCache(); _boundingRect.setWidth(width); }
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
+
+    QTextDocument *mDoc; // TODO MKO private?
 
 private:
 
@@ -177,6 +182,8 @@ public:
 
     virtual void clearCache();
 
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
 protected:
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
@@ -189,8 +196,10 @@ protected:
     virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 
     virtual void initLayout(QTextLayout *layout) const;
-    virtual void doLayout(QTextLayout *layout) const;
+    //virtual void doLayout(QTextLayout *layout) const;
     virtual UiStyle::FormatList formatList() const;
+
+    virtual qint16 posToCursor(const QPointF &posInLine) const;
 
 private:
     class ActionProxy;

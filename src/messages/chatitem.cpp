@@ -8,6 +8,12 @@
 #include <QFontMetricsF>
 #include <QApplication>
 
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QTextBlock>
+#include "smileytextobject.hpp"
+#include <QStyleOption>
+
 ChatItem::ChatItem(const QRectF &boundingRect, ChatLine *parent) :
     _parent(parent),
     _boundingRect(boundingRect),
@@ -78,7 +84,6 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     paintBackground(painter);
 
     layout()->draw(painter, pos(), additionalFormats(), boundingRect());
-
     painter->restore();
 }
 
@@ -194,6 +199,7 @@ void ChatItem::initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapM
     Q_ASSERT(layout);
 
     layout->setText(data(MessageModel::DisplayRole).toString());
+
 
     QTextOption option;
     option.setWrapMode(wrapMode);
@@ -311,6 +317,34 @@ QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
         return UiStyle::getInstance().toTextLayoutList(fmtList, end, UiStyle::Selected|data(MessageModel::MsgLabelRole).toUInt()).toVector();
 }
 
+QAbstractTextDocumentLayout::Selection ChatItem::selectionLayout() const
+{
+    QAbstractTextDocumentLayout::Selection selection;
+
+    if (!hasSelection())
+        return selection;
+
+    int start;
+    int end;
+
+    if (_selectionMode == FullSelection) {
+        start = 0;
+        end = data(MessageModel::DisplayRole).toString().length();
+    }
+    else {
+        start = _selectionStart;
+        end   = _selectionEnd;
+    }
+
+    QTextCursor c(mDoc);
+    c.setPosition(start);
+    c.setPosition(end, QTextCursor::KeepAnchor);
+    selection.cursor = c;
+
+    return selection;
+}
+
+
 QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
 {
     return selectionFormats();
@@ -396,12 +430,15 @@ ContentsChatItem::ContentsChatItem(const QPointF &pos, const qreal &width, ChatL
     _data(0)
 {
     setPos(pos);
+    mDoc = new QTextDocument;
+    mDoc->setPlainText(data(MessageModel::DisplayRole).toString());
     setGeometryByWidth(width);
 }
 
 ContentsChatItem::~ContentsChatItem()
 {
     delete _data;
+    delete mDoc;
 }
 
 QFontMetricsF *ContentsChatItem::fontMetrics() const
@@ -414,6 +451,48 @@ void ContentsChatItem::clearCache()
     delete _data;
     _data = 0;
     ChatItem::clearCache();
+}
+
+void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option); Q_UNUSED(widget);
+    painter->save();
+    painter->setClipRect(boundingRect());
+    //paintBackground(painter);
+
+    //layout()->draw(painter, pos(), additionalFormats(), boundingRect());
+    /*QTextDocument doc;
+    doc.setDocumentMargin(0);
+    doc.setTextWidth(boundingRect().width());
+    QObject *smileyInterface = new SmileyTextObject;
+    doc.documentLayout()->registerHandler(QTextFormat::UserObject + 1, smileyInterface);
+
+    QTextCursor cursor(&doc);
+    cursor.insertText(layout()->text());
+*/
+    /*QTextCharFormat smileyFormat;
+    smileyFormat.setObjectType(QTextFormat::UserObject + 1);
+    cursor.insertText(QString(QChar::ObjectReplacementCharacter), smileyFormat);
+    */
+
+
+
+    QAbstractTextDocumentLayout::PaintContext ctx;
+    ctx.palette = QApplication::palette("QWidgetTextControl"); // TODO MKO correct class name?
+
+
+    // Selection
+    QAbstractTextDocumentLayout::Selection selection = selectionLayout();
+    QPalette::ColorGroup cg = chatView()->hasFocus() ? QPalette::Active : QPalette::Inactive;
+    selection.format.setBackground(ctx.palette.brush(cg, QPalette::Highlight));
+    selection.format.setForeground(ctx.palette.brush(cg, QPalette::HighlightedText));
+    ctx.selections.append(selection);
+
+
+    painter->translate(pos());
+    mDoc->documentLayout()->draw(painter, ctx);
+
+    painter->restore();
 }
 
 void ContentsChatItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -533,9 +612,9 @@ QVector<QTextLayout::FormatRange> ContentsChatItem::additionalFormats() const
 void ContentsChatItem::initLayout(QTextLayout *layout) const
 {
     initLayoutHelper(layout, QTextOption::WrapAtWordBoundaryOrAnywhere);
-    doLayout(layout);
+    //doLayout(layout);
 }
-
+/*
 void ContentsChatItem::doLayout(QTextLayout *layout) const
 {
     MessageModel::WrapList wrapList = data(MessageModel::WrapListRole).value<MessageModel::WrapList>();
@@ -573,7 +652,7 @@ void ContentsChatItem::doLayout(QTextLayout *layout) const
     }
     layout->endLayout();
 }
-
+*/
 UiStyle::FormatList ContentsChatItem::formatList() const
 {
     UiStyle::FormatList fmtList = ChatItem::formatList();
@@ -584,6 +663,22 @@ UiStyle::FormatList ContentsChatItem::formatList() const
         }
     }
     return fmtList;
+}
+
+qint16 ContentsChatItem::posToCursor(const QPointF &posInLine) const
+{
+    QPointF pos = mapFromLine(posInLine);
+    if (pos.y() > height())
+        return data(MessageModel::DisplayRole).toString().length();
+    if (pos.y() < 0)
+        return 0;
+
+    int found = mDoc->documentLayout()->hitTest(pos, Qt::FuzzyHit);
+    //qDebug() << found << data(MessageModel::DisplayRole).toString().length();
+
+    if(found < 0)
+        return 0;
+    return found;
 }
 
 ContentsChatItemPrivate *ContentsChatItem::privateData() const
@@ -613,23 +708,14 @@ void ContentsChatItem::endHoverMode()
 
 qreal ContentsChatItem::setGeometryByWidth(qreal w)
 {
-    // We use this for reloading layout info as well, so we can't bail out if the width doesn't change
-
-    // compute height
-    int lines = 1;
-    WrapColumnFinder finder(this);
-    while (finder.nextWrapColumn(w) > 0)
-        lines++;
-
-    qreal spacing = qMax(fontMetrics()->lineSpacing(), fontMetrics()->height()); // cope with negative leading()
-    qreal h = lines * spacing;
-    delete _data;
-    _data = 0;
+    mDoc->setTextWidth(w);
+    qreal h = mDoc->size().height();
 
     if (w != width() || h != height())
         setGeometry(w, h);
 
     return h;
+
 }
 
 /*************************************************************************************************/
