@@ -107,5 +107,5 @@ void ChatPageWidget::actionReceived(const QString &message)
 
 void ChatPageWidget::actionSentResult(const QString &message)
 {
-    display->appendAction(username, message, true);
+    display->appendAction(Settings::getInstance().getUsername(), message, true);
 }
