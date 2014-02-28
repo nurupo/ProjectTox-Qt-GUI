@@ -193,11 +193,11 @@ protected:
     virtual void addActionsToMenu(QMenu *menu, const QPointF &pos);
     virtual void copyLinkToClipboard();
 
-    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
+    //virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 
-    virtual void initLayout(QTextLayout *layout) const;
+    //virtual void initLayout(QTextLayout *layout) const;
     //virtual void doLayout(QTextLayout *layout) const;
-    virtual UiStyle::FormatList formatList() const;
+    //virtual UiStyle::FormatList formatList() const;
 
     virtual qint16 posToCursor(const QPointF &posInLine) const;
 

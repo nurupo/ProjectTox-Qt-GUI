@@ -15,13 +15,9 @@ void Clickable::activate(const QString &text) const
     if (!isValid())
         return;
 
-    QString str = text.mid(start(), length());
-
     switch (type()) {
     case Clickable::Url:
-        if (!str.contains("://"))
-            str = "http://" + str;
-        QDesktopServices::openUrl(QUrl::fromEncoded(str.toUtf8(), QUrl::TolerantMode));
+        QDesktopServices::openUrl(QUrl::fromEncoded(text.toUtf8(), QUrl::TolerantMode));
         break;
     default:
         break;
