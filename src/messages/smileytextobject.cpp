@@ -2,12 +2,14 @@
 #include <QPainter>
 
 
+SmileyTextObject::SmileyTextObject(const QString &pixmap)
+{
+    mImage = QImage(pixmap);
+}
+
 QSizeF SmileyTextObject::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
-    // TODO MKO Quelle des Bildes
-    QImage bufferedImage = QImage(":/icons/emoticons/emotion_angel.png");
-
-    QSize size = bufferedImage.size();
+    QSize size = mImage.size();
 
     if (size.height() > 25)
         size *= 25.0 / (double) size.height();
@@ -17,8 +19,5 @@ QSizeF SmileyTextObject::intrinsicSize(QTextDocument *doc, int posInDocument, co
 
 void SmileyTextObject::drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
-    // TODO MKO Quelle des Bildes
-    QImage bufferedImage = QImage(":/icons/emoticons/emotion_angel.png");
-
-    painter->drawImage(rect, bufferedImage);
+    painter->drawImage(rect, mImage);
 }

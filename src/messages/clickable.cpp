@@ -41,12 +41,12 @@ ClickableList ClickableList::fromString(const QString &str)
 
         // Channel name
         // We don't match for channel names starting with + or &, because that gives us a lot of false positives.
-        QRegExp("((?:#|![A-Z0-9]{5})[^,:\\s]+(?::[^,:\\s]+)?)\\b", Qt::CaseInsensitive)
+        //QRegExp("((?:#|![A-Z0-9]{5})[^,:\\s]+(?::[^,:\\s]+)?)\\b", Qt::CaseInsensitive)
 
         // TODO: Nicks, we'll need a filtering for only matching known nicknames further down if we do this
     };
 
-    static const int regExpCount = 2; // number of regexps in the array above
+    static const int regExpCount = 1; // number of regexps in the array above
 
     qint16 matches[] = { 0, 0, 0 };
     qint16 matchEnd[] = { 0, 0, 0 };

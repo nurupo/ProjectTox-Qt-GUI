@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QPair>
 #include <QStringList>
+#include "messages/smiley.h"
 
 
 class Smileypack : public QObject

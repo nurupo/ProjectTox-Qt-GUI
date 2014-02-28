@@ -318,33 +318,6 @@ QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
         return UiStyle::getInstance().toTextLayoutList(fmtList, end, UiStyle::Selected|data(MessageModel::MsgLabelRole).toUInt()).toVector();
 }
 
-QAbstractTextDocumentLayout::Selection ChatItem::selectionLayout() const
-{
-    QAbstractTextDocumentLayout::Selection selection;
-
-    if (!hasSelection())
-        return selection;
-
-    int start;
-    int end;
-
-    if (_selectionMode == FullSelection) {
-        start = 0;
-        end = data(MessageModel::DisplayRole).toString().length();
-    }
-    else {
-        start = _selectionStart;
-        end   = _selectionEnd;
-    }
-
-    QTextCursor c(mDoc);
-    c.setPosition(start);
-    c.setPosition(end, QTextCursor::KeepAnchor);
-    selection.cursor = c;
-
-    return selection;
-}
-
 
 QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
 {
@@ -431,15 +404,17 @@ ContentsChatItem::ContentsChatItem(const QPointF &pos, const qreal &width, ChatL
     _data(0)
 {
     setPos(pos);
-    mDoc = new QTextDocument;
-    mDoc->setPlainText(data(MessageModel::DisplayRole).toString());
+
+    // Create QTextDocuement, and so on...
+    privateData();
+
     setGeometryByWidth(width);
+
 }
 
 ContentsChatItem::~ContentsChatItem()
 {
     delete _data;
-    delete mDoc;
 }
 
 QFontMetricsF *ContentsChatItem::fontMetrics() const
@@ -452,6 +427,65 @@ void ContentsChatItem::clearCache()
     delete _data;
     _data = 0;
     ChatItem::clearCache();
+}
+
+QString ContentsChatItem::selection() const
+{
+    if (selectionMode() == FullSelection)
+        return data(MessageModel::DisplayRole).toString();
+    if (selectionMode() == PartialSelection) {
+        int start = qMin(selectionStart(), selectionEnd());
+        int end   = start + qAbs(selectionStart() - selectionEnd());
+        int offset = 0;
+        QTextDocument *doc = privateData()->doc.clone();
+
+        foreach(Smiley s, privateData()->smileys) {
+            if(s.start()+offset >= start && s.start()+1+offset <= end+offset) {
+                QTextCursor c(doc);
+                c.setPosition(s.start()+offset);
+                c.setPosition(s.start()+1+offset, QTextCursor::KeepAnchor);
+                c.removeSelectedText();
+                c.insertText(s.text());
+
+                offset += s.textLength()-1;
+            }
+        }
+
+        QTextCursor cSelect(doc);
+        cSelect.setPosition(start);
+        cSelect.setPosition(end+offset, QTextCursor::KeepAnchor);
+        QString result = cSelect.selectedText();
+        delete doc;
+        return result;
+    }
+    return QString();
+}
+
+QAbstractTextDocumentLayout::Selection ContentsChatItem::selectionLayout() const
+{
+    QAbstractTextDocumentLayout::Selection selection;
+
+    if (!hasSelection())
+        return selection;
+
+    int start;
+    int end;
+
+    if (selectionMode() == FullSelection) {
+        start = 0;
+        end = privateData()->doc.characterCount()-1;
+    }
+    else {
+        start = selectionStart();
+        end   = selectionEnd();
+    }
+
+    QTextCursor c(&privateData()->doc);
+    c.setPosition(start);
+    c.setPosition(end, QTextCursor::KeepAnchor);
+    selection.cursor = c;
+
+    return selection;
 }
 
 void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -482,7 +516,7 @@ void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     // Clicables
     foreach(Clickable click, privateData()->clickables) {
-        QTextCursor c(mDoc);
+        QTextCursor c(&privateData()->doc);
         c.setPosition(click.start());
         c.setPosition(click.start()+click.length(), QTextCursor::KeepAnchor);
         QTextCharFormat f; // TODO MKO default format?
@@ -506,7 +540,7 @@ void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 
     painter->translate(pos());
-    mDoc->documentLayout()->draw(painter, ctx);
+    privateData()->doc.documentLayout()->draw(painter, ctx);
 
     painter->restore();
 }
@@ -539,7 +573,7 @@ void ContentsChatItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
             chatLine()->setCursor(Qt::PointingHandCursor);
 
             // Underline clickable
-            QTextCursor c(mDoc);
+            QTextCursor c(&privateData()->doc);
             c.setPosition(click.start());
             c.setPosition(click.start()+click.length(), QTextCursor::KeepAnchor);
             QTextCharFormat f;
@@ -562,7 +596,7 @@ void ContentsChatItem::handleClick(const QPointF &pos, ChatScene::ClickMode clic
         qint16 idx = posToCursor(pos);
         Clickable foo = privateData()->clickables.atCursorPos(idx);
         if (foo.isValid()) {
-            QTextCursor c(mDoc);
+            QTextCursor c(&privateData()->doc);
             c.setPosition(idx +1); // MKO TODO +1? Bug in link detection?
             foo.activate(c.charFormat().anchorHref());
             qDebug() << c.charFormat().anchorHref();
@@ -579,7 +613,7 @@ void ContentsChatItem::handleClick(const QPointF &pos, ChatScene::ClickMode clic
         else {
             // find word boundary
             qint16 cursor = posToCursor(pos);
-            QTextCursor c(mDoc);
+            QTextCursor c(&privateData()->doc);
             c.setPosition(cursor);
 
             c.select(QTextCursor::WordUnderCursor);
@@ -589,7 +623,9 @@ void ContentsChatItem::handleClick(const QPointF &pos, ChatScene::ClickMode clic
         chatLine()->update();
     }
     else if (clickMode == ChatScene::TripleClick) {
-        setSelection(PartialSelection, 0, data(MessageModel::DisplayRole).toString().length());
+        QTextCursor c(&privateData()->doc);
+        c.select(QTextCursor::Document);
+        setSelection(PartialSelection, 0, c.selectionEnd());
     }
     ChatItem::handleClick(pos, clickMode);
 }
@@ -618,7 +654,7 @@ void ContentsChatItem::copyLinkToClipboard()
     Clickable click = privateData()->activeClickable;
 
     if (click.isValid() && click.type() == Clickable::Url) {
-        QTextCursor c(mDoc);
+        QTextCursor c(&privateData()->doc);
         c.setPosition(click.start()+1); // MKO TODO +1? Bug in link detection?
         chatScene()->stringToClipboard(c.charFormat().anchorHref());
     }
@@ -700,11 +736,11 @@ qint16 ContentsChatItem::posToCursor(const QPointF &posInLine) const
 {
     QPointF pos = mapFromLine(posInLine);
     if (pos.y() > height())
-        return mDoc->characterCount()-1;
+        return privateData()->doc.characterCount()-1;
     if (pos.y() < 0)
         return 0;
 
-    int found = mDoc->documentLayout()->hitTest(pos, Qt::FuzzyHit);
+    int found = privateData()->doc.documentLayout()->hitTest(pos, Qt::FuzzyHit);
 
     if(found < 0)
         return 0;
@@ -716,7 +752,7 @@ ContentsChatItemPrivate *ContentsChatItem::privateData() const
 {
     if (!_data) {
         ContentsChatItem *that = const_cast<ContentsChatItem *>(this);
-        that->_data = new ContentsChatItemPrivate(ClickableList::fromString(mDoc->toPlainText()), that);
+        that->_data = new ContentsChatItemPrivate(data(MessageModel::DisplayRole).toString(), that);
     }
     return _data;
 }
@@ -736,9 +772,9 @@ void ContentsChatItem::endHoverMode()
             chatLine()->unsetCursor();
 
             // De-underline clickable
-            QTextCursor c(mDoc);
+            QTextCursor c(&privateData()->doc);
             c.setPosition(0);
-            c.setPosition(mDoc->characterCount()-1, QTextCursor::KeepAnchor);
+            c.setPosition(privateData()->doc.characterCount()-1, QTextCursor::KeepAnchor);
             QTextCharFormat f;
             f.setUnderlineStyle(QTextCharFormat::NoUnderline);
             c.mergeCharFormat(f);
@@ -749,8 +785,8 @@ void ContentsChatItem::endHoverMode()
 
 qreal ContentsChatItem::setGeometryByWidth(qreal w)
 {
-    mDoc->setTextWidth(w);
-    qreal h = mDoc->size().height();
+    privateData()->doc.setTextWidth(w);
+    qreal h = privateData()->doc.size().height();
 
     if (w != width() || h != height())
         setGeometry(w, h);
@@ -758,6 +794,44 @@ qreal ContentsChatItem::setGeometryByWidth(qreal w)
     return h;
 
 }
+
+ContentsChatItemPrivate::ContentsChatItemPrivate(QString text, ContentsChatItem *parent) :
+    contentsItem(parent)
+{
+    smileys = SmileyList::smilify(text);
+    doc.setPlainText(text);
+    doc.setTextWidth(parent->width());
+    clickables = ClickableList::fromString(text); // TODO MKO rebuild fromString to fromDoc and use QTextCursor
+
+    // Replace smileys
+    QTextCursor c(&doc);
+    for (int i=0; i<smileys.count(); i++) {
+        if(smileys.at(i).type() == Smiley::Pixmap) {
+
+            // Remove placeholder
+            c.setPosition(smileys.at(i).start());
+            c.setPosition(smileys.at(i).start()+1, QTextCursor::KeepAnchor);
+            c.removeSelectedText();
+
+            QObject *smileyInterface = new SmileyTextObject(smileys.at(i).graphics());
+            doc.documentLayout()->registerHandler(QTextFormat::UserObject + i+1, smileyInterface);
+
+            QTextCharFormat smileyFormat;
+            smileyFormat.setObjectType(QTextFormat::UserObject + i+1);
+            c.insertText(QString(QChar::ObjectReplacementCharacter), smileyFormat);
+        }
+        else if(smileys.at(i).type() == Smiley::Emoji) {
+
+            // Remove placeholder
+            c.setPosition(smileys.at(i).start());
+            c.setPosition(smileys.at(i).start()+smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
+            c.removeSelectedText();
+
+            c.insertText(smileys.at(i).graphics());
+        }
+    }
+}
+
 
 /*************************************************************************************************/
 

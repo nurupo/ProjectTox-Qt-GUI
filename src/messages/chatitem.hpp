@@ -9,6 +9,7 @@
 #include "chatscene.hpp"
 #include "clickable.hpp"
 #include "style.hpp"
+#include "smiley.h"
 
 #include <QAbstractTextDocumentLayout>
 
@@ -53,7 +54,7 @@ public:
     QVariant data(int role) const;
 
     // selection stuff, to be called by the scene
-    QString selection() const;
+    virtual QString selection() const;
     void clearSelection();
     void setFullSelection();
     void continueSelecting(const QPointF &pos);
@@ -92,7 +93,6 @@ protected:
 
     void paintBackground(QPainter *painter);
     QVector<QTextLayout::FormatRange> selectionFormats() const;
-    QAbstractTextDocumentLayout::Selection selectionLayout() const;
     virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
     void overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const;
 
@@ -110,8 +110,6 @@ protected:
     inline void setHeight(const qreal &height) { clearCache(); _boundingRect.setHeight(height); }
     inline void setWidth(const qreal &width) { clearCache(); _boundingRect.setWidth(width); }
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
-
-    QTextDocument *mDoc; // TODO MKO private?
 
 private:
 
@@ -182,6 +180,9 @@ public:
 
     virtual void clearCache();
 
+    virtual QString selection() const;
+    QAbstractTextDocumentLayout::Selection selectionLayout() const;
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 protected:
@@ -218,16 +219,21 @@ private:
     static ActionProxy mActionProxy;
 
     friend class ChatLine;
-    friend struct ContentsChatItemPrivate;
+    friend class ContentsChatItemPrivate;
 };
 
-struct ContentsChatItemPrivate {
+class ContentsChatItemPrivate {
+public:
     ContentsChatItem *contentsItem;
     ClickableList clickables;
     Clickable currentClickable;
     Clickable activeClickable;
 
-    ContentsChatItemPrivate(const ClickableList &c, ContentsChatItem *parent) : contentsItem(parent), clickables(c) {}
+    SmileyList smileys;
+
+    QTextDocument doc;
+
+    ContentsChatItemPrivate(QString text, ContentsChatItem *parent);
 };
 
 class ContentsChatItem::WrapColumnFinder
