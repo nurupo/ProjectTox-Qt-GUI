@@ -85,8 +85,13 @@ SmileyList SmileyList::smilify(QString &text)
             // TODO MKO We need placeholders with the character count of the smiley/emoji, later they will replaced by smiley image or emoji.
             //      This is a workaround because of the clickable detection works with QString insteed of QTextDocument
             QString placeholder;
-            for(int i=0; i<repRep.count(); i++)
-                placeholder.append('#');
+            if (pack.isEmoji()) {
+                for(int i=0; i<repRep.count(); i++)
+                    placeholder.append('#');
+            }
+            else {
+                placeholder = "#";
+            }
             text.replace(repPos, repSrt.count(), placeholder);
         }
     } while (found);
@@ -94,11 +99,11 @@ SmileyList SmileyList::smilify(QString &text)
     return result;
 }
 
-Smiley SmileyList::atCursorPos(int idx)
+/*Smiley SmileyList::atCursorPos(int idx)
 {
     foreach(const Smiley &smile, *this) {
         if (idx >= smile.start() && idx < smile.start() + 1)
             return smile;
     }
     return Smiley();
-}
+}*/

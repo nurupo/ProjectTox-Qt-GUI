@@ -43,7 +43,7 @@ class SmileyList : public QList<Smiley>
 public:
     static SmileyList smilify(QString &text);
 
-    Smiley atCursorPos(int idx);
+    //Smiley atCursorPos(int idx);
 };
 
 #endif // SMILEY_H

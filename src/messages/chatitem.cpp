@@ -510,27 +510,30 @@ void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     cursor.insertText(QString(QChar::ObjectReplacementCharacter), smileyFormat);
     */
 
+
     QAbstractTextDocumentLayout::PaintContext ctx;
     ctx.palette = QApplication::palette("QWidgetTextControl"); // TODO MKO correct class name?
     QPalette::ColorGroup cg = chatView()->hasFocus() ? QPalette::Active : QPalette::Inactive;
+
+    // Set color by message type
+    if (data(MessageModel::TypeRole).toInt() == Message::Nick)
+        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#204A87"));
+    else if (data(MessageModel::TypeRole).toInt() == Message::Action)
+        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#4E9A06"));
+    else if (data(MessageModel::TypeRole).toInt() == Message::DayChange)
+        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#AD7FA8"));
 
     // Clicables
     foreach(Clickable click, privateData()->clickables) {
         QTextCursor c(&privateData()->doc);
         c.setPosition(click.start());
         c.setPosition(click.start()+click.length(), QTextCursor::KeepAnchor);
-        QTextCharFormat f; // TODO MKO default format?
+        QTextCharFormat f;
         f.setAnchor(true);  // TODO MKO how to use?
         f.setAnchorHref(c.selectedText()); // TODO MKO how to use?
         f.setForeground(ctx.palette.brush(cg, QPalette::Link));
         c.mergeCharFormat(f);
     }
-
-
-
-
-
-
 
     // Selection
     QAbstractTextDocumentLayout::Selection selection = selectionLayout();
