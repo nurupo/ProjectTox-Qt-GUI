@@ -15,6 +15,8 @@
 
 class ChatLine;
 class ChatView;
+class ContentsChatItemPrivate;
+
 
 /* All external positions are relative to the parent ChatLine */
 /* Yes, that's also true for the boundingRect() and related things */
@@ -61,12 +63,12 @@ public:
     bool hasSelection() const;
     bool isPosOverSelection(const QPointF &pos) const;
 
-    QList<QRectF> findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive);
+    //QList<QRectF> findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive);
 
     virtual void addActionsToMenu(QMenu *menu, const QPointF &itemPos);
     virtual void handleClick(const QPointF &pos, ChatScene::ClickMode clickMode);
 
-    void initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapMode, Qt::Alignment alignment = Qt::AlignLeft) const;
+    //void initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapMode, Qt::Alignment alignment = Qt::AlignLeft) const;
 
     //! Remove internally cached data
     //! This removes e.g. the cached QTextLayout to avoid wasting space for nonvisible ChatLines
@@ -86,14 +88,15 @@ protected:
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) {}
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *) {}
 
-    QTextLayout *layout() const;
-    virtual void initLayout(QTextLayout *layout) const;
-    virtual void doLayout(QTextLayout *layout) const;
-    virtual UiStyle::FormatList formatList() const;
+    //QTextLayout *layout() const;
+    //virtual void initLayout(QTextLayout *layout) const;
+    //virtual void doLayout(QTextLayout *layout) const;
+    //virtual UiStyle::FormatList formatList() const;
+    QAbstractTextDocumentLayout::Selection selectionLayout() const;
 
-    void paintBackground(QPainter *painter);
-    QVector<QTextLayout::FormatRange> selectionFormats() const;
-    virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
+    //void paintBackground(QPainter *painter);
+    //QVector<QTextLayout::FormatRange> selectionFormats() const;
+    //virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
     //void overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const;
 
     inline qint16 selectionStart() const { return _selectionStart; }
@@ -111,7 +114,12 @@ protected:
     inline void setWidth(const qreal &width) { clearCache(); _boundingRect.setWidth(width); }
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
 
+    ContentsChatItemPrivate *privateData() const;
+    mutable ContentsChatItemPrivate *_data;
+
 private:
+
+
 
     ChatLine *_parent;
     QRectF _boundingRect;
@@ -123,6 +131,21 @@ private:
     mutable QTextLayout *_cachedLayout;
 
     friend class ChatLine;
+    friend class ContentsChatItemPrivate;
+};
+
+class ContentsChatItemPrivate {
+public:
+    ChatItem *contentsItem;
+    ClickableList clickables;
+    Clickable currentClickable;
+    Clickable activeClickable;
+
+    SmileyList smileys;
+
+    QTextDocument doc;
+
+    ContentsChatItemPrivate(QString text, ChatItem *parent);
 };
 
 // ************************************************************
@@ -133,12 +156,12 @@ private:
 class TimestampChatItem : public ChatItem
 {
 public:
-    TimestampChatItem(const QRectF &boundingRect, ChatLine *parent) : ChatItem(boundingRect, parent) {}
+    TimestampChatItem(const QRectF &boundingRect, ChatLine *parent);
     virtual inline int type() const { return ChatScene::TimestampChatItemType; }
     virtual inline MessageModel::ColumnType column() const { return MessageModel::TimestampColumn; }
 
 protected:
-    virtual void initLayout(QTextLayout *layout) const;
+    //virtual void initLayout(QTextLayout *layout) const;
 
 protected:
 };
@@ -150,19 +173,18 @@ protected:
 class SenderChatItem : public ChatItem
 {
 public:
-    SenderChatItem(const QRectF &boundingRect, ChatLine *parent) : ChatItem(boundingRect, parent) {}
+    SenderChatItem(const QRectF &boundingRect, ChatLine *parent);
     virtual inline int type() const { return ChatScene::SenderChatItemType; }
     virtual inline MessageModel::ColumnType column() const { return MessageModel::SenderColumn; }
 
 protected:
-    virtual void initLayout(QTextLayout *layout) const;
+    //virtual void initLayout(QTextLayout *layout) const;
 
 };
 
 // ************************************************************
 // ContentsChatItem
 // ************************************************************
-struct ContentsChatItemPrivate;
 
 //! A ChatItem for the contents column
 class ContentsChatItem : public ChatItem
@@ -171,17 +193,11 @@ class ContentsChatItem : public ChatItem
 
 public:
     ContentsChatItem(const QPointF &pos, const qreal &width, ChatLine *parent);
-    ~ContentsChatItem();
 
     virtual inline int type() const { return ChatScene::ContentsChatItemType; }
 
     inline MessageModel::ColumnType column() const { return MessageModel::ContentsColumn; }
     //QFontMetricsF *fontMetrics() const;
-
-    virtual void clearCache();
-
-    virtual QString selection() const;
-    QAbstractTextDocumentLayout::Selection selectionLayout() const;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -200,14 +216,9 @@ protected:
     //virtual void doLayout(QTextLayout *layout) const;
     //virtual UiStyle::FormatList formatList() const;
 
-    virtual qint16 posToCursor(const QPointF &posInLine) const;
-
 private:
     class ActionProxy;
     class WrapColumnFinder;
-
-    mutable ContentsChatItemPrivate *_data;
-    ContentsChatItemPrivate *privateData() const;
 
     Clickable clickableAt(const QPointF &pos) const;
 
@@ -219,22 +230,9 @@ private:
     static ActionProxy mActionProxy;
 
     friend class ChatLine;
-    friend class ContentsChatItemPrivate;
 };
 
-class ContentsChatItemPrivate {
-public:
-    ContentsChatItem *contentsItem;
-    ClickableList clickables;
-    Clickable currentClickable;
-    Clickable activeClickable;
 
-    SmileyList smileys;
-
-    QTextDocument doc;
-
-    ContentsChatItemPrivate(QString text, ContentsChatItem *parent);
-};
 
 /*class ContentsChatItem::WrapColumnFinder
 {

@@ -20,13 +20,15 @@ ChatItem::ChatItem(const QRectF &boundingRect, ChatLine *parent) :
     _boundingRect(boundingRect),
     _selectionMode(NoSelection),
     _selectionStart(-1),
-    _cachedLayout(0)
+    _cachedLayout(0),
+    _data(NULL)
 {
 }
 
 ChatItem::~ChatItem()
 {
     delete _cachedLayout;
+    delete _data;
 }
 
 const QAbstractItemModel *ChatItem::model() const
@@ -64,7 +66,7 @@ QPointF ChatItem::mapFromScene(const QPointF &p) const
     return chatLine()->mapFromScene(p) /* - pos() */;
 }
 
-void ChatItem::paintBackground(QPainter *painter)
+/*void ChatItem::paintBackground(QPainter *painter)
 {
     QVariant bgBrush;
     if (_selectionMode == FullSelection)
@@ -73,7 +75,7 @@ void ChatItem::paintBackground(QPainter *painter)
         bgBrush = data(MessageModel::BackgroundRole);
     if (bgBrush.isValid())
         painter->fillRect(boundingRect(), bgBrush.value<QBrush>());
-}
+}*/
 
 // NOTE: This is not the most time-efficient implementation, but it saves space by not caching unnecessary data
 //       This is a deliberate trade-off. (-> selectFmt creation, data() call)
@@ -82,9 +84,33 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option); Q_UNUSED(widget);
     painter->save();
     painter->setClipRect(boundingRect());
-    paintBackground(painter);
+    /*paintBackground(painter);
 
     layout()->draw(painter, pos(), additionalFormats(), boundingRect());
+    painter->restore();*/
+
+    QAbstractTextDocumentLayout::PaintContext ctx;
+    ctx.palette = QApplication::palette();
+    QPalette::ColorGroup cg = chatView()->hasFocus() ? QPalette::Active : QPalette::Inactive;
+
+    // Set color by message type
+    if (data(MessageModel::TypeRole).toInt() == Message::Nick)
+        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#204A87"));
+    else if (data(MessageModel::TypeRole).toInt() == Message::Action)
+        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#4E9A06"));
+    else if (data(MessageModel::TypeRole).toInt() == Message::DayChange)
+        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#AD7FA8"));
+
+    // Selection
+    QAbstractTextDocumentLayout::Selection selection = selectionLayout();
+    selection.format.setBackground(ctx.palette.brush(cg, QPalette::Highlight));
+    selection.format.setForeground(ctx.palette.brush(cg, QPalette::HighlightedText));
+    ctx.selections.append(selection);
+
+
+    painter->translate(pos());
+    privateData()->doc.documentLayout()->draw(painter, ctx);
+
     painter->restore();
 }
 
@@ -100,10 +126,33 @@ QVariant ChatItem::data(int role) const
 
 QString ChatItem::selection() const
 {
-    if (_selectionMode == FullSelection)
+    if (selectionMode() == FullSelection)
         return data(MessageModel::DisplayRole).toString();
-    if (_selectionMode == PartialSelection)
-        return data(MessageModel::DisplayRole).toString().mid(qMin(_selectionStart, _selectionEnd), qAbs(_selectionStart - _selectionEnd));
+    if (selectionMode() == PartialSelection) {
+        int start = qMin(selectionStart(), selectionEnd());
+        int end   = start + qAbs(selectionStart() - selectionEnd());
+        int offset = 0;
+        QTextDocument *doc = privateData()->doc.clone();
+
+        foreach(Smiley s, privateData()->smileys) {
+            if(s.start()+offset >= start && s.start()+1+offset <= end+offset) {
+                QTextCursor c(doc);
+                c.setPosition(s.start()+offset);
+                c.setPosition(s.start()+1+offset, QTextCursor::KeepAnchor);
+                c.removeSelectedText();
+                c.insertText(s.text());
+
+                offset += s.textLength()-1;
+            }
+        }
+
+        QTextCursor cSelect(doc);
+        cSelect.setPosition(start);
+        cSelect.setPosition(end+offset, QTextCursor::KeepAnchor);
+        QString result = cSelect.selectedText();
+        delete doc;
+        return result;
+    }
     return QString();
 }
 
@@ -151,7 +200,8 @@ bool ChatItem::isPosOverSelection(const QPointF &pos) const
     return false;
 }
 
-QList<QRectF> ChatItem::findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive)
+// TODO MKO find words
+/*QList<QRectF> ChatItem::findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive)
 {
     QList<QRectF> resultList;
     const QAbstractItemModel *model_ = model();
@@ -176,7 +226,7 @@ QList<QRectF> ChatItem::findWords(const QString &searchWord, Qt::CaseSensitivity
     }
 
     return resultList;
-}
+}*/
 
 void ChatItem::addActionsToMenu(QMenu *menu, const QPointF &itemPos)
 {
@@ -195,7 +245,7 @@ void ChatItem::handleClick(const QPointF &pos, ChatScene::ClickMode clickMode)
     }
 }
 
-void ChatItem::initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapMode, Qt::Alignment alignment) const
+/*void ChatItem::initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapMode, Qt::Alignment alignment) const
 {
     Q_ASSERT(layout);
 
@@ -207,12 +257,15 @@ void ChatItem::initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapM
     option.setAlignment(alignment);
     layout->setTextOption(option);
 
-    QList<QTextLayout::FormatRange> formatRanges = UiStyle::getInstance().toTextLayoutList(formatList(), layout->text().length(), data(MessageModel::MsgLabelRole).toUInt());
-    layout->setAdditionalFormats(formatRanges);
-}
+    //QList<QTextLayout::FormatRange> formatRanges = UiStyle::getInstance().toTextLayoutList(formatList(), layout->text().length(), data(MessageModel::MsgLabelRole).toUInt());
+    //layout->setAdditionalFormats(formatRanges);
+}*/
 
 void ChatItem::clearCache()
 {
+    delete _data;
+    _data = 0;
+
     delete _cachedLayout;
     _cachedLayout = 0;
 }
@@ -257,24 +310,24 @@ void ChatItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         event->ignore();
 }
 
-QTextLayout *ChatItem::layout() const
+/*QTextLayout *ChatItem::layout() const
 {
     if (_cachedLayout)
         return _cachedLayout;
 
     _cachedLayout = new QTextLayout;
     initLayout(_cachedLayout);
-    chatView()->setHasCache(chatLine());
+    chatView()->setHasCache(chatLine(), false);
     return _cachedLayout;
-}
+}*/
 
-void ChatItem::initLayout(QTextLayout *layout) const
+/*void ChatItem::initLayout(QTextLayout *layout) const
 {
-    initLayoutHelper(layout, QTextOption::NoWrap);
-    doLayout(layout);
-}
+    //initLayoutHelper(layout, QTextOption::NoWrap);
+    //doLayout(layout);
+}*/
 
-void ChatItem::doLayout(QTextLayout *layout) const
+/*void ChatItem::doLayout(QTextLayout *layout) const
 {
     layout->beginLayout();
     QTextLine line = layout->createLine();
@@ -283,14 +336,41 @@ void ChatItem::doLayout(QTextLayout *layout) const
         line.setPosition(QPointF(0, 0));
     }
     layout->endLayout();
-}
+}*/
 
-UiStyle::FormatList ChatItem::formatList() const
+/*UiStyle::FormatList ChatItem::formatList() const
 {
     return data(MessageModel::FormatRole).value<UiStyle::FormatList>();
+}*/
+
+QAbstractTextDocumentLayout::Selection ChatItem::selectionLayout() const
+{
+        QAbstractTextDocumentLayout::Selection selection;
+
+        if (!hasSelection())
+            return selection;
+
+        int start;
+        int end;
+
+        if (selectionMode() == FullSelection) {
+            start = 0;
+            end = privateData()->doc.characterCount()-1;
+        }
+        else {
+            start = selectionStart();
+            end   = selectionEnd();
+        }
+
+        QTextCursor c(&privateData()->doc);
+        c.setPosition(start);
+        c.setPosition(end, QTextCursor::KeepAnchor);
+        selection.cursor = c;
+
+        return selection;
 }
 
-QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
+/*QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
 {
     if (!hasSelection())
             return QVector<QTextLayout::FormatRange>();
@@ -316,14 +396,11 @@ QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
             fmtList.removeLast();
 
         return UiStyle::getInstance().toTextLayoutList(fmtList, end, UiStyle::Selected|data(MessageModel::MsgLabelRole).toUInt()).toVector();
-}
-
-
-QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
+}*/
+/*QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
 {
-    return selectionFormats();
-}
-
+    //return selectionFormats();
+}*/
 /*void ChatItem::overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const
 {
     for (int i = 0; i < fmtList.count(); i++) {
@@ -361,26 +438,35 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
 {
     QPointF pos = mapFromLine(posInLine);
     if (pos.y() > height())
-        return data(MessageModel::DisplayRole).toString().length();
+        return privateData()->doc.characterCount()-1;
     if (pos.y() < 0)
         return 0;
 
-    for (int l = layout()->lineCount() - 1; l >= 0; l--) {
-        QTextLine line = layout()->lineAt(l);
-        if (pos.y() >= line.y()) {
-            return line.xToCursor(pos.x(), QTextLine::CursorOnCharacter);
-        }
-    }
-    return 0;
+    int found = privateData()->doc.documentLayout()->hitTest(pos, Qt::FuzzyHit);
+
+    if(found < 0)
+        return 0;
+
+    return found;
 }
 
 // ************************************************************
 // SenderChatItem
 // ************************************************************
 
-void SenderChatItem::initLayout(QTextLayout *layout) const
+SenderChatItem::SenderChatItem(const QRectF &boundingRect, ChatLine *parent) :
+    ChatItem(boundingRect, parent)
 {
-    initLayoutHelper(layout, QTextOption::NoWrap);
+    privateData();
+
+    QTextOption o;
+    o.setWrapMode(QTextOption::NoWrap);
+    privateData()->doc.setDefaultTextOption(o);
+}
+
+/*void SenderChatItem::initLayout(QTextLayout *layout) const
+{
+    //initLayoutHelper(layout, QTextOption::NoWrap);
 
     // Hide Sender if is same as before
     QModelIndex lastIndex = model()->index(row()-1, column());
@@ -390,8 +476,8 @@ void SenderChatItem::initLayout(QTextLayout *layout) const
             && (data(MessageModel::FlagsRole).toInt() & Message::Self) == (model()->data(lastIndex, MessageModel::FlagsRole).toInt() & Message::Self)) {
         layout->setText("");
     }
-    doLayout(layout);
-}
+    //doLayout(layout);
+}*/
 
 // ************************************************************
 // ContentsChatItem
@@ -400,93 +486,17 @@ void SenderChatItem::initLayout(QTextLayout *layout) const
 ContentsChatItem::ActionProxy ContentsChatItem::mActionProxy;
 
 ContentsChatItem::ContentsChatItem(const QPointF &pos, const qreal &width, ChatLine *parent) :
-    ChatItem(QRectF(pos, QSizeF(width, 0)), parent),
-    _data(0)
+    ChatItem(QRectF(pos, QSizeF(width, 0)), parent)
 {
     setPos(pos);
-
-    // Create QTextDocuement, and so on...
-    privateData();
-
     setGeometryByWidth(width);
 
-}
-
-ContentsChatItem::~ContentsChatItem()
-{
-    delete _data;
 }
 
 /*QFontMetricsF *ContentsChatItem::fontMetrics() const
 {
     return UiStyle::getInstance().fontMetrics(data(MessageModel::FormatRole).value<UiStyle::FormatList>().at(0).second, 0);
 }*/
-
-void ContentsChatItem::clearCache()
-{
-    delete _data;
-    _data = 0;
-    ChatItem::clearCache();
-}
-
-QString ContentsChatItem::selection() const
-{
-    if (selectionMode() == FullSelection)
-        return data(MessageModel::DisplayRole).toString();
-    if (selectionMode() == PartialSelection) {
-        int start = qMin(selectionStart(), selectionEnd());
-        int end   = start + qAbs(selectionStart() - selectionEnd());
-        int offset = 0;
-        QTextDocument *doc = privateData()->doc.clone();
-
-        foreach(Smiley s, privateData()->smileys) {
-            if(s.start()+offset >= start && s.start()+1+offset <= end+offset) {
-                QTextCursor c(doc);
-                c.setPosition(s.start()+offset);
-                c.setPosition(s.start()+1+offset, QTextCursor::KeepAnchor);
-                c.removeSelectedText();
-                c.insertText(s.text());
-
-                offset += s.textLength()-1;
-            }
-        }
-
-        QTextCursor cSelect(doc);
-        cSelect.setPosition(start);
-        cSelect.setPosition(end+offset, QTextCursor::KeepAnchor);
-        QString result = cSelect.selectedText();
-        delete doc;
-        return result;
-    }
-    return QString();
-}
-
-QAbstractTextDocumentLayout::Selection ContentsChatItem::selectionLayout() const
-{
-    QAbstractTextDocumentLayout::Selection selection;
-
-    if (!hasSelection())
-        return selection;
-
-    int start;
-    int end;
-
-    if (selectionMode() == FullSelection) {
-        start = 0;
-        end = privateData()->doc.characterCount()-1;
-    }
-    else {
-        start = selectionStart();
-        end   = selectionEnd();
-    }
-
-    QTextCursor c(&privateData()->doc);
-    c.setPosition(start);
-    c.setPosition(end, QTextCursor::KeepAnchor);
-    selection.cursor = c;
-
-    return selection;
-}
 
 void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -512,8 +522,7 @@ void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 
     QAbstractTextDocumentLayout::PaintContext ctx;
-    ctx.palette = QApplication::palette("QWidgetTextControl"); // TODO MKO correct class name?
-    QPalette::ColorGroup cg = chatView()->hasFocus() ? QPalette::Active : QPalette::Inactive;
+    ctx.palette = QApplication::palette();
 
     // Set color by message type
     if (data(MessageModel::TypeRole).toInt() == Message::Nick)
@@ -523,22 +532,10 @@ void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     else if (data(MessageModel::TypeRole).toInt() == Message::DayChange)
         ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#AD7FA8"));
 
-    // Clicables
-    foreach(Clickable click, privateData()->clickables) {
-        QTextCursor c(&privateData()->doc);
-        c.setPosition(click.start());
-        c.setPosition(click.start()+click.length(), QTextCursor::KeepAnchor);
-        QTextCharFormat f;
-        f.setAnchor(true);  // TODO MKO how to use?
-        f.setAnchorHref(c.selectedText()); // TODO MKO how to use?
-        f.setForeground(ctx.palette.brush(cg, QPalette::Link));
-        c.mergeCharFormat(f);
-    }
-
     // Selection
     QAbstractTextDocumentLayout::Selection selection = selectionLayout();
-    selection.format.setBackground(ctx.palette.brush(cg, QPalette::Highlight));
-    selection.format.setForeground(ctx.palette.brush(cg, QPalette::HighlightedText));
+    selection.format.setBackground(ctx.palette.brush(QPalette::Highlight));
+    selection.format.setForeground(ctx.palette.brush(QPalette::HighlightedText));
     ctx.selections.append(selection);
 
 
@@ -678,14 +675,12 @@ void ContentsChatItem::copyLinkToClipboard()
     }
     return fmt;
 }*/
-
 /*void ContentsChatItem::initLayout(QTextLayout *layout) const
 {
-    initLayoutHelper(layout, QTextOption::WrapAtWordBoundaryOrAnywhere);
+    //initLayoutHelper(layout, QTextOption::WrapAtWordBoundaryOrAnywhere);
     //doLayout(layout);
 }*/
-/*
-void ContentsChatItem::doLayout(QTextLayout *layout) const
+/*void ContentsChatItem::doLayout(QTextLayout *layout) const
 {
     MessageModel::WrapList wrapList = data(MessageModel::WrapListRole).value<MessageModel::WrapList>();
     if (!wrapList.count()) return;  // empty chatitem
@@ -721,8 +716,8 @@ void ContentsChatItem::doLayout(QTextLayout *layout) const
         h += spacing;
     }
     layout->endLayout();
-}
-*/
+}*/
+
 /*UiStyle::FormatList ContentsChatItem::formatList() const
 {
     UiStyle::FormatList fmtList = ChatItem::formatList();
@@ -735,26 +730,10 @@ void ContentsChatItem::doLayout(QTextLayout *layout) const
     return fmtList;
 }*/
 
-qint16 ContentsChatItem::posToCursor(const QPointF &posInLine) const
-{
-    QPointF pos = mapFromLine(posInLine);
-    if (pos.y() > height())
-        return privateData()->doc.characterCount()-1;
-    if (pos.y() < 0)
-        return 0;
-
-    int found = privateData()->doc.documentLayout()->hitTest(pos, Qt::FuzzyHit);
-
-    if(found < 0)
-        return 0;
-
-    return found;
-}
-
-ContentsChatItemPrivate *ContentsChatItem::privateData() const
+ContentsChatItemPrivate *ChatItem::privateData() const
 {
     if (!_data) {
-        ContentsChatItem *that = const_cast<ContentsChatItem *>(this);
+        ChatItem *that = const_cast<ChatItem *>(this);
         that->_data = new ContentsChatItemPrivate(data(MessageModel::DisplayRole).toString(), that);
     }
     return _data;
@@ -798,47 +777,68 @@ qreal ContentsChatItem::setGeometryByWidth(qreal w)
 
 }
 
-ContentsChatItemPrivate::ContentsChatItemPrivate(QString text, ContentsChatItem *parent) :
+ContentsChatItemPrivate::ContentsChatItemPrivate(QString text, ChatItem *parent) :
     contentsItem(parent)
 {
-    smileys = SmileyList::smilify(text);
-    doc.setPlainText(text);
-    doc.setTextWidth(parent->width());
-    clickables = ClickableList::fromString(text); // TODO MKO rebuild fromString to fromDoc and use QTextCursor
+    // Only if content column, set text smileys and clicables
+    if (parent->column() == MessageModel::ContentsColumn) {
+        smileys = SmileyList::smilify(text);
+        doc.setPlainText(text);
+        doc.setTextWidth(parent->width());
 
-    // Replace smileys
-    QTextCursor c(&doc);
-    for (int i=0; i<smileys.count(); i++) {
-        if(smileys.at(i).type() == Smiley::Pixmap) {
-
-            // Remove placeholder
-            c.setPosition(smileys.at(i).start());
-            c.setPosition(smileys.at(i).start()+1, QTextCursor::KeepAnchor);
-            c.removeSelectedText();
-
-            QObject *smileyInterface = new SmileyTextObject(smileys.at(i).graphics());
-            doc.documentLayout()->registerHandler(QTextFormat::UserObject + i+1, smileyInterface);
-
-            QTextCharFormat smileyFormat;
-            smileyFormat.setObjectType(QTextFormat::UserObject + i+1);
-            c.insertText(QString(QChar::ObjectReplacementCharacter), smileyFormat);
+        // Clicables
+        clickables = ClickableList::fromString(text); // TODO MKO rebuild fromString to fromDoc and use QTextCursor
+        foreach(Clickable click, clickables) {
+            QTextCursor c(&doc);
+            c.setPosition(click.start());
+            c.setPosition(click.start()+click.length(), QTextCursor::KeepAnchor);
+            QTextCharFormat f;
+            f.setAnchor(true);
+            f.setAnchorHref(c.selectedText());
+            f.setForeground(QApplication::palette().brush(QPalette::Link));
+            c.mergeCharFormat(f);
         }
-        else if(smileys.at(i).type() == Smiley::Emoji) {
 
-            // Remove placeholder
-            c.setPosition(smileys.at(i).start());
-            c.setPosition(smileys.at(i).start()+smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
-            c.removeSelectedText();
+        // Replace smileys
+        QTextCursor c(&doc);
+        for (int i=0; i<smileys.count(); i++) {
+            if (smileys.at(i).type() == Smiley::Pixmap) {
 
-            c.insertText(smileys.at(i).graphics());
+                // Remove placeholder
+                c.setPosition(smileys.at(i).start());
+                c.setPosition(smileys.at(i).start()+1, QTextCursor::KeepAnchor);
+                c.removeSelectedText();
 
-            // Resize emoji
-            c.setPosition(smileys.at(i).start());
-            c.setPosition(smileys.at(i).start()+smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
-            QTextCharFormat format;
-            format.setFont(smileys.at(i).emojiFont());
-            c.mergeCharFormat(format);
+                QObject *smileyInterface = new SmileyTextObject(smileys.at(i).graphics());
+                doc.documentLayout()->registerHandler(QTextFormat::UserObject + i+1, smileyInterface);
+
+                QTextCharFormat smileyFormat;
+                smileyFormat.setObjectType(QTextFormat::UserObject + i+1);
+                c.insertText(QString(QChar::ObjectReplacementCharacter), smileyFormat);
+            }
+            else if (smileys.at(i).type() == Smiley::Emoji) {
+
+                // Remove placeholder
+                c.setPosition(smileys.at(i).start());
+                c.setPosition(smileys.at(i).start()+smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
+                c.removeSelectedText();
+
+                c.insertText(smileys.at(i).graphics());
+
+                // Resize emoji
+                c.setPosition(smileys.at(i).start());
+                c.setPosition(smileys.at(i).start()+smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
+                QTextCharFormat format;
+                format.setFont(smileys.at(i).emojiFont());
+                c.mergeCharFormat(format);
+            }
         }
+    }
+
+    // Other columns, only set text
+    else {
+        doc.setPlainText(text);
+        doc.setTextWidth(parent->width());
     }
 }
 
@@ -910,8 +910,18 @@ qint16 ContentsChatItem::WrapColumnFinder::nextWrapColumn(qreal width)
 // ************************************************************
 
 
-void TimestampChatItem::initLayout(QTextLayout *layout) const
+TimestampChatItem::TimestampChatItem(const QRectF &boundingRect, ChatLine *parent) :
+    ChatItem(boundingRect, parent)
 {
-        initLayoutHelper(layout, QTextOption::ManualWrap, Qt::AlignRight);
-        doLayout(layout);
+    privateData();
+    QTextOption o;
+    o.setAlignment(Qt::AlignRight);
+    o.setWrapMode(QTextOption::NoWrap);
+    privateData()->doc.setDefaultTextOption(o);
 }
+
+/*void TimestampChatItem::initLayout(QTextLayout *layout) const
+{
+        //initLayoutHelper(layout, QTextOption::ManualWrap, Qt::AlignRight);
+        //doLayout(layout);
+}*/
