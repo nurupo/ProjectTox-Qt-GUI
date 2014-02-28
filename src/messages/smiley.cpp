@@ -3,6 +3,7 @@
 #include "Settings/settings.hpp"
 #include <QMapIterator>
 #include <QDebug>
+#include <QApplication>
 
 Smiley::Smiley(const QString &text, const QString &graphics, int start, Type type)
 {
@@ -11,13 +12,15 @@ Smiley::Smiley(const QString &text, const QString &graphics, int start, Type typ
     mText = text;
     mTextLength = text.length();
     mGraphics = graphics;
+    mEmojiFont = QApplication::font();
 }
 
 // Modifies text!
 SmileyList SmileyList::smilify(QString &text)
 {
     // Get current smileypack
-    Smileypack pack(Settings::getInstance().getSmileyPack());
+    Settings &settings = Settings::getInstance();
+    Smileypack pack(settings.getSmileyPack());
 
     // Reconvert emoji
     if (!pack.isEmoji()) {
@@ -69,10 +72,18 @@ SmileyList SmileyList::smilify(QString &text)
             }
 
             // Add found smiley to List
-            // TODO MKO resize smileys
-            result.append(Smiley(repSrt, repRep, repPos, (pack.isEmoji()) ? Smiley::Emoji : Smiley::Pixmap ));
+            Smiley smile = Smiley(repSrt, repRep, repPos, (pack.isEmoji()) ? Smiley::Emoji : Smiley::Pixmap );
+            if (pack.isEmoji() && settings.isCurstomEmojiFont()) {
+                QFont f = QApplication::font();
+                f.setFamily(settings.getEmojiFontFamily());
+                f.setPointSize(settings.getEmojiFontPointSize());
+                smile.setEmojiFont(f);
+            }
+            result.append(smile);
 
             // Create replacetext
+            // TODO MKO We need placeholders with the character count of the smiley/emoji, later they will replaced by smiley image or emoji.
+            //      This is a workaround because of the clickable detection works with QString insteed of QTextDocument
             QString placeholder;
             for(int i=0; i<repRep.count(); i++)
                 placeholder.append('#');
@@ -80,18 +91,13 @@ SmileyList SmileyList::smilify(QString &text)
         }
     } while (found);
 
-    /*foreach (Smiley s, result) {
-        qDebug() << s.text() << s.graphics();
-    }*/
-    //qDebug() << text;
-
     return result;
 }
 
 Smiley SmileyList::atCursorPos(int idx)
 {
     foreach(const Smiley &smile, *this) {
-        if (idx >= smile.start() && idx < smile.start() + 1) // TODO MKO correct?
+        if (idx >= smile.start() && idx < smile.start() + 1)
             return smile;
     }
     return Smiley();

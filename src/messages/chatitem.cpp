@@ -324,7 +324,7 @@ QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
     return selectionFormats();
 }
 
-void ChatItem::overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const
+/*void ChatItem::overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const
 {
     for (int i = 0; i < fmtList.count(); i++) {
         int fmtStart = fmtList.at(i).first;
@@ -347,7 +347,7 @@ void ChatItem::overlayFormat(UiStyle::FormatList &fmtList, int start, int end, q
 
         fmtList[i].second |= overlayFmt;
     }
-}
+}*/
 
 void ChatItem::setSelection(ChatItem::SelectionMode mode, qint16 start, qint16 end)
 {
@@ -417,10 +417,10 @@ ContentsChatItem::~ContentsChatItem()
     delete _data;
 }
 
-QFontMetricsF *ContentsChatItem::fontMetrics() const
+/*QFontMetricsF *ContentsChatItem::fontMetrics() const
 {
     return UiStyle::getInstance().fontMetrics(data(MessageModel::FormatRole).value<UiStyle::FormatList>().at(0).second, 0);
-}
+}*/
 
 void ContentsChatItem::clearCache()
 {
@@ -828,6 +828,13 @@ ContentsChatItemPrivate::ContentsChatItemPrivate(QString text, ContentsChatItem 
             c.removeSelectedText();
 
             c.insertText(smileys.at(i).graphics());
+
+            // Resize emoji
+            c.setPosition(smileys.at(i).start());
+            c.setPosition(smileys.at(i).start()+smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
+            QTextCharFormat format;
+            format.setFont(smileys.at(i).emojiFont());
+            c.mergeCharFormat(format);
         }
     }
 }
@@ -835,7 +842,7 @@ ContentsChatItemPrivate::ContentsChatItemPrivate(QString text, ContentsChatItem 
 
 /*************************************************************************************************/
 
-ContentsChatItem::WrapColumnFinder::WrapColumnFinder(const ChatItem *_item)
+/*ContentsChatItem::WrapColumnFinder::WrapColumnFinder(const ChatItem *_item)
     : item(_item),
     wrapList(item->data(MessageModel::WrapListRole).value<MessageModel::WrapList>()),
     wordidx(0),
@@ -893,7 +900,7 @@ qint16 ContentsChatItem::WrapColumnFinder::nextWrapColumn(qreal width)
     }
     Q_ASSERT(false);
     return -1;
-}
+}*/
 
 // ************************************************************
 // TimestampChatItem

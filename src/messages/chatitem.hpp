@@ -94,7 +94,7 @@ protected:
     void paintBackground(QPainter *painter);
     QVector<QTextLayout::FormatRange> selectionFormats() const;
     virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
-    void overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const;
+    //void overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const;
 
     inline qint16 selectionStart() const { return _selectionStart; }
     inline void setSelectionStart(qint16 start) { _selectionStart = start; }
@@ -176,7 +176,7 @@ public:
     virtual inline int type() const { return ChatScene::ContentsChatItemType; }
 
     inline MessageModel::ColumnType column() const { return MessageModel::ContentsColumn; }
-    QFontMetricsF *fontMetrics() const;
+    //QFontMetricsF *fontMetrics() const;
 
     virtual void clearCache();
 
@@ -236,7 +236,7 @@ public:
     ContentsChatItemPrivate(QString text, ContentsChatItem *parent);
 };
 
-class ContentsChatItem::WrapColumnFinder
+/*class ContentsChatItem::WrapColumnFinder
 {
 public:
     WrapColumnFinder(const ChatItem *parent);
@@ -252,7 +252,7 @@ private:
     qint16 wordidx;
     qint16 lineCount;
     qreal choppedTrailing;
-};
+};*/
 
 //! Acts as a proxy for Action signals targetted at a ContentsChatItem
 /** Since a ChatItem is not a QObject, hence cannot receive signals, we use a static ActionProxy
