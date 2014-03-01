@@ -15,7 +15,7 @@
 
 class ChatLine;
 class ChatView;
-class ContentsChatItemPrivate;
+class ChatItemDocument;
 
 
 /* All external positions are relative to the parent ChatLine */
@@ -30,7 +30,7 @@ protected:
 
 public:
     const QAbstractItemModel *model() const;
-    ChatLine *chatLine() const;
+    inline ChatLine *chatLine() const { return _parent; }
     ChatScene *chatScene() const;
     ChatView *chatView() const;
     int row() const;
@@ -93,6 +93,8 @@ protected:
     //virtual void doLayout(QTextLayout *layout) const;
     //virtual UiStyle::FormatList formatList() const;
     QAbstractTextDocumentLayout::Selection selectionLayout() const;
+    QTextDocument *document() const;
+    virtual void initDocument(QTextDocument *doc);
 
     //void paintBackground(QPainter *painter);
     //QVector<QTextLayout::FormatRange> selectionFormats() const;
@@ -114,9 +116,6 @@ protected:
     inline void setWidth(const qreal &width) { clearCache(); _boundingRect.setWidth(width); }
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
 
-    ContentsChatItemPrivate *privateData() const;
-    mutable ContentsChatItemPrivate *_data;
-
 private:
 
 
@@ -129,23 +128,19 @@ private:
     int _selectionEnd;
 
     mutable QTextLayout *_cachedLayout;
+    mutable ChatItemDocument *mDoc;
 
     friend class ChatLine;
-    friend class ContentsChatItemPrivate;
+    friend class ChatItemDocument;
 };
 
-class ContentsChatItemPrivate {
+class ChatItemDocument {
 public:
-    ChatItem *contentsItem;
-    ClickableList clickables;
-    Clickable currentClickable;
-    Clickable activeClickable;
+    ChatItemDocument(ChatItem *parent) : chatItem(parent) {}
+    void callInitDocument() { chatItem->initDocument(&doc); }
 
-    SmileyList smileys;
-
+    ChatItem *chatItem;
     QTextDocument doc;
-
-    ContentsChatItemPrivate(QString text, ChatItem *parent);
 };
 
 // ************************************************************
@@ -162,6 +157,7 @@ public:
 
 protected:
     //virtual void initLayout(QTextLayout *layout) const;
+    virtual void initDocument(QTextDocument *doc);
 
 protected:
 };
@@ -178,13 +174,14 @@ public:
     virtual inline MessageModel::ColumnType column() const { return MessageModel::SenderColumn; }
 
 protected:
+    virtual void initDocument(QTextDocument *doc);
     //virtual void initLayout(QTextLayout *layout) const;
-
 };
 
 // ************************************************************
 // ContentsChatItem
 // ************************************************************
+class ContentsChatItemPrivate;
 
 //! A ChatItem for the contents column
 class ContentsChatItem : public ChatItem
@@ -193,6 +190,9 @@ class ContentsChatItem : public ChatItem
 
 public:
     ContentsChatItem(const QPointF &pos, const qreal &width, ChatLine *parent);
+    ~ContentsChatItem();
+
+    void clearCache();
 
     virtual inline int type() const { return ChatScene::ContentsChatItemType; }
 
@@ -201,7 +201,11 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    virtual QString selection() const;
+
 protected:
+    virtual void initDocument(QTextDocument *doc);
+
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
@@ -209,6 +213,8 @@ protected:
 
     virtual void addActionsToMenu(QMenu *menu, const QPointF &pos);
     virtual void copyLinkToClipboard();
+
+
 
     //virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
 
@@ -229,7 +235,23 @@ private:
     // we need a receiver for Action signals
     static ActionProxy mActionProxy;
 
+    ContentsChatItemPrivate *privateData() const;
+    mutable ContentsChatItemPrivate *_data;
+
     friend class ChatLine;
+    friend class ContentsChatItemPrivate;
+};
+
+class ContentsChatItemPrivate {
+public:
+    ContentsChatItem *contentsItem;
+    ClickableList clickables;
+    Clickable currentClickable;
+    Clickable activeClickable;
+
+    SmileyList smileys;
+
+    ContentsChatItemPrivate(ContentsChatItem *parent) : contentsItem(parent) {}
 };
 
 
