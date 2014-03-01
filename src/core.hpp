@@ -18,6 +18,7 @@
 #define CORE_HPP
 
 #include "status.hpp"
+#include "filetransferstate.hpp"
 
 #include <tox.h>
 
@@ -40,11 +41,15 @@ private:
     static void onUserStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
     static void onAction(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFileSendRequest(Tox *m, int, uint8_t, uint64_t, uint8_t *, uint16_t, void *);
+    static void onFileControl(Tox *m, int, uint8_t, uint8_t, uint8_t, uint8_t *, uint16_t, void *);
+    static void onFileData(Tox *m, int, uint8_t, uint8_t *, uint16_t length, void *);
 
     void checkConnection();
 
     Tox* tox;
     QTimer* timer;
+    QList<FileTransferState*> fileSenders;
 
     class CData
     {
@@ -55,7 +60,6 @@ private:
     protected:
         explicit CData(const QString& data, uint16_t byteSize);
         virtual ~CData();
-
         static QString toString(uint8_t* cData, uint16_t cDataSize);
 
     private:
@@ -127,15 +131,21 @@ public slots:
     void setStatus(Status status);
 
     void process();
+    void sendFiles();
 
     void bootstrapDht();
+
+    void fileSendRequest(int friendId, const QString& filename);
+    void sendFile(int friendId, FileTransferState* state);
+    void fileSendReply(int friendId, quint8 filenumber, quint8 message_id);
+
 
 signals:
     void connected();
     void disconnected();
 
-    void friendRequestRecieved(const QString& userId, const QString& message);
-    void friendMessageRecieved(int friendId, const QString& message);
+    void friendRequestReceived(const QString& userId, const QString& message);
+    void friendMessageReceived(int friendId, const QString& message);
 
     void friendAdded(int friendId, const QString& userId);
 
@@ -162,6 +172,11 @@ signals:
 
     void failedToStart();
 
+    void fileSendRequestReceived(int friendId, quint8 filenumber, quint64 filesize, const QString& filename);
+    void fileControlReceived(int friendId, unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data);
+    void fileDataReceived(int friendId, quint8 filenumber, const QByteArray& data);
+
+    void fileSendCompleted(int friendId, int filenumber);
 };
 
 #endif // CORE_HPP

@@ -19,7 +19,13 @@
 
 #include "frienditemwidget.hpp"
 #include "inputtextwidget.hpp"
+#include "filetransferstate.hpp"
 
+#include <tox.h>
+
+#include <QFileDialog>
+#include <QMap>
+#include <QMessageBox>
 #include <QTextBrowser>
 #include <QTextEdit>
 #include <QWidget>
@@ -40,24 +46,33 @@ public:
 private:
     FriendItemWidget* friendItem;
     MessageDisplayWidget *display;
+    QMap<quint8, FileTransferState*> states;
 
     InputTextWidget* input;
+    QToolButton *filesendButton;
     QToolButton *emoticonButton;
 
     int friendId;
     QString username;
     Status status;
+    QString currentSendFilename;
 
 public slots:
     void messageReceived(const QString& message);
     void messageSentResult(const QString& message, int messageId);
     void actionReceived(const QString& message);
     void actionSentResult(const QString& message);
+    quint8 fileSendReceived(quint8 filenumber, quint64 filesize, const QString& filename);
+    void fileControlReceived(unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data);
+    void fileDataReceived(quint8 filenumber, const QByteArray& data);
+    void fileSendCompletedReceived(int filenumber);
+    void promptSendFile(void);
 
 signals:
     void sendMessage(const QString& message);
     void sendAction(const QString& action);
-
+    void sendFile(FileTransferState* state);
+    void sendFileRequest(const QString& filename);
 };
 
 #endif // CHATPAGEWIDGET_HPP

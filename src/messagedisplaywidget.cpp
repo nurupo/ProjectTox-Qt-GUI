@@ -25,6 +25,8 @@
 #include <QFrame>
 #include <QPropertyAnimation>
 #include <QFontDatabase>
+#include <QFileInfo>
+#include <QProgressBar>
 
 #include "Settings/settings.hpp"
 #include "smileypack.hpp"
@@ -67,6 +69,17 @@ void MessageDisplayWidget::appendMessage(const QString &name, const QString &mes
     QWidget *row = createNewRow(name, message, messageId, isOur);
     mainlayout->addWidget(row);
 }
+
+void MessageDisplayWidget::appendProgress(const QString &filename, FileTransferState* state, bool isOur)
+{
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &MessageDisplayWidget::moveScrollBarToBottom, Qt::UniqueConnection);
+    QProgressBar *row = new QProgressBar(this);
+    row->setRange(0, 100);
+    row->setFormat(QString("%1 - %p%").arg(QFileInfo(filename).baseName()));
+    connect(state, &FileTransferState::progressChanged, row, &QProgressBar::setValue);
+    mainlayout->addWidget(row);
+}
+
 
 void MessageDisplayWidget::prependMessage(const QString &name, const QString &message/*, const QString &timestamp*/, int messageId, bool isOur)
 {

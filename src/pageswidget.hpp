@@ -20,6 +20,8 @@
 #include "chatpagewidget.hpp"
 
 #include <QStackedWidget>
+#include <QFile>
+#include <QObject>
 
 class PagesWidget : public QStackedWidget
 {
@@ -30,9 +32,15 @@ public:
 private:
     ChatPageWidget* widget(int friendId) const;
 
+signals:
+    void sendFile(int friendId, FileTransferState* state);
+    void fileSendReply(int friendId, quint8 filenumber, quint8 message_id);
+
 private slots:
     void onMessageSent(const QString& message);
     void onActionToSend(const QString& action);
+    void onFileToSend(FileTransferState* state);
+    void onFileRequestToSend(const QString& filename);
 
 public slots:
     void addPage(int friendId, const QString& username);
@@ -47,7 +55,13 @@ public slots:
     void messageSentResult(int friendId, const QString& message, int messageId);
     void actionResult(int friendId, const QString &action, int success);
 
+    void fileSendRequestReceived(int friendId, quint8 filenumber, quint64 filesize, const QString& filename);
+    void fileControl(int friendId, unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data);
+    void fileData(int friendId, quint8 filenumber, const QByteArray& data);
+    void fileSendCompleted(int friendId, int filenumber);
+
 signals:
+    void fileSendRequest(int friendId, const QString& filename);
     void sendMessage(int friendId, const QString& message);
     void sendAction(int friendId, const QString& action);
 

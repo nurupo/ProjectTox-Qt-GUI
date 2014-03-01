@@ -92,7 +92,8 @@ SOURCES += \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
-    ../../src/copyableelidelabel.cpp
+    ../../src/copyableelidelabel.cpp \
+    ../../src/filetransferstate.cpp \
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -135,7 +136,8 @@ HEADERS  += \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
-    ../../src/copyableelidelabel.hpp
+    ../../src/copyableelidelabel.hpp \
+    ../../src/filetransferstate.hpp
 
 ### ToxCore section. Please keep it alphabetical ###
 

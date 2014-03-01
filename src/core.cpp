@@ -19,6 +19,9 @@
 
 #include <QThread>
 #include <QTime>
+#include <QFileInfo>
+#include <QDebug>
+#include <unistd.h>
 
 Core::Core() :
     tox(nullptr)
@@ -37,12 +40,12 @@ Core::~Core()
 
 void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
-    emit static_cast<Core*>(core)->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
+    emit static_cast<Core*>(core)->friendRequestReceived(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
 
 void Core::onFriendMessage(Tox*/* tox*/, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
-    emit static_cast<Core*>(core)->friendMessageRecieved(friendId, CString::toString(cMessage, cMessageSize));
+    emit static_cast<Core*>(core)->friendMessageReceived(friendId, CString::toString(cMessage, cMessageSize));
 }
 
 void Core::onFriendNameChange(Tox*/* tox*/, int friendId, uint8_t* cName, uint16_t cNameSize, void* core)
@@ -83,6 +86,20 @@ void Core::onConnectionStatusChanged(Tox*/* tox*/, int friendId, uint8_t status,
 void Core::onAction(Tox*/* tox*/, int friendId, uint8_t *cMessage, uint16_t cMessageSize, void *core)
 {
     emit static_cast<Core*>(core)->actionReceived(friendId, CString::toString(cMessage, cMessageSize));
+}
+
+void Core::onFileSendRequest(Tox*, int friendId, uint8_t filenumber, uint64_t filesize, uint8_t *filename, uint16_t filename_length, void *core)
+{
+    emit static_cast<Core*>(core)->fileSendRequestReceived(friendId, filenumber, filesize, CString::toString(filename, filename_length));
+}
+void Core::onFileControl(Tox*, int friendId, uint8_t receive_send, uint8_t filenumber, uint8_t control_type, uint8_t *data, uint16_t length, void *core)
+{
+    emit static_cast<Core*>(core)->fileControlReceived(friendId, receive_send, filenumber, control_type, QByteArray((const char*)data, length));
+}
+
+void Core::onFileData(Tox*, int friendId, uint8_t filenumber, uint8_t *data, uint16_t length, void *core)
+{
+    emit static_cast<Core*>(core)->fileDataReceived(friendId, filenumber, QByteArray((const char*)data, length));
 }
 
 void Core::acceptFriendRequest(const QString& userId)
@@ -188,11 +205,50 @@ void Core::bootstrapDht()
 void Core::process()
 {
     tox_do(tox);
+    sendFiles();
 #ifdef DEBUG
     //we want to see the debug messages immediately
     fflush(stdout);
 #endif
     checkConnection();
+}
+
+void Core::sendFiles()
+{
+    for (QList<FileTransferState*>::iterator it = fileSenders.begin();
+            it != fileSenders.end();) {
+
+        FileTransferState* state = *it;
+        int len = 0;
+        char* buf = state->buffer();
+        int chunk_size = state->chunkSize();
+        int fn = state->fileNumber();
+        int fid = state->friendId();
+        bool completed = false;
+
+        while (true) {
+            len = state->readData(buf, chunk_size);
+
+            if (len == 0) {
+                tox_file_send_control(tox, fid, 0, fn,
+                        TOX_FILECONTROL_FINISHED, NULL, 0);
+                completed = true;
+                break;
+            } else {
+                if (tox_file_send_data(tox, fid, fn, (uint8_t*)buf, len)) {
+                    break;
+                }
+                state->readComplete();
+            }
+        }
+
+        if (completed) {
+            emit fileSendCompleted(fid, fn);
+            fileSenders.erase(it++);
+        } else {
+            it++;
+        }
+    }
 }
 
 void Core::checkConnection()
@@ -224,6 +280,9 @@ void Core::start()
     tox_callback_status_message(tox, onStatusMessageChanged, this);
     tox_callback_user_status(tox, onUserStatusChanged, this);
     tox_callback_connection_status(tox, onConnectionStatusChanged, this);
+    tox_callback_file_send_request(tox, onFileSendRequest, this);
+    tox_callback_file_control(tox, onFileControl, this);
+    tox_callback_file_data(tox, onFileData, this);
 
     uint8_t friendAddress[TOX_FRIEND_ADDRESS_SIZE];
     tox_get_address(tox, friendAddress);
@@ -242,6 +301,23 @@ void Core::start()
     timer->start();
 }
 
+void Core::fileSendRequest(int friendId, const QString& filename)
+{
+    tox_new_file_sender(tox, friendId, QFileInfo(filename).size(),
+            (uint8_t*)(const char*)filename.toUtf8(), filename.length() + 1);
+}
+
+void Core::sendFile(int friendId, FileTransferState* state)
+{
+    int chunk_size = tox_file_data_size(tox, friendId);
+    state->createBuf(chunk_size);
+    fileSenders.append(state);
+}
+
+void Core::fileSendReply(int friendId, quint8 filenumber, quint8 message_id)
+{
+    tox_file_send_control(tox, friendId, 1, filenumber, message_id, NULL, 0);
+}
 
 // CData
 

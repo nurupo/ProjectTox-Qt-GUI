@@ -19,6 +19,7 @@
 
 #include <QDebug>
 
+// PagesWidget
 PagesWidget::PagesWidget(QWidget* parent) :
     QStackedWidget(parent)
 {
@@ -45,6 +46,8 @@ void PagesWidget::addPage(int friendId, const QString& username)
     chatPage->setUsername(username);
     connect(chatPage, &ChatPageWidget::sendMessage, this, &PagesWidget::onMessageSent);
     connect(chatPage, &ChatPageWidget::sendAction,  this, &PagesWidget::onActionToSend);
+    connect(chatPage, &ChatPageWidget::sendFile,  this, &PagesWidget::onFileToSend);
+    connect(chatPage, &ChatPageWidget::sendFileRequest,  this, &PagesWidget::onFileRequestToSend);
     addWidget(chatPage);
     qDebug() << "page" << friendId << "added" << count();
 }
@@ -89,6 +92,18 @@ void PagesWidget::onActionToSend(const QString &action)
     emit sendAction(chatPage->getFriendId(), action);
 }
 
+void PagesWidget::onFileToSend(FileTransferState* state)
+{
+    ChatPageWidget* chatPage = static_cast<ChatPageWidget*>(sender());
+    emit sendFile(chatPage->getFriendId(), state);
+}
+
+void PagesWidget::onFileRequestToSend(const QString& filename)
+{
+    ChatPageWidget* chatPage = static_cast<ChatPageWidget*>(sender());
+    emit fileSendRequest(chatPage->getFriendId(), filename);
+}
+
 void PagesWidget::messageReceived(int friendId, const QString &message)
 {
     widget(friendId)->messageReceived(message);
@@ -112,4 +127,25 @@ void PagesWidget::actionResult(int friendId, const QString &action, int success)
         // FIXME: that is one confusing way of reporting a error
         widget(friendId)->messageSentResult(action, success);
     }
+}
+
+void PagesWidget::fileSendRequestReceived(int friendId, quint8 filenumber, quint64 filesize, const QString& filename)
+{
+    quint8 msg_id = widget(friendId)->fileSendReceived(filenumber, filesize, filename);
+    emit fileSendReply(friendId, filenumber, msg_id);
+}
+
+void PagesWidget::fileControl(int friendId, unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data)
+{
+    widget(friendId)->fileControlReceived(receive_send, filenumber, control_type, data);
+}
+
+void PagesWidget::fileData(int friendId, quint8 filenumber, const QByteArray& data)
+{
+  widget(friendId)->fileDataReceived(filenumber, data);
+}
+
+void PagesWidget::fileSendCompleted(int friendId, int filenumber)
+{
+  widget(friendId)->fileSendCompletedReceived(filenumber);
 }

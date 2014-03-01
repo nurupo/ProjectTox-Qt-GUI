@@ -25,6 +25,7 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QDebug>
 
 ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)
@@ -42,15 +43,25 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     emoticonButton = new QToolButton(inputPanel);
     emoticonButton->setPopupMode(QToolButton::InstantPopup);
     emoticonButton->setIcon(QIcon(":/icons/emoticons/emotion_smile.png"));
-    emoticonButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    emoticonButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     emoticonButton->setMenu(menu);
     connect(menu, &EmoticonMenu::insertEmoticon, input, &InputTextWidget::insertHtml);
+
+    filesendButton = new QToolButton(this);
+    filesendButton->setIcon(QIcon(":/icons/attach.png"));
+    filesendButton->setToolTip(tr("Send file"));
+    filesendButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    connect(filesendButton, &QToolButton::clicked, this, &ChatPageWidget::promptSendFile);
+
+    QVBoxLayout *buttonlayout = new QVBoxLayout();
+    buttonlayout->addWidget(emoticonButton);
+    buttonlayout->addWidget(filesendButton);
 
     QHBoxLayout *inputLayout = new QHBoxLayout(inputPanel);
     inputLayout->setContentsMargins(0,0,0,0);
     inputLayout->setSpacing(2);
     inputLayout->addWidget(input);
-    inputLayout->addWidget(emoticonButton);
+    inputLayout->addLayout(buttonlayout);
 
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
@@ -108,4 +119,79 @@ void ChatPageWidget::actionReceived(const QString &message)
 void ChatPageWidget::actionSentResult(const QString &message)
 {
     display->appendAction(Settings::getInstance().getUsername(), message, true);
+}
+
+quint8 ChatPageWidget::fileSendReceived(quint8 filenumber, quint64 filesize, const QString& filename)
+{
+  QMessageBox::StandardButton ret = QMessageBox::question(this,
+      tr("File Transfer"),
+      tr("%1 is sending you a file `%2', accept?").arg(username).arg(filename));
+
+  quint8 msg_id = TOX_FILECONTROL_KILL;
+
+  if (ret == QMessageBox::Yes) {
+    QString saveFilename = QFileDialog::getSaveFileName(this,
+        tr("Save file"), filename);
+
+    if (!FileTransferState::checkPermission(saveFilename)) {
+      QMessageBox::critical(this, tr("Error"),
+          tr("Failed to open `%1' for writing").arg(saveFilename));
+    } else {
+      FileTransferState* state = new FileTransferState(friendId, filenumber,
+          filesize, saveFilename);
+      states.insert(filenumber, state);
+      display->appendProgress(saveFilename, state, false);
+      msg_id = TOX_FILECONTROL_ACCEPT;
+    }
+  }
+  return msg_id;
+}
+
+void ChatPageWidget::fileControlReceived(unsigned int receive_send, quint8 filenumber, quint8 control_type, const QByteArray& data)
+{
+    if (receive_send == 0 && control_type == TOX_FILECONTROL_FINISHED) {
+        FileTransferState* state = states[filenumber];
+        states.remove(filenumber);
+        delete state;
+    } else if (receive_send == 1 && control_type == TOX_FILECONTROL_ACCEPT) {
+        FileTransferState* state = new FileTransferState(friendId, filenumber,
+                QFileInfo(currentSendFilename).size(), currentSendFilename,
+                FileTransferState::SEND);
+        states.insert(filenumber, state);
+        display->appendProgress(currentSendFilename, state, true);
+        emit sendFile(state);
+    }
+}
+
+void ChatPageWidget::fileDataReceived(quint8 filenumber, const QByteArray& data)
+{
+  FileTransferState* state = states[filenumber];
+  if (state->writeData(data) == -1) {
+    QMessageBox::critical(this, tr("Error"),
+        tr("failed to write data for `%1'").arg(state->fileName()));
+    states.remove(filenumber);
+    delete state;
+  }
+}
+
+void ChatPageWidget::fileSendCompletedReceived(int filenumber)
+{
+  FileTransferState* state = states[filenumber];
+  states.remove(filenumber);
+  delete state;
+}
+
+void ChatPageWidget::promptSendFile(void)
+{
+  QString filename = QFileDialog::getOpenFileName(this, tr("Select a file"));
+  if (filename.length()) {
+      if (!FileTransferState::checkPermission(filename,
+                  FileTransferState::SEND)) {
+          QMessageBox::critical(this, tr("Error"),
+                  tr("Failed to open `%1' for reading").arg(filename));
+      } else {
+          currentSendFilename = filename;
+          emit sendFileRequest(filename);
+      }
+  }
 }
