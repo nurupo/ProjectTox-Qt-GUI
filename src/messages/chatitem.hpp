@@ -116,10 +116,9 @@ protected:
     inline void setWidth(const qreal &width) { clearCache(); _boundingRect.setWidth(width); }
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
 
+    virtual QPalette palette();
+
 private:
-
-
-
     ChatLine *_parent;
     QRectF _boundingRect;
 
@@ -158,8 +157,9 @@ public:
 protected:
     //virtual void initLayout(QTextLayout *layout) const;
     virtual void initDocument(QTextDocument *doc);
+    virtual QPalette palette();
 
-protected:
+private:
 };
 
 // ************************************************************
@@ -175,6 +175,8 @@ public:
 
 protected:
     virtual void initDocument(QTextDocument *doc);
+    virtual QPalette palette();
+
     //virtual void initLayout(QTextLayout *layout) const;
 };
 
@@ -199,7 +201,7 @@ public:
     inline MessageModel::ColumnType column() const { return MessageModel::ContentsColumn; }
     //QFontMetricsF *fontMetrics() const;
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    //void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     virtual QString selection() const;
 

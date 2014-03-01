@@ -79,22 +79,10 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option); Q_UNUSED(widget);
     painter->save();
     painter->setClipRect(boundingRect());
-    /*paintBackground(painter);
-
-    layout()->draw(painter, pos(), additionalFormats(), boundingRect());
-    painter->restore();*/
 
     QAbstractTextDocumentLayout::PaintContext ctx;
-    ctx.palette = QApplication::palette();
+    ctx.palette = palette();
     QPalette::ColorGroup cg = chatView()->hasFocus() ? QPalette::Active : QPalette::Inactive;
-
-    // Set color by message type
-    if (data(MessageModel::TypeRole).toInt() == Message::Nick)
-        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#204A87"));
-    else if (data(MessageModel::TypeRole).toInt() == Message::Action)
-        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#4E9A06"));
-    else if (data(MessageModel::TypeRole).toInt() == Message::DayChange)
-        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#AD7FA8"));
 
     // Selection
     QAbstractTextDocumentLayout::Selection selection = selectionLayout();
@@ -448,6 +436,21 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
     return found;
 }
 
+QPalette ChatItem::palette()
+{
+    QPalette pal = QApplication::palette();
+
+    // Set color by message type
+    if (data(MessageModel::TypeRole).toInt() == Message::Nick)
+        pal.setColor(QPalette::Active, QPalette::Text, QColor("#204A87"));
+    else if (data(MessageModel::TypeRole).toInt() == Message::Action)
+        pal.setColor(QPalette::Active, QPalette::Text, QColor("#4E9A06"));
+    else if (data(MessageModel::TypeRole).toInt() == Message::DayChange)
+        pal.setColor(QPalette::Active, QPalette::Text, QColor("#AD7FA8"));
+
+    return pal;
+}
+
 
 
 // ************************************************************
@@ -461,11 +464,35 @@ SenderChatItem::SenderChatItem(const QRectF &boundingRect, ChatLine *parent) :
 
 void SenderChatItem::initDocument(QTextDocument *doc)
 {
-    ChatItem::initDocument(doc);
+    // Hide double sender names
+    QModelIndex lastIndex = model()->index(row()-1, column());
+    if (lastIndex.isValid()
+            && data(MessageModel::TypeRole).toInt() == Message::Plain
+            && model()->data(lastIndex, MessageModel::TypeRole).toInt() == Message::Plain
+            && (data(MessageModel::FlagsRole).toInt() & Message::Self) == (model()->data(lastIndex, MessageModel::FlagsRole).toInt() & Message::Self)) {
+        doc->setPlainText("");
+    }
+    else {
+        doc->setPlainText(data(MessageModel::DisplayRole).toString());
+    }
+
+    doc->setTextWidth(width());
 
     QTextOption o;
     o.setWrapMode(QTextOption::NoWrap);
     doc->setDefaultTextOption(o);
+}
+
+QPalette SenderChatItem::palette()
+{
+    QPalette pal = ChatItem::palette();
+
+    // Change sender color, if it's our own plain message
+    if((data(MessageModel::TypeRole).toInt() == Message::Plain) && ((data(MessageModel::FlagsRole).toInt() & Message::Self) == true)){
+        pal.setColor(QPalette::Active, QPalette::Text, pal.mid().color());
+    }
+
+    return pal;
 }
 
 /*void SenderChatItem::initLayout(QTextLayout *layout) const
@@ -518,23 +545,12 @@ void ContentsChatItem::clearCache()
     return UiStyle::getInstance().fontMetrics(data(MessageModel::FormatRole).value<UiStyle::FormatList>().at(0).second, 0);
 }*/
 
-void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+/*void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option); Q_UNUSED(widget);
     painter->save();
     painter->setClipRect(boundingRect());
-    /*//paintBackground(painter);
 
-    //layout()->draw(painter, pos(), additionalFormats(), boundingRect());
-    QTextDocument doc;
-    doc.setDocumentMargin(0);
-    doc.setTextWidth(boundingRect().width());
-    QObject *smileyInterface = new SmileyTextObject;
-    doc.documentLayout()->registerHandler(QTextFormat::UserObject + 1, smileyInterface);
-
-    QTextCursor cursor(&doc);
-    cursor.insertText(layout()->text());
-*/
 
 
     QAbstractTextDocumentLayout::PaintContext ctx;
@@ -559,7 +575,7 @@ void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     document()->documentLayout()->draw(painter, ctx);
 
     painter->restore();
-}
+}*/
 
 QString ContentsChatItem::selection() const
 {
@@ -964,6 +980,17 @@ void TimestampChatItem::initDocument(QTextDocument *doc)
     o.setAlignment(Qt::AlignRight);
     o.setWrapMode(QTextOption::NoWrap);
     doc->setDefaultTextOption(o);
+
+    QFont f;
+    f.setPointSize(f.pointSize()-2);
+    doc->setDefaultFont(f);
+}
+
+QPalette TimestampChatItem::palette()
+{
+    QPalette pal = ChatItem::palette();
+    pal.setColor(QPalette::Active, QPalette::Text, pal.mid().color());
+    return pal;
 }
 
 /*void TimestampChatItem::initLayout(QTextLayout *layout) const

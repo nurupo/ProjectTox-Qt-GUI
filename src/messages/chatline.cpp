@@ -72,7 +72,6 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     // Draw a rect for the whole selection (all colums with seperators).
-    // TODO MKO Double selection drawing? See ChatItem::paintBackground.
     if (_selection & Selected) {
         QTextCharFormat selFmt = UiStyle::getInstance().format(UiStyle::formatType(type), label | UiStyle::Selected);
         if (selFmt.hasProperty(QTextFormat::BackgroundBrush)) {
@@ -96,7 +95,7 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         QModelIndex lastIdx = model_->index(row()-1, 0);
         if ((model_->data(lastIdx, MessageModel::FlagsRole).toInt() & Message::Self) != (model_->data(myIdx, MessageModel::FlagsRole).toInt() & Message::Self)) {
             painter->save();
-            painter->setPen(QApplication::palette().button().color());
+            painter->setPen(QApplication::palette().mid().color());
             painter->drawLine(0, 0, width(), 0);
             painter->restore();
         }
