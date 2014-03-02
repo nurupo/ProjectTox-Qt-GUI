@@ -345,8 +345,9 @@ QTextDocument *ChatItem::document() const
     mDoc = new ChatItemDocument(that);
     mDoc->callInitDocument();
 
-    // TODO MKO chaching?
-    //chatView()->setHasCache(chatLine(), false);
+    if(chatScene())
+        chatView()->setHasCache(chatLine(), true);
+
     return &(mDoc->doc);
 }
 
@@ -434,6 +435,18 @@ qint16 ChatItem::posToCursor(const QPointF &posInLine) const
         return 0;
 
     return found;
+}
+
+void ChatItem::setGeometry(qreal width, qreal height)
+{
+    _boundingRect.setSize(QSizeF(width, height));
+    document()->setTextWidth(width);
+}
+
+void ChatItem::setWidth(const qreal &width)
+{
+    _boundingRect.setWidth(width);
+    document()->setTextWidth(width);
 }
 
 QPalette ChatItem::palette()
@@ -720,7 +733,6 @@ void ContentsChatItem::handleClick(const QPointF &pos, ChatScene::ClickMode clic
             QTextCursor c(document());
             c.setPosition(idx +1); // MKO TODO +1? Bug in link detection?
             foo.activate(c.charFormat().anchorHref());
-            qDebug() << c.charFormat().anchorHref();
         }
     }
     else if (clickMode == ChatScene::DoubleClick) {

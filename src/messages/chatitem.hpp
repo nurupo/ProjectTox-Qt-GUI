@@ -109,11 +109,11 @@ protected:
     inline void setSelectionMode(SelectionMode mode) { _selectionMode = mode; }
     void setSelection(SelectionMode mode, qint16 start, qint16 end);
 
-    virtual qint16 posToCursor(const QPointF &posInLine) const;
+    qint16 posToCursor(const QPointF &posInLine) const;
 
-    inline void setGeometry(qreal width, qreal height) { clearCache(); _boundingRect.setSize(QSizeF(width, height)); }
-    inline void setHeight(const qreal &height) { clearCache(); _boundingRect.setHeight(height); }
-    inline void setWidth(const qreal &width) { clearCache(); _boundingRect.setWidth(width); }
+    void setGeometry(qreal width, qreal height);
+    inline void setHeight(const qreal &height) { /*clearCache();*/ _boundingRect.setHeight(height); }
+    void setWidth(const qreal &width);
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
 
     virtual QPalette palette();
