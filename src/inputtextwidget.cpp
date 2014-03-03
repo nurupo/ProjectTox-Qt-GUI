@@ -80,6 +80,10 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     // Send message on Return
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
             && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
+        // Prevents empty messages
+        if (toPlainText().trimmed().isEmpty()) {
+            return;
+        }
         if (toPlainText().startsWith("/me ") ) {
             QString html = toHtml();
             html.remove(html.indexOf("/me "), 4);
