@@ -765,7 +765,9 @@ void ChatScene::firstHandlePositionChanged(qreal xpos)
     }
     //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
 
+    updateSceneRect();
     setHandleXLimits();
+    emit layoutChanged();
 }
 
 void ChatScene::secondHandlePositionChanged(qreal xpos)
