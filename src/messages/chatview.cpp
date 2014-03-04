@@ -4,7 +4,7 @@
 #include <QAbstractSlider>
 #include <QScrollBar>
 #include <QApplication>
-#include "style.hpp"
+#include "Settings/settings.hpp"
 
 ChatView::ChatView(MessageModel *model, QWidget *parent) :
     QGraphicsView(parent)
@@ -32,8 +32,8 @@ ChatView::ChatView(MessageModel *model, QWidget *parent) :
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(verticalScrollbarChanged(int)));
     _lastScrollbarPos = verticalScrollBar()->value();
 
-    // TODO Quick and Dirty message style initializing
-    qnd = UiStyle::getInstance().timestampFormatString();
+    // Update timstamps
+    connect(&Settings::getInstance(), &Settings::timestampFormatChanged, this, &ChatView::clearCache);
 }
 
 MsgId ChatView::lastMsgId() const
@@ -111,6 +111,17 @@ void ChatView::setHasCache(ChatLine *line, bool hasCache)
         _linesWithCache.insert(line);
     else
         _linesWithCache.remove(line);
+}
+
+void ChatView::clearCache()
+{
+    QSet<ChatLine *>::iterator iter = _linesWithCache.begin();
+    while (iter != _linesWithCache.end()) {
+        ChatLine *line = *iter;
+        line->clearCache();
+        iter = _linesWithCache.erase(iter);
+    }
+    update();
 }
 
 void ChatView::setMarkerLineVisible(bool visible)

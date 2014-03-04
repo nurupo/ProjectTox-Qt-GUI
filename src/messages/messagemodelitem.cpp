@@ -1,29 +1,12 @@
 #include "messagemodelitem.hpp"
 #include "messagemodel.hpp"
-
-#include <QFontMetrics>
-#include <QTextBoundaryFinder>
-#include <QTextLayout>
-
-// This Struct is taken from Harfbuzz. We use it only to calc it's size.
-// we use a shared memory region so we do not have to malloc a buffer area for every line
-typedef struct {
-    /*HB_LineBreakType*/ unsigned lineBreakType  : 2;
-    /*HB_Bool*/ unsigned whiteSpace              : 1;     /* A unicode whitespace character, except NBSP, ZWNBSP */
-    /*HB_Bool*/ unsigned charStop                : 1;     /* Valid cursor position (for left/right arrow) */
-    /*HB_Bool*/ unsigned wordBoundary            : 1;
-    /*HB_Bool*/ unsigned sentenceBoundary        : 1;
-    unsigned unused                  : 2;
-} HB_CharAttributes_Dummy;
-
-unsigned char *MessageModelItem::TextBoundaryFinderBuffer = (unsigned char *)malloc(512 * sizeof(HB_CharAttributes_Dummy));
-int MessageModelItem::TextBoundaryFinderBufferSize = 512 * (sizeof(HB_CharAttributes_Dummy) / sizeof(unsigned char));
+#include "Settings/settings.hpp"
 
 MessageModelItem::MessageModelItem(const Message &msg) :
-    _styledMsg(msg)
+    mMsg(msg)
 {
     if (!msg.sender().contains('!'))
-        _styledMsg.setFlags(msg.flags() |= Message::ServerMsg);
+        mMsg.setFlags(msg.flags() |= Message::ServerMsg);
 }
 
 QVariant MessageModelItem::data(int column, int role) const
@@ -73,7 +56,7 @@ bool MessageModelItem::setData(int column, const QVariant &value, int role)
 
     switch (role) {
     case MessageModel::FlagsRole:
-        _styledMsg.setFlags((Message::Flags)value.toUInt());
+        mMsg.setFlags((Message::Flags)value.toUInt());
         return true;
     default:
         return false;
@@ -90,16 +73,9 @@ QVariant MessageModelItem::timestampData(int role) const
 {
     switch (role) {
         case MessageModel::DisplayRole:
-            return _styledMsg.decoratedTimestamp();
+            return mMsg.timestamp().toLocalTime().toString(Settings::getInstance().getTimestampFormat());
         case MessageModel::EditRole:
-            return _styledMsg.timestamp();
-        case MessageModel::BackgroundRole:
-            return backgroundBrush(UiStyle::Timestamp);
-        case MessageModel::SelectedBackgroundRole:
-            return backgroundBrush(UiStyle::Timestamp, true);
-        case MessageModel::FormatRole:
-            return QVariant::fromValue<UiStyle::FormatList>(UiStyle::FormatList()
-                                                            << qMakePair((quint16)0, (quint32) UiStyle::formatType(_styledMsg.type()) | UiStyle::Timestamp));
+            return mMsg.timestamp();
         }
         return QVariant();
 }
@@ -107,137 +83,64 @@ QVariant MessageModelItem::timestampData(int role) const
 QVariant MessageModelItem::senderData(int role) const
 {
     switch (role) {
-        case MessageModel::DisplayRole:
-            return _styledMsg.decoratedSender();
-        case MessageModel::EditRole:
-            return _styledMsg.plainSender();
-        case MessageModel::BackgroundRole:
-            return backgroundBrush(UiStyle::Sender);
-        case MessageModel::SelectedBackgroundRole:
-            return backgroundBrush(UiStyle::Sender, true);
-        case MessageModel::FormatRole:
-            return QVariant::fromValue<UiStyle::FormatList>(UiStyle::FormatList()
-                                                            << qMakePair((quint16)0, (quint32) UiStyle::formatType(_styledMsg.type()) | UiStyle::Sender));
+    case MessageModel::DisplayRole:
+        switch (mMsg.type()) {
+        case Message::Plain:
+            return mMsg.sender();
+        case Message::Action:
+            return "*";
+        case Message::Nick:
+            return "<->";
+        case Message::Join:
+            return "-->";
+        case Message::Quit:
+            return "<--";
+        case Message::Info:
+            return "*";
+        case Message::Error:
+            return "*";
+        case Message::DayChange:
+            return "---";
+        case Message::Invite:
+            return "->";
+        default:
+            return mMsg.sender();
         }
-        return QVariant();
+    case MessageModel::EditRole:
+        return mMsg.sender();
+    }
+    return QVariant();
 }
 
 QVariant MessageModelItem::contentsData(int role) const
 {
-    switch (role) {
-        case MessageModel::DisplayRole:
-        case MessageModel::EditRole:
-            return _styledMsg.plainContents();
-        case MessageModel::BackgroundRole:
-            return backgroundBrush(UiStyle::Contents);
-        case MessageModel::SelectedBackgroundRole:
-            return backgroundBrush(UiStyle::Contents, true);
-        case MessageModel::FormatRole:
-            return QVariant::fromValue<UiStyle::FormatList>(_styledMsg.contentsFormatList());
-        case MessageModel::WrapListRole:
-            if (_wrapList.isEmpty())
-                computeWrapList();
-            return QVariant::fromValue<MessageModel::WrapList>(_wrapList);
+    if(role == MessageModel::DisplayRole || role == MessageModel::EditRole) {
+        switch (mMsg.type()) {
+        case Message::Plain:
+            return mMsg.contents();
+        case Message::Action:
+            return QString("%1 %2").arg(mMsg.sender(), mMsg.contents());
+        case Message::Nick:
+            if (mMsg.contents() == mMsg.sender())
+                return tr("You are now known as %1").arg(mMsg.contents());
+            else
+                return tr("%1 is now known as %2").arg(mMsg.sender(), mMsg.contents());
+        case Message::Join:
+            return tr("%1 has joined.").arg(mMsg.sender()); break;
+        case Message::Quit:
+            return tr("%1 has gone.").arg(mMsg.sender());
+        case Message::Info:
+        case Message::Error:
+            return mMsg.contents();
+        case Message::DayChange:
+            return tr("{Day changed to %1}").arg(mMsg.timestamp().date().toString(Qt::DefaultLocaleLongDate));
+        case Message::Invite:
+        default:
+            return mMsg.contents();
         }
-        return QVariant();
-}
-
-QVariant MessageModelItem::backgroundBrush(UiStyle::FormatType subelement, bool selected) const
-{
-    QTextCharFormat fmt =  UiStyle::getInstance().format(UiStyle::formatType(_styledMsg.type()) | subelement, messageLabel() | (selected ? UiStyle::Selected : 0));
-    if (fmt.hasProperty(QTextFormat::BackgroundBrush))
-        return QVariant::fromValue<QBrush>(fmt.background());
+    }
     return QVariant();
 }
-
-// TODO MKO SY Was ist das label?
-quint32 MessageModelItem::messageLabel() const
-{
-    quint32 label = _styledMsg.senderHash() << 16;
-    if (_styledMsg.flags() & Message::Self)
-        label |= UiStyle::OwnMsg;
-    if (_styledMsg.flags() & Message::Highlight)
-        label |= UiStyle::Highlight;
-    return label;
-}
-
-void MessageModelItem::computeWrapList() const
-{
-    QString text = _styledMsg.plainContents();
-    int length = text.length();
-    if (!length)
-        return;
-
-    QList<MessageModel::Word> wplist; // use a temp list which we'll later copy into a QVector for efficiency
-    QTextBoundaryFinder finder(QTextBoundaryFinder::Line, _styledMsg.plainContents().unicode(), length,
-                               TextBoundaryFinderBuffer, TextBoundaryFinderBufferSize);
-
-    int idx;
-    int oldidx = 0;
-    MessageModel::Word word;
-    word.start = 0;
-    qreal wordstartx = 0;
-
-    QTextLayout layout(_styledMsg.plainContents());
-    QTextOption option;
-    option.setWrapMode(QTextOption::NoWrap);
-    layout.setTextOption(option);
-
-    layout.setAdditionalFormats(UiStyle::getInstance().toTextLayoutList(_styledMsg.contentsFormatList(), length, messageLabel()));
-    layout.beginLayout();
-    QTextLine line = layout.createLine();
-    line.setNumColumns(length);
-    layout.endLayout();
-
-    while ((idx = finder.toNextBoundary()) >= 0 && idx <= length) {
-        // QTextBoundaryFinder has inconsistent behavior in Qt version up to and including 4.6.3 (at least).
-        // It doesn't point to the position we should break, but to the character before that.
-        // Unfortunately Qt decided to fix this by changing the behavior of QTBF, so now we have to add a version
-        // check. At the time of this writing, I'm still trying to get this reverted upstream...
-        //
-        // cf. https://bugs.webkit.org/show_bug.cgi?id=31076 and Qt commit e6ac173
-        static int needWorkaround = -1;
-        if (needWorkaround < 0) {
-            needWorkaround = 0;
-            QStringList versions = QString(qVersion()).split('.');
-            if (versions.count() == 3 && versions.at(0).toInt() == 4) {
-                if (versions.at(1).toInt() <= 6 && versions.at(2).toInt() <= 3)
-                    needWorkaround = 1;
-            }
-        }
-        if (needWorkaround == 1) {
-            if (idx < length)
-                idx++;
-        }
-
-        if (idx == oldidx)
-            continue;
-
-        word.start = oldidx;
-        int wordend = idx;
-        for (; wordend > word.start; wordend--) {
-            if (!text.at(wordend-1).isSpace())
-                break;
-        }
-
-        qreal wordendx = line.cursorToX(wordend);
-        qreal trailingendx = line.cursorToX(idx);
-        word.endX = wordendx;
-        word.width = wordendx - wordstartx;
-        word.trailing = trailingendx - wordendx;
-        wordstartx = trailingendx;
-        wplist.append(word);
-
-        oldidx = idx;
-    }
-
-    // A QVector needs less space than a QList
-    _wrapList.resize(wplist.count());
-    for (int i = 0; i < wplist.count(); i++) {
-        _wrapList[i] = wplist.at(i);
-    }
-}
-
 
 bool MessageModelItem::operator<(const MessageModelItem &other) const
 {

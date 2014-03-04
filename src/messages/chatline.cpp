@@ -63,24 +63,14 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     const QAbstractItemModel *model_ = model();
     QModelIndex myIdx = model_->index(row(), 0);
-    Message::Type type = (Message::Type)myIdx.data(MessageModel::TypeRole).toInt();
-    UiStyle::MessageLabel label = (UiStyle::MessageLabel)myIdx.data(MessageModel::MsgLabelRole).toInt();
-
-    QTextCharFormat msgFmt = UiStyle::getInstance().format(UiStyle::formatType(type), label);
-    if (msgFmt.hasProperty(QTextFormat::BackgroundBrush)) {
-        painter->fillRect(boundingRect(), msgFmt.background());
-    }
 
     // Draw a rect for the whole selection (all colums with seperators).
     if (_selection & Selected) {
-        QTextCharFormat selFmt = UiStyle::getInstance().format(UiStyle::formatType(type), label | UiStyle::Selected);
-        if (selFmt.hasProperty(QTextFormat::BackgroundBrush)) {
-            ChatItem *rightItem = item((MessageModel::ColumnType)((_selection & 0x0C)>>2));
-            qreal right = rightItem->pos().x() + rightItem->width();
-            qreal left  = item((MessageModel::ColumnType)(_selection & 0x03))->pos().x();
-            QRectF selectRect(left, 0, right - left, height());
-            painter->fillRect(selectRect, selFmt.background());
-        }
+        ChatItem *rightItem = item((MessageModel::ColumnType)((_selection & 0x0C)>>2));
+        qreal right = rightItem->pos().x() + rightItem->width();
+        qreal left  = item((MessageModel::ColumnType)(_selection & 0x03))->pos().x();
+        QRectF selectRect(left, 0, right - left, height());
+        painter->fillRect(selectRect, QApplication::palette().background());
     }
 
     // draw chatitems

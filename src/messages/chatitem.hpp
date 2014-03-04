@@ -7,7 +7,6 @@
 #include "messagemodel.hpp"
 #include "chatscene.hpp"
 #include "clickable.hpp"
-#include "style.hpp"
 #include "smiley.hpp"
 
 #include <QAbstractTextDocumentLayout>

@@ -11,7 +11,6 @@ Message::Message(Type type, const QString &contents, const QString &sender, Flag
 {
 }
 
-
 Message::Message(const QDateTime &ts, Type type, const QString &contents, const QString &sender, Flags flags) :
     _timestamp(ts),
     _contents(contents),
@@ -27,7 +26,6 @@ QDataStream &operator<<(QDataStream &out, const Message &msg)
     << msg.sender().toUtf8() << msg.contents().toUtf8();
     return out;
 }
-
 
 QDataStream &operator>>(QDataStream &in, Message &msg)
 {

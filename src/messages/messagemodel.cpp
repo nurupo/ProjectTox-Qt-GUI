@@ -12,10 +12,6 @@ public:
 MessageModel::MessageModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
-    qRegisterMetaType<WrapList>("MessageModel::WrapList");
-    qRegisterMetaTypeStreamOperators<WrapList>("MessageModel::WrapList");
-
-
     // Daychange timer
     QDateTime now = QDateTime::currentDateTime();
     now.setTimeSpec(Qt::UTC);
@@ -393,28 +389,4 @@ Message MessageModel::takeMessageAt(int i)
     Message msg = _messageList[i].message();
     _messageList.removeAt(i);
     return msg;
-}
-
-
-QDataStream &operator<<(QDataStream &out, const MessageModel::WrapList wplist)
-{
-    out << wplist.count();
-    MessageModel::WrapList::const_iterator it = wplist.begin();
-    while (it != wplist.end()) {
-        out << (*it).start << (*it).width << (*it).trailing;
-        ++it;
-    }
-    return out;
-}
-
-
-QDataStream &operator>>(QDataStream &in, MessageModel::WrapList &wplist)
-{
-    quint16 cnt;
-    in >> cnt;
-    wplist.resize(cnt);
-    for (quint16 i = 0; i < cnt; i++) {
-        in >> wplist[i].start >> wplist[i].width >> wplist[i].trailing;
-    }
-    return in;
 }

@@ -2,10 +2,11 @@
 #define MESSAGEMODELITEM_HPP
 
 #include "message.hpp"
-#include "style.hpp"
+#include <QObject>
 
 class MessageModelItem
 {
+    Q_DECLARE_TR_FUNCTIONS(MessageModelItem)
 public:
     //! Creates a MessageModelItem from a Message object.
     /** This baseclass implementation takes care of all Message data *except* the stylable strings.
@@ -18,11 +19,11 @@ public:
     QVariant data(int column, int role) const;
     bool setData(int column, const QVariant &value, int role);
 
-    inline const Message &message() const { return _styledMsg; }
-    inline const QDateTime &timestamp() const { return _styledMsg.timestamp(); }
-    inline const MsgId &msgId() const { return _styledMsg.msgId(); }
-    inline Message::Type msgType() const { return _styledMsg.type(); }
-    inline Message::Flags msgFlags() const { return _styledMsg.flags(); }
+    inline const Message &message() const { return mMsg; }
+    inline const QDateTime &timestamp() const { return mMsg.timestamp(); }
+    inline const MsgId &msgId() const { return mMsg.msgId(); }
+    inline Message::Type msgType() const { return mMsg.type(); }
+    inline Message::Flags msgFlags() const { return mMsg.flags(); }
 
     // For sorting
     bool operator<(const MessageModelItem &) const;
@@ -30,32 +31,12 @@ public:
     bool operator>(const MessageModelItem &) const;
     static bool lessThan(const MessageModelItem *m1, const MessageModelItem *m2);
 
-    inline void invalidateWrapList() { _wrapList.clear(); }
-
-    /// Used to store information about words to be used for wrapping
-    struct Word {
-        quint16 start;
-        qreal endX;
-        qreal width;
-        qreal trailing;
-    };
-    typedef QVector<Word> WrapList;
-
 private:
     QVariant timestampData(int role) const;
     QVariant senderData(int role) const;
     QVariant contentsData(int role) const;
 
-    QVariant backgroundBrush(UiStyle::FormatType subelement, bool selected = false) const;
-    quint32 messageLabel() const;
-
-    void computeWrapList() const;
-
-    mutable WrapList _wrapList;
-    UiStyle::StyledMessage _styledMsg;
-
-    static unsigned char *TextBoundaryFinderBuffer;
-    static int TextBoundaryFinderBufferSize;
+    Message mMsg;
 };
 
 

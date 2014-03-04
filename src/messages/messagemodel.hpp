@@ -14,18 +14,14 @@ public:
     enum MessageModelRole {
         DisplayRole = Qt::DisplayRole,
         EditRole = Qt::EditRole,
-        BackgroundRole = Qt::BackgroundRole,
         MessageRole = Qt::UserRole,
         MsgIdRole,
         TypeRole,
         FlagsRole,
         TimestampRole,
-        FormatRole,
         ColumnTypeRole,
         UserRole,
-        WrapListRole,
-        MsgLabelRole,
-        SelectedBackgroundRole
+        MsgLabelRole
         };
 
     enum ColumnType {
@@ -33,9 +29,6 @@ public:
         ContentsColumn,
         TimestampColumn
         };
-
-    typedef MessageModelItem::Word Word;
-    typedef MessageModelItem::WrapList WrapList;
 
     explicit MessageModel(QObject *parent = 0);
 
@@ -91,10 +84,5 @@ private:
     QList<MessageModelItem> _messageList;
 
 };
-
-QDataStream &operator<<(QDataStream &out, const MessageModel::WrapList wplist);
-QDataStream &operator>>(QDataStream &in, MessageModel::WrapList &wplist);
-
-Q_DECLARE_METATYPE(MessageModel::WrapList)
 
 #endif // MESSAGEMODEL_HPP
