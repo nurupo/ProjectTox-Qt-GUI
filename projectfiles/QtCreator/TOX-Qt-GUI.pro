@@ -162,7 +162,7 @@ HEADERS  += \
     ../../src/messages/columnhandleitem.hpp \
     ../../src/messages/style.hpp \
     ../../src/messages/smileytextobject.hpp \
-    ../../src/messages/smiley.h
+    ../../src/messages/smiley.hpp
 
 ### ToxCore section. Please keep it alphabetical ###
 

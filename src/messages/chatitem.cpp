@@ -20,15 +20,14 @@ ChatItem::ChatItem(const QRectF &boundingRect, ChatLine *parent) :
     _boundingRect(boundingRect),
     _selectionMode(NoSelection),
     _selectionStart(-1),
-    _cachedLayout(0),
     mDoc(NULL)
 {
 }
 
 ChatItem::~ChatItem()
 {
-    delete _cachedLayout;
-    delete mDoc;
+    if(mDoc)
+        delete mDoc;
 }
 
 const QAbstractItemModel *ChatItem::model() const
@@ -60,17 +59,6 @@ QPointF ChatItem::mapFromScene(const QPointF &p) const
 {
     return chatLine()->mapFromScene(p) /* - pos() */;
 }
-
-/*void ChatItem::paintBackground(QPainter *painter)
-{
-    QVariant bgBrush;
-    if (_selectionMode == FullSelection)
-        bgBrush = data(MessageModel::SelectedBackgroundRole);
-    else
-        bgBrush = data(MessageModel::BackgroundRole);
-    if (bgBrush.isValid())
-        painter->fillRect(boundingRect(), bgBrush.value<QBrush>());
-}*/
 
 // NOTE: This is not the most time-efficient implementation, but it saves space by not caching unnecessary data
 //       This is a deliberate trade-off. (-> selectFmt creation, data() call)
@@ -212,27 +200,8 @@ void ChatItem::handleClick(const QPointF &pos, ChatScene::ClickMode clickMode)
     }
 }
 
-/*void ChatItem::initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapMode, Qt::Alignment alignment) const
-{
-    Q_ASSERT(layout);
-
-    layout->setText(data(MessageModel::DisplayRole).toString());
-
-
-    QTextOption option;
-    option.setWrapMode(wrapMode);
-    option.setAlignment(alignment);
-    layout->setTextOption(option);
-
-    //QList<QTextLayout::FormatRange> formatRanges = UiStyle::getInstance().toTextLayoutList(formatList(), layout->text().length(), data(MessageModel::MsgLabelRole).toUInt());
-    //layout->setAdditionalFormats(formatRanges);
-}*/
-
 void ChatItem::clearCache()
 {
-    delete _cachedLayout;
-    _cachedLayout = 0;
-
     if(mDoc) {
         delete mDoc;
         mDoc = NULL;
@@ -278,36 +247,6 @@ void ChatItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     else
         event->ignore();
 }
-
-/*QTextLayout *ChatItem::layout() const
-{
-    if (_cachedLayout)
-        return _cachedLayout;
-
-    _cachedLayout = new QTextLayout;
-    initLayout(_cachedLayout);
-    chatView()->setHasCache(chatLine(), false);
-    return _cachedLayout;
-}*/
-/*void ChatItem::initLayout(QTextLayout *layout) const
-{
-    //initLayoutHelper(layout, QTextOption::NoWrap);
-    //doLayout(layout);
-}*/
-/*void ChatItem::doLayout(QTextLayout *layout) const
-{
-    layout->beginLayout();
-    QTextLine line = layout->createLine();
-    if (line.isValid()) {
-        line.setLineWidth(width());
-        line.setPosition(QPointF(0, 0));
-    }
-    layout->endLayout();
-}*/
-/*UiStyle::FormatList ChatItem::formatList() const
-{
-    return data(MessageModel::FormatRole).value<UiStyle::FormatList>();
-}*/
 
 QAbstractTextDocumentLayout::Selection ChatItem::selectionLayout() const
 {
@@ -356,62 +295,6 @@ void ChatItem::initDocument(QTextDocument *doc)
     doc->setPlainText(data(MessageModel::DisplayRole).toString());
     doc->setTextWidth(width());
 }
-
-/*QVector<QTextLayout::FormatRange> ChatItem::selectionFormats() const
-{
-    if (!hasSelection())
-            return QVector<QTextLayout::FormatRange>();
-
-        int start, end;
-        if (_selectionMode == FullSelection) {
-            start = 0;
-            end = data(MessageModel::DisplayRole).toString().length();
-        }
-        else {
-            start = qMin(_selectionStart, _selectionEnd);
-            end = qMax(_selectionStart, _selectionEnd);
-        }
-
-        UiStyle::FormatList fmtList = formatList();
-
-        while (fmtList.count() > 1 && fmtList.at(1).first <= start)
-            fmtList.removeFirst();
-
-        fmtList.first().first = start;
-
-        while (fmtList.count() > 1 && fmtList.last().first >= end)
-            fmtList.removeLast();
-
-        return UiStyle::getInstance().toTextLayoutList(fmtList, end, UiStyle::Selected|data(MessageModel::MsgLabelRole).toUInt()).toVector();
-}*/
-/*QVector<QTextLayout::FormatRange> ChatItem::additionalFormats() const
-{
-    //return selectionFormats();
-}*/
-/*void ChatItem::overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const
-{
-    for (int i = 0; i < fmtList.count(); i++) {
-        int fmtStart = fmtList.at(i).first;
-        int fmtEnd = (i < fmtList.count()-1 ? fmtList.at(i+1).first : data(MessageModel::DisplayRole).toString().length());
-
-        if (fmtEnd <= start)
-            continue;
-        if (fmtStart >= end)
-            break;
-
-        // split the format if necessary
-        if (fmtStart < start) {
-            fmtList.insert(i, fmtList.at(i));
-            fmtList[++i].first = start;
-        }
-        if (end < fmtEnd) {
-            fmtList.insert(i, fmtList.at(i));
-            fmtList[i+1].first = end;
-        }
-
-        fmtList[i].second |= overlayFmt;
-    }
-}*/
 
 void ChatItem::setSelection(ChatItem::SelectionMode mode, qint16 start, qint16 end)
 {
@@ -508,21 +391,6 @@ QPalette SenderChatItem::palette()
     return pal;
 }
 
-/*void SenderChatItem::initLayout(QTextLayout *layout) const
-{
-    //initLayoutHelper(layout, QTextOption::NoWrap);
-
-    // Hide Sender if is same as before
-    QModelIndex lastIndex = model()->index(row()-1, column());
-    if (lastIndex.isValid()
-            && data(MessageModel::TypeRole).toInt() == Message::Plain
-            && model()->data(lastIndex, MessageModel::TypeRole).toInt() == Message::Plain
-            && (data(MessageModel::FlagsRole).toInt() & Message::Self) == (model()->data(lastIndex, MessageModel::FlagsRole).toInt() & Message::Self)) {
-        layout->setText("");
-    }
-    //doLayout(layout);
-}*/
-
 // ************************************************************
 // ContentsChatItem
 // ************************************************************
@@ -552,43 +420,6 @@ void ContentsChatItem::clearCache()
         _data = NULL;
     }
 }
-
-/*QFontMetricsF *ContentsChatItem::fontMetrics() const
-{
-    return UiStyle::getInstance().fontMetrics(data(MessageModel::FormatRole).value<UiStyle::FormatList>().at(0).second, 0);
-}*/
-
-/*void ContentsChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option); Q_UNUSED(widget);
-    painter->save();
-    painter->setClipRect(boundingRect());
-
-
-
-    QAbstractTextDocumentLayout::PaintContext ctx;
-    ctx.palette = QApplication::palette();
-
-    // Set color by message type
-    if (data(MessageModel::TypeRole).toInt() == Message::Nick)
-        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#204A87"));
-    else if (data(MessageModel::TypeRole).toInt() == Message::Action)
-        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#4E9A06"));
-    else if (data(MessageModel::TypeRole).toInt() == Message::DayChange)
-        ctx.palette.setColor(QPalette::Active, QPalette::Text, QColor("#AD7FA8"));
-
-    // Selection
-    QAbstractTextDocumentLayout::Selection selection = selectionLayout();
-    selection.format.setBackground(ctx.palette.brush(QPalette::Highlight));
-    selection.format.setForeground(ctx.palette.brush(QPalette::HighlightedText));
-    ctx.selections.append(selection);
-
-
-    painter->translate(pos());
-    document()->documentLayout()->draw(painter, ctx);
-
-    painter->restore();
-}*/
 
 QString ContentsChatItem::selection() const
 {
@@ -793,75 +624,6 @@ void ContentsChatItem::copyLinkToClipboard()
     }
 }
 
-/*QVector<QTextLayout::FormatRange> ContentsChatItem::additionalFormats() const
-{
-    QVector<QTextLayout::FormatRange> fmt = ChatItem::additionalFormats();
-
-    // mark a clickable if hovered upon
-    if (privateData()->currentClickable.isValid()) {
-        Clickable click = privateData()->currentClickable;
-        QTextLayout::FormatRange f;
-        f.start = click.start();
-        f.length = click.length();
-        f.format.setFontUnderline(true);
-        fmt.append(f);
-    }
-    return fmt;
-}*/
-/*void ContentsChatItem::initLayout(QTextLayout *layout) const
-{
-    //initLayoutHelper(layout, QTextOption::WrapAtWordBoundaryOrAnywhere);
-    //doLayout(layout);
-}*/
-/*void ContentsChatItem::doLayout(QTextLayout *layout) const
-{
-    MessageModel::WrapList wrapList = data(MessageModel::WrapListRole).value<MessageModel::WrapList>();
-    if (!wrapList.count()) return;  // empty chatitem
-
-    qreal h = 0;
-    qreal spacing = qMax(fontMetrics()->lineSpacing(), fontMetrics()->height()); // cope with negative leading()
-    WrapColumnFinder finder(this);
-    layout->beginLayout();
-    forever {
-        QTextLine line = layout->createLine();
-        if (!line.isValid())
-            break;
-
-        int col = finder.nextWrapColumn(width());
-        if (col < 0)
-            col = layout->text().length();
-        int num = col - line.textStart();
-
-        line.setNumColumns(num);
-
-        // Sometimes, setNumColumns will create a line that's too long (cf. Qt bug 238249)
-        // We verify this and try setting the width again, making it shorter each time until the lengths match.
-        // Dead fugly, but seems to work…
-        for (int i = line.textLength()-1; i >= 0 && line.textLength() > num; i--) {
-            line.setNumColumns(i);
-        }
-        if (num != line.textLength()) {
-            qWarning() << "WARNING: Layout engine couldn't workaround Qt bug 238249, please report!";
-            // qDebug() << num << line.textLength() << t.mid(line.textStart(), line.textLength()) << t.mid(line.textStart() + line.textLength());
-        }
-
-        line.setPosition(QPointF(0, h));
-        h += spacing;
-    }
-    layout->endLayout();
-}*/
-/*UiStyle::FormatList ContentsChatItem::formatList() const
-{
-    UiStyle::FormatList fmtList = ChatItem::formatList();
-    for (int i = 0; i < privateData()->clickables.count(); i++) {
-        Clickable click = privateData()->clickables.at(i);
-        if (click.type() == Clickable::Url) {
-            overlayFormat(fmtList, click.start(), click.start() + click.length(), UiStyle::Url);
-        }
-    }
-    return fmtList;
-}*/
-
 Clickable ContentsChatItem::clickableAt(const QPointF &pos) const
 {
     return privateData()->clickables.atCursorPos(posToCursor(pos));
@@ -909,71 +671,6 @@ ContentsChatItemPrivate *ContentsChatItem::privateData() const
     return _data;
 }
 
-
-
-
-/*************************************************************************************************/
-
-/*ContentsChatItem::WrapColumnFinder::WrapColumnFinder(const ChatItem *_item)
-    : item(_item),
-    wrapList(item->data(MessageModel::WrapListRole).value<MessageModel::WrapList>()),
-    wordidx(0),
-    lineCount(0),
-    choppedTrailing(0)
-{
-}
-
-qint16 ContentsChatItem::WrapColumnFinder::nextWrapColumn(qreal width)
-{
-    if (wordidx >= wrapList.count())
-        return -1;
-
-    lineCount++;
-    qreal targetWidth = lineCount * width + choppedTrailing;
-
-    qint16 start = wordidx;
-    qint16 end = wrapList.count() - 1;
-
-    // check if the whole line fits
-    if (wrapList.at(end).endX <= targetWidth) //  || start == end)
-        return -1;
-
-    // check if we have a very long word that needs inter word wrap
-    if (wrapList.at(start).endX > targetWidth) {
-        if (!line.isValid()) {
-            item->initLayoutHelper(&layout, QTextOption::NoWrap);
-            layout.beginLayout();
-            line = layout.createLine();
-            layout.endLayout();
-        }
-        return line.xToCursor(targetWidth, QTextLine::CursorOnCharacter);
-    }
-
-    while (true) {
-        if (start + 1 == end) {
-            wordidx = end;
-            const MessageModel::Word &lastWord = wrapList.at(start); // the last word we were able to squeeze in
-
-            // both cases should be cought preliminary
-            Q_ASSERT(lastWord.endX <= targetWidth); // ensure that "start" really fits in
-            Q_ASSERT(end < wrapList.count()); // ensure that start isn't the last word
-
-            choppedTrailing += lastWord.trailing - (targetWidth - lastWord.endX);
-            return wrapList.at(wordidx).start;
-        }
-
-        qint16 pivot = (end + start) / 2;
-        if (wrapList.at(pivot).endX > targetWidth) {
-            end = pivot;
-        }
-        else {
-            start = pivot;
-        }
-    }
-    Q_ASSERT(false);
-    return -1;
-}*/
-
 // ************************************************************
 // TimestampChatItem
 // ************************************************************
@@ -1004,9 +701,3 @@ QPalette TimestampChatItem::palette()
     pal.setColor(QPalette::Active, QPalette::Text, pal.mid().color());
     return pal;
 }
-
-/*void TimestampChatItem::initLayout(QTextLayout *layout) const
-{
-        //initLayoutHelper(layout, QTextOption::ManualWrap, Qt::AlignRight);
-        //doLayout(layout);
-}*/

@@ -1,4 +1,4 @@
-#include "smiley.h"
+#include "smiley.hpp"
 #include <smileypack.hpp>
 #include "Settings/settings.hpp"
 #include <QMapIterator>

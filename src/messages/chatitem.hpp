@@ -3,13 +3,12 @@
 
 #include <QAction>
 #include <QObject>
-#include <QTextLayout>
 
 #include "messagemodel.hpp"
 #include "chatscene.hpp"
 #include "clickable.hpp"
 #include "style.hpp"
-#include "smiley.h"
+#include "smiley.hpp"
 
 #include <QAbstractTextDocumentLayout>
 
@@ -68,10 +67,8 @@ public:
     virtual void addActionsToMenu(QMenu *menu, const QPointF &itemPos);
     virtual void handleClick(const QPointF &pos, ChatScene::ClickMode clickMode);
 
-    //void initLayoutHelper(QTextLayout *layout, QTextOption::WrapMode wrapMode, Qt::Alignment alignment = Qt::AlignLeft) const;
-
     //! Remove internally cached data
-    //! This removes e.g. the cached QTextLayout to avoid wasting space for nonvisible ChatLines
+    //! This removes the cached QTextDocument to avoid wasting space for nonvisible ChatLines.
     virtual void clearCache();
 
 protected:
@@ -88,18 +85,9 @@ protected:
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *) {}
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *) {}
 
-    //QTextLayout *layout() const;
-    //virtual void initLayout(QTextLayout *layout) const;
-    //virtual void doLayout(QTextLayout *layout) const;
-    //virtual UiStyle::FormatList formatList() const;
     QAbstractTextDocumentLayout::Selection selectionLayout() const;
     QTextDocument *document() const;
     virtual void initDocument(QTextDocument *doc);
-
-    //void paintBackground(QPainter *painter);
-    //QVector<QTextLayout::FormatRange> selectionFormats() const;
-    //virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
-    //void overlayFormat(UiStyle::FormatList &fmtList, int start, int end, quint32 overlayFmt) const;
 
     inline qint16 selectionStart() const { return _selectionStart; }
     inline void setSelectionStart(qint16 start) { _selectionStart = start; }
@@ -126,7 +114,6 @@ private:
     int _selectionStart;
     int _selectionEnd;
 
-    mutable QTextLayout *_cachedLayout;
     mutable ChatItemDocument *mDoc;
 
     friend class ChatLine;
@@ -137,9 +124,10 @@ class ChatItemDocument {
 public:
     ChatItemDocument(ChatItem *parent) : chatItem(parent) {}
     void callInitDocument() { chatItem->initDocument(&doc); }
-
-    ChatItem *chatItem;
     QTextDocument doc;
+
+private:
+    ChatItem *chatItem;
 };
 
 // ************************************************************
@@ -155,11 +143,8 @@ public:
     virtual inline MessageModel::ColumnType column() const { return MessageModel::TimestampColumn; }
 
 protected:
-    //virtual void initLayout(QTextLayout *layout) const;
     virtual void initDocument(QTextDocument *doc);
     virtual QPalette palette();
-
-private:
 };
 
 // ************************************************************
@@ -176,8 +161,6 @@ public:
 protected:
     virtual void initDocument(QTextDocument *doc);
     virtual QPalette palette();
-
-    //virtual void initLayout(QTextLayout *layout) const;
 };
 
 // ************************************************************
@@ -197,12 +180,7 @@ public:
     void clearCache();
 
     virtual inline int type() const { return ChatScene::ContentsChatItemType; }
-
     inline MessageModel::ColumnType column() const { return MessageModel::ContentsColumn; }
-    //QFontMetricsF *fontMetrics() const;
-
-    //void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
     virtual QString selection() const;
 
 protected:
@@ -216,17 +194,8 @@ protected:
     virtual void addActionsToMenu(QMenu *menu, const QPointF &pos);
     virtual void copyLinkToClipboard();
 
-
-
-    //virtual QVector<QTextLayout::FormatRange> additionalFormats() const;
-
-    //virtual void initLayout(QTextLayout *layout) const;
-    //virtual void doLayout(QTextLayout *layout) const;
-    //virtual UiStyle::FormatList formatList() const;
-
 private:
     class ActionProxy;
-    class WrapColumnFinder;
 
     Clickable clickableAt(const QPointF &pos) const;
 
@@ -255,26 +224,6 @@ public:
 
     ContentsChatItemPrivate(ContentsChatItem *parent) : contentsItem(parent) {}
 };
-
-
-
-/*class ContentsChatItem::WrapColumnFinder
-{
-public:
-    WrapColumnFinder(const ChatItem *parent);
-    ~WrapColumnFinder() {}
-
-    qint16 nextWrapColumn(qreal width);
-
-private:
-    const ChatItem *item;
-    QTextLayout layout;
-    QTextLine line;
-    MessageModel::WrapList wrapList;
-    qint16 wordidx;
-    qint16 lineCount;
-    qreal choppedTrailing;
-};*/
 
 //! Acts as a proxy for Action signals targetted at a ContentsChatItem
 /** Since a ChatItem is not a QObject, hence cannot receive signals, we use a static ActionProxy
