@@ -25,6 +25,7 @@ class QComboBox;
 class QLabel;
 class QToolButton;
 class EmojiFontSettingsDialog;
+class QLineEdit;
 
 class GuiSettingsPage : public AbstractSettingsPage
 {
@@ -38,13 +39,14 @@ public:
     
 private slots:
     void updateSmileypackDetails(int index);
+    void updateTimestampPreview(QString format);
 
 private:
     QGroupBox* buildAnimationGroup();
     QGroupBox* buildSmileypackGroup();
+    QGroupBox* buildChatviewGroup();
 
     void searchSmileyPacks();
-
 
     EmojiFontSettingsDialog *emojiSettings;
     QCheckBox* enableAnimationCheckbox;
@@ -52,6 +54,8 @@ private:
     QComboBox* smileypackCombobox;
     QToolButton *emojiButton;
     QLabel*    smileypackDescLabel;
+    QLineEdit *timestampLineedit;
+    QLabel    *timestampPreview;
 };
 
 

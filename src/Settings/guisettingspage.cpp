@@ -31,6 +31,8 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QToolButton>
+#include <QLineEdit>
+#include <QDateTime>
 
 #include "smileypack.hpp"
 #include "emojifontsettingsdialog.hpp"
@@ -46,6 +48,7 @@ void GuiSettingsPage::buildGui()
 
     layout->addWidget(buildAnimationGroup());
     layout->addWidget(buildSmileypackGroup());
+    layout->addWidget(buildChatviewGroup());
     layout->addStretch(0);
 }
 
@@ -85,6 +88,8 @@ void GuiSettingsPage::setGui()
         index = 1;
     }
     smileypackCombobox->setCurrentIndex(index);
+
+    timestampLineedit->setText(settings.getTimestampFormat());
 }
 
 void GuiSettingsPage::applyChanges()
@@ -96,6 +101,8 @@ void GuiSettingsPage::applyChanges()
     settings.setCurstomEmojiFont(emojiSettings->useCustomFont());
     settings.setEmojiFontFamily(emojiSettings->getFontFamily());
     settings.setEmojiFontPointSize(emojiSettings->getFontPointSize());
+
+    settings.setTimestampFormat(timestampLineedit->text());
 }
 
 QGroupBox *GuiSettingsPage::buildAnimationGroup()
@@ -131,6 +138,25 @@ QGroupBox *GuiSettingsPage::buildSmileypackGroup()
 
     layout->addLayout(selectLayout);
     layout->addWidget(smileypackDescLabel);
+    return group;
+}
+
+QGroupBox *GuiSettingsPage::buildChatviewGroup()
+{
+    QGroupBox *group = new QGroupBox(tr("Chat view"), this);
+    QFormLayout *layout = new QFormLayout(group);
+    QVBoxLayout *horizontal = new QVBoxLayout();
+
+    timestampLineedit = new QLineEdit(group);
+    timestampPreview = new QLabel(group);
+
+    horizontal->addWidget(timestampLineedit);
+    horizontal->addWidget(timestampPreview);
+
+    layout->addRow(tr("Timestamp format:"), horizontal);
+
+    connect(timestampLineedit, &QLineEdit::textChanged, this, &GuiSettingsPage::updateTimestampPreview);
+
     return group;
 }
 
@@ -187,4 +213,9 @@ void GuiSettingsPage::updateSmileypackDetails(int index)
     else {
         emojiButton->setVisible(false);
     }
+}
+
+void GuiSettingsPage::updateTimestampPreview(QString format)
+{
+    timestampPreview->setText(tr("Preview: %1").arg(QDateTime::currentDateTime().toString(format)));
 }

@@ -19,8 +19,10 @@
 #include "status.hpp"
 #include "Settings/settings.hpp"
 #include "customhintwidget.hpp"
-#include "messagedisplaywidget.hpp"
 #include "emoticonmenu.hpp"
+
+#include "messages/messagemodel.hpp"
+#include "messages/chatview.hpp"
 
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -30,7 +32,8 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)
 {
     friendItem = new FriendItemWidget(this);
-    display = new MessageDisplayWidget(this);
+    model = new MessageModel(this);
+    chatview = new ChatView(model, this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
@@ -55,7 +58,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QSplitter* splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
     splitter->setChildrenCollapsible(false);
-    splitter->addWidget(display);
+    splitter->addWidget(chatview);
     splitter->addWidget(inputPanel);
     splitter->setStretchFactor(0, 3);
 
@@ -73,11 +76,14 @@ int ChatPageWidget::getFriendId() const
 
 void ChatPageWidget::messageReceived(const QString& message)
 {
-    display->appendMessage(username, message, -1, false);
+    model->insertNewMessage(message, username, Message::Plain);
 }
 
 void ChatPageWidget::setUsername(const QString& newUsername)
 {
+    if(!username.isEmpty() && username != newUsername)
+        model->insertNewMessage(newUsername, username, Message::Nick);
+
     username = newUsername;
     friendItem->setUsername(username);
 }
@@ -97,15 +103,18 @@ void ChatPageWidget::setStatusMessage(const QString& statusMessage)
 
 void ChatPageWidget::messageSentResult(const QString& message, int messageId)
 {
-    display->appendMessage(Settings::getInstance().getUsername(), message, messageId, true);
+    if(messageId == 0)
+        model->insertNewMessage(message, Settings::getInstance().getUsername(), Message::Error, Message::Self);
+    else
+        model->insertNewMessage(message, Settings::getInstance().getUsername(), Message::Plain, Message::Self);
 }
 
 void ChatPageWidget::actionReceived(const QString &message)
 {
-    display->appendAction(username, message, false);
+    model->insertNewMessage(message, username, Message::Action);
 }
 
 void ChatPageWidget::actionSentResult(const QString &message)
 {
-    display->appendAction(Settings::getInstance().getUsername(), message, true);
+    model->insertNewMessage(message, Settings::getInstance().getUsername(), Message::Action, Message::Self);
 }
