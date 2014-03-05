@@ -25,6 +25,9 @@ SmileyTextObject::SmileyTextObject(const QString &pixmap)
 
 QSizeF SmileyTextObject::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
+    Q_UNUSED(doc)
+    Q_UNUSED(posInDocument)
+    Q_UNUSED(format)
     QSize size = mImage.size();
 
     if (size.height() > 25)
@@ -35,5 +38,8 @@ QSizeF SmileyTextObject::intrinsicSize(QTextDocument *doc, int posInDocument, co
 
 void SmileyTextObject::drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
+    Q_UNUSED(doc)
+    Q_UNUSED(posInDocument)
+    Q_UNUSED(format)
     painter->drawImage(rect, mImage);
 }
