@@ -24,11 +24,8 @@
 #include <QTextEdit>
 #include <QWidget>
 
-#include "messages/messagemodel.hpp"
-#include "QTreeView"
-#include "messages/chatview.hpp"
-
-class MessageDisplayWidget;
+class MessageModel;
+class ChatView;
 class QToolButton;
 
 class ChatPageWidget : public QWidget
@@ -43,7 +40,9 @@ public:
 
 private:
     FriendItemWidget* friendItem;
-    MessageDisplayWidget *display;
+
+    MessageModel *model;
+    ChatView *chatview;
 
     InputTextWidget* input;
     QToolButton *emoticonButton;
@@ -51,11 +50,6 @@ private:
     int friendId;
     QString username;
     Status status;
-
-    MessageModel model;
-    QTreeView *view;
-    ChatView *cv;
-
 
 public slots:
     void messageReceived(const QString& message);
@@ -66,7 +60,6 @@ public slots:
 signals:
     void sendMessage(const QString& message);
     void sendAction(const QString& action);
-
 };
 
 #endif // CHATPAGEWIDGET_HPP

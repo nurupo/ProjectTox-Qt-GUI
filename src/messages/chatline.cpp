@@ -1,3 +1,20 @@
+/*
+    Copyright (C) 2005-2014 by the Quassel Project <devel@quassel-irc.org>
+                  2014 by Martin Kröll <technikschlumpf@web.de>
+
+    This file is part of Tox Qt GUI.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the COPYING file for more details.
+*/
+
 #include "chatline.hpp"
 #include "chatview.hpp"
 #include "chatitem.hpp"
@@ -70,7 +87,7 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         qreal right = rightItem->pos().x() + rightItem->width();
         qreal left  = item((MessageModel::ColumnType)(_selection & 0x03))->pos().x();
         QRectF selectRect(left, 0, right - left, height());
-        painter->fillRect(selectRect, QApplication::palette().background());
+        painter->fillRect(selectRect, QApplication::palette().highlight());
     }
 
     // draw chatitems

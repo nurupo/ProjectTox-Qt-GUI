@@ -1,3 +1,20 @@
+/*
+    Copyright (C) 2005-2014 by the Quassel Project <devel@quassel-irc.org>
+                  2014 by Martin Kröll <technikschlumpf@web.de>
+
+    This file is part of Tox Qt GUI.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the COPYING file for more details.
+*/
+
 #include "messagemodelitem.hpp"
 #include "messagemodel.hpp"
 #include "Settings/settings.hpp"
@@ -100,9 +117,9 @@ QVariant MessageModelItem::senderData(int role) const
         case Message::Quit:
             return "<--";
         case Message::Info:
-            return "*";
+            return "-i-";
         case Message::Error:
-            return "*";
+            return "-!-";
         case Message::DayChange:
             return "---";
         case Message::Invite:
@@ -141,8 +158,9 @@ QVariant MessageModelItem::contentsData(int role) const
         case Message::Quit:
             return tr("%1 has gone.").arg(mMsg.sender());
         case Message::Info:
-        case Message::Error:
             return mMsg.contents();
+        case Message::Error:
+            return tr("Couldn't send the message \"%1\"!").arg(mMsg.contents());
         case Message::DayChange:
             return tr("{Day changed to %1}").arg(mMsg.timestamp().date().toString(Qt::DefaultLocaleLongDate));
         case Message::Invite:
@@ -167,8 +185,9 @@ QBrush MessageModelItem::foreground(Message::Type type) const
     case Message::Join:
     case Message::Quit:
     case Message::Info:
-    case Message::Error:
         return QApplication::palette().text();
+    case Message::Error:
+        return QBrush("#cc0000");
     case Message::DayChange:
         return QBrush("#AD7FA8");
     case Message::Invite:
@@ -187,7 +206,6 @@ bool MessageModelItem::operator==(const MessageModelItem &other) const
 {
     return msgId() == other.msgId();
 }
-
 
 bool MessageModelItem::operator>(const MessageModelItem &other) const
 {
