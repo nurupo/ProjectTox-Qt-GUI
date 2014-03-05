@@ -103,8 +103,6 @@ protected:
     void setWidth(const qreal &width);
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
 
-    virtual QPalette palette();
-
 private:
     ChatLine *_parent;
     QRectF _boundingRect;
@@ -143,7 +141,6 @@ public:
 
 protected:
     virtual void initDocument(QTextDocument *doc);
-    virtual QPalette palette();
 };
 
 // ************************************************************
@@ -159,7 +156,6 @@ public:
 
 protected:
     virtual void initDocument(QTextDocument *doc);
-    virtual QPalette palette();
 };
 
 // ************************************************************

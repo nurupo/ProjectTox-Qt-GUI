@@ -80,13 +80,15 @@ void ChatLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     timestampItem()->paint(painter, option, widget);
 
     // draw seperator line
-    // TODO MKO is this the right place for drawing the line? Maybe it's better to have a "seperatorline" object.
     if(row()-1 >= 0) {
         QModelIndex lastIdx = model_->index(row()-1, 0);
         if ((model_->data(lastIdx, MessageModel::FlagsRole).toInt() & Message::Self) != (model_->data(myIdx, MessageModel::FlagsRole).toInt() & Message::Self)) {
             painter->save();
-            painter->setPen(QApplication::palette().mid().color());
-            painter->drawLine(0, 0, width(), 0);
+            QLinearGradient g(0, 0, width(), 1);
+            g.setColorAt(0  , Qt::transparent);
+            g.setColorAt(0.5, QApplication::palette().mid().color());
+            g.setColorAt(1  , Qt::transparent);
+            painter->fillRect(0, 0, width(), 1, g);
             painter->restore();
         }
     }
@@ -130,19 +132,22 @@ void ChatLine::setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth
     setPos(0, linePos);
 }
 
-void ChatLine::setGeometryByWidth(const qreal &width, const qreal &thirdWidth, qreal &linePos)
+void ChatLine::setGeometryByWidth(const qreal &width, const qreal &secondWidth, const qreal &thirdWidth, qreal &linePos)
 {
     Q_UNUSED(width)
     Q_UNUSED(linePos)
     // linepos is the *bottom* position for the line
-    _timestampItem.setWidth(thirdWidth);
-        /*qreal height = _contentsItem.setGeometryByWidth(contentsWidth);
+        qreal height = _contentsItem.setGeometryByWidth(secondWidth);
         linePos -= height;
         bool needGeometryChange = (height != _height || width != _width);
 
         if (height != _height) {
             _timestampItem.setHeight(height);
             _senderItem.setHeight(height);
+        }
+
+        if (width != _width) {
+            _timestampItem.setWidth(thirdWidth);
         }
 
         if (needGeometryChange) {

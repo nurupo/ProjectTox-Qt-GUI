@@ -60,8 +60,6 @@ QPointF ChatItem::mapFromScene(const QPointF &p) const
     return chatLine()->mapFromScene(p) /* - pos() */;
 }
 
-// NOTE: This is not the most time-efficient implementation, but it saves space by not caching unnecessary data
-//       This is a deliberate trade-off. (-> selectFmt creation, data() call)
 void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option); Q_UNUSED(widget);
@@ -69,7 +67,8 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setClipRect(boundingRect());
 
     QAbstractTextDocumentLayout::PaintContext ctx;
-    ctx.palette = palette();
+    ctx.palette = QApplication::palette();
+    ctx.palette.setBrush(QPalette::Active, QPalette::Text, data(MessageModel::ForegroundRole).value<QBrush>());
     QPalette::ColorGroup cg = chatView()->hasFocus() ? QPalette::Active : QPalette::Inactive;
 
     // Selection
@@ -77,7 +76,6 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     selection.format.setBackground(ctx.palette.brush(cg, QPalette::Highlight));
     selection.format.setForeground(ctx.palette.brush(cg, QPalette::HighlightedText));
     ctx.selections.append(selection);
-
 
     painter->translate(pos());
     document()->documentLayout()->draw(painter, ctx);
@@ -332,21 +330,6 @@ void ChatItem::setWidth(const qreal &width)
     document()->setTextWidth(width);
 }
 
-QPalette ChatItem::palette()
-{
-    QPalette pal = QApplication::palette();
-
-    // Set color by message type
-    if (data(MessageModel::TypeRole).toInt() == Message::Nick)
-        pal.setColor(QPalette::Active, QPalette::Text, QColor("#204A87"));
-    else if (data(MessageModel::TypeRole).toInt() == Message::Action)
-        pal.setColor(QPalette::Active, QPalette::Text, QColor("#4E9A06"));
-    else if (data(MessageModel::TypeRole).toInt() == Message::DayChange)
-        pal.setColor(QPalette::Active, QPalette::Text, QColor("#AD7FA8"));
-
-    return pal;
-}
-
 
 
 // ************************************************************
@@ -377,18 +360,6 @@ void SenderChatItem::initDocument(QTextDocument *doc)
     QTextOption o;
     o.setWrapMode(QTextOption::NoWrap);
     doc->setDefaultTextOption(o);
-}
-
-QPalette SenderChatItem::palette()
-{
-    QPalette pal = ChatItem::palette();
-
-    // Change sender color, if it's our own plain message
-    if((data(MessageModel::TypeRole).toInt() == Message::Plain) && ((data(MessageModel::FlagsRole).toInt() & Message::Self) == true)){
-        pal.setColor(QPalette::Active, QPalette::Text, pal.mid().color());
-    }
-
-    return pal;
 }
 
 // ************************************************************
@@ -693,11 +664,4 @@ void TimestampChatItem::initDocument(QTextDocument *doc)
     QFont f;
     f.setPointSize(f.pointSize()-2);
     doc->setDefaultFont(f);
-}
-
-QPalette TimestampChatItem::palette()
-{
-    QPalette pal = ChatItem::palette();
-    pal.setColor(QPalette::Active, QPalette::Text, pal.mid().color());
-    return pal;
 }

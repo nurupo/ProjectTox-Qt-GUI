@@ -271,8 +271,9 @@ void ChatScene::layout(int start, int end, qreal width)
         int row = end;
         qreal linePos = _lines.at(row)->scenePos().y() + _lines.at(row)->height();
         qreal thirdWidth = width - secondColumnHandle()->sceneRight();
+        qreal secondWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
         while (row >= start) {
-            _lines.at(row--)->setGeometryByWidth(width, thirdWidth, linePos);
+            _lines.at(row--)->setGeometryByWidth(width, secondWidth, thirdWidth, linePos);
         }
 
         if (row >= 0) {

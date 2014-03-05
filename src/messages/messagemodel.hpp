@@ -12,9 +12,10 @@ class MessageModel : public QAbstractItemModel
     Q_OBJECT
 public:
     enum MessageModelRole {
-        DisplayRole = Qt::DisplayRole,
-        EditRole = Qt::EditRole,
-        MessageRole = Qt::UserRole,
+        DisplayRole    = Qt::DisplayRole,
+        EditRole       = Qt::EditRole,
+        MessageRole    = Qt::UserRole,
+        ForegroundRole = Qt::ForegroundRole,
         MsgIdRole,
         TypeRole,
         FlagsRole,

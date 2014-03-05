@@ -36,6 +36,8 @@ private:
     QVariant senderData(int role) const;
     QVariant contentsData(int role) const;
 
+    QBrush foreground(Message::Type type) const;
+
     Message mMsg;
 };
 

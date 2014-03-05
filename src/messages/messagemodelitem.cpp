@@ -2,6 +2,8 @@
 #include "messagemodel.hpp"
 #include "Settings/settings.hpp"
 
+#include <QApplication>
+
 MessageModelItem::MessageModelItem(const Message &msg) :
     mMsg(msg)
 {
@@ -72,12 +74,14 @@ bool MessageModelItem::lessThan(const MessageModelItem *m1, const MessageModelIt
 QVariant MessageModelItem::timestampData(int role) const
 {
     switch (role) {
-        case MessageModel::DisplayRole:
-            return mMsg.timestamp().toLocalTime().toString(Settings::getInstance().getTimestampFormat());
-        case MessageModel::EditRole:
-            return mMsg.timestamp();
-        }
-        return QVariant();
+    case MessageModel::DisplayRole:
+        return mMsg.timestamp().toLocalTime().toString(Settings::getInstance().getTimestampFormat());
+    case MessageModel::EditRole:
+        return mMsg.timestamp();
+    case MessageModel::ForegroundRole:
+        return QVariant::fromValue<QBrush>(QApplication::palette().mid());
+    }
+    return QVariant();
 }
 
 QVariant MessageModelItem::senderData(int role) const
@@ -108,13 +112,20 @@ QVariant MessageModelItem::senderData(int role) const
         }
     case MessageModel::EditRole:
         return mMsg.sender();
+    case MessageModel::ForegroundRole:
+        if((mMsg.type() == Message::Plain) && (mMsg.flags().testFlag(Message::Self)))
+            return QVariant::fromValue<QBrush>(QApplication::palette().mid());
+        else
+            return QVariant::fromValue<QBrush>(foreground(mMsg.type()));
     }
     return QVariant();
 }
 
 QVariant MessageModelItem::contentsData(int role) const
 {
-    if(role == MessageModel::DisplayRole || role == MessageModel::EditRole) {
+    switch (role) {
+    case MessageModel::DisplayRole:
+    case MessageModel::EditRole:
         switch (mMsg.type()) {
         case Message::Plain:
             return mMsg.contents();
@@ -138,8 +149,32 @@ QVariant MessageModelItem::contentsData(int role) const
         default:
             return mMsg.contents();
         }
+    case MessageModel::ForegroundRole:
+        return QVariant::fromValue<QBrush>(foreground(mMsg.type()));
     }
     return QVariant();
+}
+
+QBrush MessageModelItem::foreground(Message::Type type) const
+{
+    switch (type) {
+    case Message::Plain:
+        return QApplication::palette().text();
+    case Message::Action:
+        return QBrush("#4E9A06");
+    case Message::Nick:
+        return QBrush("#204A87");
+    case Message::Join:
+    case Message::Quit:
+    case Message::Info:
+    case Message::Error:
+        return QApplication::palette().text();
+    case Message::DayChange:
+        return QBrush("#AD7FA8");
+    case Message::Invite:
+    default:
+        return QApplication::palette().text();
+    }
 }
 
 bool MessageModelItem::operator<(const MessageModelItem &other) const
