@@ -149,7 +149,7 @@ QVariant MessageModelItem::contentsData(int role) const
         case Message::Action:
             return QString("%1 %2").arg(mMsg.sender(), mMsg.contents());
         case Message::Nick:
-            if (mMsg.contents() == mMsg.sender())
+            if (mMsg.flags().testFlag(Message::Self))
                 return tr("You are now known as %1").arg(mMsg.contents());
             else
                 return tr("%1 is now known as %2").arg(mMsg.sender(), mMsg.contents());

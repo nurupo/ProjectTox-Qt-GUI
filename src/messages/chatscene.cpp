@@ -432,7 +432,7 @@ void ChatScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     QMenu menu;
 
     if (isPosOverSelection(pos)) {
-        menu.addAction(tr("Copy Selection"),
+        menu.addAction(QIcon(":/icons/page_copy.png"),tr("Copy Selection"),
                        this, SLOT(selectionToClipboard()),
                        QKeySequence::Copy);
     }
@@ -441,6 +441,9 @@ void ChatScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     ChatItem *item = chatItemAt(pos);
     if (item)
         item->addActionsToMenu(&menu, item->mapFromScene(pos));
+
+    // Add common Aactions
+    chatView()->addActionsToMenu(&menu, pos);
 
     menu.exec(event->screenPos());
 }

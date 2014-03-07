@@ -22,8 +22,10 @@
 #include <QScrollBar>
 #include <QApplication>
 #include "Settings/settings.hpp"
+#include "messagefilter.hpp"
+#include <QMenu>
 
-ChatView::ChatView(MessageModel *model, QWidget *parent) :
+ChatView::ChatView(MessageFilter *model, QWidget *parent) :
     QGraphicsView(parent)
 {
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -51,6 +53,27 @@ ChatView::ChatView(MessageModel *model, QWidget *parent) :
 
     // Update timstamps
     connect(&Settings::getInstance(), &Settings::timestampFormatChanged, this, &ChatView::clearCache);
+
+    // Actions
+    hidePlain = new QAction(tr("Text messages"), this);
+    hidePlain->setCheckable(true);
+    connect(hidePlain, &QAction::toggled, model, &MessageFilter::filterPlain);
+
+    hideAction = new QAction(tr("Actions"), this);
+    hideAction->setCheckable(true);
+    connect(hideAction, &QAction::toggled, model, &MessageFilter::filterAction);
+
+    hideNick = new QAction(tr("Name changes"), this);
+    hideNick->setCheckable(true);
+    connect(hideNick, &QAction::toggled, model, &MessageFilter::filterNick);
+
+    hideError = new QAction(tr("Errors"), this);
+    hideError->setCheckable(true);
+    connect(hideError, &QAction::toggled, model, &MessageFilter::filterError);
+
+    hideDaychange = new QAction(tr("Day changes"), this);
+    hideDaychange->setCheckable(true);
+    connect(hideDaychange, &QAction::toggled, model, &MessageFilter::filterDaychange);
 }
 
 MsgId ChatView::lastMsgId() const
@@ -120,6 +143,22 @@ ChatLine *ChatView::lastVisibleChatLine(bool ignoreDayChange) const
         return scene()->chatLine(row);
 
     return 0;
+}
+
+void ChatView::addActionsToMenu(QMenu *menu, const QPointF &pos)
+{
+    Q_UNUSED(pos)
+
+    QMenu *filterMenu =  new QMenu(tr("Hide messages"), menu);
+    filterMenu->setIcon(QIcon(":/icons/filter.png"));
+    filterMenu->addAction(hidePlain);
+    filterMenu->addAction(hideAction);
+    filterMenu->addAction(hideNick);
+    filterMenu->addAction(hideError);
+    filterMenu->addAction(hideDaychange);
+
+
+    menu->addMenu(filterMenu);
 }
 
 void ChatView::setHasCache(ChatLine *line, bool hasCache)

@@ -23,6 +23,7 @@
 
 #include "messages/messagemodel.hpp"
 #include "messages/chatview.hpp"
+#include "messages/messagefilter.hpp"
 
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -32,8 +33,11 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     QWidget(parent), friendId(friendId)
 {
     friendItem = new FriendItemWidget(this);
+
     model = new MessageModel(this);
-    chatview = new ChatView(model, this);
+    filterModel = new MessageFilter(this);
+    filterModel->setSourceModel(model);
+    chatview = new ChatView(filterModel, this);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
@@ -81,9 +85,6 @@ void ChatPageWidget::messageReceived(const QString& message)
 
 void ChatPageWidget::setUsername(const QString& newUsername)
 {
-    if(!username.isEmpty() && username != newUsername)
-        model->insertNewMessage(newUsername, username, Message::Nick);
-
     username = newUsername;
     friendItem->setUsername(username);
 }
@@ -117,4 +118,15 @@ void ChatPageWidget::actionReceived(const QString &message)
 void ChatPageWidget::actionSentResult(const QString &message)
 {
     model->insertNewMessage(message, Settings::getInstance().getUsername(), Message::Action, Message::Self);
+}
+
+void ChatPageWidget::onFriendUsernameChanged(const QString &newUsername)
+{
+    model->insertNewMessage(newUsername, username, Message::Nick);
+    setUsername(newUsername);
+}
+
+void ChatPageWidget::onOurUsernameChanged(const QString &newUsername)
+{
+    model->insertNewMessage(newUsername, Settings::getInstance().getUsername(), Message::Nick, Message::Self);
 }

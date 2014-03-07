@@ -25,6 +25,7 @@
 #include <QWidget>
 
 class MessageModel;
+class MessageFilter;
 class ChatView;
 class QToolButton;
 
@@ -42,6 +43,7 @@ private:
     FriendItemWidget* friendItem;
 
     MessageModel *model;
+    MessageFilter *filterModel;
     ChatView *chatview;
 
     InputTextWidget* input;
@@ -56,6 +58,9 @@ public slots:
     void messageSentResult(const QString& message, int messageId);
     void actionReceived(const QString& message);
     void actionSentResult(const QString& message);
+
+    void onFriendUsernameChanged(const QString &newUsername);
+    void onOurUsernameChanged(const QString &newUsername);
 
 signals:
     void sendMessage(const QString& message);

@@ -19,17 +19,19 @@
 #define CHATVIEW_H
 
 #include <QGraphicsView>
+#include <QTimer>
+#include <QMenu>
 #include "id.hpp"
-#include "messagemodel.hpp"
 
 class ChatLine;
 class ChatScene;
+class MessageFilter;
 
 class ChatView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    explicit ChatView(MessageModel *model, QWidget *parent = 0);
+    explicit ChatView(MessageFilter *model, QWidget *parent = 0);
 
     virtual MsgId lastMsgId() const;
     virtual MsgId lastVisibleMsgId() const;
@@ -50,6 +52,8 @@ public:
     /** Using this method more efficient than calling visibleChatLinesSorted() and taking its last element.
      *  \return The last fully visible ChatLine in the view */
     ChatLine *lastVisibleChatLine(bool ignoreDayChange = false) const;
+
+    void addActionsToMenu(QMenu *menu, const QPointF &pos);
 
     //! Tell the view that this ChatLine has cached data
     /** ChatLines cache some layout data that should be cleared as soon as it's no
@@ -89,6 +93,13 @@ private:
     QTimer _scrollTimer;
     int _scrollOffset;
     QSet<ChatLine *> _linesWithCache;
+
+    // Filter actions
+    QAction *hidePlain;
+    QAction *hideNick;
+    QAction *hideAction;
+    QAction *hideDaychange;
+    QAction *hideError;
 };
 
 #endif // CHATVIEW_H
