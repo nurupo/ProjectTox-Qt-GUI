@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Martin Kröll <technikschlumpf@web.de>
+    Copyright (C) 2014 by Martin Kröll <technikschlumpf@web.de>
 
     This file is part of Tox Qt GUI.
 
@@ -14,27 +14,23 @@
     See the COPYING file for more details.
 */
 
-#ifndef MESSAGELABEL_HPP
-#define MESSAGELABEL_HPP
+#ifndef SMILEYTEXTOBJECT_HPP
+#define SMILEYTEXTOBJECT_HPP
 
-#include <QLabel>
+#include <QTextObjectInterface>
 
-class MessageLabel : public QLabel
+class SmileyTextObject : public QObject, public QTextObjectInterface
 {
     Q_OBJECT
+    Q_INTERFACES(QTextObjectInterface)
 public:
-    explicit MessageLabel(QWidget *parent = 0);
+    SmileyTextObject(const QString &pixmap);
 
-    void setMessageId(int id);
-    int messageId() const;
+    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
 
 private:
-    int mId;
-    QAction *copyAction;
-    QAction *copyAllAction;
-
-private slots:
-    void showContextMenu(const QPoint &pos);
+    QImage mImage;
 };
 
-#endif // MESSAGELABEL_HPP
+#endif // SMILEYTEXTOBJECT_HPP

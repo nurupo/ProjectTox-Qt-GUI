@@ -36,5 +36,7 @@
         <file>icons/arrow_redo.png</file>
         <file>icons/arrow_undo.png</file>
         <file>DejaVuSans.ttf</file>
+        <file>icons/world_link.png</file>
+        <file>icons/filter.png</file>
     </qresource>
 </RCC>

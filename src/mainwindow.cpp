@@ -123,7 +123,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
-    connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::usernameChanged);
+    connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::onFriendusernameChanged);
     connect(core, &Core::friendRemoved, friendsWidget, &FriendsWidget::removeFriend);
     connect(core, &Core::friendRemoved, pages, &PagesWidget::removePage);
     connect(core, &Core::failedToRemoveFriend, this, &MainWindow::onFailedToRemoveFriend);
@@ -143,6 +143,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
     connect(core, &Core::usernameSet, ourUserItem, &OurUserItemWidget::setUsername);
+    connect(core, &Core::usernameSet, pages, &PagesWidget::onOurUsernameChanged);
 
     connect(ourUserItem, &OurUserItemWidget::statusMessageChanged, core, &Core::setStatusMessage);
     connect(core, &Core::statusMessageSet, ourUserItem, &OurUserItemWidget::setStatusMessage);

@@ -62,9 +62,19 @@ void PagesWidget::removePage(int friendId)
     qDebug() << "page" << friendId << "removed" << count();
 }
 
-void PagesWidget::usernameChanged(int friendId, const QString& username)
+void PagesWidget::onFriendusernameChanged(int friendId, const QString& username)
 {
-    widget(friendId)->setUsername(username);
+    widget(friendId)->onFriendUsernameChanged(username);
+}
+
+void PagesWidget::onOurUsernameChanged(const QString &username)
+{
+    for (int i = 0; i < count(); i++) {
+        ChatPageWidget* chatPage = dynamic_cast<ChatPageWidget*>(QStackedWidget::widget(i));
+        if (chatPage != nullptr) {
+            chatPage->onOurUsernameChanged(username);
+        }
+    }
 }
 
 void PagesWidget::statusChanged(int friendId, Status status)

@@ -39,7 +39,8 @@ public slots:
     void removePage(int friendId);
     void activatePage(int friendId);
     void statusChanged(int friendId, Status status);
-    void usernameChanged(int friendId, const QString& username);
+    void onFriendusernameChanged(int friendId, const QString& username);
+    void onOurUsernameChanged(const QString& username);
     void statusMessageChanged(int friendId, const QString& statusMessage);
     void messageReceived(int friendId, const QString& message);
     void actionReceived(int friendId, const QString& message);
