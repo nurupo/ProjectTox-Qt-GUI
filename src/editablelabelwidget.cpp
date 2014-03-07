@@ -44,7 +44,7 @@ bool ClickableCopyableElideLabel::event(QEvent* event)
 }
 
 EditableLabelWidget::EditableLabelWidget(QWidget* parent) :
-    QStackedWidget(parent)
+    QStackedWidget(parent), isSubmitting(false)
 {
     label = new ClickableCopyableElideLabel(this);
 
@@ -71,8 +71,14 @@ void EditableLabelWidget::setText(const QString& text)
 
 void EditableLabelWidget::onLabelChangeSubmited()
 {
+    if (isSubmitting) {
+        return;
+    }
+    isSubmitting = true;
+
     QString oldText = label->text();
     QString newText = lineEdit->text();
+    // `lineEdit->clearFocus()` triggers `onLabelChangeSubmited()`, we use `isSubmitting` as a workaround
     lineEdit->clearFocus();
     setCurrentWidget(label);
 
@@ -80,6 +86,8 @@ void EditableLabelWidget::onLabelChangeSubmited()
         label->setText(newText);
         emit textChanged(newText, oldText);
     }
+
+    isSubmitting = false;
 }
 
 void EditableLabelWidget::onLabelChangeCancelled()

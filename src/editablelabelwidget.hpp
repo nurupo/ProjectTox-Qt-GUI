@@ -50,6 +50,7 @@ public:
 
 private:
     static const int LINE_SPACING_OFFSET = 2;
+    bool isSubmitting;
 
 private slots:
     void onLabelChangeSubmited();
