@@ -275,11 +275,26 @@ void ChatScene::updateForViewport(qreal width, qreal height)
     setWidth(width);
 }
 
+// Move second column handle while changing scene width
 void ChatScene::setWidth(qreal width)
 {
     if (width == _sceneRect.width())
         return;
-    layout(0, _lines.count()-1, width);
+
+    qreal newSecondHandlePos = secondColumnHandle()->x() + (width - _sceneRect.width());
+
+    if(newSecondHandlePos < width) {
+        if (newSecondHandlePos < secondColumnHandle()->xMin())
+            newSecondHandlePos = secondColumnHandle()->xMin();
+
+        secondColumnHandle()->setXPos(newSecondHandlePos);
+        secondHandlePositionChanged(secondColumnHandle()->x(), width);
+    }
+
+    updateSceneRect(width);
+    setHandleXLimits();
+    setMarkerLine();
+    emit layoutChanged();
 }
 
 void ChatScene::layout(int start, int end, qreal width)
@@ -796,6 +811,16 @@ void ChatScene::secondHandlePositionChanged(qreal xpos)
     if (_secondColHandlePos == xpos)
         return;
 
+    secondHandlePositionChanged(xpos, _sceneRect.width());
+
+    updateSceneRect();
+    setHandleXLimits();
+    emit layoutChanged();
+}
+
+// Extracted the core of secondHandlePositionChanged(qreal xpos) because of it's needed for scene resizing, too. But with a changed scene width.
+void ChatScene::secondHandlePositionChanged(qreal xpos, qreal sceneWidth)
+{
     _secondColHandlePos = xpos;
 
     // Save handle positions
@@ -812,17 +837,13 @@ void ChatScene::secondHandlePositionChanged(qreal xpos)
     QList<ChatLine *>::iterator lineIterBegin = _lines.begin();
     qreal linePos = _sceneRect.y() + _sceneRect.height();
     qreal secondColumnWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
-    qreal thirdColumnWidth = _sceneRect.width() - secondColumnHandle()->sceneRight();
+    qreal thirdColumnWidth = sceneWidth - secondColumnHandle()->sceneRight();
     QPointF thirdColumnPos(secondColumnHandle()->sceneRight(), 0);
     while (lineIter != lineIterBegin) {
         lineIter--;
         (*lineIter)->setSecondColumn(secondColumnWidth, thirdColumnWidth, thirdColumnPos, linePos);
     }
     //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
-
-    updateSceneRect();
-    setHandleXLimits();
-    emit layoutChanged();
 }
 
 void ChatScene::rowsRemoved()

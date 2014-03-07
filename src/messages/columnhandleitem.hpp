@@ -41,6 +41,8 @@ public:
 
     void setXPos(qreal xpos);
     void setXLimits(qreal min, qreal max);
+    inline qreal xMin() { return _minXPos; }
+    inline qreal xMax() { return _maxXPos; }
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 

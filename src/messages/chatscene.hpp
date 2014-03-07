@@ -132,6 +132,7 @@ protected slots:
 private slots:
     void firstHandlePositionChanged(qreal xpos);
     void secondHandlePositionChanged(qreal xpos);
+    void secondHandlePositionChanged(qreal xpos, qreal sceneWidth);
 
     void rowsRemoved();
     void clickTimeout();
