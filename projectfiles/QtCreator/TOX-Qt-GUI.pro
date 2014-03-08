@@ -28,7 +28,7 @@ defineTest(minQtVersion) {
     error("Cannot build with Qt version $${QT_VERSION}, this project requires at least Qt 5.2.0")
 }
 
-QT       += core gui widgets
+QT       += core gui widgets multimedia
 
 TARGET = TOX-Qt-GUI
 TEMPLATE = app
@@ -92,7 +92,9 @@ SOURCES += \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
-    ../../src/copyableelidelabel.cpp
+    ../../src/copyableelidelabel.cpp \
+    ../../src/soundmanager.cpp \
+    ../../src/Settings/soundsettingspage.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -135,7 +137,9 @@ HEADERS  += \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
-    ../../src/copyableelidelabel.hpp
+    ../../src/copyableelidelabel.hpp \
+    ../../src/soundmanager.hpp \
+    ../../src/Settings/soundsettingspage.hpp
 
 ### ToxCore section. Please keep it alphabetical ###
 

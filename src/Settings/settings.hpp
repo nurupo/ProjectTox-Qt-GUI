@@ -20,6 +20,7 @@
 #include <QHash>
 #include <QMainWindow>
 #include <QSplitter>
+#include "soundmanager.hpp"
 
 class Settings : public QObject
 {
@@ -90,6 +91,41 @@ public:
     int getEmojiFontPointSize() const;
     void setEmojiFontPointSize(int value);
 
+    bool isSoundEnabled() const;
+    void setSoundEnabled(bool value);
+
+    QString getsoundPackDirName() const;
+    void setsoundPackDirName(const QString &value);
+
+    bool isPlayOnError() const;
+    void setPlayOnError(bool value);
+
+    bool isPlayOnLogInOut() const;
+    void setPlayOnLogInOut(bool value);
+
+    bool isPlayOnFriendLogsInOut() const;
+    void setPlayOnFriendLogsInOut(bool value);
+
+    bool isPlayOnFriendRequestAccepted() const;
+    void setPlayOnFriendRequestAccepted(bool value);
+
+    bool isPlayOnIncommingCall() const;
+    void setPlayOnIncommingCall(bool value);
+
+    bool isPlayOnOutgoingCall() const;
+    void setPlayOnOutgoingCall(bool value);
+
+    bool isPlayOnNewMessage() const;
+    void setPlayOnNewMessage(bool value);
+
+    bool isPlayOnFiletransferComplete() const;
+    void setPlayOnFiletransferComplete(bool value);
+
+    bool isPlayOnFiletransferPending() const;
+    void setPlayOnFiletransferPending(bool value);
+
+    bool isPlayOn(const Sound &sound);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -121,12 +157,26 @@ private:
     QString emojiFontFamily;
     int     emojiFontPointSize;
 
+    // Sound
+    bool    soundEnabled;
+    QString soundPackDirName;
+    bool playOnError;
+    bool playOnLogInOut;
+    bool playOnFriendLogsInOut;
+    bool playOnFriendRequestAccepted;
+    bool playOnIncommingCall;
+    bool playOnOutgoingCall;
+    bool playOnNewMessage;
+    bool playOnFiletransferComplete;
+    bool playOnFiletransferPending;
+
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
     void smileyPackChanged();
     void emojiFontChanged();
+    void soundPackChanged(const QString &pack);
 };
 
 #endif // SETTINGS_HPP

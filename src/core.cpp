@@ -172,7 +172,11 @@ void Core::setStatus(Status status)
             userstatus = TOX_USERSTATUS_INVALID;
             break;
     }
-    tox_set_user_status(tox, userstatus);
+
+    if (tox_set_user_status(tox, userstatus) == -1)
+        emit failedToSetUserStatus(status);
+    else
+        emit userStatusSet(status);
 }
 
 void Core::bootstrapDht()

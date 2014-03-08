@@ -17,6 +17,7 @@
 #include "friendproxymodel.hpp"
 #include "friendswidget.hpp"
 #include "frienditemdelegate.hpp"
+#include "soundmanager.hpp"
 
 #include <QAction>
 #include <QClipboard>
@@ -94,6 +95,12 @@ void FriendsWidget::setStatus(int friendId, Status status)
     if (friendItem == nullptr) {
         return;
     }
+
+    Status oldStatus = friendItem->data(FriendItemDelegate::StatusRole).value<Status>();
+    if (oldStatus == Status::Offline && status == Status::Online)
+        SoundManager::getInstance().playSingleSound(Sound::FriendLogsIn);
+    else if(status == Status::Offline)
+        SoundManager::getInstance().playSingleSound(Sound::FriendLogsOut);
 
     setStatus(friendItem, status);
 }
