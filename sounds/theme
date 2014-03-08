@@ -1,0 +1,20 @@
+[header]
+name = Default
+author = Adam Reid
+decription = default sound pack fot tox
+license = Creative Commons Attribution 3.0 Unported
+
+[sounds]
+error = Error.wav
+friendLogsIn = Contact Logs In.wav
+friendLogsOut = Contact Logs Out.wav
+friendRequestAccepted = Contact Request Accepted.wav
+incommingCall = Incoming Call.wav
+incommingVideoCall = Incoming Video Call.wav
+logIn = Log In.wav
+logOut = Log Out.wav
+newMessage = New Message.wav
+outgoingCall = Outgoing Call.wav
+outgoingVideoCall = Outgoing Video Call.wav
+filetransferComplete = Transfer Complete.wav
+filetransferPending = Transfer Pending.wav
