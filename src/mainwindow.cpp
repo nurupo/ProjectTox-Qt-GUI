@@ -23,6 +23,7 @@
 #include "friendrequestdialog.hpp"
 #include "pageswidget.hpp"
 #include "Settings/settings.hpp"
+#include "soundmanager.hpp"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -162,6 +163,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     Settings::getInstance().restoreGeometryState(splitterWidget);
     Settings::getInstance().restoreGeometryState(this);
+
+    connect(&Settings::getInstance(), &Settings::soundPackChanged, &SoundManager::getInstance(), &SoundManager::setSoundPack);
 }
 
 MainWindow::~MainWindow()

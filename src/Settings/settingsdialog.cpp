@@ -18,6 +18,7 @@
 #include "loggingsettingspage.hpp"
 #include "settingsdialog.hpp"
 #include "guisettingspage.hpp"
+#include "soundsettingspage.hpp"
 
 SettingsDialog::SettingsDialog(QWidget* parent) :
     BasicSettingsDialog(parent)
@@ -28,6 +29,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     //NOTE: make use of when logging will be implemented
     //addPage(":/icons/database.png", "Logging", new LoggingSettingsPage(this));
     addPage(":/icons/application_side_list.png", tr("GUI"), new GuiSettingsPage(this));
+    addPage(":/icons/sound.png", tr("Sound"), new SoundSettingsPage(this));
 
     listWidget->setCurrentRow(0);
     listWidget->setMinimumWidth(130);

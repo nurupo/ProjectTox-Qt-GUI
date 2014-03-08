@@ -149,6 +149,7 @@ signals:
 
     void usernameSet(const QString& username);
     void statusMessageSet(const QString& message);
+    void userStatusSet(const Status &status);
 
     void messageSentResult(int friendId, const QString& message, int messageId);
     void actionSentResult(int friendId, const QString& action, int success);
@@ -157,6 +158,7 @@ signals:
     void failedToRemoveFriend(int friendId);
     void failedToSetUsername(const QString& username);
     void failedToSetStatusMessage(const QString& message);
+    void failedToSetUserStatus(const Status &status);
 
     void actionReceived(int friendId, const QString& acionMessage);
 

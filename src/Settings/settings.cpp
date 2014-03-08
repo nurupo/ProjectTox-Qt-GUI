@@ -100,8 +100,122 @@ void Settings::load()
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
     s.endGroup();
 
+    s.beginGroup("Sound");
+        soundEnabled = s.value("enabled", true).toBool();
+        soundPackDirName = s.value("soundPackDirName", "tox").toString();
+        playOnError = s.value("playOnError", true).toBool();
+        playOnLogInOut = s.value("playOnLogInOut", true).toBool();
+        playOnFriendLogsInOut = s.value("playOnFriendLogsInOut", true).toBool();
+        playOnFriendRequestAccepted = s.value("playOnFriendRequestAccepted", true).toBool();
+        playOnIncommingCall = s.value("playOnIncommingCall", true).toBool();
+        playOnOutgoingCall = s.value("playOnOutgoingCall", true).toBool();
+        playOnNewMessage = s.value("playOnNewMessage", true).toBool();
+        playOnFiletransferComplete = s.value("playOnFiletransferComplete", true).toBool();
+        playOnFiletransferPending = s.value("playOnFiletransferPending", true).toBool();
+    s.endGroup();
+
     loaded = true;
 }
+bool Settings::isPlayOnFiletransferPending() const
+{
+    return playOnFiletransferPending;
+}
+
+void Settings::setPlayOnFiletransferPending(bool value)
+{
+    playOnFiletransferPending = value;
+}
+
+bool Settings::isPlayOn(const Sound &sound)
+{
+    switch (sound) {
+    case Sound::Error:                return playOnError;
+    case Sound::FriendLogsIn:
+    case Sound::FriendLogsOut:        return playOnFriendLogsInOut;
+    case Sound::FriendRequestAccepted:return playOnFriendRequestAccepted;
+    case Sound::IncommingCall:
+    case Sound::IncommingVideoCall:   return playOnIncommingCall;
+    case Sound::LogIn:
+    case Sound::LogOut:               return playOnLogInOut;
+    case Sound::NewMessage:           return playOnNewMessage;
+    case Sound::OutgoingCall:
+    case Sound::OutgoingVideoCall:    return playOnOutgoingCall;
+    case Sound::FiletransferComplete: return playOnFiletransferComplete;
+    case Sound::FiletransferPending:  return playOnFiletransferPending;
+    }
+    return false;
+}
+
+bool Settings::isPlayOnFiletransferComplete() const
+{
+    return playOnFiletransferComplete;
+}
+
+void Settings::setPlayOnFiletransferComplete(bool value)
+{
+    playOnFiletransferComplete = value;
+}
+
+bool Settings::isPlayOnNewMessage() const
+{
+    return playOnNewMessage;
+}
+
+void Settings::setPlayOnNewMessage(bool value)
+{
+    playOnNewMessage = value;
+}
+
+bool Settings::isPlayOnOutgoingCall() const
+{
+    return playOnOutgoingCall;
+}
+
+void Settings::setPlayOnOutgoingCall(bool value)
+{
+    playOnOutgoingCall = value;
+}
+
+bool Settings::isPlayOnIncommingCall() const
+{
+    return playOnIncommingCall;
+}
+
+void Settings::setPlayOnIncommingCall(bool value)
+{
+    playOnIncommingCall = value;
+}
+
+bool Settings::isPlayOnFriendRequestAccepted() const
+{
+    return playOnFriendRequestAccepted;
+}
+
+void Settings::setPlayOnFriendRequestAccepted(bool value)
+{
+    playOnFriendRequestAccepted = value;
+}
+
+bool Settings::isPlayOnFriendLogsInOut() const
+{
+    return playOnFriendLogsInOut;
+}
+
+void Settings::setPlayOnFriendLogsInOut(bool value)
+{
+    playOnFriendLogsInOut = value;
+}
+
+bool Settings::isPlayOnLogInOut() const
+{
+    return playOnLogInOut;
+}
+
+void Settings::setPlayOnLogInOut(bool value)
+{
+    playOnLogInOut = value;
+}
+
 
 void Settings::save()
 {
@@ -149,6 +263,20 @@ void Settings::save()
         s.setValue("customEmojiFont", customEmojiFont);
         s.setValue("emojiFontFamily", emojiFontFamily);
         s.setValue("emojiFontPointSize", emojiFontPointSize);
+    s.endGroup();
+
+    s.beginGroup("Sound");
+        s.setValue("enabled", soundEnabled);
+        s.setValue("soundPackDirName", soundPackDirName);
+        s.setValue("playOnError", playOnError);
+        s.setValue("playOnLogInOut", playOnLogInOut);
+        s.setValue("playOnFriendLogsInOut", playOnFriendLogsInOut);
+        s.setValue("playOnFriendRequestAccepted", playOnFriendRequestAccepted);
+        s.setValue("playOnIncommingCall", playOnIncommingCall);
+        s.setValue("playOnOutgoingCall", playOnOutgoingCall);
+        s.setValue("playOnNewMessage", playOnNewMessage);
+        s.setValue("playOnFiletransferComplete", playOnFiletransferComplete);
+        s.setValue("playOnFiletransferPending", playOnFiletransferPending);
     s.endGroup();
 }
 
@@ -263,6 +391,37 @@ void Settings::setEmojiFontPointSize(int value)
 {
     emojiFontPointSize = value;
     emit emojiFontChanged();
+}
+
+bool Settings::isSoundEnabled() const
+{
+    return soundEnabled;
+}
+
+void Settings::setSoundEnabled(bool value)
+{
+    soundEnabled = value;
+}
+
+QString Settings::getsoundPackDirName() const
+{
+    return soundPackDirName;
+}
+
+void Settings::setsoundPackDirName(const QString &value)
+{
+    soundPackDirName = value;
+    emit soundPackChanged(value);
+}
+
+bool Settings::isPlayOnError() const
+{
+    return playOnError;
+}
+
+void Settings::setPlayOnError(bool value)
+{
+    playOnError = value;
 }
 
 QString Settings::getEmojiFontFamily() const

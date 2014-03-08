@@ -16,6 +16,7 @@
 
 #include "chatpagewidget.hpp"
 #include "pageswidget.hpp"
+#include "soundmanager.hpp"
 
 #include <QDebug>
 
@@ -92,6 +93,7 @@ void PagesWidget::onActionToSend(const QString &action)
 void PagesWidget::messageReceived(int friendId, const QString &message)
 {
     widget(friendId)->messageReceived(message);
+    SoundManager::getInstance().playSingleSound(Sound::NewMessage);
 }
 
 void PagesWidget::actionReceived(int friendId, const QString &message)
