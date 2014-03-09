@@ -42,6 +42,9 @@ private:
     static void onAction(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
 
     void checkConnection();
+    void loadConfiguration();
+    void saveConfiguration();
+    void loadFriends();
 
     Tox* tox;
     QTimer* timer;
