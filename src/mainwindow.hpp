@@ -60,6 +60,7 @@ private slots:
     void onAboutAppActionTriggered();
     void onQuitApplicationTriggered();
     void onShowHideWindow();
+    void onTrayIconClick(QSystemTrayIcon::ActivationReason reason);
 
 signals:
     void friendRequestAccepted(const QString& userId);

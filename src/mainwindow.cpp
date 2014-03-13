@@ -180,6 +180,7 @@ MainWindow::MainWindow(QWidget* parent)
     trayMenu->addSeparator();
     trayMenu->addAction(tr("Quit"),this,SLOT(onQuitApplicationTriggered()),QKeySequence::Quit);
     trayIcon->setContextMenu(trayMenu);
+    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(onTrayIconClick(QSystemTrayIcon::ActivationReason)));
     trayIcon->show();
 }
 
@@ -282,4 +283,10 @@ void MainWindow::onShowHideWindow()
         this->hide();
     else
         this->show();
+}
+void MainWindow::onTrayIconClick(QSystemTrayIcon::ActivationReason reason)
+{
+    if(reason == QSystemTrayIcon::Trigger)
+        if(!this->isVisible())
+            this->show();
 }
