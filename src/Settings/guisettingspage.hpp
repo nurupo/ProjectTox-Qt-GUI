@@ -42,12 +42,14 @@ private slots:
 private:
     QGroupBox* buildAnimationGroup();
     QGroupBox* buildSmileypackGroup();
+    QGroupBox* buildOthersGroup();
 
     void searchSmileyPacks();
 
 
     EmojiFontSettingsDialog *emojiSettings;
     QCheckBox* enableAnimationCheckbox;
+    QCheckBox* minimizeToTrayCheckbox;
 
     QComboBox* smileypackCombobox;
     QToolButton *emojiButton;

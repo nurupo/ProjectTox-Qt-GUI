@@ -98,6 +98,7 @@ void Settings::load()
         customEmojiFont = s.value("customEmojiFont", true).toBool();
         emojiFontFamily = s.value("emojiFontFamily", "DejaVu Sans").toString();
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
+        minimizeOnClose = s.value("minimizeOnClose",true).toBool();
     s.endGroup();
 
     loaded = true;
@@ -149,6 +150,7 @@ void Settings::save()
         s.setValue("customEmojiFont", customEmojiFont);
         s.setValue("emojiFontFamily", emojiFontFamily);
         s.setValue("emojiFontPointSize", emojiFontPointSize);
+        s.setValue("minimizeOnClose", minimizeOnClose);
     s.endGroup();
 }
 
@@ -274,4 +276,14 @@ void Settings::setEmojiFontFamily(const QString &value)
 {
     emojiFontFamily = value;
     emit emojiFontChanged();
+}
+
+bool Settings::isMinimizeOnCloseEnabled() const
+{
+    return minimizeOnClose;
+}
+
+void Settings::setMinimizeOnClose(bool newValue)
+{
+    minimizeOnClose = newValue;
 }
