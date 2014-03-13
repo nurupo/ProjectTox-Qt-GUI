@@ -48,7 +48,6 @@ private:
     QSplitter* splitterWidget;
     QSystemTrayIcon* trayIcon;
 
-
 private slots:
     void onAddFriendButtonClicked();
     void onConnected();

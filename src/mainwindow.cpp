@@ -33,7 +33,7 @@
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QToolButton>
-#include <QDebug>
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
