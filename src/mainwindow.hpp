@@ -47,6 +47,9 @@ private:
     OurUserItemWidget* ourUserItem;
     QSplitter* splitterWidget;
     QSystemTrayIcon* trayIcon;
+    QAction* settingsAction;
+    QAction* trayMenuShowHideAction;
+    QList<QAction*> trayMenuStatusActions;
 
 private slots:
     void onAddFriendButtonClicked();
@@ -62,6 +65,7 @@ private slots:
     void onTrayMenuQuitApplicationActionTriggered();
     void onShowHideWindow();
     void onTrayIconClick(QSystemTrayIcon::ActivationReason reason);
+    void onStatusSet(Status status);
 
 signals:
     void friendRequestAccepted(const QString& userId);

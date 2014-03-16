@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget* parent)
     menuButton->setToolTip(tr("Menu"));
     menuButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *menu = new QMenu(menuButton);
-    menu->addAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this, SLOT(onSettingsActionTriggered()));
+    settingsAction = menu->addAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this, SLOT(onSettingsActionTriggered()));
     menu->addSeparator();
     menu->addAction(tr("About %1").arg(AppInfo::name), this, SLOT(onAboutAppActionTriggered()));
     menu->addAction(tr("About Qt"), qApp, SLOT(aboutQt()));
@@ -136,6 +136,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
 
     connect(this, &MainWindow::statusSet, core, &Core::setStatus);
+    connect(core, &Core::statusSet, this, &MainWindow::onStatusSet);
 
     coreThread->start(/*QThread::IdlePriority*/);
 
@@ -166,20 +167,20 @@ MainWindow::MainWindow(QWidget* parent)
     Settings::getInstance().restoreGeometryState(splitterWidget);
     Settings::getInstance().restoreGeometryState(this);
 
-    trayIcon = new QSystemTrayIcon(QIcon(":/icons/icon64.png"),this);
+    trayIcon = new QSystemTrayIcon(QIcon(":/icons/icon64.png"), this);
     QMenu* trayMenu = new QMenu(this);
-
-    trayMenu->addAction(tr("Show/Hide"), this, SLOT(onShowHideWindow()));
+    trayMenuShowHideAction = trayMenu->addAction(tr("Hide"), this, SLOT(onShowHideWindow()));
     trayMenu->addSeparator();
-    QList<QAction*> statusActions;
     for (int i = 0; i <= StatusHelper::MAX_STATUS; i ++) {
         StatusHelper::Info statusInfo = StatusHelper::getInfo(i);
         QAction* statusAction = new QAction(QIcon(statusInfo.iconPath), statusInfo.name, trayMenu);
         statusAction->setData(i);
         connect(statusAction, &QAction::triggered, this, &MainWindow::onTrayMenuStatusActionTriggered);
-        statusActions << statusAction;
+        trayMenuStatusActions << statusAction;
     }
-    trayMenu->addActions(QList<QAction*>() << statusActions);
+    trayMenu->addActions(QList<QAction*>() << trayMenuStatusActions);
+    trayMenu->addSeparator();
+    trayMenu->addActions(QList<QAction*>() << settingsAction);
     trayMenu->addSeparator();
     trayMenu->addAction(tr("Quit"), this, SLOT(onTrayMenuQuitApplicationActionTriggered()), QKeySequence::Quit);
     trayIcon->setContextMenu(trayMenu);
@@ -282,9 +283,11 @@ void MainWindow::onShowHideWindow()
 {
     if (isVisible()) {
         hide();
+        trayMenuShowHideAction->setText(tr("Show"));
     } else {
         show();
         setFocus();
+        trayMenuShowHideAction->setText(tr("Hide"));
     }
 }
 
@@ -305,5 +308,17 @@ void MainWindow::onTrayIconClick(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger) {
         onShowHideWindow();
+    }
+}
+
+void MainWindow::onStatusSet(Status status)
+{
+    int statusValue = static_cast<int>(status);
+    for (int i = 0; i <= StatusHelper::MAX_STATUS; i ++) {
+        if (trayMenuStatusActions[i]->data().toInt() == statusValue) {
+            trayMenuStatusActions[i]->setEnabled(false);
+        } else if (!trayMenuStatusActions[i]->isEnabled()) {
+            trayMenuStatusActions[i]->setEnabled(true);
+        }
     }
 }
