@@ -58,13 +58,15 @@ private slots:
     void onFailedToStartCore();
     void onSettingsActionTriggered();
     void onAboutAppActionTriggered();
-    void onQuitApplicationTriggered();
+    void onTrayMenuStatusActionTriggered();
+    void onTrayMenuQuitApplicationActionTriggered();
     void onShowHideWindow();
     void onTrayIconClick(QSystemTrayIcon::ActivationReason reason);
 
 signals:
     void friendRequestAccepted(const QString& userId);
     void friendRequested(const QString& friendAddress, const QString& message);
+    void statusSet(Status status);
 
 };
 

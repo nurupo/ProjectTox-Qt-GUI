@@ -98,7 +98,7 @@ void Settings::load()
         customEmojiFont = s.value("customEmojiFont", true).toBool();
         emojiFontFamily = s.value("emojiFontFamily", "DejaVu Sans").toString();
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
-        minimizeOnClose = s.value("minimizeOnClose",true).toBool();
+        minimizeOnClose = s.value("minimizeOnClose", true).toBool();
     s.endGroup();
 
     loaded = true;

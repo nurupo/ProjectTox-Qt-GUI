@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget* parent)
     menu->addAction(tr("About %1").arg(AppInfo::name), this, SLOT(onAboutAppActionTriggered()));
     menu->addAction(tr("About Qt"), qApp, SLOT(aboutQt()));
     menu->addSeparator();
-    menu->addAction(tr("Quit"), this, SLOT(onQuitApplicationTriggered()), QKeySequence::Quit);
+    menu->addAction(tr("Quit"), this, SLOT(onTrayMenuQuitApplicationActionTriggered()), QKeySequence::Quit);
     menuButton->setMenu(menu);
 
     toolBar->addWidget(addFriendButton);
@@ -135,6 +135,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
 
+    connect(this, &MainWindow::statusSet, core, &Core::setStatus);
+
     coreThread->start(/*QThread::IdlePriority*/);
 
     connect(this, &MainWindow::friendRequested, core, &Core::requestFriendship);
@@ -148,6 +150,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::statusMessageSet, ourUserItem, &OurUserItemWidget::setStatusMessage);
 
     connect(ourUserItem, &OurUserItemWidget::statusSelected, core, &Core::setStatus);
+    connect(core, &Core::statusSet, ourUserItem, &OurUserItemWidget::setStatus);
 
     connect(pages, &PagesWidget::sendMessage, core, &Core::sendMessage);
     connect(pages, &PagesWidget::sendAction,  core, &Core::sendAction);
@@ -166,21 +169,21 @@ MainWindow::MainWindow(QWidget* parent)
     trayIcon = new QSystemTrayIcon(QIcon(":/icons/icon64.png"),this);
     QMenu* trayMenu = new QMenu(this);
 
-    trayMenu->addAction(tr("Show/Hide"),this,SLOT(onShowHideWindow()));
+    trayMenu->addAction(tr("Show/Hide"), this, SLOT(onShowHideWindow()));
     trayMenu->addSeparator();
     QList<QAction*> statusActions;
     for (int i = 0; i <= StatusHelper::MAX_STATUS; i ++) {
         StatusHelper::Info statusInfo = StatusHelper::getInfo(i);
         QAction* statusAction = new QAction(QIcon(statusInfo.iconPath), statusInfo.name, trayMenu);
         statusAction->setData(i);
-        connect(statusAction,SIGNAL(triggered()), ourUserItem, SLOT(onStatusActionTriggered()));
+        connect(statusAction, &QAction::triggered, this, &MainWindow::onTrayMenuStatusActionTriggered);
         statusActions << statusAction;
     }
     trayMenu->addActions(QList<QAction*>() << statusActions);
     trayMenu->addSeparator();
-    trayMenu->addAction(tr("Quit"),this,SLOT(onQuitApplicationTriggered()),QKeySequence::Quit);
+    trayMenu->addAction(tr("Quit"), this, SLOT(onTrayMenuQuitApplicationActionTriggered()), QKeySequence::Quit);
     trayIcon->setContextMenu(trayMenu);
-    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(onTrayIconClick(QSystemTrayIcon::ActivationReason)));
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onTrayIconClick);
     trayIcon->show();
 }
 
@@ -194,13 +197,10 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     bool minimize = Settings::getInstance().isMinimizeOnCloseEnabled();
-    if(this->isVisible() && minimize)
-    {
-        this->hide();
+    if (isVisible() && minimize) {
+        hide();
         event->ignore();
-    }
-    else
-    {
+    } else {
         Settings::getInstance().saveGeometryState(this);
         Settings::getInstance().saveGeometryState(splitterWidget);
         QMainWindow::closeEvent(event);
@@ -228,12 +228,12 @@ void MainWindow::onAddFriendButtonClicked()
 
 void MainWindow::onConnected()
 {
-    ourUserItem->setStatus(Status::Online);
+    emit statusSet(Status::Online);
 }
 
 void MainWindow::onDisconnected()
 {
-    ourUserItem->setStatus(Status::Offline);
+    emit statusSet(Status::Offline);
 }
 
 void MainWindow::onFailedToRemoveFriend(int friendId)
@@ -272,7 +272,7 @@ void MainWindow::onAboutAppActionTriggered()
     dialog.exec();
 }
 
-void MainWindow::onQuitApplicationTriggered()
+void MainWindow::onTrayMenuQuitApplicationActionTriggered()
 {
     CloseApplicationDialog dialog(this);
     dialog.exec();
@@ -280,14 +280,30 @@ void MainWindow::onQuitApplicationTriggered()
 
 void MainWindow::onShowHideWindow()
 {
-    if(this->isVisible())
-        this->hide();
-    else
-        this->show();
+    if (isVisible()) {
+        hide();
+    } else {
+        show();
+        setFocus();
+    }
 }
+
+void MainWindow::onTrayMenuStatusActionTriggered()
+{
+    QAction* statusAction = static_cast<QAction*>(sender());
+    Status selectedStatus = static_cast<Status>(statusAction->data().toInt());
+
+    if (selectedStatus == Status::Offline) {
+        CloseApplicationDialog dialog(this);
+        dialog.exec();
+    } else {
+        emit statusSet(selectedStatus);
+    }
+}
+
 void MainWindow::onTrayIconClick(QSystemTrayIcon::ActivationReason reason)
 {
-    if(reason == QSystemTrayIcon::Trigger)
-        if(!this->isVisible())
-            this->show();
+    if (reason == QSystemTrayIcon::Trigger) {
+        onShowHideWindow();
+    }
 }
