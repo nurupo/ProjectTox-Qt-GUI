@@ -27,6 +27,7 @@
 #include <QTextBrowser>
 #include <QThread>
 #include <QSplitter>
+#include <QSystemTrayIcon>
 
 class MainWindow : public QMainWindow
 {
@@ -45,6 +46,7 @@ private:
     FriendsWidget* friendsWidget;
     OurUserItemWidget* ourUserItem;
     QSplitter* splitterWidget;
+    QSystemTrayIcon* trayIcon;
 
 private slots:
     void onAddFriendButtonClicked();
@@ -57,6 +59,8 @@ private slots:
     void onSettingsActionTriggered();
     void onAboutAppActionTriggered();
     void onQuitApplicationTriggered();
+    void onShowHideWindow();
+    void onTrayIconClick(QSystemTrayIcon::ActivationReason reason);
 
 signals:
     void friendRequestAccepted(const QString& userId);

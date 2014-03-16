@@ -46,6 +46,7 @@ void GuiSettingsPage::buildGui()
 
     layout->addWidget(buildAnimationGroup());
     layout->addWidget(buildSmileypackGroup());
+    layout->addWidget(buildOthersGroup());
     layout->addStretch(0);
 }
 
@@ -53,6 +54,7 @@ void GuiSettingsPage::setGui()
 {
     const Settings& settings = Settings::getInstance();
     enableAnimationCheckbox->setChecked(settings.isAnimationEnabled());
+    minimizeToTrayCheckbox->setChecked(settings.isMinimizeOnCloseEnabled());
 
     emojiSettings->setUseCustomFont(settings.isCurstomEmojiFont());
     emojiSettings->setFontFamily(settings.getEmojiFontFamily());
@@ -96,6 +98,7 @@ void GuiSettingsPage::applyChanges()
     settings.setCurstomEmojiFont(emojiSettings->useCustomFont());
     settings.setEmojiFontFamily(emojiSettings->getFontFamily());
     settings.setEmojiFontPointSize(emojiSettings->getFontPointSize());
+    settings.setMinimizeOnClose(minimizeToTrayCheckbox->isChecked());
 }
 
 QGroupBox *GuiSettingsPage::buildAnimationGroup()
@@ -187,4 +190,14 @@ void GuiSettingsPage::updateSmileypackDetails(int index)
     else {
         emojiButton->setVisible(false);
     }
+}
+
+QGroupBox* GuiSettingsPage::buildOthersGroup()
+{
+    QGroupBox *group = new QGroupBox(tr("Others"), this);
+    QVBoxLayout* layout = new QVBoxLayout(group);
+    minimizeToTrayCheckbox = new QCheckBox(tr("Minimize to tray on close"), group);
+
+    layout->addWidget(minimizeToTrayCheckbox);
+    return group;
 }

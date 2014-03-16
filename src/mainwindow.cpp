@@ -162,6 +162,26 @@ MainWindow::MainWindow(QWidget* parent)
 
     Settings::getInstance().restoreGeometryState(splitterWidget);
     Settings::getInstance().restoreGeometryState(this);
+
+    trayIcon = new QSystemTrayIcon(QIcon(":/icons/icon64.png"),this);
+    QMenu* trayMenu = new QMenu(this);
+
+    trayMenu->addAction(tr("Show/Hide"),this,SLOT(onShowHideWindow()));
+    trayMenu->addSeparator();
+    QList<QAction*> statusActions;
+    for (int i = 0; i <= StatusHelper::MAX_STATUS; i ++) {
+        StatusHelper::Info statusInfo = StatusHelper::getInfo(i);
+        QAction* statusAction = new QAction(QIcon(statusInfo.iconPath), statusInfo.name, trayMenu);
+        statusAction->setData(i);
+        connect(statusAction,SIGNAL(triggered()), ourUserItem, SLOT(onStatusActionTriggered()));
+        statusActions << statusAction;
+    }
+    trayMenu->addActions(QList<QAction*>() << statusActions);
+    trayMenu->addSeparator();
+    trayMenu->addAction(tr("Quit"),this,SLOT(onQuitApplicationTriggered()),QKeySequence::Quit);
+    trayIcon->setContextMenu(trayMenu);
+    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(onTrayIconClick(QSystemTrayIcon::ActivationReason)));
+    trayIcon->show();
 }
 
 MainWindow::~MainWindow()
@@ -173,9 +193,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    Settings::getInstance().saveGeometryState(this);
-    Settings::getInstance().saveGeometryState(splitterWidget);
-    QMainWindow::closeEvent(event);
+    bool minimize = Settings::getInstance().isMinimizeOnCloseEnabled();
+    if(this->isVisible() && minimize)
+    {
+        this->hide();
+        event->ignore();
+    }
+    else
+    {
+        Settings::getInstance().saveGeometryState(this);
+        Settings::getInstance().saveGeometryState(splitterWidget);
+        QMainWindow::closeEvent(event);
+    }
 }
 
 void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& message)
@@ -246,4 +275,18 @@ void MainWindow::onQuitApplicationTriggered()
 {
     CloseApplicationDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::onShowHideWindow()
+{
+    if(this->isVisible())
+        this->hide();
+    else
+        this->show();
+}
+void MainWindow::onTrayIconClick(QSystemTrayIcon::ActivationReason reason)
+{
+    if(reason == QSystemTrayIcon::Trigger)
+        if(!this->isVisible())
+            this->show();
 }

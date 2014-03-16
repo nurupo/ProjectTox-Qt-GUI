@@ -90,6 +90,9 @@ public:
     int getEmojiFontPointSize() const;
     void setEmojiFontPointSize(int value);
 
+    bool isMinimizeOnCloseEnabled() const;
+    void setMinimizeOnClose(bool newValue);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -120,6 +123,7 @@ private:
     bool customEmojiFont;
     QString emojiFontFamily;
     int     emojiFontPointSize;
+    bool minimizeOnClose;
 
 signals:
     //void dataChanged();
