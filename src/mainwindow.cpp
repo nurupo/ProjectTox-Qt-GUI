@@ -204,6 +204,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         Settings::getInstance().saveGeometryState(this);
         Settings::getInstance().saveGeometryState(splitterWidget);
         QMainWindow::closeEvent(event);
+        qApp->quit();
     }
 }
 

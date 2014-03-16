@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     // used in QStandardPaths
     a.setApplicationName("Qt GUI");
     a.setOrganizationName("Tox");
+    qApp->setQuitOnLastWindowClosed(false);
     Starter s;
     return a.exec();
 }
