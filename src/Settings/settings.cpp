@@ -156,8 +156,7 @@ void Settings::save()
 
 void Settings::executeSettingsDialog(QWidget* parent)
 {
-    SettingsDialog dialog(parent);
-    if (dialog.exec() == QDialog::Accepted) {
+    if (SettingsDialog::showDialog(parent) == QDialog::Accepted) {
         save();
         //emit dataChanged();
     }
