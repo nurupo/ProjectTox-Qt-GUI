@@ -15,7 +15,7 @@
 */
 
 #include "closeapplicationdialog.hpp"
-
+#include "Settings/settings.hpp"
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QPushButton>
@@ -36,15 +36,21 @@ CloseApplicationDialog::CloseApplicationDialog(QWidget *parent) :
     connect(buttonBox, &QDialogButtonBox::accepted, this, &CloseApplicationDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &CloseApplicationDialog::reject);
 
+    askAgainBox = new QCheckBox("Don't ask again",this);
+    askAgainBox->setChecked(false);
+
     QVBoxLayout* layout = new QVBoxLayout(this);
 
     layout->addWidget(closeLabel);
-    layout->addSpacing(16);
-    layout->addWidget(buttonBox);
+    layout->addSpacing(8);
+    layout->addWidget(buttonBox,0,Qt::AlignCenter);
+    layout->addSpacing(8);
+    layout->addWidget(askAgainBox);
 }
 
 void CloseApplicationDialog::accept()
 {
+    Settings::getInstance().setShowConfrimationDialogOnClose(!askAgainBox->isChecked());
     qApp->quit();
     QDialog::accept();
 }

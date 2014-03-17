@@ -200,12 +200,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
     bool minimize = Settings::getInstance().isMinimizeOnCloseEnabled();
     if (isVisible() && minimize) {
         hide();
+        trayMenuShowHideAction->setText(tr("Show"));
         event->ignore();
     } else {
-        Settings::getInstance().saveGeometryState(this);
-        Settings::getInstance().saveGeometryState(splitterWidget);
-        QMainWindow::closeEvent(event);
-        qApp->quit();
+        CloseApplicationDialog dialog(this);
+        bool showConfrimationDialog = Settings::getInstance().isShowConfrimationDialogOnCloseEnabled();
+        QDialog::DialogCode onCloseDialogResult = QDialog::Accepted;
+        if (showConfrimationDialog)
+            onCloseDialogResult = static_cast<QDialog::DialogCode>(dialog.exec());
+        if(onCloseDialogResult == QDialog::Accepted) {
+            Settings::getInstance().saveGeometryState(this);
+            Settings::getInstance().saveGeometryState(splitterWidget);
+            QMainWindow::closeEvent(event);
+            qApp->quit();
+        } else {
+            event->ignore();
+        }
     }
 }
 
@@ -276,7 +286,12 @@ void MainWindow::onAboutAppActionTriggered()
 void MainWindow::onTrayMenuQuitApplicationActionTriggered()
 {
     CloseApplicationDialog dialog(this);
-    dialog.exec();
+    bool showConfrimationDialog = Settings::getInstance().isShowConfrimationDialogOnCloseEnabled();
+    if(showConfrimationDialog){
+        dialog.exec();
+    } else {
+        qApp->quit();
+    }
 }
 
 void MainWindow::onShowHideWindow()
@@ -297,8 +312,14 @@ void MainWindow::onTrayMenuStatusActionTriggered()
     Status selectedStatus = static_cast<Status>(statusAction->data().toInt());
 
     if (selectedStatus == Status::Offline) {
+        bool showConfrimationDialog = Settings::getInstance().isShowConfrimationDialogOnCloseEnabled();
         CloseApplicationDialog dialog(this);
-        dialog.exec();
+        if(showConfrimationDialog) {
+            dialog.exec();
+        } else {
+            qApp->quit();
+        }
+
     } else {
         emit statusSet(selectedStatus);
     }

@@ -18,13 +18,16 @@
 #define CLOSEAPPLICATIONDIALOG_HPP
 
 #include <QDialog>
-
+#include <QCheckBox>
 class CloseApplicationDialog : public QDialog
 {
     Q_OBJECT
 public:
     explicit CloseApplicationDialog(QWidget *parent = 0);
     
+private:
+    QCheckBox* askAgainBox;
+
 public slots:
     void accept();
     
