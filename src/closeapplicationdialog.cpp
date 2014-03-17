@@ -39,13 +39,14 @@ CloseApplicationDialog::CloseApplicationDialog(QWidget *parent) :
     askAgainBox = new QCheckBox("Don't ask again",this);
     askAgainBox->setChecked(false);
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    QHBoxLayout* buttonsLayout = new QHBoxLayout();
+    buttonsLayout->addWidget(askAgainBox);
+    buttonsLayout->addWidget(buttonBox);
 
-    layout->addWidget(closeLabel);
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget(closeLabel,0,Qt::AlignHCenter);
     layout->addSpacing(8);
-    layout->addWidget(buttonBox,0,Qt::AlignCenter);
-    layout->addSpacing(8);
-    layout->addWidget(askAgainBox);
+    layout->addLayout(buttonsLayout);
 }
 
 void CloseApplicationDialog::accept()
