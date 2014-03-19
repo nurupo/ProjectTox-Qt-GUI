@@ -35,7 +35,7 @@ Core::~Core()
     }
 }
 
-void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
+void Core::onFriendRequest(Tox*/* tox*/, uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
     emit static_cast<Core*>(core)->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
@@ -55,7 +55,7 @@ void Core::onStatusMessageChanged(Tox*/* tox*/, int friendId, uint8_t* cMessage,
     emit static_cast<Core*>(core)->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, TOX_USERSTATUS userstatus, void* core)
+void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, uint8_t userstatus, void* core)
 {
     Status status;
     switch (userstatus) {
@@ -316,7 +316,7 @@ QString Core::CFriendAddress::toString(uint8_t* cFriendAddress)
 
 Core::CString::CString(const QString& string)
 {
-    cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER + 1]();
+    cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER]();
     cStringSize = fromString(string, cString);
 }
 
@@ -337,17 +337,12 @@ uint16_t Core::CString::size()
 
 QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
 {
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize - 1);
-}
-
-QString Core::CString::toString(uint8_t* cString)
-{
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), -1);
+    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize);
 }
 
 uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
 {
     QByteArray byteArray = QByteArray(string.toUtf8());
     memcpy(cString, reinterpret_cast<uint8_t*>(byteArray.data()), byteArray.size());
-    return byteArray.size() + 1;
+    return byteArray.size();
 }
