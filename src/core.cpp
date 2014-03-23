@@ -17,14 +17,12 @@
 #include "core.hpp"
 #include "Settings/settings.hpp"
 
-#include <QThread>
+#include <QDebug>
 #include <QTime>
 
 Core::Core() :
     tox(nullptr)
 {
-    timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Core::process);
     connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
 }
 
@@ -192,12 +190,28 @@ void Core::bootstrapDht()
 
 void Core::process()
 {
+#ifdef QT_GUI_CALLS_PER_SECOND
+    static int time = QTime::currentTime().second();
+    static int time_counter = 1;
+
+    int time_new = QTime::currentTime().second();
+    if (time != time_new) {
+        qDebug("cps: %02d:%02d:%02d = %d", QTime::currentTime().hour(), QTime::currentTime().minute(), QTime::currentTime().second(), time_counter);
+        time_counter = 1;
+        time = time_new;
+    } else {
+        time_counter++;
+    }
+#endif
     tox_do(tox);
 #ifdef DEBUG
     //we want to see the debug messages immediately
     fflush(stdout);
 #endif
     checkConnection();
+#ifdef QT_GUI_TOX_WAIT
+    waitWrapper->run();
+#endif
 }
 
 void Core::checkConnection()
@@ -243,8 +257,17 @@ void Core::start()
 
     bootstrapDht();
 
-    timer->setInterval(30);
+#ifdef QT_GUI_TOX_WAIT
+    waitWrapper = new WaitWrapper(tox, this);
+    connect(waitWrapper, &WaitWrapper::wokeUp, this, &Core::process);
+    waitWrapper->setWaitTimeMicroseconds(900000);
+    waitWrapper->run();
+#else
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Core::process);
+    timer->setInterval(45);
     timer->start();
+#endif
 }
 
 
@@ -346,3 +369,70 @@ uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
     memcpy(cString, reinterpret_cast<uint8_t*>(byteArray.data()), byteArray.size());
     return byteArray.size();
 }
+
+#ifdef QT_GUI_TOX_WAIT
+WaitWrapper::WaitWrapper(Tox* tox, QObject *parent) : QObject(parent), tox(tox)
+{
+    data = new uint8_t[tox_wait_data_size()];
+    connect(&wait, &Wait::wokeUp, this, &WaitWrapper::onWakeUp);
+    thread = new QThread(this);
+    wait.moveToThread(thread);
+    thread->start();
+}
+
+WaitWrapper::~WaitWrapper()
+{
+    delete data;
+    thread->quit();
+    thread->wait();
+}
+
+long WaitWrapper::getWaitTimeSeconds()
+{
+    return seconds;
+}
+
+long WaitWrapper::getWaitTimeMicroseconds()
+{
+    return microseconds;
+}
+
+void WaitWrapper::setWaitTimeSeconds(long seconds)
+{
+    setWaitTime(seconds, 0);
+}
+
+void WaitWrapper::setWaitTimeMicroseconds(long microseconds)
+{
+    setWaitTime(0, microseconds);
+}
+
+void WaitWrapper::setWaitTime(long seconds, long microseconds)
+{
+    this->seconds = seconds;
+    this->microseconds = microseconds;
+}
+
+void WaitWrapper::run()
+{
+    tox_wait_prepare(tox, data);
+    qRegisterMetaType<uint8_t*>("uint8_t*");
+    QMetaObject::invokeMethod(&wait, "run", Qt::QueuedConnection, Q_ARG(uint8_t*, data), Q_ARG(long, seconds), Q_ARG(long, microseconds));
+}
+
+void WaitWrapper::onWakeUp()
+{
+    tox_wait_cleanup(tox, data);
+    emit wokeUp();
+}
+
+Wait::Wait(QObject *parent) : QObject(parent)
+{
+}
+
+void Wait::run(uint8_t* data, long seconds, long microseconds)
+{
+    tox_wait_execute(data, seconds, microseconds);
+    emit wokeUp();
+}
+#endif

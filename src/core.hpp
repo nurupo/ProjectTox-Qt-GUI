@@ -22,8 +22,12 @@
 #include <tox.h>
 
 #include <QObject>
+#include <QThread>
 #include <QTimer>
-#include <QList>
+
+#ifdef QT_GUI_TOX_WAIT
+class WaitWrapper;
+#endif
 
 class Core : public QObject
 {
@@ -44,7 +48,12 @@ private:
     void checkConnection();
 
     Tox* tox;
+
+#ifdef QT_GUI_TOX_WAIT
+    WaitWrapper* waitWrapper;
+#else
     QTimer* timer;
+#endif
 
     class CData
     {
@@ -163,6 +172,51 @@ signals:
     void failedToStart();
 
 };
+
+#ifdef QT_GUI_TOX_WAIT
+class Wait : public QObject
+{
+    Q_OBJECT
+public:
+    Wait(QObject* parent = 0);
+public slots:
+    void run(uint8_t* data, long seconds, long microseconds);
+
+signals:
+    void wokeUp();
+};
+
+class WaitWrapper : public QObject
+{
+    Q_OBJECT
+public:
+    WaitWrapper(Tox *tox, QObject* parent = 0);
+    ~WaitWrapper();
+
+    long getWaitTimeSeconds();
+    long getWaitTimeMicroseconds();
+
+public slots:
+    void setWaitTimeSeconds(long seconds);
+    void setWaitTimeMicroseconds(long microseconds);
+    void setWaitTime(long seconds, long microseconds);
+    void run();
+
+private slots:
+    void onWakeUp();
+signals:
+    void wokeUp();
+
+private:
+
+    long seconds;
+    long microseconds;
+    uint8_t* data;
+    QThread* thread;
+    Wait wait;
+    Tox* tox;
+};
+#endif
 
 #endif // CORE_HPP
 

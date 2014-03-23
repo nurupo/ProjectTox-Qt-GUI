@@ -35,6 +35,9 @@ TEMPLATE = app
 
 CONFIG += c++11
 
+DEFINES += QT_GUI_TOX_WAIT
+DEFINES += QT_GUI_CALLS_PER_SECOND
+
 INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/
 win32:INCLUDEPATH += ../../libs/sodium/include/
 macx:INCLUDEPATH += /usr/local/include
