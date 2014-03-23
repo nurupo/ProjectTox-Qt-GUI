@@ -243,7 +243,7 @@ void Core::start()
 
     bootstrapDht();
 
-    timer->setInterval(30);
+    timer->setInterval(45);
     timer->start();
 }
 
