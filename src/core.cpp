@@ -290,6 +290,22 @@ void Core::loadFriends()
         for (int32_t i = 0; i < static_cast<int32_t>(friendCount); ++i) {
             if (tox_get_client_id(tox, ids[i], clientId) == 0) {
                 emit friendAdded(ids[i], CUserId::toString(clientId));
+
+                const int nameSize = tox_get_name_size(tox, ids[i]);
+                if (nameSize > 0) {
+                    uint8_t name[nameSize];
+                    if (tox_get_name(tox, ids[i], name) == nameSize) {
+                        emit friendUsernameChanged(ids[i], CString::toString(name, nameSize));
+                    }
+                }
+
+                const int statusMessageSize = tox_get_status_message_size(tox, ids[i]);
+                if (statusMessageSize > 0) {
+                    uint8_t statusMessage[statusMessageSize];
+                    if (tox_get_status_message(tox, ids[i], statusMessage, statusMessageSize) == statusMessageSize) {
+                        emit friendStatusMessageChanged(ids[i], CString::toString(statusMessage, statusMessageSize));
+                    }
+                }
             }
         }
     }
