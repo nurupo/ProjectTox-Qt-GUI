@@ -17,8 +17,16 @@
 #include "core.hpp"
 #include "Settings/settings.hpp"
 
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QStandardPaths>
 #include <QThread>
 #include <QTime>
+
+#include <vector>
+
+static QString CONFIG_FILE_NAME = "toxConfig";
 
 Core::Core() :
     tox(nullptr)
@@ -31,6 +39,7 @@ Core::Core() :
 Core::~Core()
 {
     if (tox) {
+        saveConfiguration();
         tox_kill(tox);
     }
 }
@@ -213,6 +222,77 @@ void Core::checkConnection()
     }
 }
 
+void Core::loadConfiguration()
+{
+    QString path = QStandardPaths::locate(QStandardPaths::StandardLocation::DataLocation, CONFIG_FILE_NAME);
+    if (path.isEmpty()) {
+        qWarning() << "The Tox configuration file was not found";
+        return;
+    }
+
+    QFile configurationFile(path);
+    if (!configurationFile.open(QIODevice::ReadOnly)) {
+        qCritical() << "File " << path << " cannot be opened";
+        return;
+    }
+
+    qint64 fileSize = configurationFile.size();
+    if (fileSize > 0) {
+        QByteArray data = configurationFile.readAll();
+        tox_load(tox, reinterpret_cast<uint8_t *>(data.data()), data.length());
+    }
+
+    configurationFile.close();
+
+    loadFriends();
+}
+
+void Core::saveConfiguration()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::DataLocation);
+    if (path.isEmpty()) {
+        qCritical() << "Error finding data location directory";
+        return;
+    }
+
+    QDir directory(path);
+    if (!directory.exists(path) && !directory.mkpath(directory.absolutePath())) {
+        qCritical() << "Error while creating directory " << path;
+        return;
+    }
+
+    path += QDir::separator() + CONFIG_FILE_NAME;
+    QFile configurationFile(path);
+    if (!configurationFile.open(QIODevice::WriteOnly)) {
+        qCritical() << "File " << path << " cannot be opened";
+        return;
+    }
+
+    uint32_t fileSize = tox_size(tox);
+    if (fileSize > 0) {
+        std::vector<char> saveData;
+        saveData.resize(fileSize);
+        tox_save(tox, reinterpret_cast<uint8_t *>(&saveData[0]));
+        configurationFile.write(&saveData[0], fileSize);
+        configurationFile.close();
+    }
+}
+
+void Core::loadFriends()
+{
+    uint32_t friendCount = tox_count_friendlist(tox);
+    if (friendCount > 0) {
+        std::vector<int> ids;
+        ids.resize(friendCount);
+        tox_get_friendlist(tox, &ids[0], friendCount);
+        for (uint32_t i = 0; i < friendCount; ++i) {
+            uint8_t clientId[TOX_CLIENT_ID_SIZE];
+            tox_get_client_id(tox, ids[i], clientId);
+            friendAdded(ids[i], CUserId::toString(clientId));
+        }
+    }
+}
+
 void Core::start()
 {
     tox = tox_new(0);
@@ -221,6 +301,8 @@ void Core::start()
         emit failedToStart();
         return;
     }
+
+    loadConfiguration();
 
     tox_callback_friend_request(tox, onFriendRequest, this);
     tox_callback_friend_message(tox, onFriendMessage, this);
