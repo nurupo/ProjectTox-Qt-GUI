@@ -35,7 +35,10 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/
+INCLUDEPATH += \
+    ../../src/ ../../submodules/ProjectTox-Core/toxcore/ \
+    ../../submodules/ProjectTox-libtoxdata/ \
+    ../../submodules/ProjectTox-libtoxdata/submodules/scrypt-jane/
 win32:INCLUDEPATH += ../../libs/sodium/include/
 macx:INCLUDEPATH += /usr/local/include
 
@@ -50,6 +53,11 @@ win32 {
 }
 
 win32:DEFINES += WIN32
+DEFINES += SCRYPT_SALSA SCRYPT_SHA256
+
+contains(QMAKE_CC, clang) {
+    QMAKE_CFLAGS += -no-integrated-as
+}
 
 SOURCES += \
     ../../src/main.cpp \
@@ -92,7 +100,8 @@ SOURCES += \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
-    ../../src/copyableelidelabel.cpp
+    ../../src/copyableelidelabel.cpp \
+    ../../src/profile.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -135,7 +144,8 @@ HEADERS  += \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
-    ../../src/copyableelidelabel.hpp
+    ../../src/copyableelidelabel.hpp \
+    ../../src/profile.hpp
 
 ### ToxCore section. Please keep it alphabetical ###
 
@@ -175,6 +185,14 @@ HEADERS  += \
     ../../submodules/ProjectTox-Core/toxcore/tox.h \
     ../../submodules/ProjectTox-Core/toxcore/util.h
 
+
+SOURCES += \
+    ../../submodules/ProjectTox-libtoxdata/tox_data.c \
+    ../../submodules/ProjectTox-libtoxdata/submodules/scrypt-jane/scrypt-jane.c
+
+HEADERS += \
+    ../../submodules/ProjectTox-libtoxdata/tox_data.h \
+    ../../submodules/ProjectTox-libtoxdata/submodules/scrypt-jane/scrypt-jane.h
 
 RESOURCES += \
     ../../resources/resources.qrc
