@@ -17,6 +17,8 @@
 #include "core.hpp"
 #include "Settings/settings.hpp"
 
+#include <cstdint>
+
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -24,9 +26,7 @@
 #include <QThread>
 #include <QTime>
 
-#include <vector>
-
-static QString CONFIG_FILE_NAME = "toxConfig";
+const QString Core::CONFIG_FILE_NAME = "data.tox";
 
 Core::Core() :
     tox(nullptr)
@@ -224,7 +224,7 @@ void Core::checkConnection()
 
 void Core::loadConfiguration()
 {
-    QString path = QStandardPaths::locate(QStandardPaths::StandardLocation::DataLocation, CONFIG_FILE_NAME);
+    QString path = QStandardPaths::locate(QStandardPaths::StandardLocation::ConfigLocation, CONFIG_FILE_NAME);
     if (path.isEmpty()) {
         qWarning() << "The Tox configuration file was not found";
         return;
@@ -239,7 +239,7 @@ void Core::loadConfiguration()
     qint64 fileSize = configurationFile.size();
     if (fileSize > 0) {
         QByteArray data = configurationFile.readAll();
-        tox_load(tox, reinterpret_cast<uint8_t *>(data.data()), data.length());
+        tox_load(tox, reinterpret_cast<uint8_t *>(data.data()), data.size());
     }
 
     configurationFile.close();
@@ -249,7 +249,7 @@ void Core::loadConfiguration()
 
 void Core::saveConfiguration()
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::DataLocation);
+    QString path = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::ConfigLocation);
     if (path.isEmpty()) {
         qCritical() << "Error finding data location directory";
         return;
@@ -261,7 +261,7 @@ void Core::saveConfiguration()
         return;
     }
 
-    path += QDir::separator() + CONFIG_FILE_NAME;
+    path += '/' + CONFIG_FILE_NAME;
     QFile configurationFile(path);
     if (!configurationFile.open(QIODevice::WriteOnly)) {
         qCritical() << "File " << path << " cannot be opened";
@@ -269,26 +269,28 @@ void Core::saveConfiguration()
     }
 
     uint32_t fileSize = tox_size(tox);
-    if (fileSize > 0) {
-        std::vector<char> saveData;
-        saveData.resize(fileSize);
-        tox_save(tox, reinterpret_cast<uint8_t *>(&saveData[0]));
-        configurationFile.write(&saveData[0], fileSize);
-        configurationFile.close();
+    if (fileSize > 0 && fileSize <= INT32_MAX) {
+        uint8_t* data = new uint8_t[fileSize];
+        tox_save(tox, data);
+        configurationFile.write(reinterpret_cast<char *>(data), fileSize);
+        delete data;
     }
+
+    configurationFile.close();
 }
 
 void Core::loadFriends()
 {
-    uint32_t friendCount = tox_count_friendlist(tox);
+    const uint32_t friendCount = tox_count_friendlist(tox);
     if (friendCount > 0) {
-        std::vector<int> ids;
-        ids.resize(friendCount);
-        tox_get_friendlist(tox, &ids[0], friendCount);
-        for (uint32_t i = 0; i < friendCount; ++i) {
-            uint8_t clientId[TOX_CLIENT_ID_SIZE];
-            tox_get_client_id(tox, ids[i], clientId);
-            friendAdded(ids[i], CUserId::toString(clientId));
+        // assuming there are not that many friends to fill up the whole stack
+        int32_t ids[friendCount];
+        tox_get_friendlist(tox, ids, friendCount);
+        uint8_t clientId[TOX_CLIENT_ID_SIZE];
+        for (int32_t i = 0; i < static_cast<int32_t>(friendCount); ++i) {
+            if (tox_get_client_id(tox, ids[i], clientId) == 0) {
+                emit friendAdded(ids[i], CUserId::toString(clientId));
+            }
         }
     }
 }
