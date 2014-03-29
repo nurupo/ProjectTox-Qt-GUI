@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QSaveFile>
 #include <QStandardPaths>
 #include <QThread>
 #include <QTime>
@@ -262,7 +263,7 @@ void Core::saveConfiguration()
     }
 
     path += '/' + CONFIG_FILE_NAME;
-    QFile configurationFile(path);
+    QSaveFile configurationFile(path);
     if (!configurationFile.open(QIODevice::WriteOnly)) {
         qCritical() << "File " << path << " cannot be opened";
         return;
@@ -273,10 +274,9 @@ void Core::saveConfiguration()
         uint8_t* data = new uint8_t[fileSize];
         tox_save(tox, data);
         configurationFile.write(reinterpret_cast<char *>(data), fileSize);
+        configurationFile.commit();
         delete data;
     }
-
-    configurationFile.close();
 }
 
 void Core::loadFriends()
