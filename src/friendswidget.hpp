@@ -21,6 +21,7 @@
 #include "friendproxymodel.hpp"
 #include "status.hpp"
 
+#include <QDateTime>
 #include <QHash>
 #include <QMenu>
 #include <QPushButton>
@@ -43,8 +44,7 @@ private:
     QMenu* friendContextMenu;
 
     QStandardItem* findFriendItem(int friendId) const;
-    void setStatus(QStandardItem* friendItem, Status status);
-
+    void updateToolTip(QStandardItem *friendItem) const;
 
 private slots:
     void onFriendContextMenuRequested(const QPoint& pos);
@@ -58,10 +58,10 @@ public slots:
     void setUsername(int friendId, const QString& username);
     void setStatus(int friendId, Status status);
     void setStatusMessage(int friendId, const QString& statusMessage);
+    void setLastSeen(int friendId, const QDateTime& dateTime);
 
 signals:
     void friendAdded(int friendId, const QString& userId);
-    void friendStatusChanged(int friendId, Status status);
     void friendRemoved(int friendId);
     void friendSelectionChanged(int friendId);
 

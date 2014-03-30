@@ -21,9 +21,9 @@
 
 #include <tox.h>
 
+#include <QDateTime>
 #include <QObject>
 #include <QTimer>
-#include <QList>
 
 class Core : public QObject
 {
@@ -46,6 +46,8 @@ private:
     void loadConfiguration();
     void saveConfiguration();
     void loadFriends();
+
+    void checkLastOnline(int friendId);
 
     Tox* tox;
     QTimer* timer;
@@ -150,6 +152,8 @@ signals:
     void friendAddressGenerated(const QString& friendAddress);
 
     void friendRemoved(int friendId);
+
+    void friendLastSeenChanged(int friendId, const QDateTime& dateTime);
 
     void usernameSet(const QString& username);
     void statusMessageSet(const QString& message);

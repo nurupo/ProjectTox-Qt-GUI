@@ -102,7 +102,6 @@ MainWindow::MainWindow(QWidget* parent)
     PagesWidget* pages = new PagesWidget(this);
     connect(friendsWidget, &FriendsWidget::friendAdded, pages, &PagesWidget::addPage);
     connect(friendsWidget, &FriendsWidget::friendSelectionChanged, pages, &PagesWidget::activatePage);
-    connect(friendsWidget, &FriendsWidget::friendStatusChanged, pages, &PagesWidget::statusChanged);
 
     //FIXME: start core in a separate function
     //all connections to `core` should be done after its creation because it registers some types
@@ -135,10 +134,12 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
 
+    connect(core, &Core::friendStatusChanged, pages, &PagesWidget::statusChanged);
+
     connect(this, &MainWindow::statusSet, core, &Core::setStatus);
     connect(core, &Core::statusSet, this, &MainWindow::onStatusSet);
 
-    coreThread->start(/*QThread::IdlePriority*/);
+    connect(core, &Core::friendLastSeenChanged, friendsWidget, &FriendsWidget::setLastSeen);
 
     connect(this, &MainWindow::friendRequested, core, &Core::requestFriendship);
 
@@ -157,6 +158,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(pages, &PagesWidget::sendAction,  core, &Core::sendAction);
 
     connect(friendsWidget, &FriendsWidget::friendRemoved, core, &Core::removeFriend);
+
+    coreThread->start();
 
     splitterWidget->addWidget(friendsLayout);
     splitterWidget->addWidget(pages);

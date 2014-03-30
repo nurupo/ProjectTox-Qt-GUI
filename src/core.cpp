@@ -25,7 +25,6 @@
 #include <QSaveFile>
 #include <QStandardPaths>
 #include <QThread>
-#include <QTime>
 
 const QString Core::CONFIG_FILE_NAME = "data.tox";
 
@@ -87,7 +86,11 @@ void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, uint8_t userstatus, v
 
 void Core::onConnectionStatusChanged(Tox*/* tox*/, int friendId, uint8_t status, void* core)
 {
-    emit static_cast<Core*>(core)->friendStatusChanged(friendId, status ? Status::Online : Status::Offline);
+    Status friendStatus = status ? Status::Online : Status::Offline;
+    emit static_cast<Core*>(core)->friendStatusChanged(friendId, friendStatus);
+    if (friendStatus == Status::Offline) {
+        static_cast<Core*>(core)->checkLastOnline(friendId);
+    }
 }
 
 void Core::onAction(Tox*/* tox*/, int friendId, uint8_t *cMessage, uint16_t cMessageSize, void *core)
@@ -306,8 +309,17 @@ void Core::loadFriends()
                         emit friendStatusMessageChanged(ids[i], CString::toString(statusMessage, statusMessageSize));
                     }
                 }
+
+                checkLastOnline(ids[i]);
             }
         }
+    }
+}
+
+void Core::checkLastOnline(int friendId) {
+    const uint64_t lastOnline = tox_get_last_online(tox, friendId);
+    if (lastOnline > 0) {
+        emit friendLastSeenChanged(friendId, QDateTime::fromTime_t(lastOnline));
     }
 }
 
