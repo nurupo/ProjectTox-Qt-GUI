@@ -50,6 +50,7 @@ private:
     EmojiFontSettingsDialog *emojiSettings;
     QCheckBox* enableAnimationCheckbox;
     QCheckBox* minimizeToTrayCheckbox;
+    QCheckBox* showConfrimationDialogOnCloseCheckbox;
 
     QComboBox* smileypackCombobox;
     QToolButton *emojiButton;

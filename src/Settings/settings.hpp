@@ -93,6 +93,9 @@ public:
     bool isMinimizeOnCloseEnabled() const;
     void setMinimizeOnClose(bool newValue);
 
+    bool isShowConfrimationDialogOnCloseEnabled() const;
+    void setShowConfrimationDialogOnClose(bool newValue);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -124,6 +127,7 @@ private:
     QString emojiFontFamily;
     int     emojiFontPointSize;
     bool minimizeOnClose;
+    bool showConfrimationDialogOnClose;
 
 signals:
     //void dataChanged();

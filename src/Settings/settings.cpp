@@ -99,6 +99,7 @@ void Settings::load()
         emojiFontFamily = s.value("emojiFontFamily", "DejaVu Sans").toString();
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
         minimizeOnClose = s.value("minimizeOnClose", true).toBool();
+        showConfrimationDialogOnClose = s.value("showConfrimationDialogOnClose",true).toBool();
     s.endGroup();
 
     loaded = true;
@@ -151,6 +152,7 @@ void Settings::save()
         s.setValue("emojiFontFamily", emojiFontFamily);
         s.setValue("emojiFontPointSize", emojiFontPointSize);
         s.setValue("minimizeOnClose", minimizeOnClose);
+        s.setValue("showConfrimationDialogOnClose",showConfrimationDialogOnClose);
     s.endGroup();
 }
 
@@ -285,4 +287,13 @@ bool Settings::isMinimizeOnCloseEnabled() const
 void Settings::setMinimizeOnClose(bool newValue)
 {
     minimizeOnClose = newValue;
+}
+
+bool Settings::isShowConfrimationDialogOnCloseEnabled() const
+{
+    return showConfrimationDialogOnClose;
+}
+void Settings::setShowConfrimationDialogOnClose(bool newValue)
+{
+    showConfrimationDialogOnClose = newValue;
 }

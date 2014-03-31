@@ -99,6 +99,7 @@ void GuiSettingsPage::applyChanges()
     settings.setEmojiFontFamily(emojiSettings->getFontFamily());
     settings.setEmojiFontPointSize(emojiSettings->getFontPointSize());
     settings.setMinimizeOnClose(minimizeToTrayCheckbox->isChecked());
+    settings.setShowConfrimationDialogOnClose(showConfrimationDialogOnCloseCheckbox->isChecked());
 }
 
 QGroupBox *GuiSettingsPage::buildAnimationGroup()
@@ -197,7 +198,9 @@ QGroupBox* GuiSettingsPage::buildOthersGroup()
     QGroupBox *group = new QGroupBox(tr("Others"), this);
     QVBoxLayout* layout = new QVBoxLayout(group);
     minimizeToTrayCheckbox = new QCheckBox(tr("Minimize to tray on close"), group);
+    showConfrimationDialogOnCloseCheckbox = new QCheckBox(tr("Show confrimation dialog on close"));
 
     layout->addWidget(minimizeToTrayCheckbox);
+    layout->addWidget(showConfrimationDialogOnCloseCheckbox);
     return group;
 }
