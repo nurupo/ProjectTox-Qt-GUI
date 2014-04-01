@@ -244,7 +244,7 @@ const Smileypack::SmileyList Smileypack::defaultList()
 {
     static const SmileyList tmpList =
     {
-        {":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)"}},
+        {":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)", ":/"}},
         {":/icons/emoticons/emotion_sad.png",      {":(", ":-("}},
         {":/icons/emoticons/emotion_grin.png",     {":D", ":-D"}},
         {":/icons/emoticons/emotion_cool.png",     {"8)", "8-)"}},

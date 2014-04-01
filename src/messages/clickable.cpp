@@ -19,6 +19,7 @@
 #include <QDesktopServices>
 #include <QModelIndex>
 #include <QUrl>
+#include "chatitem.hpp"
 
 
 Clickable::Clickable(Clickable::Type type, quint16 start, quint16 length) :
@@ -113,3 +114,12 @@ Clickable ClickableList::atCursorPos(int idx)
     }
     return Clickable();
 }
+
+// ============================================================================
+
+Hightlight::Hightlight(Hightlight::Type type, ChatItem *item, quint16 start, quint16 length) :
+    _type(type),
+    mItem(item),
+    _start(start),
+    _length(length)
+{}

@@ -28,6 +28,7 @@ class MessageModel;
 class MessageFilter;
 class ChatView;
 class QToolButton;
+class ChatViewSearchWidget;
 
 class ChatPageWidget : public QWidget
 {
@@ -45,6 +46,7 @@ private:
     MessageModel *model;
     MessageFilter *filterModel;
     ChatView *chatview;
+    ChatViewSearchWidget *searchWidget;
 
     InputTextWidget* input;
     QToolButton *emoticonButton;
@@ -61,6 +63,8 @@ public slots:
 
     void onFriendUsernameChanged(const QString &newUsername);
     void onOurUsernameChanged(const QString &newUsername);
+
+    void showSearchBar();
 
 signals:
     void sendMessage(const QString& message);

@@ -97,6 +97,7 @@ signals:
     void lastLineChanged(QGraphicsItem *item, qreal offset);
     void layoutChanged(); // indicates changes to the scenerect due to resizing of the contentsitems
     void mouseMoveWhileSelecting(const QPointF &scenePos);
+    void rowsInserted();
 
 public slots:
     void updateForViewport(qreal width, qreal height);

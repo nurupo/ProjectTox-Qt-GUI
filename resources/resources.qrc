@@ -38,5 +38,10 @@
         <file>DejaVuSans.ttf</file>
         <file>icons/world_link.png</file>
         <file>icons/filter.png</file>
+        <file>icons/cross.png</file>
+        <file>icons/resultset_next.png</file>
+        <file>icons/resultset_previous.png</file>
+        <file>icons/find.png</file>
+        <file>icons/text_uppercase.png</file>
     </qresource>
 </RCC>

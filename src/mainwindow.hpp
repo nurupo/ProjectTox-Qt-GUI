@@ -28,6 +28,8 @@
 #include <QThread>
 #include <QSplitter>
 
+class PagesWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -45,6 +47,7 @@ private:
     FriendsWidget* friendsWidget;
     OurUserItemWidget* ourUserItem;
     QSplitter* splitterWidget;
+    PagesWidget *pages;
 
 private slots:
     void onAddFriendButtonClicked();
@@ -57,6 +60,7 @@ private slots:
     void onSettingsActionTriggered();
     void onAboutAppActionTriggered();
     void onQuitApplicationTriggered();
+    void onSearchActionTriggered();
 
 signals:
     void friendRequestAccepted(const QString& userId);

@@ -21,18 +21,21 @@
 #include <QDebug>
 #include <QApplication>
 
-Smiley::Smiley(const QString &text, const QString &graphics, int start, Type type)
+#include "clickable.hpp"
+
+Smiley::Smiley(const QString &text, const QString &graphics, int start, int smileyfiedStart, Type type)
 {
     mType = type;
     mStart = start;
+    mSmiletfiedStart = smileyfiedStart;
     mText = text;
     mTextLength = text.length();
     mGraphics = graphics;
     mEmojiFont = QApplication::font();
 }
 
-// Modifies text!
-SmileyList SmileyList::smilify(QString &text)
+// Find smileys with original positions
+SmileyList SmileyList::fromText(QString text)
 {
     // Get current smileypack
     Settings &settings = Settings::getInstance();
@@ -44,9 +47,12 @@ SmileyList SmileyList::smilify(QString &text)
     }
 
     SmileyList result;
+    ClickableList clickables = ClickableList::fromString(text);
 
     // Whlie smileys found to replace
     bool found;
+    int searchStart = 0;
+    int offset = 0;
     do {
         found = false;
 
@@ -54,7 +60,7 @@ SmileyList SmileyList::smilify(QString &text)
         QMap<int, QStringList> possibleTexts;
         for (const auto& pair : pack.getList()) {
             for (const QString& smileytext : pair.second) {
-                int pos = text.indexOf(smileytext);
+                int pos = text.indexOf(smileytext, searchStart);
                 if (pos > -1) {
                     possibleTexts.insertMulti(pos, {smileytext, pair.first});
                     found = true;
@@ -87,28 +93,23 @@ SmileyList SmileyList::smilify(QString &text)
                 }
             }
 
-            // Add found smiley to List
-            Smiley smile = Smiley(repSrt, repRep, repPos, (pack.isEmoji()) ? Smiley::Emoji : Smiley::Pixmap );
-            if (pack.isEmoji() && settings.isCurstomEmojiFont()) {
-                QFont f = QApplication::font();
-                f.setFamily(settings.getEmojiFontFamily());
-                f.setPointSize(settings.getEmojiFontPointSize());
-                smile.setEmojiFont(f);
-            }
-            result.append(smile);
+            // Check if there is a clickable
+            if(!clickables.atCursorPos(repPos).isValid()) {
 
-            // Create replacetext
-            // TODO MKO We need placeholders with the character count of the smiley/emoji, later they will replaced by smiley image or emoji.
-            //      This is a workaround because of the clickable detection works with QString insteed of QTextDocument
-            QString placeholder;
-            if (pack.isEmoji()) {
-                for(int i=0; i<repRep.count(); i++)
-                    placeholder.append('#');
+                // Add found smiley to List
+                Smiley smile = Smiley(repSrt, repRep, repPos, repPos - offset, (pack.isEmoji()) ? Smiley::Emoji : Smiley::Pixmap );
+                if (pack.isEmoji() && settings.isCurstomEmojiFont()) {
+                    QFont f = QApplication::font();
+                    f.setFamily(settings.getEmojiFontFamily());
+                    f.setPointSize(settings.getEmojiFontPointSize());
+                    smile.setEmojiFont(f);
+                }
+                result.append(smile);
+
+                // calculate offset for next smiley
+                offset += repSrt.count() - ((pack.isEmoji()) ? repRep.count() : 1);
             }
-            else {
-                placeholder = "#";
-            }
-            text.replace(repPos, repSrt.count(), placeholder);
+            searchStart = repPos + repSrt.count();
         }
     } while (found);
 

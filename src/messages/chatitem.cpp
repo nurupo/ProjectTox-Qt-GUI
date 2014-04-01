@@ -45,6 +45,7 @@ ChatItem::~ChatItem()
 {
     if(mDoc)
         delete mDoc;
+    qDeleteAll(mHighlights);
 }
 
 const QAbstractItemModel *ChatItem::model() const
@@ -87,6 +88,28 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     ctx.palette = QApplication::palette();
     ctx.palette.setBrush(QPalette::Active, QPalette::Text, data(MessageModel::ForegroundRole).value<QBrush>());
     QPalette::ColorGroup cg = chatView()->hasFocus() ? QPalette::Active : QPalette::Inactive;
+
+    //qDebug() << "-A--------";
+    // Highlights (search results)
+    for (Hightlight *h : mHighlights) {
+        //qDebug() << h->start() << h->length() << h->type();
+        QTextCursor c(document());
+        c.setPosition(h->start());
+        c.setPosition(h->start() + h->length(), QTextCursor::KeepAnchor);
+
+        QTextCharFormat f;
+        if(h->type() == Hightlight::Current)
+            f.setBackground(QBrush("#a40000"));
+        else
+            f.setBackground(QBrush("#C4A000"));
+        f.setForeground(Qt::white);
+
+        QAbstractTextDocumentLayout::Selection highlight;
+        highlight.cursor = c;
+        highlight.format = f;
+        ctx.selections.append(highlight);
+    }
+    //qDebug() << "-E--------";
 
     // Selection
     QAbstractTextDocumentLayout::Selection selection = selectionLayout();
@@ -170,9 +193,87 @@ bool ChatItem::isPosOverSelection(const QPointF &pos) const
     return false;
 }
 
-// TODO MKO find words
-/*QList<QRectF> ChatItem::findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive)
+/*void ChatItem::removeHighlight(const int &cursorPos)
 {
+    for (int i=0; i<mHighlights.count(); i++) {
+        if (cursorPos >= mHighlights.at(i)->start() && cursorPos < mHighlights.at(i)->start() + mHighlights.at(i)->length()) {
+            delete mHighlights[i];
+            mHighlights.removeAt(i);
+            return;
+        }
+    }
+    chatLine()->update();
+}*/
+
+Hightlight *ChatItem::setHighlight(int start, int length, bool current)
+{
+    //qDebug() << "ChatItem::setHighlight" << start << length << current;
+    Hightlight* h = highlightAtCursorPos(start);
+    if(h) {
+        h->setStart(start);
+        h->setLength(length);
+        h->setCurrent(current);
+    }
+    else {
+        h = new Hightlight(Hightlight::Found, this, start,length);
+        h->setCurrent(current);
+        mHighlights << h;
+    }
+    chatLine()->update();
+
+    /*for (Hightlight *h : mHighlights) {
+        qDebug() << "foreach (Hightlight h, mHighlights)" << h->start() << h->length() << h->type();
+    }*/
+    return h;
+}
+
+/*void ChatItem::updateHighlightLength(const Hightlight *highlight, int length)
+{
+    // TODO MKO const casten statt in liste suchen?
+    mHighlights[mHighlights.indexOf(highlight)]->setLength(length);
+}*/
+
+/*void ChatItem::updateHighlightCurrent(const Hightlight *highlight, bool current)
+{
+    // TODO MKO const casten statt in liste suchen?
+    mHighlights[mHighlights.indexOf(highlight)]->setCurrent(current);
+}*/
+
+void ChatItem::highlightsClear()
+{
+    qDeleteAll(mHighlights);
+    mHighlights.clear();
+    chatLine()->update();
+}
+
+Hightlight *ChatItem::highlightAtCursorPos(int pos)
+{
+    for (int i=0; i<mHighlights.count(); i++) {
+        if ((pos >= mHighlights.at(i)->start()) && (pos < (mHighlights.at(i)->start() + mHighlights.at(i)->length())))
+            return mHighlights[i];
+    }
+    return nullptr;
+}
+
+void ChatItem::highlightRemove(Hightlight *h)
+{
+    int pos = mHighlights.indexOf(h);
+    if(h)
+        delete h;
+    mHighlights.removeAt(pos);
+    chatLine()->update();
+}
+
+// TODO MKO find words
+/*QTextCursor ChatItem::findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive)
+{
+    QTextCursor c(document());
+    c.setPosition(0);
+
+    while()
+    return document()->find(searchWord, 0, (caseSensitive == Qt::CaseSensitive) ? QTextDocument::FindCaseSensitively : );
+
+
     QList<QRectF> resultList;
     const QAbstractItemModel *model_ = model();
     if (!model_)
@@ -417,40 +518,75 @@ QString ContentsChatItem::selection() const
         int start = qMin(selectionStart(), selectionEnd());
         int end   = start + qAbs(selectionStart() - selectionEnd());
         int offset = 0;
-        QTextDocument *doc = document()->clone();
 
-        foreach(Smiley s, privateData()->smileys) {
-            if(s.start()+offset >= start && s.start()+1+offset <= end+offset) {
-                QTextCursor c(doc);
-                c.setPosition(s.start()+offset);
-                c.setPosition(s.start()+1+offset, QTextCursor::KeepAnchor);
-                c.removeSelectedText();
-                c.insertText(s.text());
-
-                offset += s.textLength()-1;
+        for (const Smiley &s : privateData()->smileys) {
+            if(s.smileyfiedStart() >= start && s.smileyfiedStart()+1 <= end) {
+                offset += s.text().count() - ((s.type() == Smiley::Emoji) ? s.graphics().count() : 1);
             }
         }
 
-        QTextCursor cSelect(doc);
-        cSelect.setPosition(start);
-        cSelect.setPosition(end+offset, QTextCursor::KeepAnchor);
-        QString result = cSelect.selectedText();
-        delete doc;
-        return result;
+        return data(MessageModel::DisplayRole).toString().mid(start, end-start+offset);;
     }
     return QString();
+}
+
+const SmileyList *ContentsChatItem::smileyList() const
+{
+    return &(privateData()->smileys);
 }
 
 void ContentsChatItem::initDocument(QTextDocument *doc)
 {
     QString text = data(MessageModel::DisplayRole).toString();
 
-    privateData()->smileys = SmileyList::smilify(text);
+    privateData()->smileys = SmileyList::fromText(text);
+
     doc->setPlainText(text);
     doc->setTextWidth(width());
 
+    // Replace smileys
+    QTextCursor c(doc);
+    int i=0;
+    for(const Smiley &smiley : privateData()->smileys) {
+
+        // Remove textual smiley representation
+        c.setPosition(smiley.smileyfiedStart());
+        c.setPosition(smiley.smileyfiedStart()+smiley.text().count(), QTextCursor::KeepAnchor);
+        c.removeSelectedText();
+
+        if (smiley.type() == Smiley::Pixmap) {
+
+            QObject *smileyInterface = new SmileyTextObject(smiley.graphics());
+            doc->documentLayout()->registerHandler(QTextFormat::UserObject + i+1, smileyInterface);
+
+            QTextCharFormat smileyFormat;
+            smileyFormat.setObjectType(QTextFormat::UserObject + i+1);
+            c.insertText(QString(QChar::ObjectReplacementCharacter), smileyFormat);
+            i++;
+        }
+        else if (smiley.type() == Smiley::Emoji) {
+
+            c.insertText(smiley.graphics());
+            c.setPosition(smiley.smileyfiedStart(), QTextCursor::KeepAnchor);
+            QTextCharFormat format;
+            format.setFont(smiley.emojiFont());
+            c.mergeCharFormat(format);
+        }
+    }
+
     // Clicables
-    privateData()->clickables = ClickableList::fromString(text); // TODO MKO rebuild fromString to fromDoc and use QTextCursor
+
+    QString dummtext = text;
+    for(const Smiley &smiley : privateData()->smileys) {
+        QString dummy = "#";
+        if(smiley.type() == Smiley::Emoji) {
+            for(int i=1; i<smiley.graphics().count(); i++)
+                dummy += "#";
+        }
+        dummtext.replace(smiley.smileyfiedStart(), smiley.text().count(), dummy);
+    }
+
+    privateData()->clickables = ClickableList::fromString(dummtext);
     foreach(Clickable click, privateData()->clickables) {
         QTextCursor c(doc);
         c.setPosition(click.start());
@@ -460,41 +596,6 @@ void ContentsChatItem::initDocument(QTextDocument *doc)
         f.setAnchorHref(c.selectedText());
         f.setForeground(QApplication::palette().brush(QPalette::Link));
         c.mergeCharFormat(f);
-    }
-
-    // Replace smileys
-    QTextCursor c(doc);
-    for (int i=0; i<privateData()->smileys.count(); i++) {
-        if (privateData()->smileys.at(i).type() == Smiley::Pixmap) {
-
-            // Remove placeholder
-            c.setPosition(privateData()->smileys.at(i).start());
-            c.setPosition(privateData()->smileys.at(i).start()+1, QTextCursor::KeepAnchor);
-            c.removeSelectedText();
-
-            QObject *smileyInterface = new SmileyTextObject(privateData()->smileys.at(i).graphics());
-            doc->documentLayout()->registerHandler(QTextFormat::UserObject + i+1, smileyInterface);
-
-            QTextCharFormat smileyFormat;
-            smileyFormat.setObjectType(QTextFormat::UserObject + i+1);
-            c.insertText(QString(QChar::ObjectReplacementCharacter), smileyFormat);
-        }
-        else if (privateData()->smileys.at(i).type() == Smiley::Emoji) {
-
-            // Remove placeholder
-            c.setPosition(privateData()->smileys.at(i).start());
-            c.setPosition(privateData()->smileys.at(i).start()+privateData()->smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
-            c.removeSelectedText();
-
-            c.insertText(privateData()->smileys.at(i).graphics());
-
-            // Resize emoji
-            c.setPosition(privateData()->smileys.at(i).start());
-            c.setPosition(privateData()->smileys.at(i).start()+privateData()->smileys.at(i).graphics().count(), QTextCursor::KeepAnchor);
-            QTextCharFormat format;
-            format.setFont(privateData()->smileys.at(i).emojiFont());
-            c.mergeCharFormat(format);
-        }
     }
 }
 

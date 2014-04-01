@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget* parent)
     menuButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *menu = new QMenu(menuButton);
     menu->addAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this, SLOT(onSettingsActionTriggered()));
+    menu->addAction(QIcon(":/icons/find.png"), tr("Find"), this, SLOT(onSearchActionTriggered()), QKeySequence::Find);
     menu->addSeparator();
     menu->addAction(tr("About %1").arg(AppInfo::name), this, SLOT(onAboutAppActionTriggered()));
     menu->addAction(tr("About Qt"), qApp, SLOT(aboutQt()));
@@ -99,7 +100,7 @@ MainWindow::MainWindow(QWidget* parent)
     layout->addWidget(friendsWidget);
     layout->addWidget(toolBar);
 
-    PagesWidget* pages = new PagesWidget(this);
+    pages = new PagesWidget(this);
     connect(friendsWidget, &FriendsWidget::friendAdded, pages, &PagesWidget::addPage);
     connect(friendsWidget, &FriendsWidget::friendSelectionChanged, pages, &PagesWidget::activatePage);
     connect(friendsWidget, &FriendsWidget::friendStatusChanged, pages, &PagesWidget::statusChanged);
@@ -247,4 +248,11 @@ void MainWindow::onQuitApplicationTriggered()
 {
     CloseApplicationDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::onSearchActionTriggered()
+{
+    ChatPageWidget *chatpage = qobject_cast<ChatPageWidget*>(pages->currentWidget());
+    if(chatpage)
+        chatpage->showSearchBar();
 }

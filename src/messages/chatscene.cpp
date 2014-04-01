@@ -671,6 +671,8 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
     // now move the marker line if necessary. we don't need to do anything if we appended lines though...
     if (!_markerLineValid)
         setMarkerLine();
+
+    emit rowsInserted();
 }
 
 void ChatScene::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)

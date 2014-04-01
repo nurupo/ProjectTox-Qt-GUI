@@ -31,6 +31,7 @@
 class ChatLine;
 class ChatView;
 class ChatItemDocument;
+class ChatViewSearchWidget;
 
 
 /* All external positions are relative to the parent ChatLine */
@@ -79,6 +80,14 @@ public:
     bool isPosOverSelection(const QPointF &pos) const;
 
     //QList<QRectF> findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive);
+    inline QList<Hightlight*> *highlights() { return &mHighlights; }
+    //void removeHighlight(const int &cursorPos);
+    Hightlight *setHighlight(int start, int length, bool current = false);
+    //void updateHighlightLength(const Hightlight *highlight, int length);
+    //void updateHighlightCurrent(const Hightlight *highlight, bool current);
+    void highlightsClear();
+    Hightlight *highlightAtCursorPos(int pos);
+    void highlightRemove(Hightlight *h);
 
     virtual void addActionsToMenu(QMenu *menu, const QPointF &itemPos);
     virtual void handleClick(const QPointF &pos, ChatScene::ClickMode clickMode);
@@ -129,6 +138,9 @@ private:
     int _selectionEnd;
 
     mutable ChatItemDocument *mDoc;
+
+    // Search results
+    QList<Hightlight*> mHighlights;
 
     friend class ChatLine;
     friend class ChatItemDocument;
@@ -194,6 +206,7 @@ public:
     virtual inline int type() const { return ChatScene::ContentsChatItemType; }
     inline MessageModel::ColumnType column() const { return MessageModel::ContentsColumn; }
     virtual QString selection() const;
+    const SmileyList *smileyList() const;
 
 protected:
     virtual void initDocument(QTextDocument *doc);

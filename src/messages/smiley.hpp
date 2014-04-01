@@ -30,10 +30,11 @@ public:
         Emoji   = 2
     };
 
-    explicit Smiley(const QString &text = "", const QString &graphics = "", int start = 0, Type type = Invalid);
+    explicit Smiley(const QString &text = "", const QString &graphics = "", int start = 0, int smileyfiedStart = 0, Type type = Invalid);
 
     inline Type type() const { return mType; }
     inline int start() const { return mStart; }
+    inline int smileyfiedStart() const { return mSmiletfiedStart; }
     inline int textLength() const { return mTextLength; }
     inline bool isValid() const { return mType != Invalid; }
     inline QString text() const { return mText; }
@@ -48,6 +49,7 @@ public:
 private:
     Type mType;
     int  mStart;
+    int  mSmiletfiedStart; // start pos in smileyfied QTextDocument
     int  mTextLength;
     QString mText;
     QString mGraphics; // pixmap URL or emoji character
@@ -57,7 +59,7 @@ private:
 class SmileyList : public QList<Smiley>
 {
 public:
-    static SmileyList smilify(QString &text);
+    static SmileyList fromText(QString text);
 
     //Smiley atCursorPos(int idx);
 };

@@ -24,6 +24,7 @@
 #include "messages/messagemodel.hpp"
 #include "messages/chatview.hpp"
 #include "messages/messagefilter.hpp"
+#include "messages/chatviewsearchwidget.hpp"
 
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -38,6 +39,9 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
     filterModel = new MessageFilter(this);
     filterModel->setSourceModel(model);
     chatview = new ChatView(filterModel, this);
+
+    searchWidget = new ChatViewSearchWidget(this);
+    searchWidget->setScene(chatview->scene());
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
@@ -68,6 +72,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(friendItem);
+    layout->addWidget(searchWidget);
     layout->addWidget(splitter);
     layout->setSpacing(2);
     layout->setContentsMargins(0, 0, 2, 3);
@@ -129,4 +134,9 @@ void ChatPageWidget::onFriendUsernameChanged(const QString &newUsername)
 void ChatPageWidget::onOurUsernameChanged(const QString &newUsername)
 {
     model->insertNewMessage(newUsername, Settings::getInstance().getUsername(), Message::Nick, Message::Self);
+}
+
+void ChatPageWidget::showSearchBar()
+{
+    searchWidget->show();
 }
