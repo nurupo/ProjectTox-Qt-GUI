@@ -1,118 +1,91 @@
 #include "chatviewsearchwidget.hpp"
 #include "chatscene.hpp"
-#include <QTextCursor>
 #include "chatitem.hpp"
 #include "chatline.hpp"
 #include <QLineEdit>
-#include <QLabel>
-#include <QToolButton>
-#include <QCheckBox>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QDebug>
 #include "clickable.hpp"
 #include "Settings/settings.hpp"
 #include "smiley.hpp"
+#include <QToolBar>
 
 ChatViewSearchWidget::ChatViewSearchWidget(QWidget *parent) :
-    QWidget(parent),
-    _scene(0),
-    _caseSensitive(Qt::CaseInsensitive),
-    _searchOnlyRegularMsgs(true)
+    QToolBar(parent),
+    mScene(nullptr),
+    mCaseSensitive(Qt::CaseInsensitive),
+    mRegularMsgOnly(true)
 {
     setHidden(true);
+    setIconSize(QSize(16,16));
 
-    // Create widgets
-    searchLineEdit = new QLineEdit(this);
-    searchLineEdit->setClearButtonEnabled(true);
-    searchLineEdit->setPlaceholderText(tr("Search..."));
-    connect(searchLineEdit, &QLineEdit::textChanged, this, &ChatViewSearchWidget::setSearchString);
+    mSearchLineEdit = new QLineEdit(this);
+    mSearchLineEdit->setClearButtonEnabled(true);
+    mSearchLineEdit->setPlaceholderText(tr("Search"));
+    connect(mSearchLineEdit, &QLineEdit::textChanged, this, &ChatViewSearchWidget::setSearchString);
 
-    QToolButton *caseSensitiveCheckBox = new QToolButton(this);
-    caseSensitiveCheckBox->setCheckable(true);
-    caseSensitiveCheckBox->setAutoRaise(true);
-    caseSensitiveCheckBox->setToolTip(tr("Case sensitive"));
-    caseSensitiveCheckBox->setIcon(QIcon("://icons/text_uppercase.png"));
-    connect(caseSensitiveCheckBox, &QCheckBox::toggled, this, &ChatViewSearchWidget::setCaseSensitive);
+    QAction *csCheckbox = new QAction(QIcon(":/icons/text_uppercase.png"), tr("Case sensitive"), this);
+    csCheckbox->setCheckable(true);
+    connect(csCheckbox, &QAction::toggled, this, &ChatViewSearchWidget::setCaseSensitive);
 
-    QCheckBox *regularMsgCheckBox = new QCheckBox(tr("Regular messages only"), this);
-    regularMsgCheckBox->setChecked(_searchOnlyRegularMsgs);
-    connect(regularMsgCheckBox, &QCheckBox::toggled, this, &ChatViewSearchWidget::setSearchOnlyRegularMsgs);
+    QAction *regularMsgCheckBox = new QAction(tr("Regular messages only"), this);
+    regularMsgCheckBox->setCheckable(true);
+    regularMsgCheckBox->setChecked(mRegularMsgOnly);
+    connect(regularMsgCheckBox, &QAction::toggled, this, &ChatViewSearchWidget::setSearchOnlyRegularMsgs);
 
-    QToolButton *prevButton = new QToolButton(this);
-    prevButton->setAutoRaise(true);
-    prevButton->setIcon(QIcon(":/icons/resultset_previous.png"));
-    prevButton->setToolTip(tr("Previous search result"));
-    connect(prevButton, &QToolButton::clicked, this, &ChatViewSearchWidget::highlightPrev);
+    QAction *prevButton = new QAction(QIcon(":/icons/resultset_previous.png"), tr("Previous search result"), this);
+    prevButton->setShortcut(QKeySequence::FindPrevious);
+    connect(prevButton, &QAction::triggered, this, &ChatViewSearchWidget::highlightPrev);
 
-    QToolButton *nextButton = new QToolButton(this);
-    nextButton->setAutoRaise(true);
-    nextButton->setIcon(QIcon(":/icons/resultset_next.png"));
-    nextButton->setToolTip(tr("Next search result"));
+    QAction *nextButton = new QAction(QIcon(":/icons/resultset_next.png"), tr("Next search result"), this);
     nextButton->setShortcut(QKeySequence::FindNext);
-    connect(nextButton, &QToolButton::clicked, this, &ChatViewSearchWidget::highlightNext);
+    connect(nextButton, &QAction::triggered, this, &ChatViewSearchWidget::highlightNext);
 
-    QToolButton *closeButton = new QToolButton(this);
-    closeButton->setAutoRaise(true);
-    closeButton->setIcon(QIcon(":/icons/cross.png"));
-    connect(closeButton, &QToolButton::clicked, this, &ChatViewSearchWidget::closeSearch);
-
-    QHBoxLayout *searchLayout = new QHBoxLayout;
-    searchLayout->setSpacing(2);
-    searchLayout->setContentsMargins(0,0,0,0);
-    searchLayout->addWidget(searchLineEdit);
-    searchLayout->addWidget(caseSensitiveCheckBox);
-    searchLayout->addWidget(prevButton);
-    searchLayout->addWidget(nextButton);
-    searchLayout->addStretch(1);
-    searchLayout->addWidget(closeButton);
-
-    QHBoxLayout *checkLayout = new QHBoxLayout;
-    checkLayout->setSpacing(0);
-    checkLayout->setContentsMargins(0,0,0,0);
-    checkLayout->addWidget(regularMsgCheckBox);
-    checkLayout->addStretch(1);
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,0);
-    layout->addLayout(searchLayout);
-    layout->addLayout(checkLayout);
-    this->setLayout(layout);
+    addWidget(mSearchLineEdit);
+    addAction(prevButton);
+    addAction(nextButton);
+    addSeparator();
+    addAction(csCheckbox);
+    addAction(regularMsgCheckBox);
+    addSeparator();
+    addAction(QIcon(":/icons/cross.png"), tr("Close search"), this, SLOT(closeSearch()));
 }
 
 void ChatViewSearchWidget::setScene(ChatScene *scene)
 {
     Q_ASSERT(scene);
-    if (scene == _scene)
+    if (scene == mScene)
         return;
 
-    if (_scene) {
-        disconnect(_scene, 0, this, 0);
-        mHighlights.clear();
+    if (mScene) {
+        disconnect(mScene, 0, this, 0);
+        clearHightlights();
     }
 
-    _scene = scene;
+    mScene = scene;
     if (!scene)
         return;
 
     const Settings &s = Settings::getInstance();
 
-    connect(_scene, SIGNAL(destroyed()), this, SLOT(sceneDestroyed()));
-    connect(_scene, SIGNAL(rowsInserted()), this, SLOT(updateHighlights()));
+    connect(mScene, SIGNAL(destroyed()), this, SLOT(sceneDestroyed()));
+
+    // TODO MKO search only if widget is visible
+    connect(mScene, SIGNAL(rowsInserted()), this, SLOT(updateHighlights()));
     connect(&s, &Settings::smileyPackChanged, this, &ChatViewSearchWidget::updateExistingHighlights);
     // TODO MKO Backlog
+
+    connect(mScene, SIGNAL(rowsAboutToBeRemoved(int,int)), this, SLOT(rowsRemoved(int,int)), Qt::DirectConnection); // Direct connection is important
 
     updateHighlights();
 }
 
 void ChatViewSearchWidget::setSearchString(const QString &searchString)
 {
-    QString oldSearchString = _searchString;
-    _searchString = searchString;
-    if (_scene) {
+    QString oldSearchString = mSearchString;
+    mSearchString = searchString;
+    if (mScene) {
         if (!searchString.startsWith(oldSearchString) || oldSearchString.isEmpty()) {
-            // we can't reuse our all findings... cler the scene and do it all over
+            // we can't reuse our all findings... clear the scene and do it all over
             updateHighlights();
         }
         else {
@@ -124,13 +97,13 @@ void ChatViewSearchWidget::setSearchString(const QString &searchString)
 
 void ChatViewSearchWidget::setCaseSensitive(bool caseSensitive)
 {
-    if ((_caseSensitive == Qt::CaseSensitive && caseSensitive) || (_caseSensitive == Qt::CaseInsensitive && !caseSensitive))
+    if ((mCaseSensitive == Qt::CaseSensitive && caseSensitive) || (mCaseSensitive == Qt::CaseInsensitive && !caseSensitive))
         return;
 
     if(caseSensitive)
-        _caseSensitive = Qt::CaseSensitive;
+        mCaseSensitive = Qt::CaseSensitive;
     else
-        _caseSensitive = Qt::CaseInsensitive;
+        mCaseSensitive = Qt::CaseInsensitive;
 
     // we can reuse the original search results if the new search parameters are a restriction of the original one
     updateHighlights(caseSensitive);
@@ -138,10 +111,10 @@ void ChatViewSearchWidget::setCaseSensitive(bool caseSensitive)
 
 void ChatViewSearchWidget::setSearchOnlyRegularMsgs(bool searchOnlyRegularMsgs)
 {
-    if (_searchOnlyRegularMsgs == searchOnlyRegularMsgs)
+    if (mRegularMsgOnly == searchOnlyRegularMsgs)
         return;
 
-    _searchOnlyRegularMsgs = searchOnlyRegularMsgs;
+    mRegularMsgOnly = searchOnlyRegularMsgs;
 
     // we can reuse the original search results if the new search parameters are a restriction of the original one
     updateHighlights(searchOnlyRegularMsgs);
@@ -152,26 +125,19 @@ void ChatViewSearchWidget::highlightNext()
     if (mHighlights.isEmpty())
         return;
 
-    if (_currentHighlight < mHighlights.count()) {
-        //SearchItemCursor scCur = mHighlights[_currentHighlight];
-        //scCur.item->highlightFoundWord(scCur.start, scCur.end, false);
-        mHighlights[_currentHighlight]->setCurrent(false);
-        mHighlights.at(_currentHighlight)->item()->chatLine()->update();
-        //scCur.item->setHighlight(scCur.start, scCur.end - scCur.start, false);
-        //qDebug() << "de-highlight" << scCur.item->data(MessageModel::DisplayRole).toString().mid(scCur.start, scCur.end - scCur.start);
+    if (mCurrentHighlight < mHighlights.count()) {
+        mHighlights[mCurrentHighlight]->setCurrent(false);
+        mHighlights.at(mCurrentHighlight)->item()->chatLine()->update();
     }
 
-    _currentHighlight++;
-    if (_currentHighlight >= mHighlights.count())
-        _currentHighlight = 0;
+    mCurrentHighlight++;
+    if (mCurrentHighlight >= mHighlights.count())
+        mCurrentHighlight = 0;
 
-    mHighlights[_currentHighlight]->setCurrent(true);
-    mHighlights.at(_currentHighlight)->item()->chatLine()->update();
-    //SearchItemCursor scCur = _highlightCursors[_currentHighlight];
-    //scCur.item->highlightFoundWord(scCur.start, scCur.end, true);
-    //scCur.item->setHighlight(scCur.start, scCur.end - scCur.start, true);
-    //qDebug() << "   Highlight" << scCur.item->data(MessageModel::DisplayRole).toString().mid(scCur.start, scCur.end - scCur.start);
-    // emit newCurrentHighlight(_highlightItems.at(_currentHighlight));
+    mHighlights[mCurrentHighlight]->setCurrent(true);
+    mHighlights.at(mCurrentHighlight)->item()->chatLine()->update();
+
+    emit newCurrentHighlight(mHighlights.at(mCurrentHighlight)->item()->chatLine()->scenePos());
 }
 
 void ChatViewSearchWidget::highlightPrev()
@@ -179,143 +145,155 @@ void ChatViewSearchWidget::highlightPrev()
     if (mHighlights.isEmpty())
         return;
 
-    if (_currentHighlight < mHighlights.count()) {
-        mHighlights[_currentHighlight]->setCurrent(false);
-        mHighlights.at(_currentHighlight)->item()->chatLine()->update();
-        //SearchItemCursor scCur = _highlightCursors[_currentHighlight];
-        //scCur.item->highlightFoundWord(scCur.start, scCur.end, false);
-        //scCur.item->setHighlight(scCur.start, scCur.end - scCur.start, false);
-        //qDebug() << "de-highlight" << scCur.item->data(MessageModel::DisplayRole).toString().mid(scCur.start, scCur.end - scCur.start);
+    if (mCurrentHighlight < mHighlights.count()) {
+        mHighlights[mCurrentHighlight]->setCurrent(false);
+        mHighlights.at(mCurrentHighlight)->item()->chatLine()->update();
     }
 
-    _currentHighlight--;
-    if (_currentHighlight < 0)
-        _currentHighlight = mHighlights.count() - 1;
+    mCurrentHighlight--;
+    if (mCurrentHighlight < 0)
+        mCurrentHighlight = mHighlights.count() - 1;
 
-    mHighlights[_currentHighlight]->setCurrent(true);
-    mHighlights.at(_currentHighlight)->item()->chatLine()->update();
-    //SearchItemCursor scCur = _highlightCursors[_currentHighlight];
-    //scCur.item->highlightFoundWord(scCur.start, scCur.end, true);
-    //scCur.item->setHighlight(scCur.start, scCur.end - scCur.start, true);
-    //qDebug() << "   Highlight" << scCur.item->data(MessageModel::DisplayRole).toString().mid(scCur.start, scCur.end - scCur.start);
-    // emit newCurrentHighlight(_highlightItems.at(_currentHighlight));
+    mHighlights[mCurrentHighlight]->setCurrent(true);
+    mHighlights.at(mCurrentHighlight)->item()->chatLine()->update();
+
+    emit newCurrentHighlight(mHighlights.at(mCurrentHighlight)->item()->chatLine()->scenePos());
+}
+
+// Remove all highlights in mHighlights-list of removed rows
+void ChatViewSearchWidget::rowsRemoved(int start, int end)
+{
+
+    for (int i=0; i<mHighlights.count(); i++) {
+        Highlight *h = mHighlights.at(i);
+        if (!h)
+            mHighlights.removeAt(mHighlights.indexOf(h));
+
+        else if(h->item()->row()>= start && h->item()->row() <= end) {
+            // Highlights in item will deleted by deleting item
+            mHighlights.removeAt(mHighlights.indexOf(h));
+            i--;
+        }
+    }
+
+    // Find new current highlight
+    updateCurrentHighlight(nullptr, 0);
 }
 
 void ChatViewSearchWidget::sceneDestroyed()
 {
-    _scene = nullptr;
+    mScene = nullptr;
     mHighlights.clear();
 }
 
 void ChatViewSearchWidget::updateHighlights(bool reuse)
 {
-    if (!_scene)
+    if (!mScene)
         return;
 
-    reuse = false;
     if (reuse) {
         QSet<ChatItem *> chatItems;
-        for (Hightlight *highlight : mHighlights) {
+        for (Highlight *highlight : mHighlights) {
             ChatItem *item = highlight->item();
             if (item)
                 chatItems << item;
         }
         for (ChatItem *item : QList<ChatItem *>(chatItems.toList())) {
-            item->highlightsClear();
             updateHighlights(item);
         }
     }
     else {
         ChatItem *oldItem = nullptr;
         int oldStart = 0;
-        if (!mHighlights.isEmpty() && _currentHighlight < mHighlights.count()) {
-            oldItem = mHighlights.at(_currentHighlight)->item();
-            oldStart = mHighlights.at(_currentHighlight)->start();
+        if (!mHighlights.isEmpty() && mCurrentHighlight < mHighlights.count()) {
+            oldItem = mHighlights.at(mCurrentHighlight)->item();
+            oldStart = mHighlights.at(mCurrentHighlight)->start();
         }
 
         clearHightlights();
         Q_ASSERT(mHighlights.isEmpty());
 
-        if (_searchString.isEmpty())
+        if (mSearchString.isEmpty())
             return;
 
         checkMessagesForHighlight();
+        updateCurrentHighlight(oldItem, oldStart);
+    }
+}
 
-        if (mHighlights.isEmpty())
-            return;
+// Find the nearest highlight to a given old one
+void ChatViewSearchWidget::updateCurrentHighlight(ChatItem *oldItem, int oldStart)
+{
+    if (mHighlights.isEmpty())
+        return;
 
-        if (oldItem) {
-            int start = 0;
-            int end = mHighlights.count() - 1;
+    if (oldItem) {
+        int start = 0;
+        int end = mHighlights.count() - 1;
 
-            Hightlight *startPos;
-            Hightlight *endPos;
+        Highlight *startPos;
+        Highlight *endPos;
 
-            while (1) {
-                startPos = mHighlights.at(start);
-                endPos = mHighlights.at(end);
+        while (1) {
+            startPos = mHighlights.at(start);
+            endPos = mHighlights.at(end);
 
-                if (startPos->item()->row() == oldItem->row() && startPos->start() == oldStart) {
-                    _currentHighlight = start;
-                    break;
-                }
+            if (startPos->item()->row() == oldItem->row() && startPos->start() == oldStart) {
+                mCurrentHighlight = start;
+                break;
+            }
 
-                if (endPos->item()->row() == oldItem->row() && endPos->start() == oldStart) {
-                    _currentHighlight = end;
-                    break;
-                }
+            if (endPos->item()->row() == oldItem->row() && endPos->start() == oldStart) {
+                mCurrentHighlight = end;
+                break;
+            }
 
-                if (end - start == 1) {
-                    _currentHighlight = start;
-                    break;
-                }
+            if (end - start == 1) {
+                mCurrentHighlight = start;
+                break;
+            }
 
-                if(end-start == 0) {
-                    qDebug() << "hmm suchen warum pivot"; // TODO MKO
-                    break;
-                }
+            if(end-start == 0) {
+                qDebug() << "you shouldn't see this..."; // TODO MKO pivot search
+                mCurrentHighlight = start;
+                break;
+            }
 
-                int pivot = (end + start) / 2;
-                Hightlight *pivotPos = mHighlights.at(pivot);
-                if (startPos->item()->row() == endPos->item()->row()) {
-                    if (oldStart <= pivotPos->start())
-                        end = pivot;
-                    else
-                        start = pivot;
-                }
-                else {
-                    if (oldItem->row() <= pivotPos->item()->row())
-                        end = pivot;
-                    else
-                        start = pivot;
-                }
+            int pivot = (end + start) / 2;
+            Highlight *pivotPos = mHighlights.at(pivot);
+            if (startPos->item()->row() == endPos->item()->row()) {
+                if (oldStart <= pivotPos->start())
+                    end = pivot;
+                else
+                    start = pivot;
+            }
+            else {
+                if (oldItem->row() <= pivotPos->item()->row())
+                    end = pivot;
+                else
+                    start = pivot;
             }
         }
-        else {
-            _currentHighlight = mHighlights.count() - 1;
-        }
-
-        mHighlights.at(_currentHighlight)->setCurrent(true);
-        mHighlights.at(_currentHighlight)->item()->chatLine()->update();
-        //SearchItemCursor scCur = _highlightCursors[_currentHighlight];
-        //scCur.item->highlightFoundWord(scCur.start, scCur.end, true);
-        //scCur.item->setHighlight(scCur.start, scCur.end - scCur.start, true);
-        //qDebug() << "newCurrentHighlight" << scCur.item->data(MessageModel::DisplayRole).toString().mid(scCur.start, scCur.end - scCur.start);
-        //_highlightCursors[_currentHighlight]->setHighlighted(true);
-        //emit newCurrentHighlight(_highlightItems[_currentHighlight]);
     }
+    else {
+        mCurrentHighlight = mHighlights.count() - 1;
+    }
+
+    mHighlights.at(mCurrentHighlight)->setCurrent(true);
+    mHighlights.at(mCurrentHighlight)->item()->chatLine()->update();
+    emit newCurrentHighlight(mHighlights.at(mCurrentHighlight)->item()->chatLine()->scenePos());
 }
 
 void ChatViewSearchWidget::closeSearch()
 {
     clearHightlights();
-    searchLineEdit->clear();
+    mSearchLineEdit->clear();
     hide();
 }
 
 void ChatViewSearchWidget::checkMessagesForHighlight(int start, int end)
 {
-    QAbstractItemModel *model = _scene->model();
+    QAbstractItemModel *model = mScene->model();
     Q_ASSERT(model);
 
     if (end == -1) {
@@ -326,127 +304,62 @@ void ChatViewSearchWidget::checkMessagesForHighlight(int start, int end)
 
     QModelIndex index;
     for (int row = start; row <= end; row++) {
-        if (_searchOnlyRegularMsgs) {
+        if (mRegularMsgOnly) {
             index = model->index(row, 0);
             if (!checkType((Message::Type)index.data(MessageModel::TypeRole).toInt()))
                 continue;
         }
-        highlightLine(_scene->chatLine(row)->contentsItem());
+        findHighlightInItem(mScene->chatLine(row)->contentsItem());
     }
 }
 
-// find highlights in item and highlight it
-void ChatViewSearchWidget::highlightLine(ChatItem *line) // TODO MKO ubenennen
+// Find new highlights in item and highlight them
+void ChatViewSearchWidget::findHighlightInItem(ChatItem *item)
 {
-    ChatItem *item = line;
-
-    // adjust highlight length for smileys
-    QString text = item->data(MessageModel::DisplayRole).toString();
-    SmileyList smileys = SmileyList::fromText(text);
-
-    foreach (Smiley s, smileys) {
-        qDebug() << s.start() << s.text();
-    }
-
+    Offsets offset;
+    offset.length = 0;
+    offset.start  = 0;
 
     for (int idx : findWords(item->data(MessageModel::DisplayRole).toString())) {
+        // Calculate smiley offsets
+        if (item->type() == ChatScene::ContentsChatItemType) {
+            ContentsChatItem *contentItem = static_cast<ContentsChatItem*>(item);
+            offset = calculateSmileyOffsets(contentItem->smileyList(), idx);
+        }
 
-       Offsets offset = calculateSmileyOffsets(&smileys, idx);
-
-       if(_searchString.count() + offset.length > 0)
-            mHighlights << item->setHighlight(idx + offset.start, _searchString.count() + offset.length);
-
-       // give highlight to item without care of smiley offsets
-        //mHighlights << item->setHighlight(idx, _searchString.count());
+        if (mSearchString.count() + offset.length > 0)
+            mHighlights << item->addHighlight(idx + offset.start, mSearchString.count() + offset.length);
     }
 }
 
-// This function updates only highlights of an item (delete and search again)
+// This function updates only highlights of 1 item (delete and search again)
 void ChatViewSearchWidget::updateHighlights(ChatItem *item)
 {
-    // adjust highlight length for smileys
-    //QString text = item->data(MessageModel::DisplayRole).toString();
-    //SmileyList smileys = SmileyList::smilify(text);
-
-    //QList<int> wordFounds = findWords(item->data(MessageModel::DisplayRole).toString());
-
-    //bool deleteAll = false;
-    QAbstractItemModel *model = _scene->model();
-    Q_ASSERT(model);
-
+    // Store the old current highlight
+    ChatItem *oldItem = nullptr;
+    int oldStart = 0;
+    if (!mHighlights.isEmpty() && mCurrentHighlight < mHighlights.count()) {
+        oldItem = mHighlights.at(mCurrentHighlight)->item();
+        oldStart = mHighlights.at(mCurrentHighlight)->start();
+    }
 
     // Delete all highlights of this item
     for (int i=0; i<item->highlights()->count(); i++) {
-        Hightlight *highlightItem = item->highlights()->at(i);
+        Highlight *highlightItem = item->highlights()->at(i);
         if (!highlightItem)
             continue;
 
-        int pos = mHighlights.indexOf(highlightItem);
-        if (pos == _currentHighlight) {
-            highlightPrev();
-        }
-        else if (pos < _currentHighlight) {
-            _currentHighlight--;
-        }
-
         highlightItem->item()->highlightRemove(highlightItem);
-        mHighlights.removeAt(pos);
+        mHighlights.removeAt(mHighlights.indexOf(highlightItem));
         i--;
     }
 
-    // Find highlights of this line
-    highlightLine(item);
+    // Find highlights of this item
+    findHighlightInItem(item);
 
+    // set the current to the nearest highlight from the old one
+    updateCurrentHighlight(oldItem, oldStart);
 
-
-    /*if (_searchOnlyRegularMsgs) {
-        QModelIndex index = model->index(item->row(), 0);
-        if (!checkType((Message::Type)index.data(MessageModel::TypeRole).toInt()))
-            deleteAll = true;
-    }*/
-
-
-    // TODO MKO hier dran!!!!!!!! die smileypositionen mit offsetfunktion neu brerechnen
-
-    // if it is a content item
-    /*ContentsChatItem *contentItem = nullptr;
-    if (highlightItem->item()->type() == ChatScene::ContentsChatItemType) {
-        contentItem = static_cast<ContentsChatItem*>(highlightItem->item());
-    }*/
-
-
-    /*for (int i=0; i<item->highlights()->count(); i++) {
-        Hightlight *highlightItem = item->highlights()->at(i);
-        if (!highlightItem)
-            continue;
-
-
-        // 1. alle highlights löschen
-        // 2. neue erstellen
-
-
-        // HIER DRAN !!!!!!!!! Problem, der highlight hat ja schon einen offset, er soll ja nur verlängert werden
-        Offsets offset = calculateSmileyOffsets(&smileys, highlightItem->start());
-
-        if (!deleteAll && wordFounds.contains(highlightItem->start() + offset.start)) {
-
-            highlightItem->setLength(_searchString.count() + offset.length);
-            item->chatLine()->update();
-        }
-        else {
-            int pos = mHighlights.indexOf(highlightItem);
-            if (pos == _currentHighlight) {
-                highlightPrev();
-            }
-            else if (pos < _currentHighlight) {
-                _currentHighlight--;
-            }
-
-            highlightItem->item()->highlightRemove(highlightItem);
-            mHighlights.removeAt(pos);
-            i--;
-        }
-    }*/
 }
 
 QList<int> ChatViewSearchWidget::findWords(const QString &string)
@@ -455,7 +368,7 @@ QList<int> ChatViewSearchWidget::findWords(const QString &string)
 
     int searchIdx = 0;
     do {
-        searchIdx = string.indexOf(_searchString, searchIdx, _caseSensitive);
+        searchIdx = string.indexOf(mSearchString, searchIdx, mCaseSensitive);
         if(searchIdx!=-1) {
             result << searchIdx;
             searchIdx++;
@@ -467,7 +380,7 @@ QList<int> ChatViewSearchWidget::findWords(const QString &string)
 
 void ChatViewSearchWidget::clearHightlights()
 {
-    for (Hightlight *sc : mHighlights) {
+    for (Highlight *sc : mHighlights) {
         if(sc->item())
             sc->item()->highlightRemove(sc);
     }
@@ -484,103 +397,33 @@ ChatViewSearchWidget::Offsets ChatViewSearchWidget::calculateSmileyOffsets(const
         const Smiley s = smileys->at(i);
         qint8 graphicsLength = (s.type() == Smiley::Emoji) ? s.graphics().count() : 1;
         int searchStart      = foundWordStart;
-        int searchEnd        = foundWordStart + _searchString.count() - 1;
+        int searchEnd        = foundWordStart + mSearchString.count() - 1;
         int smileStart       = s.start();
         int smileEnd         = s.start() + s.textLength() - 1;
-        qDebug() << "searchStart:" << searchStart << "| searchEnd:" << searchEnd << "| smileStart:" << smileStart << "| smileEnd:" << smileEnd << "| _searchString.count()" << _searchString.count();
 
         // Julians algorithm
         if (smileStart < searchStart) {
             if (smileEnd < searchStart) {
                 r.start += graphicsLength - s.textLength();
-                qDebug() << "a";
             }
             else if (smileEnd >= searchStart) {
                 if (smileEnd < searchEnd) {
                     r.start += smileStart + graphicsLength - searchStart;
                     r.length += searchStart - smileEnd - 1;
-                    qDebug() << "b";
                 }
                 else {
-                    r.length -= _searchString.count();
-                    // TODO MKO offset auf ende smiley setzen
-                    qDebug() << "c";
+                    r.length -= mSearchString.count();
                 }
             }
         }
         else if (smileStart >= searchStart && smileStart <= searchEnd) {
             if (smileEnd <= searchEnd) {
                 r.length += graphicsLength - s.textLength();
-                qDebug() << "d";
             }
             else {
                 r.length += smileStart - searchEnd - 1;
-                qDebug() << "e";
             }
         }
-
-        qDebug() << "temp Offsets:" << r.start << r.length;
-
-        /*
-        // startet vor oder mit smiley und endet innerhalb smiley
-        if (searchStart <= smileStart && searchEnd >= smileStart && searchEnd < smileEnd) {
-            r.length -= searchEnd - smileStart + 1; // MKO TODO slength
-        }
-        // startet in und endet mit oder in smiley
-        else if(searchStart > smileStart && searchEnd <= smileEnd) {
-            r.length -= _searchString.count();
-            r.start += smileStart + graphicsLength -searchStart;
-        }
-        // startet in smiley und endet nach smiley
-        else if(searchStart > smileStart && searchStart <= smileEnd && searchEnd > smileEnd) {
-            r.length -= smileEnd - searchStart + 1;
-            r.start += smileStart + graphicsLength -searchStart;
-        }
-        // startet mit oder vor und endet mit oder nach smiley
-        else if(searchStart <= smileStart && searchEnd >= smileEnd) {
-            r.length -= s.textLength() - graphicsLength;
-        }
-        // startet nach smiley
-        else if(searchStart > smileEnd) {
-            r.start -= s.textLength() - graphicsLength;
-        }
-        // startet vor und endet vor smiley
-        else if(searchStart < smileStart) {
-            ;
-        }
-        else {
-            qWarning() << "MKO SOLLTE NICHT PASSIEREN!";
-        }
-        */
-
-
-        /*if ((idx >= s.start() && idx <= s.start() + s.textLength())
-                || (idx < s.start() && idx + _searchString.count() > s.start() && idx + _searchString.count() < s.start() + s.textLength())) {
-            offset += idx + _searchString.count() - s.start();
-            break;
-        } else if(idx < s.start() && idx + _searchString.count() > s.start()) {
-            offset += s.textLength() - slength;
-            break;
-        }*/
     }
-    qDebug() << QString("============================\n")
-             << QString("start   : %1").arg(foundWordStart)         << QString("length  : %1\n").arg(_searchString.count())
-             << QString("+ offset: %1").arg(r.start)                << QString("+ offset: %1\n").arg(r.length)
-             << QString("-----------")                              << QString("-----------\n")
-             << QString("        : %1").arg(foundWordStart+r.start) << QString("        : %1").arg(_searchString.count() + r.length);
-
     return r;
-}
-
-// ============================================================================
-
-
-bool ChatViewSearchWidget::SearchItemCursor::operator==(const ChatViewSearchWidget::SearchItemCursor &other) const
-{
-    return (start == other.start && end == other.end && item->row() == other.item->row()) ? true : false;
-}
-
-uint qHash(const ChatViewSearchWidget::SearchItemCursor &key, uint seed)
-{
-    return qHash(key.item->row(), seed) ^ key.start ^ key.end; // TODO MKO ?????
 }

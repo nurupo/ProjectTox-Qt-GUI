@@ -70,6 +70,7 @@ public slots:
     void setMarkerLineVisible(bool visible = true);
     void setMarkerLine(MsgId msgId);
     void jumpToMarkerLine();
+    void scrollTo(const QPointF &position);
 
 protected:
     virtual bool event(QEvent *event);

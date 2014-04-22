@@ -196,6 +196,11 @@ void ChatView::jumpToMarkerLine()
     scene()->jumpToMarkerLine();
 }
 
+void ChatView::scrollTo(const QPointF &position)
+{
+    ensureVisible(0, position.y(), 1, 1);
+}
+
 bool ChatView::event(QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {

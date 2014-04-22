@@ -42,6 +42,7 @@ ChatPageWidget::ChatPageWidget(int friendId, QWidget* parent) :
 
     searchWidget = new ChatViewSearchWidget(this);
     searchWidget->setScene(chatview->scene());
+    connect(searchWidget, &ChatViewSearchWidget::newCurrentHighlight, chatview, &ChatView::scrollTo);
 
     input = new InputTextWidget(this);
     connect(input, &InputTextWidget::sendMessage, this, &ChatPageWidget::sendMessage);
@@ -98,7 +99,7 @@ void ChatPageWidget::setStatus(Status newStatus)
 {
     status = newStatus;
     friendItem->setStatus(status);
-    input->setDisabled(newStatus == Status::Offline);
+    //input->setDisabled(newStatus == Status::Offline);
     emoticonButton->setDisabled(newStatus == Status::Offline);
 }
 

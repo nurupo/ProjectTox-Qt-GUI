@@ -31,8 +31,6 @@
 class ChatLine;
 class ChatView;
 class ChatItemDocument;
-class ChatViewSearchWidget;
-
 
 /* All external positions are relative to the parent ChatLine */
 /* Yes, that's also true for the boundingRect() and related things */
@@ -79,15 +77,9 @@ public:
     bool hasSelection() const;
     bool isPosOverSelection(const QPointF &pos) const;
 
-    //QList<QRectF> findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive);
-    inline QList<Hightlight*> *highlights() { return &mHighlights; }
-    //void removeHighlight(const int &cursorPos);
-    Hightlight *setHighlight(int start, int length, bool current = false);
-    //void updateHighlightLength(const Hightlight *highlight, int length);
-    //void updateHighlightCurrent(const Hightlight *highlight, bool current);
-    void highlightsClear();
-    Hightlight *highlightAtCursorPos(int pos);
-    void highlightRemove(Hightlight *h);
+    inline QList<Highlight*> *highlights() { return &mHighlights; }
+    Highlight *addHighlight(int start, int length);
+    void highlightRemove(Highlight *h);
 
     virtual void addActionsToMenu(QMenu *menu, const QPointF &itemPos);
     virtual void handleClick(const QPointF &pos, ChatScene::ClickMode clickMode);
@@ -125,7 +117,7 @@ protected:
     qint16 posToCursor(const QPointF &posInLine) const;
 
     void setGeometry(qreal width, qreal height);
-    inline void setHeight(const qreal &height) { /*clearCache();*/ _boundingRect.setHeight(height); }
+    inline void setHeight(const qreal &height) { _boundingRect.setHeight(height); }
     void setWidth(const qreal &width);
     inline void setPos(const QPointF &pos) {_boundingRect.moveTopLeft(pos); }
 
@@ -140,7 +132,7 @@ private:
     mutable ChatItemDocument *mDoc;
 
     // Search results
-    QList<Hightlight*> mHighlights;
+    QList<Highlight*> mHighlights;
 
     friend class ChatLine;
     friend class ChatItemDocument;

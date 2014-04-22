@@ -98,6 +98,7 @@ signals:
     void layoutChanged(); // indicates changes to the scenerect due to resizing of the contentsitems
     void mouseMoveWhileSelecting(const QPointF &scenePos);
     void rowsInserted();
+    void rowsAboutToBeRemoved(int start, int end); // will emitted just before removing items
 
 public slots:
     void updateForViewport(qreal width, qreal height);

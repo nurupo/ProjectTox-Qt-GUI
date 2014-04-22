@@ -37,7 +37,7 @@ ChatItem::ChatItem(const QRectF &boundingRect, ChatLine *parent) :
     _boundingRect(boundingRect),
     _selectionMode(NoSelection),
     _selectionStart(-1),
-    mDoc(NULL)
+    mDoc(nullptr)
 {
 }
 
@@ -45,6 +45,7 @@ ChatItem::~ChatItem()
 {
     if(mDoc)
         delete mDoc;
+
     qDeleteAll(mHighlights);
 }
 
@@ -91,14 +92,14 @@ void ChatItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     //qDebug() << "-A--------";
     // Highlights (search results)
-    for (Hightlight *h : mHighlights) {
+    for (Highlight *h : mHighlights) {
         //qDebug() << h->start() << h->length() << h->type();
         QTextCursor c(document());
         c.setPosition(h->start());
         c.setPosition(h->start() + h->length(), QTextCursor::KeepAnchor);
 
         QTextCharFormat f;
-        if(h->type() == Hightlight::Current)
+        if(h->type() == Highlight::Current)
             f.setBackground(QBrush("#a40000"));
         else
             f.setBackground(QBrush("#C4A000"));
@@ -193,111 +194,29 @@ bool ChatItem::isPosOverSelection(const QPointF &pos) const
     return false;
 }
 
-/*void ChatItem::removeHighlight(const int &cursorPos)
+Highlight *ChatItem::addHighlight(int start, int length)
 {
-    for (int i=0; i<mHighlights.count(); i++) {
-        if (cursorPos >= mHighlights.at(i)->start() && cursorPos < mHighlights.at(i)->start() + mHighlights.at(i)->length()) {
-            delete mHighlights[i];
-            mHighlights.removeAt(i);
-            return;
-        }
-    }
-    chatLine()->update();
-}*/
+     Highlight *h = new Highlight(Highlight::Found, this, start,length);
+     mHighlights << h;
+     chatLine()->update();
 
-Hightlight *ChatItem::setHighlight(int start, int length, bool current)
-{
-    //qDebug() << "ChatItem::setHighlight" << start << length << current;
-    Hightlight* h = highlightAtCursorPos(start);
-    if(h) {
-        h->setStart(start);
-        h->setLength(length);
-        h->setCurrent(current);
-    }
-    else {
-        h = new Hightlight(Hightlight::Found, this, start,length);
-        h->setCurrent(current);
-        mHighlights << h;
-    }
-    chatLine()->update();
-
-    /*for (Hightlight *h : mHighlights) {
-        qDebug() << "foreach (Hightlight h, mHighlights)" << h->start() << h->length() << h->type();
-    }*/
     return h;
 }
 
-/*void ChatItem::updateHighlightLength(const Hightlight *highlight, int length)
-{
-    // TODO MKO const casten statt in liste suchen?
-    mHighlights[mHighlights.indexOf(highlight)]->setLength(length);
-}*/
-
-/*void ChatItem::updateHighlightCurrent(const Hightlight *highlight, bool current)
-{
-    // TODO MKO const casten statt in liste suchen?
-    mHighlights[mHighlights.indexOf(highlight)]->setCurrent(current);
-}*/
-
-void ChatItem::highlightsClear()
-{
-    qDeleteAll(mHighlights);
-    mHighlights.clear();
-    chatLine()->update();
-}
-
-Hightlight *ChatItem::highlightAtCursorPos(int pos)
-{
-    for (int i=0; i<mHighlights.count(); i++) {
-        if ((pos >= mHighlights.at(i)->start()) && (pos < (mHighlights.at(i)->start() + mHighlights.at(i)->length())))
-            return mHighlights[i];
-    }
-    return nullptr;
-}
-
-void ChatItem::highlightRemove(Hightlight *h)
+void ChatItem::highlightRemove(Highlight *h)
 {
     int pos = mHighlights.indexOf(h);
-    if(h)
+    if (mHighlights.count() == 0 || pos < 0) {
+        return;
+    }
+
+    if(h) {
         delete h;
+        h = nullptr;
+    }
     mHighlights.removeAt(pos);
     chatLine()->update();
 }
-
-// TODO MKO find words
-/*QTextCursor ChatItem::findWords(const QString &searchWord, Qt::CaseSensitivity caseSensitive)
-{
-    QTextCursor c(document());
-    c.setPosition(0);
-
-    while()
-    return document()->find(searchWord, 0, (caseSensitive == Qt::CaseSensitive) ? QTextDocument::FindCaseSensitively : );
-
-
-    QList<QRectF> resultList;
-    const QAbstractItemModel *model_ = model();
-    if (!model_)
-        return resultList;
-
-    QString plainText = model_->data(model_->index(row(), column()), MessageModel::DisplayRole).toString();
-    QList<int> indexList;
-    int searchIdx = plainText.indexOf(searchWord, 0, caseSensitive);
-    while (searchIdx != -1) {
-        indexList << searchIdx;
-        searchIdx = plainText.indexOf(searchWord, searchIdx + 1, caseSensitive);
-    }
-
-    foreach(int idx, indexList) {
-        QTextLine line = layout()->lineForTextPosition(idx);
-        qreal x = line.cursorToX(idx);
-        qreal width = line.cursorToX(idx + searchWord.count()) - x;
-        qreal height = line.height();
-        qreal y = height * line.lineNumber();
-        resultList << QRectF(x, y, width, height);
-    }
-
-    return resultList;
-}*/
 
 void ChatItem::addActionsToMenu(QMenu *menu, const QPointF &itemPos)
 {
@@ -574,8 +493,7 @@ void ContentsChatItem::initDocument(QTextDocument *doc)
         }
     }
 
-    // Clicables
-
+    // Clickables
     QString dummtext = text;
     for(const Smiley &smiley : privateData()->smileys) {
         QString dummy = "#";
@@ -651,7 +569,7 @@ void ContentsChatItem::handleClick(const QPointF &pos, ChatScene::ClickMode clic
         Clickable foo = privateData()->clickables.atCursorPos(idx);
         if (foo.isValid()) {
             QTextCursor c(document());
-            c.setPosition(idx +1); // MKO TODO +1? Bug in link detection?
+            c.setPosition(idx +1); // TODO MKO +1? Bug in link detection?
             foo.activate(c.charFormat().anchorHref());
         }
     }
@@ -708,7 +626,7 @@ void ContentsChatItem::copyLinkToClipboard()
 
     if (click.isValid() && click.type() == Clickable::Url) {
         QTextCursor c(document());
-        c.setPosition(click.start()+1); // MKO TODO +1? Bug in link detection?
+        c.setPosition(click.start()+1); // TODO MKO +1? Bug in link detection?
         chatScene()->stringToClipboard(c.charFormat().anchorHref());
     }
 }

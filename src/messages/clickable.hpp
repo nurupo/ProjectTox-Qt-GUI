@@ -58,7 +58,7 @@ public:
 
 // ============================================================================
 
-class Hightlight
+class Highlight
 {
 public:
     enum Type {
@@ -67,7 +67,7 @@ public:
         Current = 1
     };
 
-    explicit Hightlight(Type type = Invalid, ChatItem *item = nullptr, quint16 start = 0, quint16 length = 0);
+    explicit Highlight(Type type = Invalid, ChatItem *item = nullptr, quint16 start = 0, quint16 length = 0);
 
     inline Type type() const { return _type; }
     inline quint16 start() const { return _start; }

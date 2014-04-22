@@ -678,6 +678,7 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
 void ChatScene::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
 {
     Q_UNUSED(parent);
+    emit rowsAboutToBeRemoved(start, end);
 
     qreal h = 0; // total height of removed items;
 
