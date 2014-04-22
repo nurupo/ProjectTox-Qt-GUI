@@ -164,8 +164,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     Settings::getInstance().restoreGeometryState(splitterWidget);
     Settings::getInstance().restoreGeometryState(this);
-
-    emit friendRequested("76F516A3114259EAE5CC81F3D4B847002328C6DEC88FC636F1740FE086B3541E61CF89A1F061", "test");
 }
 
 MainWindow::~MainWindow()
