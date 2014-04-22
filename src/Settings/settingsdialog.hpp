@@ -18,11 +18,19 @@
 #define SETTINGSDIALOG_HPP
 
 #include "basicsettingsdialog.hpp"
+#include "settings.hpp"
 
 class SettingsDialog: public BasicSettingsDialog
 {
-public:
+protected:
+    static int showDialog(QWidget *parent);
+
+private:
     SettingsDialog(QWidget* parent);
+    SettingsDialog(SettingsDialog &settingsDialog) = delete;
+    SettingsDialog& operator=(const SettingsDialog&) = delete;
+
+    friend void Settings::executeSettingsDialog(QWidget *parent);
 
 };
 

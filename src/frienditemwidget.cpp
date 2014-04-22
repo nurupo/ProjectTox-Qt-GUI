@@ -25,6 +25,7 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
     statusLabel = new QLabel(this);
     statusLabel->setScaledContents(true);
     statusLabel->setFixedSize(24, 24);
+    setStatus(Status::Offline);
 
     usernameLabel = new CopyableElideLabel(this);
     usernameLabel->setAlignment(Qt::AlignLeft);

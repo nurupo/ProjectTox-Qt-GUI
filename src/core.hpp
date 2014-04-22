@@ -21,9 +21,9 @@
 
 #include <tox.h>
 
+#include <QDateTime>
 #include <QObject>
 #include <QTimer>
-#include <QList>
 
 class Core : public QObject
 {
@@ -33,18 +33,26 @@ public:
     ~Core();
 
 private:
-    static void onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendRequest(Tox* tox, uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
     static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
-    static void onUserStatusChanged(Tox* tox, int friendId, TOX_USERSTATUS userstatus, void* core);
+    static void onUserStatusChanged(Tox* tox, int friendId, uint8_t userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
     static void onAction(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
 
     void checkConnection();
 
+    void loadConfiguration();
+    void saveConfiguration();
+    void loadFriends();
+
+    void checkLastOnline(int friendId);
+
     Tox* tox;
     QTimer* timer;
+
+    static const QString CONFIG_FILE_NAME;
 
     class CData
     {
@@ -99,8 +107,6 @@ private:
         uint16_t size();
 
         static QString toString(uint8_t* cMessage, uint16_t cMessageSize);
-        static QString toString(uint8_t* cMessage);
-
 
     private:
         const static int MAX_SIZE_OF_UTF8_ENCODED_CHARACTER = 4;
@@ -147,8 +153,11 @@ signals:
 
     void friendRemoved(int friendId);
 
+    void friendLastSeenChanged(int friendId, const QDateTime& dateTime);
+
     void usernameSet(const QString& username);
     void statusMessageSet(const QString& message);
+    void statusSet(Status status);
 
     void messageSentResult(int friendId, const QString& message, int messageId);
     void actionSentResult(int friendId, const QString& action, int success);
@@ -157,6 +166,7 @@ signals:
     void failedToRemoveFriend(int friendId);
     void failedToSetUsername(const QString& username);
     void failedToSetStatusMessage(const QString& message);
+    void failedToSetStatus(Status status);
 
     void actionReceived(int friendId, const QString& acionMessage);
 

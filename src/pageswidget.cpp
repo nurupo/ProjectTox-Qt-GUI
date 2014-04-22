@@ -17,8 +17,6 @@
 #include "chatpagewidget.hpp"
 #include "pageswidget.hpp"
 
-#include <QDebug>
-
 PagesWidget::PagesWidget(QWidget* parent) :
     QStackedWidget(parent)
 {
@@ -46,7 +44,6 @@ void PagesWidget::addPage(int friendId, const QString& username)
     connect(chatPage, &ChatPageWidget::sendMessage, this, &PagesWidget::onMessageSent);
     connect(chatPage, &ChatPageWidget::sendAction,  this, &PagesWidget::onActionToSend);
     addWidget(chatPage);
-    qDebug() << "page" << friendId << "added" << count();
 }
 
 void PagesWidget::activatePage(int friendId)
@@ -59,7 +56,6 @@ void PagesWidget::removePage(int friendId)
     ChatPageWidget* chatPage = widget(friendId);
     removeWidget(chatPage);
     delete chatPage;
-    qDebug() << "page" << friendId << "removed" << count();
 }
 
 void PagesWidget::onFriendusernameChanged(int friendId, const QString& username)

@@ -45,11 +45,13 @@ private:
     QGroupBox* buildAnimationGroup();
     QGroupBox* buildSmileypackGroup();
     QGroupBox* buildChatviewGroup();
+    QGroupBox* buildOthersGroup();
 
     void searchSmileyPacks();
 
     EmojiFontSettingsDialog *emojiSettings;
     QCheckBox* enableAnimationCheckbox;
+    QCheckBox* minimizeToTrayCheckbox;
 
     QComboBox* smileypackCombobox;
     QToolButton *emojiButton;

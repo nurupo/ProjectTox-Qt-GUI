@@ -73,18 +73,18 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
 void FriendsWidget::addFriend(int friendId, const QString& userId)
 {
     QStandardItem* item = new QStandardItem();
+
     item->setData(userId, FriendItemDelegate::UsernameRole);
     item->setData(userId, FriendItemDelegate::UserIdRole);
-    item->setData(QString("User ID: %1").arg(userId), Qt::ToolTipRole);
     item->setData(friendId, FriendItemDelegate::FriendIdRole);
+    item->setData(QVariant::fromValue(Status::Offline), FriendItemDelegate::StatusRole);
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 
-    emit friendAdded(friendId, userId);
-
-    Status status = Status::Offline;
-    setStatus(item, status);
-
     friendModel->appendRow(item);
+
+    updateToolTip(item);
+
+    emit friendAdded(friendId, userId);
 }
 
 void FriendsWidget::setStatus(int friendId, Status status)
@@ -95,16 +95,9 @@ void FriendsWidget::setStatus(int friendId, Status status)
         return;
     }
 
-    setStatus(friendItem, status);
-}
-
-void FriendsWidget::setStatus(QStandardItem* friendItem, Status status)
-{
     friendItem->setData(QVariant::fromValue(status), FriendItemDelegate::StatusRole);
 
-    int friendId = friendItem->data(FriendItemDelegate::FriendIdRole).toInt();
-
-    emit friendStatusChanged(friendId, status);
+    updateToolTip(friendItem);
 }
 
 void FriendsWidget::setUsername(int friendId, const QString& username)
@@ -117,7 +110,6 @@ void FriendsWidget::setUsername(int friendId, const QString& username)
 
     friendItem->setData(username, FriendItemDelegate::UsernameRole);
 }
-
 
 void FriendsWidget::setStatusMessage(int friendId, const QString& statusMessage)
 {
@@ -195,4 +187,36 @@ QString FriendsWidget::getUsername(int friendId)
     }
 
     return friendItem->text();
+}
+
+void FriendsWidget::setLastSeen(int friendId, const QDateTime &dateTime) {
+    QStandardItem* friendItem = findFriendItem(friendId);
+
+    if (friendItem == nullptr) {
+        return;
+    }
+
+    friendItem->setData(dateTime, FriendItemDelegate::LastSeenRole);
+
+    updateToolTip(friendItem);
+}
+
+void FriendsWidget::updateToolTip(QStandardItem* friendItem) const
+{
+    const Status status = FriendItemDelegate::getStatus(friendItem->index());
+    const QString userIdString = QString("User ID: %1").arg(friendItem->data(FriendItemDelegate::UserIdRole).toString());
+    QString lastSeenString = "Last seen: ";
+
+    if (status == Status::Offline) {
+        QDateTime lastSeenDateTime = friendItem->data(FriendItemDelegate::LastSeenRole).toDateTime();
+        if (lastSeenDateTime.isValid()) {
+            lastSeenString += lastSeenDateTime.toString(Qt::SystemLocaleShortDate);
+        } else {
+            lastSeenString += "Never";
+        }
+    } else {
+        lastSeenString += "Now";
+    }
+
+    friendItem->setData(userIdString + "\n" + lastSeenString, Qt::ToolTipRole);
 }

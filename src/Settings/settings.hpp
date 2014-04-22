@@ -100,6 +100,9 @@ public:
     const QString &getTimestampFormat() const;
     void setTimestampFormat(const QString &format);
 
+    bool isMinimizeOnCloseEnabled() const;
+    void setMinimizeOnClose(bool newValue);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -130,6 +133,7 @@ private:
     bool customEmojiFont;
     QString emojiFontFamily;
     int     emojiFontPointSize;
+    bool minimizeOnClose;
 
     // ChatView
     int firstColumnHandlePos;

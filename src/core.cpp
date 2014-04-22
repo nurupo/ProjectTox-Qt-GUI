@@ -17,8 +17,16 @@
 #include "core.hpp"
 #include "Settings/settings.hpp"
 
+#include <cstdint>
+
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QSaveFile>
+#include <QStandardPaths>
 #include <QThread>
-#include <QTime>
+
+const QString Core::CONFIG_FILE_NAME = "data.tox";
 
 Core::Core() :
     tox(nullptr)
@@ -31,11 +39,12 @@ Core::Core() :
 Core::~Core()
 {
     if (tox) {
+        saveConfiguration();
         tox_kill(tox);
     }
 }
 
-void Core::onFriendRequest(uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
+void Core::onFriendRequest(Tox*/* tox*/, uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
     emit static_cast<Core*>(core)->friendRequestRecieved(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
@@ -55,7 +64,7 @@ void Core::onStatusMessageChanged(Tox*/* tox*/, int friendId, uint8_t* cMessage,
     emit static_cast<Core*>(core)->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
 }
 
-void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, TOX_USERSTATUS userstatus, void* core)
+void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, uint8_t userstatus, void* core)
 {
     Status status;
     switch (userstatus) {
@@ -77,7 +86,11 @@ void Core::onUserStatusChanged(Tox*/* tox*/, int friendId, TOX_USERSTATUS userst
 
 void Core::onConnectionStatusChanged(Tox*/* tox*/, int friendId, uint8_t status, void* core)
 {
-    emit static_cast<Core*>(core)->friendStatusChanged(friendId, status ? Status::Online : Status::Offline);
+    Status friendStatus = status ? Status::Online : Status::Offline;
+    emit static_cast<Core*>(core)->friendStatusChanged(friendId, friendStatus);
+    if (friendStatus == Status::Offline) {
+        static_cast<Core*>(core)->checkLastOnline(friendId);
+    }
 }
 
 void Core::onAction(Tox*/* tox*/, int friendId, uint8_t *cMessage, uint16_t cMessageSize, void *core)
@@ -172,7 +185,12 @@ void Core::setStatus(Status status)
             userstatus = TOX_USERSTATUS_INVALID;
             break;
     }
-    tox_set_user_status(tox, userstatus);
+
+    if (tox_set_user_status(tox, userstatus) == 0) {
+        emit statusSet(status);
+    } else {
+        emit failedToSetStatus(status);
+    }
 }
 
 void Core::bootstrapDht()
@@ -208,6 +226,103 @@ void Core::checkConnection()
     }
 }
 
+void Core::loadConfiguration()
+{
+    QString path = QStandardPaths::locate(QStandardPaths::StandardLocation::ConfigLocation, CONFIG_FILE_NAME);
+    if (path.isEmpty()) {
+        qWarning() << "The Tox configuration file was not found";
+        return;
+    }
+
+    QFile configurationFile(path);
+    if (!configurationFile.open(QIODevice::ReadOnly)) {
+        qCritical() << "File " << path << " cannot be opened";
+        return;
+    }
+
+    qint64 fileSize = configurationFile.size();
+    if (fileSize > 0) {
+        QByteArray data = configurationFile.readAll();
+        tox_load(tox, reinterpret_cast<uint8_t *>(data.data()), data.size());
+    }
+
+    configurationFile.close();
+
+    loadFriends();
+}
+
+void Core::saveConfiguration()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::ConfigLocation);
+    if (path.isEmpty()) {
+        qCritical() << "Error finding data location directory";
+        return;
+    }
+
+    QDir directory(path);
+    if (!directory.exists(path) && !directory.mkpath(directory.absolutePath())) {
+        qCritical() << "Error while creating directory " << path;
+        return;
+    }
+
+    path += '/' + CONFIG_FILE_NAME;
+    QSaveFile configurationFile(path);
+    if (!configurationFile.open(QIODevice::WriteOnly)) {
+        qCritical() << "File " << path << " cannot be opened";
+        return;
+    }
+
+    uint32_t fileSize = tox_size(tox);
+    if (fileSize > 0 && fileSize <= INT32_MAX) {
+        uint8_t* data = new uint8_t[fileSize];
+        tox_save(tox, data);
+        configurationFile.write(reinterpret_cast<char *>(data), fileSize);
+        configurationFile.commit();
+        delete data;
+    }
+}
+
+void Core::loadFriends()
+{
+    const uint32_t friendCount = tox_count_friendlist(tox);
+    if (friendCount > 0) {
+        // assuming there are not that many friends to fill up the whole stack
+        int32_t ids[friendCount];
+        tox_get_friendlist(tox, ids, friendCount);
+        uint8_t clientId[TOX_CLIENT_ID_SIZE];
+        for (int32_t i = 0; i < static_cast<int32_t>(friendCount); ++i) {
+            if (tox_get_client_id(tox, ids[i], clientId) == 0) {
+                emit friendAdded(ids[i], CUserId::toString(clientId));
+
+                const int nameSize = tox_get_name_size(tox, ids[i]);
+                if (nameSize > 0) {
+                    uint8_t name[nameSize];
+                    if (tox_get_name(tox, ids[i], name) == nameSize) {
+                        emit friendUsernameChanged(ids[i], CString::toString(name, nameSize));
+                    }
+                }
+
+                const int statusMessageSize = tox_get_status_message_size(tox, ids[i]);
+                if (statusMessageSize > 0) {
+                    uint8_t statusMessage[statusMessageSize];
+                    if (tox_get_status_message(tox, ids[i], statusMessage, statusMessageSize) == statusMessageSize) {
+                        emit friendStatusMessageChanged(ids[i], CString::toString(statusMessage, statusMessageSize));
+                    }
+                }
+
+                checkLastOnline(ids[i]);
+            }
+        }
+    }
+}
+
+void Core::checkLastOnline(int friendId) {
+    const uint64_t lastOnline = tox_get_last_online(tox, friendId);
+    if (lastOnline > 0) {
+        emit friendLastSeenChanged(friendId, QDateTime::fromTime_t(lastOnline));
+    }
+}
+
 void Core::start()
 {
     tox = tox_new(0);
@@ -216,6 +331,8 @@ void Core::start()
         emit failedToStart();
         return;
     }
+
+    loadConfiguration();
 
     tox_callback_friend_request(tox, onFriendRequest, this);
     tox_callback_friend_message(tox, onFriendMessage, this);
@@ -238,7 +355,7 @@ void Core::start()
 
     bootstrapDht();
 
-    timer->setInterval(30);
+    timer->setInterval(45);
     timer->start();
 }
 
@@ -311,7 +428,7 @@ QString Core::CFriendAddress::toString(uint8_t* cFriendAddress)
 
 Core::CString::CString(const QString& string)
 {
-    cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER + 1]();
+    cString = new uint8_t[string.length() * MAX_SIZE_OF_UTF8_ENCODED_CHARACTER]();
     cStringSize = fromString(string, cString);
 }
 
@@ -332,17 +449,12 @@ uint16_t Core::CString::size()
 
 QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
 {
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize - 1);
-}
-
-QString Core::CString::toString(uint8_t* cString)
-{
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), -1);
+    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize);
 }
 
 uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
 {
     QByteArray byteArray = QByteArray(string.toUtf8());
     memcpy(cString, reinterpret_cast<uint8_t*>(byteArray.data()), byteArray.size());
-    return byteArray.size() + 1;
+    return byteArray.size();
 }

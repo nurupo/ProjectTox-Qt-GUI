@@ -27,6 +27,7 @@
 #include <QTextBrowser>
 #include <QThread>
 #include <QSplitter>
+#include <QSystemTrayIcon>
 
 class PagesWidget;
 
@@ -48,6 +49,10 @@ private:
     OurUserItemWidget* ourUserItem;
     QSplitter* splitterWidget;
     PagesWidget *pages;
+    QSystemTrayIcon* trayIcon;
+    QAction* settingsAction;
+    QAction* trayMenuShowHideAction;
+    QList<QAction*> trayMenuStatusActions;
 
 private slots:
     void onAddFriendButtonClicked();
@@ -59,12 +64,17 @@ private slots:
     void onFailedToStartCore();
     void onSettingsActionTriggered();
     void onAboutAppActionTriggered();
-    void onQuitApplicationTriggered();
     void onSearchActionTriggered();
+    void onTrayMenuStatusActionTriggered();
+    void onTrayMenuQuitApplicationActionTriggered();
+    void onShowHideWindow();
+    void onTrayIconClick(QSystemTrayIcon::ActivationReason reason);
+    void onStatusSet(Status status);
 
 signals:
     void friendRequestAccepted(const QString& userId);
     void friendRequested(const QString& friendAddress, const QString& message);
+    void statusSet(Status status);
 
 };
 

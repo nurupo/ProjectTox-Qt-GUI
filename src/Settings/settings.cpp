@@ -101,6 +101,7 @@ void Settings::load()
         firstColumnHandlePos = s.value("firstColumnHandlePos", 50).toInt();
         secondColumnHandlePos = s.value("SecondColumnHandlePos", 250).toInt();
         timestampFormat = s.value("timestampFormat", "hh:mm").toString();
+        minimizeOnClose = s.value("minimizeOnClose", true).toBool();
     s.endGroup();
 
     loaded = true;
@@ -155,13 +156,13 @@ void Settings::save()
         s.setValue("firstColumnHandlePos", firstColumnHandlePos);
         s.setValue("SecondColumnHandlePos", secondColumnHandlePos);
         s.setValue("timestampFormat", timestampFormat);
+        s.setValue("minimizeOnClose", minimizeOnClose);
     s.endGroup();
 }
 
 void Settings::executeSettingsDialog(QWidget* parent)
 {
-    SettingsDialog dialog(parent);
-    if (dialog.exec() == QDialog::Accepted) {
+    if (SettingsDialog::showDialog(parent) == QDialog::Accepted) {
         save();
         //emit dataChanged();
     }
@@ -311,4 +312,14 @@ void Settings::setEmojiFontFamily(const QString &value)
 {
     emojiFontFamily = value;
     emit emojiFontChanged();
+}
+
+bool Settings::isMinimizeOnCloseEnabled() const
+{
+    return minimizeOnClose;
+}
+
+void Settings::setMinimizeOnClose(bool newValue)
+{
+    minimizeOnClose = newValue;
 }

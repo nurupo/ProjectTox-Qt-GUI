@@ -33,3 +33,26 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     listWidget->setMinimumWidth(130);
     setMinimumSize(450, 325);
 }
+
+int SettingsDialog::showDialog(QWidget* parent)
+{
+    static SettingsDialog* dialog = nullptr;
+
+    int ret;
+
+    if (dialog == nullptr) {
+        dialog = new SettingsDialog(parent);
+
+        ret = dialog->exec();
+
+        delete dialog;
+        dialog = nullptr;
+    } else {
+        dialog->setFocus();
+        dialog->setWindowState(dialog->windowState() | Qt::WindowActive);
+        dialog->setWindowState(dialog->windowState() & ~Qt::WindowActive);
+        ret = -1;
+    }
+
+    return ret;
+}
