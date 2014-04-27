@@ -60,8 +60,6 @@ class SmileyList : public QList<Smiley>
 {
 public:
     static SmileyList fromText(QString text);
-
-    //Smiley atCursorPos(int idx);
 };
 
 #endif // SMILEY_H

@@ -115,12 +115,3 @@ SmileyList SmileyList::fromText(QString text)
 
     return result;
 }
-
-/*Smiley SmileyList::atCursorPos(int idx)
-{
-    foreach(const Smiley &smile, *this) {
-        if (idx >= smile.start() && idx < smile.start() + 1)
-            return smile;
-    }
-    return Smiley();
-}*/

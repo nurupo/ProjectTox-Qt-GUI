@@ -49,81 +49,6 @@ void Smileypack::operator =(const Smileypack &other)
     icon = other.icon;
 }
 
-/*! Replace all text smileys by images or emoji */
-QString Smileypack::smilify(QString text)
-{
-    Settings &settings = Settings::getInstance();
-    Smileypack pack(settings.getSmileyPack());
-
-
-    if (!pack.isEmoji()) {
-        text = Smileypack::deemojify(text);
-    }
-
-    // whlie smileys found to replace
-    bool found;
-    do {
-        found = false;
-
-        // Fill a map with positions of possible smileys
-        QMap<int, QStringList> possibleTexts;
-        for (const auto& pair : pack.getList()) {
-            for (const QString& smileytext : pair.second) {
-                int pos = text.indexOf(smileytext);
-                if (pos > -1) {
-                    possibleTexts.insertMulti(pos, {smileytext, pair.first});
-                    found = true;
-                }
-            }
-        }
-
-        // check the first smiley alternative representations
-        QMapIterator<int, QStringList> first(possibleTexts);
-        if (first.hasNext())
-        {
-            first.next();
-            int length = first.value().first().count();
-            QString repSrt = first.value().first();
-            int     repPos = first.key();
-            QString repRep = first.value().at(1);
-
-            QMapIterator<int, QStringList> i(possibleTexts);
-            i.next();
-
-            // Search for a longer smileyrepresentation at same position
-            while (i.hasNext() && i.key() < first.key() + length) {
-                i.next();
-
-                // If there is a longer smileyrepresentation, use it
-                if (i.value().count() > length) {
-                    repPos = i.key();
-                    repSrt = i.value().first();
-                    repRep = i.value().at(1);
-                }
-            }
-
-            // Replace found smiley
-            if (pack.isEmoji()) {
-                /*if (settings.isCurstomEmojiFont()) {
-                    repRep = QString("<span style=\"font-family: '%1'; font-size: %2pt;\">%3</span>").arg(settings.getEmojiFont(), QString::number(settings.getEmojiSize()), repRep);
-                }*/
-                text.replace(repPos, repSrt.count(), repRep);
-            }
-            else {
-                text.replace(repPos, repSrt.count(), QString("<img src=\"%1\" />").arg(repRep));
-            }
-
-        }
-    } while (found);
-
-
-    if (settings.isCurstomEmojiFont() && pack.isEmoji()) {
-        text = Smileypack::resizeEmoji(text);
-    }
-
-    return text;
-}
-
 QString Smileypack::desmilify(QString htmlText)
 {
     Smileypack pack(Settings::getInstance().getSmileyPack());
@@ -187,9 +112,9 @@ QString Smileypack::resizeEmoji(QString text)
     return text;
 }
 
-const Smileypack::SmileyList Smileypack::emojiList()
+const Smileypack::SmileypackList Smileypack::emojiList()
 {
-    static const SmileyList tmpList =
+    static const SmileypackList tmpList =
     {
         // Smileys
         {"☺", {":)",  ":-)"}},
@@ -240,11 +165,11 @@ const Smileypack::SmileyList Smileypack::emojiList()
     return tmpList;
 }
 
-const Smileypack::SmileyList Smileypack::defaultList()
+const Smileypack::SmileypackList Smileypack::defaultList()
 {
-    static const SmileyList tmpList =
+    static const SmileypackList tmpList =
     {
-        {":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)", ":/"}},
+        {":/icons/emoticons/emotion_smile.png",    {":)", ":-)", ":o)"}},
         {":/icons/emoticons/emotion_sad.png",      {":(", ":-("}},
         {":/icons/emoticons/emotion_grin.png",     {":D", ":-D"}},
         {":/icons/emoticons/emotion_cool.png",     {"8)", "8-)"}},
@@ -372,7 +297,7 @@ QDataStream &operator >>(QDataStream &in, Smileypack &pack)
     QString website;
     QString icon;
     bool    emoji;
-    Smileypack::SmileyList list;
+    Smileypack::SmileypackList list;
     in >> themefile >> name >> author >> desc >> version >> website >> icon >> emoji >> list;
 
     pack.setThemeFile(themefile);

@@ -27,7 +27,7 @@ class Smileypack : public QObject
 {
     Q_OBJECT
 public:
-    typedef QList<QPair<QString, QStringList>> SmileyList;
+    typedef QList<QPair<QString, QStringList>> SmileypackList;
 
     explicit Smileypack(QObject *parent = 0);
     explicit Smileypack(const QByteArray &savedData, QObject *parent = 0);
@@ -52,18 +52,17 @@ public:
     void           setWebsite(const QString &x)     { website = x;        }
     const QString &getIcon() const                  { return icon;        }
     void           setIcon(const QString &x)        { icon = x;           }
-    const SmileyList &getList() const               { return list;        }
-    void              setList(const SmileyList &x)  { list = x;           }
+    const SmileypackList &getList() const               { return list;        }
+    void              setList(const SmileypackList &x)  { list = x;           }
     bool  isEmoji() const                           { return emoji;       }
     void setEmoji(bool x)                           { emoji = x;          }
 
     static const QString& packDir();
-    static QString smilify(QString text);
     static QString desmilify(QString htmlText);
     static QString deemojify(QString text);
     static QString resizeEmoji(QString text);
-    static const SmileyList emojiList();
-    static const SmileyList defaultList();
+    static const SmileypackList emojiList();
+    static const SmileypackList defaultList();
 
 private:
     QString themeFile;
@@ -73,7 +72,7 @@ private:
     QString version;
     QString website;
     QString icon;
-    SmileyList list;
+    SmileypackList list;
     bool emoji;
 
     // Parser functions
