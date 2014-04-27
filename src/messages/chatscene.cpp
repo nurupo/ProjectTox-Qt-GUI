@@ -281,20 +281,7 @@ void ChatScene::setWidth(qreal width)
     if (width == _sceneRect.width())
         return;
 
-    qreal newSecondHandlePos = secondColumnHandle()->x() + (width - _sceneRect.width());
-
-    if(newSecondHandlePos < width) {
-        if (newSecondHandlePos < secondColumnHandle()->xMin())
-            newSecondHandlePos = secondColumnHandle()->xMin();
-
-        secondColumnHandle()->setXPos(newSecondHandlePos);
-        secondHandlePositionChanged(secondColumnHandle()->x(), width);
-    }
-
-    updateSceneRect(width);
-    setHandleXLimits();
-    setMarkerLine();
-    emit layoutChanged();
+    layout(0, _lines.count()-1, width);
 }
 
 void ChatScene::layout(int start, int end, qreal width)
@@ -326,7 +313,18 @@ void ChatScene::layout(int start, int end, qreal width)
     updateSceneRect(width);
     setHandleXLimits();
     setMarkerLine();
-    emit layoutChanged();
+
+    // Update second handle position
+    qreal newSecondHandlePos = secondColumnHandle()->x() + (width - _sceneRect.width());
+    if(newSecondHandlePos < width) {
+        if (newSecondHandlePos < secondColumnHandle()->xMin())
+            newSecondHandlePos = secondColumnHandle()->xMin();
+
+        secondColumnHandle()->setXPos(newSecondHandlePos);
+        secondHandlePositionChanged(secondColumnHandle()->x(), width);
+    } else {
+        emit layoutChanged();
+    }
 }
 
 void ChatScene::setMarkerLineVisible(bool visible)
