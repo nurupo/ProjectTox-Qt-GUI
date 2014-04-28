@@ -355,7 +355,9 @@ void ChatViewSearchWidget::updateHighlights(ChatItem *item)
     }
 
     // Find highlights of this item
-    findHighlightInItem(item);
+    if (!mRegularMsgOnly || checkType((Message::Type)item->data(MessageModel::TypeRole).toInt())) {
+        findHighlightInItem(item);
+    }
 
     // set the current to the nearest highlight from the old one
     updateCurrentHighlight(oldItem, oldStart);
