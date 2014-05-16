@@ -101,6 +101,8 @@ private:
     void save();
     void load();
 
+    QString getSettingsFilePath();
+
     static const QString FILENAME;
 
     bool loaded;
