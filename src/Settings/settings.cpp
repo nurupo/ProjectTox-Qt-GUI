@@ -49,7 +49,7 @@ void Settings::load()
         return;
     }
 
-    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + FILENAME;
+    QString filePath = getSettingsFilePath();
 
     //if no settings file exist -- use the default one
     QFile file(filePath);
@@ -106,7 +106,7 @@ void Settings::load()
 
 void Settings::save()
 {
-    QString filePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + FILENAME;
+    QString filePath = getSettingsFilePath();
 
     QSettings s(filePath, QSettings::IniFormat);
 
@@ -152,6 +152,16 @@ void Settings::save()
         s.setValue("emojiFontPointSize", emojiFontPointSize);
         s.setValue("minimizeOnClose", minimizeOnClose);
     s.endGroup();
+}
+
+QString Settings::getSettingsFilePath()
+{
+    // workaround for https://bugreports.qt-project.org/browse/QTBUG-38845
+#ifdef Q_OS_WIN
+    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + FILENAME;
+#else
+    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + qApp->organizationName() + '/' + qApp->applicationName() + '/' + FILENAME;
+#endif
 }
 
 void Settings::executeSettingsDialog(QWidget* parent)
