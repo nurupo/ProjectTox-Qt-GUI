@@ -44,6 +44,7 @@ private slots:
 private:
     QString desmile(QString htmlText);
     Spellchecker spellchecker;
+    const int maxSuggestions;
 
     QAction *actionUndo;
     QAction *actionRedo;

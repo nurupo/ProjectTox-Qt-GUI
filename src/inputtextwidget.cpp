@@ -30,7 +30,7 @@
 #include "Settings/settings.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
-    QTextEdit(parent), spellchecker(document())
+    QTextEdit(parent), spellchecker(document()), maxSuggestions(4)
 {
     setMinimumSize(10, 50);
 
@@ -171,7 +171,7 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
         if (!suggestions.isEmpty()) {
             contextMenu.addSeparator();
             QStringListIterator it(suggestions);
-            while (it.hasNext()) {
+            for (int i = 0; i < maxSuggestions && it.hasNext(); i++) {
                 QString suggestion = it.next();
                 QAction* action = new QAction(suggestion, this);
                 action->setData(suggestion);
