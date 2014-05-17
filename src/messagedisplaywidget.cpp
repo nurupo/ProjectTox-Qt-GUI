@@ -33,7 +33,8 @@
 #include "opacitywidget.hpp"
 
 MessageDisplayWidget::MessageDisplayWidget(QWidget *parent) :
-    QScrollArea(parent)
+    QScrollArea(parent),
+    lastMessageIsOurs(true) // the initial value doesn't matter, just silencing Valgrind
 {
     // Scroll down on new Message
     QScrollBar* scrollbar = verticalScrollBar();
