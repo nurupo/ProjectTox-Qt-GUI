@@ -49,7 +49,7 @@ void Settings::load()
         return;
     }
 
-    QString filePath = getSettingsFilePath();
+    QString filePath = getSettingsDirPath() + '/' + FILENAME;
 
     //if no settings file exist -- use the default one
     QFile file(filePath);
@@ -106,7 +106,7 @@ void Settings::load()
 
 void Settings::save()
 {
-    QString filePath = getSettingsFilePath();
+    QString filePath = getSettingsDirPath() + '/' + FILENAME;
 
     QSettings s(filePath, QSettings::IniFormat);
 
@@ -154,13 +154,13 @@ void Settings::save()
     s.endGroup();
 }
 
-QString Settings::getSettingsFilePath()
+QString Settings::getSettingsDirPath()
 {
     // workaround for https://bugreports.qt-project.org/browse/QTBUG-38845
 #ifdef Q_OS_WIN
-    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + FILENAME;
+    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
 #else
-    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + qApp->organizationName() + '/' + qApp->applicationName() + '/' + FILENAME;
+    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + qApp->organizationName() + '/' + qApp->applicationName();
 #endif
 }
 
