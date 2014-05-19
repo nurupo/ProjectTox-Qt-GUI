@@ -70,8 +70,8 @@ bool Spellchecker::isCorrect(const QString& word)
 void Spellchecker::suggest(const QString& word, QStringList& suggestions)
 {
     char** slst;
-    int n = hunspell->suggest(&slst, word.toLocal8Bit().constData());
-    while (n-- > 0) {
-        suggestions << slst[n];
+    const int numberOfSuggestions = hunspell->suggest(&slst, word.toLocal8Bit().constData());
+    for (int i = 0; i < numberOfSuggestions; i++) {
+        suggestions << slst[i];
     }
 }
