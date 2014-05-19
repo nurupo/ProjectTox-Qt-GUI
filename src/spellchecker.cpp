@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
+    Copyright (C) 2013 by retuxx <github@retux.de>
 
     This file is part of Tox Qt GUI.
 
