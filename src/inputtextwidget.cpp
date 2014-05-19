@@ -73,6 +73,10 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
         actionCut->setEnabled(enabled);
         actionCopy->setEnabled(enabled);
     });
+
+    connect(this, &InputTextWidget::textChanged, [this]() {
+        spellchecker.setSkippedPosition(textCursor().position());
+    });
 }
 
 /*! Handle keyboard events. */

@@ -23,7 +23,7 @@
 #include <QFileInfo>
 
 Spellchecker::Spellchecker(QTextDocument* document)
-    : QSyntaxHighlighter(document), regEx("\\W") /* any non-word character */
+    : QSyntaxHighlighter(document), regEx("\\W") /* any non-word character */, skippedPosition(-1)
 {
     QFileInfo aff("/usr/share/hunspell/en_US.aff");
     QFileInfo dic("/usr/share/hunspell/en_US.dic");
@@ -46,14 +46,17 @@ void Spellchecker::highlightBlock(const QString& text)
     const QStringList tokens = text.split(regEx);
     QStringListIterator it(tokens);
     QString token;
-    int start, length;
-    start = length = 0;
+    const int offset = currentBlock().position();
+    int start, length, end;
+    start = length = end = 0;
 
     while (it.hasNext()) {
-        token = it.next();
+        token  = it.next();
         length = token.length();
+        end    = start + length;
 
-        if (!isCorrect(token)) {
+        if (!(skippedPosition >= offset + start && skippedPosition < offset + end) && // skip ignored position
+            !isCorrect(token)) {
             setFormat(start, length, format);
         }
 
@@ -73,4 +76,14 @@ void Spellchecker::suggest(const QString& word, QStringList& suggestions)
     for (int i = 0; i < numberOfSuggestions; i++) {
         suggestions << slst[i];
     }
+}
+
+int Spellchecker::getSkippedPosition()
+{
+    return skippedPosition;
+}
+
+void Spellchecker::setSkippedPosition(int position)
+{
+    skippedPosition = position;
 }

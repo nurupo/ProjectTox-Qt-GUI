@@ -32,14 +32,17 @@ public:
 
     bool isCorrect(const QString&);
     void suggest(const QString&, QStringList&);
+    int  getSkippedPosition();
+    void setSkippedPosition(int);
 
 protected:
     void highlightBlock(const QString& text);
 
 private:
     Hunspell* hunspell;
-    QRegularExpression regEx;
+    const QRegularExpression regEx;
     QTextCharFormat format;
+    int skippedPosition; // absolute position in document
 };
 
 #endif // SPELLCHECKER_HPP
