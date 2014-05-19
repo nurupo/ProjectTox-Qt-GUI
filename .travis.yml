@@ -9,6 +9,7 @@ before_install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50; fi
   - if [ "$CXX" = "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50; fi
+  - sudo apt-get install hunspell
   - wget -O Qt5.2.0.tar.xz https://dl.dropboxusercontent.com/u/20447449/Qt5.2.0.tar.xz
   - mkdir ~/Qt5.2.0
   - tar -xJf Qt5.2.0.tar.xz -C ~/Qt5.2.0
@@ -20,13 +21,6 @@ before_install:
   - ./autogen.sh
   - ./configure && make -j3 check
   - sudo make install
-  - cd ..
-  - wget http://dfn.dl.sourceforge.net/project/hunspell/Hunspell/1.3.2/hunspell-1.3.2.tar.gz > /dev/null
-  - tar xfz hunspell-1.3.2.tar.gz > /dev/null
-  - cd hunspell-1.3.2
-  - ./configure > /dev/null
-  - make -j3 > /dev/null
-  - sudo make install > /dev/null
   - cd ..
   - sudo ldconfig
   
