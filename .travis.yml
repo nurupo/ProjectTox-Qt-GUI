@@ -22,6 +22,14 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd ..
+  - wget http://dfn.dl.sourceforge.net/project/hunspell/Hunspell/1.3.2/hunspell-1.3.2.tar.gz > /dev/null
+  - tar xfz hunspell-1.3.2.tar.gz > /dev/null
+  - cd hunspell-1.3.2
+  - ./configure > /dev/null
+  - make -j3 > /dev/null
+  - sudo make install > /dev/null
+  - cd ..
+  
 
 script:
   - ~/Qt5.2.0/5.2.0/gcc_64/bin/qmake -v
