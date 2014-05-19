@@ -16,17 +16,26 @@
 
 #include "spellchecker.hpp"
 
+#include <QFileInfo>
+#include <QStandardPaths>
 #include <QString>
 #include <QStringList>
 #include <QStringListIterator>
 #include <QTextCharFormat>
-#include <QFileInfo>
+
+#include <hunspell/hunspell.hxx>
 
 Spellchecker::Spellchecker(QTextDocument* document)
     : QSyntaxHighlighter(document), regEx("\\W") /* any non-word character */, skippedPosition(-1)
 {
-    QFileInfo aff("/usr/share/hunspell/en_US.aff");
-    QFileInfo dic("/usr/share/hunspell/en_US.dic");
+    QString basePath;
+#ifdef Q_OS_WIN
+    basePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + "hunspell" + '/';
+#else
+    basePath = "/usr/share/hunspell/";
+#endif
+    QFileInfo aff(basePath + "en_US.aff");
+    QFileInfo dic(basePath + "en_US.dic");
     hunspell = new Hunspell(
         aff.absoluteFilePath().toLocal8Bit().constData(),
         dic.absoluteFilePath().toLocal8Bit().constData()

@@ -17,10 +17,10 @@
 #ifndef SPELLCHECKER_HPP
 #define SPELLCHECKER_HPP
 
-#include <QSyntaxHighlighter>
 #include <QRegularExpression>
-#include <hunspell/hunspell.hxx>
+#include <QSyntaxHighlighter>
 
+class Hunspell;
 class QTextCharFormat;
 
 class Spellchecker : public QSyntaxHighlighter
