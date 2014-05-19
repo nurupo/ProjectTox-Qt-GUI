@@ -19,7 +19,6 @@
 #include <QString>
 #include <QStringList>
 #include <QStringListIterator>
-#include <QRegExp>
 #include <QTextCharFormat>
 #include <QFileInfo>
 

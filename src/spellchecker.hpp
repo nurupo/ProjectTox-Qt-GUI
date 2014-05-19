@@ -18,9 +18,9 @@
 #define SPELLCHECKER_HPP
 
 #include <QSyntaxHighlighter>
+#include <QRegularExpression>
 #include <hunspell/hunspell.hxx>
 
-class QRegExp;
 class QTextCharFormat;
 
 class Spellchecker : public QSyntaxHighlighter
@@ -38,7 +38,7 @@ protected:
 
 private:
     Hunspell* hunspell;
-    QRegExp  regEx;
+    QRegularExpression regEx;
     QTextCharFormat format;
 };
 
