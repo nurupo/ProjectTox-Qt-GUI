@@ -144,17 +144,8 @@ void InputTextWidget::cutPlainText()
 
 void InputTextWidget::showContextMenu(const QPoint &pos)
 {
-    QPoint globalPos = mapToGlobal(pos);
-
+    const QPoint globalPos = mapToGlobal(pos);
     QMenu contextMenu;
-    contextMenu.addAction(actionUndo);
-    contextMenu.addAction(actionRedo);
-    contextMenu.addSeparator();
-    contextMenu.addAction(actionCut);
-    contextMenu.addAction(actionCopy);
-    contextMenu.addAction(actionPaste);
-
-    actionPaste->setDisabled(QApplication::clipboard()->text().isEmpty());
 
     // get current selected word and - if neccessary - the suggested
     // words by the spellchecker
@@ -163,13 +154,12 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     QList<QAction*> actions;
     QTextCursor cursor = cursorForPosition(pos);
     cursor.select(QTextCursor::WordUnderCursor);
-    QString selectedWord = cursor.selectedText();
+    const QString selectedWord = cursor.selectedText();
     if (!spellchecker.isCorrect(selectedWord)) {
         QStringList suggestions;
         spellchecker.suggest(selectedWord, suggestions);
 
         if (!suggestions.isEmpty()) {
-            contextMenu.addSeparator();
             QStringListIterator it(suggestions);
             for (int i = 0; i < maxSuggestions && it.hasNext(); i++) {
                 QString suggestion = it.next();
@@ -178,9 +168,18 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
                 contextMenu.addAction(action);
                 actions.append(action);
             }
+            contextMenu.addSeparator();
         }
     }
 
+    contextMenu.addAction(actionUndo);
+    contextMenu.addAction(actionRedo);
+    contextMenu.addSeparator();
+    contextMenu.addAction(actionCut);
+    contextMenu.addAction(actionCopy);
+    contextMenu.addAction(actionPaste);
+
+    actionPaste->setDisabled(QApplication::clipboard()->text().isEmpty());
 
     QAction* selected = contextMenu.exec(globalPos);
     if (actions.contains(selected)) {
