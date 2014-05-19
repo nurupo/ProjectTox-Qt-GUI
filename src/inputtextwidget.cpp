@@ -161,7 +161,7 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     // create a QAction for each suggested word and handle them after
     // the execution of the context menu
     QList<QAction*> actions;
-    QTextCursor cursor = textCursor();
+    QTextCursor cursor = cursorForPosition(pos);
     cursor.select(QTextCursor::WordUnderCursor);
     QString selectedWord = cursor.selectedText();
     if (!spellchecker.isCorrect(selectedWord)) {
