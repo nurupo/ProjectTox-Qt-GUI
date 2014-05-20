@@ -22,11 +22,17 @@
 #include <QStringList>
 #include <QStringListIterator>
 #include <QTextCharFormat>
+#include <QTextEdit>
 
 #include <hunspell/hunspell.hxx>
 
-Spellchecker::Spellchecker(QTextDocument* document)
-    : QSyntaxHighlighter(document), regEx("\\W") /* any non-word character */, skippedPosition(NO_SKIPPING)
+Spellchecker::Spellchecker(QTextEdit* parent)
+    : QSyntaxHighlighter(parent),
+      textEdit(parent),
+      regEx("\\W"),                 /* any non-word character. */
+      format(),
+      skippedPosition(NO_SKIPPING), /* skipping should be disabled by default. */
+      contentChanged(false)
 {
     QString basePath;
 #ifdef Q_OS_WIN
@@ -43,6 +49,13 @@ Spellchecker::Spellchecker(QTextDocument* document)
 
     format.setUnderlineColor(QColor(255,0,0));
     format.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
+
+    connect(textEdit, &QTextEdit::cursorPositionChanged, this, &Spellchecker::cursorPositionChanged);
+    connect(textEdit->document(), &QTextDocument::contentsChange, this, &Spellchecker::contentsChanged);
+    // this is a simple hack to ensure that the connected slot above
+    // will be triggered before the highlighting will be applied.
+    setDocument(textEdit->document());
+
 }
 
 Spellchecker::~Spellchecker()
@@ -54,13 +67,12 @@ void Spellchecker::highlightBlock(const QString& text)
 {
     const QStringList tokens = text.split(regEx);
     QStringListIterator it(tokens);
-    QString token;
     const int offset = currentBlock().position();
     int start, length, end;
     start = length = end = 0;
 
     while (it.hasNext()) {
-        token  = it.next();
+        const QString& token  = it.next();
         length = token.length();
         end    = start + length;
 
@@ -87,17 +99,53 @@ void Spellchecker::suggest(const QString& word, QStringList& suggestions)
     }
 }
 
-int Spellchecker::getSkippedPosition()
-{
-    return skippedPosition;
-}
-
-void Spellchecker::setSkippedPosition(int position)
-{
-    skippedPosition = position;
-}
-
 bool Spellchecker::skipRange(int start, int end)
 {
     return skippedPosition >= start && skippedPosition <= end;
+}
+
+int Spellchecker::toPositionInBlock(int position)
+{
+    int counter = 0;
+    const QTextBlock block = textEdit->document()->findBlock(position);
+    const QString text = block.text();
+    const int mappedPosition = position - block.position();
+    const QStringList tokens = text.split(regEx);
+
+    QStringListIterator it(tokens);
+    int start = 0;
+
+    while (it.hasNext() && start < mappedPosition) {
+        start += it.next().length() + 1; // skip the non-word character
+        counter++;
+    }
+
+    return start < mappedPosition ? -1 : counter;
+}
+
+void Spellchecker::contentsChanged(int position, int charsRemoved, int charsAdded)
+{
+    contentChanged = true;
+    skippedPosition = textEdit->textCursor().position();
+}
+
+void Spellchecker::cursorPositionChanged()
+{
+    // block signal if content was changed because
+    // skipping was already handled by slot Spellchecker::contentsChanged();
+    if (!contentChanged && skippedPosition >= 0) {
+        const int pos     = textEdit->textCursor().position();
+        const int current = toPositionInBlock(skippedPosition);
+        const int moved   = toPositionInBlock(pos);
+
+        if (current >= 0 && moved >= 0 && current == moved) {
+            skippedPosition = pos;
+        } else {
+            skippedPosition = NO_SKIPPING;
+        }
+
+        rehighlight();
+    }
+
+    contentChanged = false;
 }

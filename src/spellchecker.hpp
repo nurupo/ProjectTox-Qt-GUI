@@ -22,6 +22,7 @@
 
 class Hunspell;
 class QTextCharFormat;
+class QTextEdit;
 
 class Spellchecker : public QSyntaxHighlighter
 {
@@ -29,23 +30,44 @@ class Spellchecker : public QSyntaxHighlighter
 public:
     static const int NO_SKIPPING = -1;
 
-    Spellchecker(QTextDocument*);
+    Spellchecker(QTextEdit*);
     ~Spellchecker();
 
     bool isCorrect(const QString&);
     void suggest(const QString&, QStringList&);
-    int  getSkippedPosition();
-    void setSkippedPosition(int);
     bool skipRange(int /*inclusive*/, int /*inclusive*/);
 
 protected:
     void highlightBlock(const QString& text);
 
 private:
+    /* the view to highlight */
+    QTextEdit* textEdit;
+
+    /* the current used dictionary */
     Hunspell* hunspell;
+
+    /* the regular expression to use for tokenizing each line */
     const QRegularExpression regEx;
+
+    /* the format to apply to misspelled words */
     QTextCharFormat format;
-    int skippedPosition; // absolute position in document
+
+    /* the spell checker will ignore the word which
+     * has at least one character at this position (absolute) */
+    int skippedPosition;
+
+    /* indicates whether the content was changed or not
+     * do not use until you know what you are doing */
+    bool contentChanged;
+
+    /* maps the given absolute position of a character in the document
+     * to the relative position of its words inside its block */
+    int toPositionInBlock(int);
+
+private slots:
+    void contentsChanged(int, int, int);
+    void cursorPositionChanged();
 };
 
 #endif // SPELLCHECKER_HPP
