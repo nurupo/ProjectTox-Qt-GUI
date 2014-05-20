@@ -30,7 +30,7 @@
 #include "Settings/settings.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
-    QTextEdit(parent), spellchecker(this), contentChanged(false), maxSuggestions(4)
+    QTextEdit(parent), spellchecker(this), maxSuggestions(4)
 {
     setMinimumSize(10, 50);
 
