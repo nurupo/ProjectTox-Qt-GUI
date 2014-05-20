@@ -120,7 +120,7 @@ int Spellchecker::toPositionInBlock(int position)
         counter++;
     }
 
-    return start < mappedPosition ? -1 : counter;
+    return start <= mappedPosition ? -1 : counter;
 }
 
 void Spellchecker::contentsChanged(int position, int charsRemoved, int charsAdded)
