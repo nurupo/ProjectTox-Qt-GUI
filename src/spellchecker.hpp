@@ -27,6 +27,8 @@ class Spellchecker : public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
+    static const int NO_SKIPPING = -1;
+
     Spellchecker(QTextDocument*);
     ~Spellchecker();
 
@@ -34,6 +36,7 @@ public:
     void suggest(const QString&, QStringList&);
     int  getSkippedPosition();
     void setSkippedPosition(int);
+    bool skipRange(int /*inclusive*/, int /*inclusive*/);
 
 protected:
     void highlightBlock(const QString& text);

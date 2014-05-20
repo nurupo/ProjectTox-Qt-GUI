@@ -30,7 +30,7 @@
 #include "Settings/settings.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
-    QTextEdit(parent), spellchecker(document()), maxSuggestions(4)
+    QTextEdit(parent), spellchecker(document()), contentChanged(false), maxSuggestions(4)
 {
     setMinimumSize(10, 50);
 
@@ -74,9 +74,22 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
         actionCopy->setEnabled(enabled);
     });
 
-    connect(this, &InputTextWidget::textChanged, [this]() {
+
+    connect(this, &InputTextWidget::cursorPositionChanged, [this]() {
+        if (!contentChanged) {
+            spellchecker.setSkippedPosition(Spellchecker::NO_SKIPPING);
+            spellchecker.rehighlight();
+        } else {
+            contentChanged = false;
+        }
+    });
+    connect(document(), &QTextDocument::contentsChange, [this](int position, int charsRemoved, int charsAdded) {
+        contentChanged = true;
         spellchecker.setSkippedPosition(textCursor().position());
     });
+    // this is a simple hack to ensure that the connected slots above
+    // will be triggered before the highlighting will be applied.
+    spellchecker.setDocument(document());
 }
 
 /*! Handle keyboard events. */
@@ -159,7 +172,8 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     QTextCursor cursor = cursorForPosition(pos);
     cursor.select(QTextCursor::WordUnderCursor);
     const QString selectedWord = cursor.selectedText();
-    if (!spellchecker.isCorrect(selectedWord)) {
+    if (!spellchecker.skipRange(cursor.position(), selectedWord.length()) &&
+        !spellchecker.isCorrect(selectedWord)) {
         QStringList suggestions;
         spellchecker.suggest(selectedWord, suggestions);
 

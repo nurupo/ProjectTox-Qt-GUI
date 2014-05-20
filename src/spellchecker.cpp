@@ -26,7 +26,7 @@
 #include <hunspell/hunspell.hxx>
 
 Spellchecker::Spellchecker(QTextDocument* document)
-    : QSyntaxHighlighter(document), regEx("\\W") /* any non-word character */, skippedPosition(-1)
+    : QSyntaxHighlighter(document), regEx("\\W") /* any non-word character */, skippedPosition(NO_SKIPPING)
 {
     QString basePath;
 #ifdef Q_OS_WIN
@@ -64,7 +64,7 @@ void Spellchecker::highlightBlock(const QString& text)
         length = token.length();
         end    = start + length;
 
-        if (!(skippedPosition >= offset + start && skippedPosition < offset + end) && // skip ignored position
+        if (!skipRange(offset + start, offset + end) &&
             !isCorrect(token)) {
             setFormat(start, length, format);
         }
@@ -95,4 +95,9 @@ int Spellchecker::getSkippedPosition()
 void Spellchecker::setSkippedPosition(int position)
 {
     skippedPosition = position;
+}
+
+bool Spellchecker::skipRange(int start, int end)
+{
+    return skippedPosition >= start && skippedPosition <= end;
 }
