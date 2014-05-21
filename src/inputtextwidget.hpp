@@ -45,7 +45,6 @@ private:
     QString desmile(QString htmlText);
 
     Spellchecker spellchecker;
-    bool contentChanged;
     const int maxSuggestions;
 
     QAction *actionUndo;
