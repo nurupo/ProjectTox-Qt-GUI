@@ -36,16 +36,16 @@ TEMPLATE = app
 CONFIG += c++11
 
 INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/
-win32:INCLUDEPATH += ../../libs/sodium/include/
+win32:INCLUDEPATH += ../../libs/sodium/include/ ../../libs/hunspell/include/
 macx:INCLUDEPATH += /usr/local/include
 
 win32 {
-    LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a
+    LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a ../../libs/hunspell/lib/libhunspell.a
 } else {
     macx {
-        LIBS += -L/usr/local/lib -lsodium
+        LIBS += -L/usr/local/lib -lsodium -lhunspell
     } else {
-        LIBS += -lsodium
+        LIBS += -lsodium -lhunspell
     }
 }
 
@@ -92,7 +92,8 @@ SOURCES += \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
-    ../../src/copyableelidelabel.cpp
+    ../../src/copyableelidelabel.cpp \
+    ../../src/spellchecker.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -135,7 +136,8 @@ HEADERS  += \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
-    ../../src/copyableelidelabel.hpp
+    ../../src/copyableelidelabel.hpp \
+    ../../src/spellchecker.hpp
 
 ### ToxCore section. Please keep it alphabetical ###
 

@@ -24,12 +24,13 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <QTextDocumentFragment>
+#include <QList>
 
 #include "smileypack.hpp"
 #include "Settings/settings.hpp"
 
 InputTextWidget::InputTextWidget(QWidget* parent) :
-    QTextEdit(parent)
+    QTextEdit(parent), spellchecker(this), maxSuggestions(4)
 {
     setMinimumSize(10, 50);
 
@@ -143,9 +144,37 @@ void InputTextWidget::cutPlainText()
 
 void InputTextWidget::showContextMenu(const QPoint &pos)
 {
-    QPoint globalPos = mapToGlobal(pos);
-
+    const QPoint globalPos = mapToGlobal(pos);
     QMenu contextMenu;
+
+    // get current selected word and - if neccessary - the suggested
+    // words by the spellchecker
+    // create a QAction for each suggested word and handle them after
+    // the execution of the context menu
+    QList<QAction*> actions;
+    QTextCursor cursor = cursorForPosition(pos);
+    cursor.select(QTextCursor::WordUnderCursor);
+    const QString selectedWord = cursor.selectedText();
+    // cursor.position() points to the end of the selected word
+    // substract selectedWord.length() to get the start position
+    if (!spellchecker.skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
+        !spellchecker.isCorrect(selectedWord)) {
+        QStringList suggestions;
+        spellchecker.suggest(selectedWord, suggestions);
+
+        if (!suggestions.isEmpty()) {
+            QStringListIterator it(suggestions);
+            for (int i = 0; i < maxSuggestions && it.hasNext(); i++) {
+                QString suggestion = it.next();
+                QAction* action = new QAction(suggestion, this);
+                action->setData(suggestion);
+                contextMenu.addAction(action);
+                actions.append(action);
+            }
+            contextMenu.addSeparator();
+        }
+    }
+
     contextMenu.addAction(actionUndo);
     contextMenu.addAction(actionRedo);
     contextMenu.addSeparator();
@@ -155,5 +184,9 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
 
     actionPaste->setDisabled(QApplication::clipboard()->text().isEmpty());
 
-    contextMenu.exec(globalPos);
+    QAction* selected = contextMenu.exec(globalPos);
+    if (actions.contains(selected)) {
+        cursor.insertText(selected->data().toString());
+    }
+    qDeleteAll(actions);
 }

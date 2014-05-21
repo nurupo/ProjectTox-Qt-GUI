@@ -18,6 +18,7 @@
 #ifndef INPUTTEXTWIDGET_HPP
 #define INPUTTEXTWIDGET_HPP
 
+#include "spellchecker.hpp"
 #include <QTextEdit>
 
 class InputTextWidget : public QTextEdit
@@ -42,6 +43,9 @@ private slots:
 
 private:
     QString desmile(QString htmlText);
+
+    Spellchecker spellchecker;
+    const int maxSuggestions;
 
     QAction *actionUndo;
     QAction *actionRedo;
