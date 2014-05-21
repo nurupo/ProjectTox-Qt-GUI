@@ -228,13 +228,15 @@ void Core::checkConnection()
 
 void Core::loadConfiguration()
 {
-    QString path = QStandardPaths::locate(QStandardPaths::StandardLocation::ConfigLocation, CONFIG_FILE_NAME);
-    if (path.isEmpty()) {
+    QString path = Settings::getSettingsDirPath() + '/' + CONFIG_FILE_NAME;
+
+    QFile configurationFile(path);
+
+    if (!configurationFile.exists()) {
         qWarning() << "The Tox configuration file was not found";
         return;
     }
 
-    QFile configurationFile(path);
     if (!configurationFile.open(QIODevice::ReadOnly)) {
         qCritical() << "File " << path << " cannot be opened";
         return;
@@ -253,14 +255,11 @@ void Core::loadConfiguration()
 
 void Core::saveConfiguration()
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::ConfigLocation);
-    if (path.isEmpty()) {
-        qCritical() << "Error finding data location directory";
-        return;
-    }
+    QString path = Settings::getSettingsDirPath();
 
     QDir directory(path);
-    if (!directory.exists(path) && !directory.mkpath(directory.absolutePath())) {
+
+    if (!directory.exists() && !directory.mkpath(directory.absolutePath())) {
         qCritical() << "Error while creating directory " << path;
         return;
     }

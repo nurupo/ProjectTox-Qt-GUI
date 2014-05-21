@@ -30,6 +30,8 @@ public:
 
     void executeSettingsDialog(QWidget* parent);
 
+    static QString getSettingsDirPath();
+
     struct DhtServer
     {
         QString name;
@@ -110,6 +112,8 @@ private:
 
     void save();
     void load();
+
+
 
     static const QString FILENAME;
 

@@ -204,7 +204,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     bool minimize = Settings::getInstance().isMinimizeOnCloseEnabled();
     if (isVisible() && minimize) {
-        hide();
+        onShowHideWindow();
         event->ignore();
     } else {
         Settings::getInstance().saveGeometryState(this);
