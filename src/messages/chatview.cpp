@@ -176,8 +176,8 @@ void ChatView::clearCache()
         ChatLine *line = *iter;
         line->clearCache();
         iter = _linesWithCache.erase(iter);
+        line->update();
     }
-    update();
 }
 
 void ChatView::setMarkerLineVisible(bool visible)
