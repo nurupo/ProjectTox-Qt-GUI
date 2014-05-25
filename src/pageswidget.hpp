@@ -33,6 +33,7 @@ private:
 private slots:
     void onMessageSent(const QString& message);
     void onActionToSend(const QString& action);
+    void onTypingToSend(bool typing);
 
 public slots:
     void addPage(int friendId, const QString& username);
@@ -52,6 +53,7 @@ public slots:
 signals:
     void sendMessage(int friendId, const QString& message);
     void sendAction(int friendId, const QString& action);
+    void sendTyping(int friendId, bool typing);
 
 };
 

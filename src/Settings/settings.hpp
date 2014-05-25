@@ -105,6 +105,10 @@ public:
     bool isMinimizeOnCloseEnabled() const;
     void setMinimizeOnClose(bool newValue);
 
+    // Privacy
+    bool isTypingNotificationEnabled() const;
+    void setTypingNotification(bool enabled);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -143,6 +147,9 @@ private:
     int firstColumnHandlePos;
     int secondColumnHandlePos;
     QString timestampFormat;
+
+    // Privacy
+    bool typingNotification;
 
 signals:
     //void dataChanged();

@@ -159,6 +159,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(pages, &PagesWidget::sendMessage, core, &Core::sendMessage);
     connect(pages, &PagesWidget::sendAction,  core, &Core::sendAction);
+    connect(pages, &PagesWidget::sendTyping,  core, &Core::sendTyping);
 
     connect(friendsWidget, &FriendsWidget::friendRemoved, core, &Core::removeFriend);
 

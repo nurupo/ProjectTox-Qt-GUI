@@ -128,6 +128,7 @@ public slots:
 
     void sendMessage(int friendId, const QString& message);
     void sendAction(int friendId, const QString& action);
+    void sendTyping(int friendId, bool typing);
 
     void setUsername(const QString& username);
     void setStatusMessage(const QString& message);
@@ -169,6 +170,7 @@ signals:
     void failedToSetUsername(const QString& username);
     void failedToSetStatusMessage(const QString& message);
     void failedToSetStatus(Status status);
+    void failedToSetTyping(bool typing);
 
     void actionReceived(int friendId, const QString& acionMessage);
 

@@ -19,6 +19,7 @@
 #define INPUTTEXTWIDGET_HPP
 
 #include <QTextEdit>
+#include <QTimer>
 
 class InputTextWidget : public QTextEdit
 {
@@ -33,12 +34,14 @@ protected:
 signals:
     void sendMessage(const QString& message);
     void sendAction(const QString& action);
+    void sendTyping(bool typing);
 
 private slots:
     void showContextMenu(const QPoint &pos);
     void copyPlainText();
     void pastePlainText();
     void cutPlainText();
+    void endTyping();
 
 private:
     QString desmile(QString htmlText);
@@ -48,6 +51,9 @@ private:
     QAction *actionCut;
     QAction *actionCopy;
     QAction *actionPaste;
+
+    bool mTyping;
+    QTimer mTypingTimer;
 };
 
 #endif // INPUTTEXTWIDGET_HPP

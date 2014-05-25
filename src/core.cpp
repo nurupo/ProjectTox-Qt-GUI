@@ -142,6 +142,13 @@ void Core::sendAction(int friendId, const QString &action)
     emit actionSentResult(friendId, action, ret);
 }
 
+void Core::sendTyping(int friendId, bool typing)
+{
+    int ret = tox_set_user_is_typing(tox, friendId, typing);
+    if (ret == -1)
+        emit failedToSetTyping(typing);
+}
+
 void Core::removeFriend(int friendId)
 {
     if (tox_del_friend(tox, friendId) == -1) {

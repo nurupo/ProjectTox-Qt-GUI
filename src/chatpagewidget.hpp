@@ -72,6 +72,7 @@ public slots:
 signals:
     void sendMessage(const QString& message);
     void sendAction(const QString& action);
+    void sendTyping(bool typing);
 };
 
 #endif // CHATPAGEWIDGET_HPP

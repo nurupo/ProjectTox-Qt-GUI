@@ -72,14 +72,27 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
         actionCut->setEnabled(enabled);
         actionCopy->setEnabled(enabled);
     });
+
+    mTyping = false;
+    mTypingTimer.setSingleShot(true);
+    connect(&mTypingTimer, &QTimer::timeout, this, &InputTextWidget::endTyping);
 }
 
 /*! Handle keyboard events. */
 void InputTextWidget::keyPressEvent(QKeyEvent* event)
 {
+    const Settings &settings = Settings::getInstance();
     // Send message on Return
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
             && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
+
+        mTypingTimer.stop();
+        if(mTyping) {
+            mTyping = false;
+            if(settings.isTypingNotificationEnabled())
+                emit sendTyping(false);
+        }
+
         // Prevents empty messages
         if (toPlainText().trimmed().isEmpty()) {
             return;
@@ -104,6 +117,13 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
 
     // Normal text writing
     } else {
+        if(!mTyping) {
+            mTyping = true;
+            if(settings.isTypingNotificationEnabled())
+                emit sendTyping(true);
+        }
+        mTypingTimer.start(2000);
+
         QTextEdit::keyPressEvent(event);
     }
 }
@@ -138,6 +158,17 @@ void InputTextWidget::cutPlainText()
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(Smileypack::desmilify(selection.toHtml()));
         textCursor().removeSelectedText();
+    }
+}
+
+void InputTextWidget::endTyping()
+{
+    const Settings &settings = Settings::getInstance();
+
+    if (mTyping) {
+        mTyping = false;
+        if(settings.isTypingNotificationEnabled())
+            emit sendTyping(false);
     }
 }
 

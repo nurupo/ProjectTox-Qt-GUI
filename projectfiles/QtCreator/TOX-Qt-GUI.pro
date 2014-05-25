@@ -104,7 +104,8 @@ SOURCES += \
     ../../src/messages/smileytextobject.cpp \
     ../../src/messages/smiley.cpp \
     ../../src/messages/messagefilter.cpp \
-    ../../src/messages/chatviewsearchwidget.cpp
+    ../../src/messages/chatviewsearchwidget.cpp \
+    ../../src/Settings/privacysettingspage.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -160,7 +161,8 @@ HEADERS  += \
     ../../src/messages/smileytextobject.hpp \
     ../../src/messages/smiley.hpp \
     ../../src/messages/messagefilter.hpp \
-    ../../src/messages/chatviewsearchwidget.hpp
+    ../../src/messages/chatviewsearchwidget.hpp \
+    ../../src/Settings/privacysettingspage.hpp
 
 ### ToxCore section. Please keep it alphabetical ###
 

@@ -43,5 +43,6 @@
         <file>icons/resultset_previous.png</file>
         <file>icons/find.png</file>
         <file>icons/text_uppercase.png</file>
+        <file>icons/eye.png</file>
     </qresource>
 </RCC>

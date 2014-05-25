@@ -104,6 +104,10 @@ void Settings::load()
         minimizeOnClose = s.value("minimizeOnClose", true).toBool();
     s.endGroup();
 
+    s.beginGroup("Privacy");
+        typingNotification = s.value("typingNotification", false).toBool();
+    s.endGroup();
+
     loaded = true;
 }
 
@@ -157,6 +161,10 @@ void Settings::save()
         s.setValue("SecondColumnHandlePos", secondColumnHandlePos);
         s.setValue("timestampFormat", timestampFormat);
         s.setValue("minimizeOnClose", minimizeOnClose);
+    s.endGroup();
+
+    s.beginGroup("Privacy");
+        s.setValue("typingNotification", typingNotification);
     s.endGroup();
 }
 
@@ -332,4 +340,14 @@ bool Settings::isMinimizeOnCloseEnabled() const
 void Settings::setMinimizeOnClose(bool newValue)
 {
     minimizeOnClose = newValue;
+}
+
+bool Settings::isTypingNotificationEnabled() const
+{
+    return typingNotification;
+}
+
+void Settings::setTypingNotification(bool enabled)
+{
+    typingNotification = enabled;
 }
