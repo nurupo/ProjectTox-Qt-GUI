@@ -36,6 +36,7 @@ private:
     static void onFriendRequest(Tox* tox, uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
+    static void onFriendTypingChange(Tox* tox, int friendId, uint8_t isTyping, void* core);
     static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onUserStatusChanged(Tox* tox, int friendId, uint8_t userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
@@ -148,6 +149,7 @@ signals:
     void friendStatusChanged(int friendId, Status status);
     void friendStatusMessageChanged(int friendId, const QString& message);
     void friendUsernameChanged(int friendId, const QString& username);
+    void friendTypingChanged(int friendId, bool isTyping);
 
     void friendAddressGenerated(const QString& friendAddress);
 

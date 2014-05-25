@@ -137,6 +137,19 @@ void ChatPageWidget::onOurUsernameChanged(const QString &newUsername)
     model->insertNewMessage(newUsername, Settings::getInstance().getUsername(), Message::Nick, Message::Self);
 }
 
+void ChatPageWidget::onFriendTypingChanged(bool isTyping)
+{
+    if (isTyping) {
+        if (mIsTypingMsg != 0)
+            model->removeMessage(mIsTypingMsg);
+        mIsTypingMsg = model->insertNewMessage(QString(), username, Message::Typing);
+    }
+    else {
+        model->removeMessage(mIsTypingMsg);
+        mIsTypingMsg = 0;
+    }
+}
+
 void ChatPageWidget::showSearchBar()
 {
     searchWidget->show();

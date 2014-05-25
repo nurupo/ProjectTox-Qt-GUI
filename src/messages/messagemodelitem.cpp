@@ -24,8 +24,6 @@
 MessageModelItem::MessageModelItem(const Message &msg) :
     mMsg(msg)
 {
-    if (!msg.sender().contains('!'))
-        mMsg.setFlags(msg.flags() |= Message::ServerMsg);
 }
 
 QVariant MessageModelItem::data(int column, int role) const
@@ -122,6 +120,8 @@ QVariant MessageModelItem::senderData(int role) const
             return "-!-";
         case Message::DayChange:
             return "---";
+        case Message::Typing:
+            return mMsg.sender();
         case Message::Invite:
             return "->";
         default:
@@ -154,7 +154,7 @@ QVariant MessageModelItem::contentsData(int role) const
             else
                 return tr("%1 is now known as %2").arg(mMsg.sender(), mMsg.contents());
         case Message::Join:
-            return tr("%1 has joined.").arg(mMsg.sender()); break;
+            return tr("%1 has joined.").arg(mMsg.sender());
         case Message::Quit:
             return tr("%1 has gone.").arg(mMsg.sender());
         case Message::Info:
@@ -163,6 +163,8 @@ QVariant MessageModelItem::contentsData(int role) const
             return tr("Couldn't send the message \"%1\"!").arg(mMsg.contents());
         case Message::DayChange:
             return tr("{Day changed to %1}").arg(mMsg.timestamp().date().toString(Qt::DefaultLocaleLongDate));
+        case Message::Typing:
+            return tr("is typing...");
         case Message::Invite:
         default:
             return mMsg.contents();
@@ -190,6 +192,7 @@ QBrush MessageModelItem::foreground(Message::Type type) const
         return QBrush("#cc0000");
     case Message::DayChange:
         return QBrush("#AD7FA8");
+    case Message::Typing:
     case Message::Invite:
     default:
         return QApplication::palette().text();
@@ -200,7 +203,6 @@ bool MessageModelItem::operator<(const MessageModelItem &other) const
 {
     return msgId() < other.msgId();
 }
-
 
 bool MessageModelItem::operator==(const MessageModelItem &other) const
 {

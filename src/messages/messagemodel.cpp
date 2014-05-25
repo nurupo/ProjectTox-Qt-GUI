@@ -74,7 +74,7 @@ bool MessageModel::setData(const QModelIndex &index, const QVariant &value, int 
     }
     return false;
 }
-
+/*
 bool MessageModel::insertMessage(const Message &msg)
 {
     MsgId id = msg.msgId();
@@ -114,21 +114,32 @@ void MessageModel::insertMessages(const QList<Message> &msglist)
         qSort(_messageBuffer);
     }
 }
-
-void MessageModel::insertNewMessage(const QString &content, const QString &sender, Message::Type type, Message::Flag flag)
+*/
+MsgId MessageModel::insertNewMessage(const QString &content, const QString &sender, Message::Type type, Message::Flag flag)
 {
     int idx = messageCount();
     beginInsertRows(QModelIndex(), idx, idx);
     Message msg(type, content, sender);
     msg.setFlags(flag);
-    if (!messagesIsEmpty())
-        msg.setMsgId(messageItemAt(idx-1)->msgId());
-    else
-        msg.setMsgId(0);
+    msg.setMsgId(QDateTime::currentMSecsSinceEpoch());
     insertMessage__(idx, msg);
     endInsertRows();
+
+    return msg.msgId();
 }
 
+void MessageModel::removeMessage(const MsgId &msgid)
+{
+    for (int i=0; i<_messageList.count(); i++) {
+        if(_messageList.at(i).msgId() == msgid) {
+            beginRemoveRows(QModelIndex(), i, i);
+            _messageList.removeAt(i);
+            endRemoveRows();
+            return;
+        }
+    }
+}
+/*
 void MessageModel::insertMessageGroup(const QList<Message> &msglist)
 {
     Q_ASSERT(!msglist.isEmpty()); // the msglist can be assumed to be non empty
@@ -197,13 +208,13 @@ void MessageModel::insertMessageGroup(const QList<Message> &msglist)
 
 int MessageModel::insertMessagesGracefully(const QList<Message> &msglist)
 {
-    /* short description:
-     * 1) first we check where the message with the highest msgId from msglist would be inserted
-     * 2) check that position for dupe
-     * 3) determine the messageId of the preceeding msg
-     * 4) insert as many msgs from msglist with with msgId larger then the just determined id
-     *    those messages are automatically less then the msg of the position we just determined in 1)
-     */
+    // short description:
+    // 1) first we check where the message with the highest msgId from msglist would be inserted
+    // 2) check that position for dupe
+    // 3) determine the messageId of the preceeding msg
+    // 4) insert as many msgs from msglist with with msgId larger then the just determined id
+    //    those messages are automatically less then the msg of the position we just determined in 1)
+
     bool inOrder = (msglist.first().msgId() < msglist.last().msgId());
     // depending on the order we have to traverse from the front to the back or vice versa
 
@@ -333,16 +344,16 @@ void MessageModel::customEvent(QEvent *event)
     if (!_messageBuffer.isEmpty())
         QCoreApplication::postEvent(this, new ProcessBufferEvent());
 }
-
+*/
 void MessageModel::clear()
 {
     if (rowCount() > 0) {
         beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
-        removeAllMessages();
+        _messageList.clear();
         endRemoveRows();
     }
 }
-
+/*
 // returns index of msg with given Id or of the next message after that (i.e., the index where we'd insert this msg)
 int MessageModel::indexForId(MsgId id)
 {
@@ -362,7 +373,7 @@ int MessageModel::indexForId(MsgId id)
         else start = pivot;
     }
 }
-
+*/
 void MessageModel::changeOfDay()
 {
     _dayChangeTimer.setInterval(86400000);
@@ -392,7 +403,7 @@ void MessageModel::insertErrorMessage(const QString &errorString)
     insertMessage__(idx, msg);
     endInsertRows();
 }
-
+/*
 void MessageModel::insertMessages__(int pos, const QList<Message> &messages)
 {
     for (int i = 0; i < messages.count(); i++) {
@@ -407,3 +418,4 @@ Message MessageModel::takeMessageAt(int i)
     _messageList.removeAt(i);
     return msg;
 }
+*/

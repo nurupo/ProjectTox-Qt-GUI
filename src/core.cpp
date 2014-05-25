@@ -59,6 +59,11 @@ void Core::onFriendNameChange(Tox*/* tox*/, int friendId, uint8_t* cName, uint16
     emit static_cast<Core*>(core)->friendUsernameChanged(friendId, CString::toString(cName, cNameSize));
 }
 
+void Core::onFriendTypingChange(Tox*/* tox*/, int friendId, uint8_t isTyping, void *core)
+{
+    emit static_cast<Core*>(core)->friendTypingChanged(friendId, isTyping ? true : false);
+}
+
 void Core::onStatusMessageChanged(Tox*/* tox*/, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
     emit static_cast<Core*>(core)->friendStatusMessageChanged(friendId, CString::toString(cMessage, cMessageSize));
@@ -337,6 +342,7 @@ void Core::start()
     tox_callback_friend_message(tox, onFriendMessage, this);
     tox_callback_friend_action(tox, onAction, this);
     tox_callback_name_change(tox, onFriendNameChange, this);
+    tox_callback_typing_change(tox, onFriendTypingChange, this);
     tox_callback_status_message(tox, onStatusMessageChanged, this);
     tox_callback_user_status(tox, onUserStatusChanged, this);
     tox_callback_connection_status(tox, onConnectionStatusChanged, this);

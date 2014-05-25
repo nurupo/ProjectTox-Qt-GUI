@@ -73,6 +73,11 @@ void PagesWidget::onOurUsernameChanged(const QString &username)
     }
 }
 
+void PagesWidget::onFriendTypingChanged(int friendId, bool isTyping)
+{
+    widget(friendId)->onFriendTypingChanged(isTyping);
+}
+
 void PagesWidget::statusChanged(int friendId, Status status)
 {
     widget(friendId)->setStatus(status);

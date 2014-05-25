@@ -124,6 +124,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::onFriendusernameChanged);
+    connect(core, &Core::friendTypingChanged, pages, &PagesWidget::onFriendTypingChanged);
     connect(core, &Core::friendRemoved, friendsWidget, &FriendsWidget::removeFriend);
     connect(core, &Core::friendRemoved, pages, &PagesWidget::removePage);
     connect(core, &Core::failedToRemoveFriend, this, &MainWindow::onFailedToRemoveFriend);

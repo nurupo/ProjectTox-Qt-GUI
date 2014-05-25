@@ -389,6 +389,12 @@ void SenderChatItem::initDocument(QTextDocument *doc)
         doc->setPlainText("");
     }
     else {
+        if (data(MessageModel::TypeRole).toInt() == Message::Typing) {
+            QFont f = doc->defaultFont();
+            f.setItalic(true);
+            f.setPointSize(f.pointSize()-2);
+            doc->setDefaultFont(f);
+        }
         doc->setPlainText(data(MessageModel::DisplayRole).toString());
     }
 
@@ -462,6 +468,13 @@ void ContentsChatItem::initDocument(QTextDocument *doc)
 
     doc->setPlainText(text);
     doc->setTextWidth(width());
+
+    if (data(MessageModel::TypeRole).toInt() == Message::Typing) {
+        QFont f = doc->defaultFont();
+        f.setItalic(true);
+        f.setPointSize(f.pointSize()-2);
+        doc->setDefaultFont(f);
+    }
 
     // Replace smileys
     QTextCursor c(doc);
@@ -690,7 +703,12 @@ TimestampChatItem::TimestampChatItem(const QRectF &boundingRect, ChatLine *paren
 
 void TimestampChatItem::initDocument(QTextDocument *doc)
 {
-    ChatItem::initDocument(doc);
+    if (data(MessageModel::TypeRole).toInt() == Message::Typing)
+        doc->setPlainText(QString());
+    else
+        doc->setPlainText(data(MessageModel::DisplayRole).toString());
+
+    doc->setTextWidth(width());
 
     QTextOption o;
     o.setAlignment(Qt::AlignRight);

@@ -41,6 +41,7 @@ public slots:
     void statusChanged(int friendId, Status status);
     void onFriendusernameChanged(int friendId, const QString& username);
     void onOurUsernameChanged(const QString& username);
+    void onFriendTypingChanged(int friendId, bool isTyping);
     void statusMessageChanged(int friendId, const QString& statusMessage);
     void messageReceived(int friendId, const QString& message);
     void actionReceived(int friendId, const QString& message);
