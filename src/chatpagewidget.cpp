@@ -140,4 +140,5 @@ void ChatPageWidget::onOurUsernameChanged(const QString &newUsername)
 void ChatPageWidget::showSearchBar()
 {
     searchWidget->show();
+    searchWidget->enableSearch();
 }

@@ -1,3 +1,19 @@
+/*
+    Copyright (C) 2014 by Martin Kröll <technikschlumpf@web.de>
+
+    This file is part of Tox Qt GUI.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the COPYING file for more details.
+*/
+
 #include "chatviewsearchwidget.hpp"
 #include "chatscene.hpp"
 #include "chatitem.hpp"
@@ -18,10 +34,13 @@ ChatViewSearchWidget::ChatViewSearchWidget(QWidget *parent) :
     setHidden(true);
     setIconSize(QSize(16,16));
 
+    mSearchDelayTimer.setSingleShot(true);
+
     mSearchLineEdit = new QLineEdit(this);
     mSearchLineEdit->setClearButtonEnabled(true);
     mSearchLineEdit->setPlaceholderText(tr("Search"));
-    connect(mSearchLineEdit, &QLineEdit::textChanged, this, &ChatViewSearchWidget::setSearchString);
+    connect(mSearchLineEdit, SIGNAL(textChanged(QString)), this, SLOT(delaySearch()));
+    connect(&mSearchDelayTimer, &QTimer::timeout, this, &ChatViewSearchWidget::search);
 
     QAction *csCheckbox = new QAction(QIcon(":/icons/text_uppercase.png"), tr("Case sensitive"), this);
     csCheckbox->setCheckable(true);
@@ -75,7 +94,11 @@ void ChatViewSearchWidget::setScene(ChatScene *scene)
     // TODO MKO Backlog
 
     connect(mScene, SIGNAL(rowsAboutToBeRemoved(int,int)), this, SLOT(rowsRemoved(int,int)), Qt::DirectConnection); // Direct connection is important
+}
 
+void ChatViewSearchWidget::enableSearch(bool enable)
+{
+    mSearchEnabled = enable;
     updateHighlights();
 }
 
@@ -191,6 +214,9 @@ void ChatViewSearchWidget::updateHighlights(bool reuse)
     if (!mScene)
         return;
 
+    if(!mSearchEnabled)
+        return;
+
     if (reuse) {
         QSet<ChatItem *> chatItems;
         for (Highlight *highlight : mHighlights) {
@@ -286,9 +312,20 @@ void ChatViewSearchWidget::updateCurrentHighlight(ChatItem *oldItem, int oldStar
 
 void ChatViewSearchWidget::closeSearch()
 {
+    mSearchEnabled = false;
     clearHightlights();
     mSearchLineEdit->clear();
     hide();
+}
+
+void ChatViewSearchWidget::delaySearch()
+{
+    mSearchDelayTimer.start(300);
+}
+
+void ChatViewSearchWidget::search()
+{
+    setSearchString(mSearchLineEdit->text());
 }
 
 void ChatViewSearchWidget::checkMessagesForHighlight(int start, int end)

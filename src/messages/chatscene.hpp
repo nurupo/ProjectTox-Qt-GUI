@@ -35,11 +35,6 @@ class ChatScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    enum CutoffMode {
-        CutoffLeft,
-        CutoffRight
-    };
-
     enum ItemType {
         ChatLineType = QGraphicsItem::UserType + 1,
         ChatItemType,
@@ -80,9 +75,6 @@ public:
 
     ColumnHandleItem *firstColumnHandle() const  { return _firstColHandle;  }
     ColumnHandleItem *secondColumnHandle() const { return _secondColHandle; }
-
-    inline CutoffMode senderCutoffMode() const { return _cutoffMode; }
-    inline void setSenderCutoffMode(CutoffMode mode) { _cutoffMode = mode; }
 
     QString selection() const;
     bool hasSelection() const;
@@ -164,7 +156,6 @@ private:
     ColumnHandleItem *_secondColHandle;
     qreal _firstColHandlePos;
     qreal _secondColHandlePos;
-    CutoffMode _cutoffMode;
 
     ChatItem *_selectingItem;
     int  _selectionStartCol;

@@ -45,7 +45,6 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     _markerLineVisible(false),
     _markerLineValid(false),
     _markerLineJumpPending(false),
-    _cutoffMode(CutoffRight),
     _selectingItem(0),
     _selectionStartRow(-1),
     _isSelecting(false),
