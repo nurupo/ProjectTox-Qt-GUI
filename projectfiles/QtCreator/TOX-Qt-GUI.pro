@@ -35,17 +35,17 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../src/ ../../submodules/ProjectTox-Core/toxcore/
-win32:INCLUDEPATH += ../../libs/sodium/include/
-macx:INCLUDEPATH += /usr/local/include
+INCLUDEPATH += ../../src/
+win32:INCLUDEPATH += ../../libs/include/
+macx:INCLUDEPATH += /usr/local/include/
 
 win32 {
-    LIBS += -lWS2_32 ../../libs/sodium/lib/libsodium.a
+    LIBS += ../../libs/lib/libtoxcore.a -lWS2_32 ../../libs/lib/libsodium.a
 } else {
     macx {
-        LIBS += -L/usr/local/lib -lsodium
+        LIBS += -L/usr/local/lib -ltoxcore -lsodium
     } else {
-        LIBS += -lsodium
+        LIBS += -ltoxcore -lsodium
     }
 }
 
@@ -136,54 +136,6 @@ HEADERS  += \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
     ../../src/copyableelidelabel.hpp
-
-### ToxCore section. Please keep it alphabetical ###
-
-SOURCES += \
-    ../../submodules/ProjectTox-Core/toxcore/assoc.c \
-    ../../submodules/ProjectTox-Core/toxcore/crypto_core.c \
-    ../../submodules/ProjectTox-Core/toxcore/DHT.c \
-    ../../submodules/ProjectTox-Core/toxcore/friend_requests.c \
-    ../../submodules/ProjectTox-Core/toxcore/group_chats.c \
-    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.c \
-    ../../submodules/ProjectTox-Core/toxcore/list.c \
-    ../../submodules/ProjectTox-Core/toxcore/Messenger.c \
-    ../../submodules/ProjectTox-Core/toxcore/net_crypto.c \
-    ../../submodules/ProjectTox-Core/toxcore/network.c \
-    ../../submodules/ProjectTox-Core/toxcore/onion.c \
-    ../../submodules/ProjectTox-Core/toxcore/onion_announce.c \
-    ../../submodules/ProjectTox-Core/toxcore/onion_client.c \
-    ../../submodules/ProjectTox-Core/toxcore/ping.c \
-    ../../submodules/ProjectTox-Core/toxcore/ping_array.c \
-    ../../submodules/ProjectTox-Core/toxcore/TCP_client.c \
-    ../../submodules/ProjectTox-Core/toxcore/TCP_server.c \
-    ../../submodules/ProjectTox-Core/toxcore/tox.c \
-    ../../submodules/ProjectTox-Core/toxcore/util.c
-
-
-
-HEADERS  += \
-    ../../submodules/ProjectTox-Core/toxcore/assoc.h \
-    ../../submodules/ProjectTox-Core/toxcore/crypto_core.h \
-    ../../submodules/ProjectTox-Core/toxcore/DHT.h \
-    ../../submodules/ProjectTox-Core/toxcore/friend_requests.h \
-    ../../submodules/ProjectTox-Core/toxcore/group_chats.h \
-    ../../submodules/ProjectTox-Core/toxcore/LAN_discovery.h \
-    ../../submodules/ProjectTox-Core/toxcore/list.h \
-    ../../submodules/ProjectTox-Core/toxcore/Messenger.h \
-    ../../submodules/ProjectTox-Core/toxcore/misc_tools.h \
-    ../../submodules/ProjectTox-Core/toxcore/net_crypto.h \
-    ../../submodules/ProjectTox-Core/toxcore/network.h \
-    ../../submodules/ProjectTox-Core/toxcore/onion.h \
-    ../../submodules/ProjectTox-Core/toxcore/onion_announce.h \
-    ../../submodules/ProjectTox-Core/toxcore/onion_client.h \
-    ../../submodules/ProjectTox-Core/toxcore/ping.h \
-    ../../submodules/ProjectTox-Core/toxcore/ping_array.h \
-    ../../submodules/ProjectTox-Core/toxcore/TCP_client.h \
-    ../../submodules/ProjectTox-Core/toxcore/TCP_server.h \
-    ../../submodules/ProjectTox-Core/toxcore/tox.h \
-    ../../submodules/ProjectTox-Core/toxcore/util.h
-
 
 RESOURCES += \
     ../../resources/resources.qrc

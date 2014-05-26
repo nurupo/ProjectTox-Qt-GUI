@@ -19,7 +19,7 @@
 
 #include "status.hpp"
 
-#include <tox.h>
+#include <tox/tox.h>
 
 #include <QDateTime>
 #include <QObject>

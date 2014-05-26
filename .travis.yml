@@ -16,9 +16,18 @@ before_install:
   - ln -s ~/Qt5.2.0/5.2.0/gcc_64/mkspecs/linux-g++ ~/Qt5.2.0/5.2.0/gcc_64/mkspecs/linux-gcc
   - git clone git://github.com/jedisct1/libsodium.git
   - cd libsodium
-  - git checkout tags/0.4.2
+  - git checkout tags/0.5.0
   - ./autogen.sh
-  - ./configure && make -j3 check
+  - ./configure
+  - make -j$(nproc)
+  - sudo make install
+  - sudo ldconfig
+  - cd ..
+  - git clone git://github.com/irungentoo/ProjectTox-Core.git
+  - cd ProjectTox-Core
+  - autoreconf -i
+  - ./configure --disable-tests
+  - make -j$(nproc)
   - sudo make install
   - sudo ldconfig
   - cd ..
@@ -26,7 +35,7 @@ before_install:
 script:
   - ~/Qt5.2.0/5.2.0/gcc_64/bin/qmake -v
   - ~/Qt5.2.0/5.2.0/gcc_64/bin/qmake -spec linux-$CC -Wall projectfiles/QtCreator/TOX-Qt-GUI.pro
-  - make -j3
+  - make -j$(nproc)
 
 notifications:
   

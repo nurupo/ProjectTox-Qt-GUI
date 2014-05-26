@@ -16,7 +16,7 @@
 
 #include "dhtserverdialog.hpp"
 
-#include <tox.h>
+#include <tox/tox.h>
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

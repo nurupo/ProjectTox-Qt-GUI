@@ -17,7 +17,7 @@
 #include "addfrienddialog.hpp"
 #include "customhinttextedit.hpp"
 
-#include <tox.h>
+#include <tox/tox.h>
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
