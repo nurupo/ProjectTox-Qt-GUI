@@ -19,7 +19,6 @@
 
 #include "frienditemwidget.hpp"
 #include "inputtextwidget.hpp"
-#include "messages/id.hpp"
 
 #include <QTextBrowser>
 #include <QTextEdit>
@@ -55,7 +54,6 @@ private:
     int friendId;
     QString username;
     Status status;
-    MsgId mIsTypingMsg;
 
 public slots:
     void messageReceived(const QString& message);

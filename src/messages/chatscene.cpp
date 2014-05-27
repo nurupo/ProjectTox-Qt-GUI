@@ -29,6 +29,7 @@
 #include <QMimeData>
 #include <QGraphicsSceneContextMenuEvent>
 #include "chatview.hpp"
+#include "typingitem.hpp"
 
 #include "Settings/settings.hpp"
 
@@ -50,10 +51,15 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     _isSelecting(false),
     _clickMode(NoClick),
     _clickHandled(true),
-    _leftButtonPressed(false)
+    _leftButtonPressed(false),
+    mTypingItem(new TypingItem(width)),
+    mTypingShown(false)
 {
     addItem(_markerLine);
     connect(this, SIGNAL(sceneRectChanged(const QRectF &)), _markerLine, SLOT(sceneRectChanged(const QRectF &)));
+
+    addItem(mTypingItem);
+    connect(this, SIGNAL(sceneRectChanged(const QRectF &)), mTypingItem, SLOT(sceneRectChanged(const QRectF &)));
 
     // Load handle positions
     Settings &s = Settings::getInstance();
@@ -566,6 +572,19 @@ void ChatScene::handleClick(Qt::MouseButton button, const QPointF &scenePos)
     }
 }
 
+void ChatScene::setTypingNotificationVisible(const QString &name, bool visible)
+{
+    if (visible) {
+        mTypingItem->setVisible(name);
+        updateSceneRect();
+        emit lastLineChanged(nullptr, height());
+    }
+    else {
+        mTypingItem->hide();
+        updateSceneRect();
+    }
+}
+
 void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
 {
     Q_UNUSED(index)
@@ -644,6 +663,11 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
             if (line == markerLine()->chatLine())
                 markerLine()->setPos(line->pos() + QPointF(0, line->height()));
         }
+    }
+
+    // Move typing notification
+    if (mTypingItem->isVisible()) {
+        mTypingItem->setPos(0, _lines.last()->y() + h);
     }
 
     // check if all went right
@@ -945,7 +969,14 @@ void ChatScene::updateSceneRect(qreal width)
     if (_firstLineRow < _lines.count()) {
         ChatLine *firstLine = _lines.at(_firstLineRow);
         ChatLine *lastLine = _lines.last();
-        updateSceneRect(QRectF(0, firstLine->pos().y(), width, lastLine->pos().y() + lastLine->height() - firstLine->pos().y()));
+        qreal y = lastLine->pos().y() + lastLine->height();
+
+        // Update typing notification position
+        if(mTypingItem->isVisible()) {
+            mTypingItem->setPos(0, y);
+            y += mTypingItem->height();
+        }
+        updateSceneRect(QRectF(0, firstLine->pos().y(), width, y - firstLine->pos().y()));
     }
     else {
         // empty scene rect

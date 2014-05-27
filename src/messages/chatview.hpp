@@ -69,6 +69,7 @@ public slots:
 
     void setMarkerLineVisible(bool visible = true);
     void setMarkerLine(MsgId msgId);
+    void setTypingNotificationVisible(const QString &name, bool visible = true);
     void jumpToMarkerLine();
     void scrollTo(const QPointF &position);
 

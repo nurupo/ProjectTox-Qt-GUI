@@ -191,6 +191,11 @@ void ChatView::setMarkerLine(MsgId msgId)
     // TODO MKO Markerline
 }
 
+void ChatView::setTypingNotificationVisible(const QString &name, bool visible)
+{
+    scene()->setTypingNotificationVisible(name, visible);
+}
+
 void ChatView::jumpToMarkerLine()
 {
     scene()->jumpToMarkerLine();

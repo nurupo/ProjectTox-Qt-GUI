@@ -38,7 +38,6 @@ public:
         Info      = 0x00800,
         Error     = 0x01000,
         DayChange = 0x02000,
-        Typing    = 0x10000,
         Invite    = 0x20000,
     };
 

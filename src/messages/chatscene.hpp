@@ -30,6 +30,7 @@ class ChatLine;
 class ChatItem;
 class ColumnHandleItem;
 class MarkerLineItem;
+class TypingItem;
 
 class ChatScene : public QGraphicsScene
 {
@@ -42,7 +43,8 @@ public:
         SenderChatItemType,
         ContentsChatItemType,
         ColumnHandleType,
-        MarkerLineType
+        MarkerLineType,
+        TypingNotificationType
     };
 
     enum ClickMode {
@@ -100,6 +102,8 @@ public slots:
     void setMarkerLineVisible(bool visible = true);
     void setMarkerLine(MsgId msgId = MsgId());
     void jumpToMarkerLine();
+
+    void setTypingNotificationVisible(const QString &name, bool visible = true);
 
     // these are used by the chatitems to notify the scene and manage selections
     void setSelectingItem(ChatItem *item);
@@ -171,6 +175,10 @@ private:
     QPointF _clickPos;
     bool _clickHandled;
     bool _leftButtonPressed;
+
+    // Typing notification
+    TypingItem *mTypingItem;
+    bool mTypingShown;
 };
 
 #endif // CHATSCENE_HPP

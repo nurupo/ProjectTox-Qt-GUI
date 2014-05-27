@@ -140,15 +140,7 @@ void ChatPageWidget::onOurUsernameChanged(const QString &newUsername)
 
 void ChatPageWidget::onFriendTypingChanged(bool isTyping)
 {
-    if (isTyping) {
-        if (mIsTypingMsg != 0)
-            model->removeMessage(mIsTypingMsg);
-        mIsTypingMsg = model->insertNewMessage(QString(), username, Message::Typing);
-    }
-    else {
-        model->removeMessage(mIsTypingMsg);
-        mIsTypingMsg = 0;
-    }
+    chatview->setTypingNotificationVisible(username, isTyping);
 }
 
 void ChatPageWidget::showSearchBar()

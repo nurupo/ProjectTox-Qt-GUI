@@ -120,8 +120,6 @@ QVariant MessageModelItem::senderData(int role) const
             return "-!-";
         case Message::DayChange:
             return "---";
-        case Message::Typing:
-            return mMsg.sender();
         case Message::Invite:
             return "->";
         default:
@@ -163,8 +161,6 @@ QVariant MessageModelItem::contentsData(int role) const
             return tr("Couldn't send the message \"%1\"!").arg(mMsg.contents());
         case Message::DayChange:
             return tr("{Day changed to %1}").arg(mMsg.timestamp().date().toString(Qt::DefaultLocaleLongDate));
-        case Message::Typing:
-            return tr("is typing...");
         case Message::Invite:
         default:
             return mMsg.contents();
@@ -192,7 +188,6 @@ QBrush MessageModelItem::foreground(Message::Type type) const
         return QBrush("#cc0000");
     case Message::DayChange:
         return QBrush("#AD7FA8");
-    case Message::Typing:
     case Message::Invite:
     default:
         return QApplication::palette().text();
