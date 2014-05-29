@@ -159,7 +159,7 @@ private:
     ColumnHandleItem *_firstColHandle;
     ColumnHandleItem *_secondColHandle;
     qreal _firstColHandlePos;
-    qreal _secondColHandlePos;
+    qreal _secondColHandlePosFromRight;
 
     ChatItem *_selectingItem;
     int  _selectionStartCol;

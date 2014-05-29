@@ -96,8 +96,8 @@ public:
     int getFirstColumnHandlePos() const;
     void setFirstColumnHandlePos(const int pos);
 
-    int getSecondColumnHandlePos() const;
-    void setSecondColumnHandlePos(const int pos);
+    int getSecondColumnHandlePosFromRight() const;
+    void setSecondColumnHandlePosFromRight(const int pos);
 
     const QString &getTimestampFormat() const;
     void setTimestampFormat(const QString &format);
@@ -145,7 +145,7 @@ private:
 
     // ChatView
     int firstColumnHandlePos;
-    int secondColumnHandlePos;
+    int secondColumnHandlePosFromRight;
     QString timestampFormat;
 
     // Privacy

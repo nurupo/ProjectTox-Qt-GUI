@@ -64,7 +64,7 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     // Load handle positions
     Settings &s = Settings::getInstance();
     _firstColHandlePos = s.getFirstColumnHandlePos();
-    _secondColHandlePos = s.getSecondColumnHandlePos();
+    _secondColHandlePosFromRight = s.getSecondColumnHandlePosFromRight();
 
     _firstColHandle = new ColumnHandleItem(6);
     addItem(_firstColHandle);
@@ -74,7 +74,7 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
 
     _secondColHandle = new ColumnHandleItem(6);
     addItem(_secondColHandle);
-    _secondColHandle->setXPos(_secondColHandlePos);
+    _secondColHandle->setXPos(_sceneRect.width() - _secondColHandlePosFromRight);
     connect(_secondColHandle, SIGNAL(positionChanged(qreal)), this, SLOT(secondHandlePositionChanged(qreal)));
 
     connect(this, SIGNAL(sceneRectChanged(const QRectF &)), _secondColHandle, SLOT(sceneRectChanged(const QRectF &)));
@@ -291,13 +291,22 @@ void ChatScene::setWidth(qreal width)
 
 void ChatScene::layout(int start, int end, qreal width)
 {
+    // Update second handle position
+    qreal newSecondHandlePos = width - _secondColHandlePosFromRight;
+    if(newSecondHandlePos < width) {
+        if (newSecondHandlePos < secondColumnHandle()->xMin())
+            newSecondHandlePos = secondColumnHandle()->xMin();
+        secondColumnHandle()->setXPos(newSecondHandlePos);
+    }
+
     if (end >= 0) {
         int row = end;
         qreal linePos = _lines.at(row)->scenePos().y() + _lines.at(row)->height();
         qreal thirdWidth = width - secondColumnHandle()->sceneRight();
         qreal secondWidth = secondColumnHandle()->sceneLeft() - firstColumnHandle()->sceneRight();
+        QPointF thirdColumnPos(secondColumnHandle()->sceneRight(), 0);
         while (row >= start) {
-            _lines.at(row--)->setGeometryByWidth(width, secondWidth, thirdWidth, linePos);
+            _lines.at(row--)->setGeometryByWidth(width, secondWidth, thirdWidth, thirdColumnPos, linePos);
         }
 
         if (row >= 0) {
@@ -313,23 +322,10 @@ void ChatScene::layout(int start, int end, qreal width)
         }
     }
 
-    //setItemIndexMethod(QGraphicsScene::BspTreeIndex);
-
     updateSceneRect(width);
     setHandleXLimits();
     setMarkerLine();
-
-    // Update second handle position
-    qreal newSecondHandlePos = secondColumnHandle()->x() + (width - _sceneRect.width());
-    if(newSecondHandlePos < width) {
-        if (newSecondHandlePos < secondColumnHandle()->xMin())
-            newSecondHandlePos = secondColumnHandle()->xMin();
-
-        secondColumnHandle()->setXPos(newSecondHandlePos);
-        secondHandlePositionChanged(secondColumnHandle()->x(), width);
-    } else {
-        emit layoutChanged();
-    }
+    emit layoutChanged();
 }
 
 void ChatScene::setMarkerLineVisible(bool visible)
@@ -832,7 +828,7 @@ void ChatScene::firstHandlePositionChanged(qreal xpos)
 
 void ChatScene::secondHandlePositionChanged(qreal xpos)
 {
-    if (_secondColHandlePos == xpos)
+    if (_sceneRect.width() - _secondColHandlePosFromRight == xpos)
         return;
 
     secondHandlePositionChanged(xpos, _sceneRect.width());
@@ -845,11 +841,11 @@ void ChatScene::secondHandlePositionChanged(qreal xpos)
 // Extracted the core of secondHandlePositionChanged(qreal xpos) because of it's needed for scene resizing, too. But with a changed scene width.
 void ChatScene::secondHandlePositionChanged(qreal xpos, qreal sceneWidth)
 {
-    _secondColHandlePos = xpos;
+    _secondColHandlePosFromRight = sceneWidth - xpos;
 
     // Save handle positions
     Settings &s = Settings::getInstance();
-    s.setSecondColumnHandlePos(_secondColHandlePos);
+    s.setSecondColumnHandlePosFromRight(_secondColHandlePosFromRight);
 
     // clock_t startT = clock();
 

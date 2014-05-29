@@ -64,7 +64,7 @@ public:
     // setSecondColumn and setGeometryByWidth both also relocate the chatline.
     // the _bottom_ position is passed via linePos. linePos is updated to the top of the chatLine.
     void setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos);
-    void setGeometryByWidth(const qreal &width, const qreal &secondWidth, const qreal &thirdWidth, qreal &linePos);
+    void setGeometryByWidth(const qreal &width, const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos);
 
     void setSelected(bool selected, MessageModel::ColumnType minColumn = MessageModel::SenderColumn, MessageModel::ColumnType maxColumn = MessageModel::TimestampColumn);
     void setHighlighted(bool highlighted);

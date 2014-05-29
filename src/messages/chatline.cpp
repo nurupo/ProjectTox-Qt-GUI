@@ -149,7 +149,7 @@ void ChatLine::setSecondColumn(const qreal &secondWidth, const qreal &thirdWidth
     setPos(0, linePos);
 }
 
-void ChatLine::setGeometryByWidth(const qreal &width, const qreal &secondWidth, const qreal &thirdWidth, qreal &linePos)
+void ChatLine::setGeometryByWidth(const qreal &width, const qreal &secondWidth, const qreal &thirdWidth, const QPointF &thirdPos, qreal &linePos)
 {
     Q_UNUSED(width)
     Q_UNUSED(linePos)
@@ -165,6 +165,7 @@ void ChatLine::setGeometryByWidth(const qreal &width, const qreal &secondWidth, 
 
         if (width != _width) {
             _timestampItem.setWidth(thirdWidth);
+            _timestampItem.setPos(thirdPos);
         }
 
         if (needGeometryChange) {

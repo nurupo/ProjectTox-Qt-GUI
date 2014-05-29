@@ -99,7 +99,7 @@ void Settings::load()
         emojiFontFamily = s.value("emojiFontFamily", "DejaVu Sans").toString();
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
         firstColumnHandlePos = s.value("firstColumnHandlePos", 50).toInt();
-        secondColumnHandlePos = s.value("SecondColumnHandlePos", 250).toInt();
+        secondColumnHandlePosFromRight = s.value("secondColumnHandlePosFromRight", 50).toInt();
         timestampFormat = s.value("timestampFormat", "hh:mm").toString();
         minimizeOnClose = s.value("minimizeOnClose", true).toBool();
     s.endGroup();
@@ -158,7 +158,7 @@ void Settings::save()
         s.setValue("emojiFontFamily", emojiFontFamily);
         s.setValue("emojiFontPointSize", emojiFontPointSize);
         s.setValue("firstColumnHandlePos", firstColumnHandlePos);
-        s.setValue("SecondColumnHandlePos", secondColumnHandlePos);
+        s.setValue("secondColumnHandlePosFromRight", secondColumnHandlePosFromRight);
         s.setValue("timestampFormat", timestampFormat);
         s.setValue("minimizeOnClose", minimizeOnClose);
     s.endGroup();
@@ -300,14 +300,14 @@ void Settings::setFirstColumnHandlePos(const int pos)
     firstColumnHandlePos = pos;
 }
 
-int Settings::getSecondColumnHandlePos() const
+int Settings::getSecondColumnHandlePosFromRight() const
 {
-    return secondColumnHandlePos;
+    return secondColumnHandlePosFromRight;
 }
 
-void Settings::setSecondColumnHandlePos(const int pos)
+void Settings::setSecondColumnHandlePosFromRight(const int pos)
 {
-    secondColumnHandlePos = pos;
+    secondColumnHandlePosFromRight = pos;
 }
 
 const QString &Settings::getTimestampFormat() const
