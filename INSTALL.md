@@ -13,7 +13,7 @@
 | Name         | Version                          |
 |--------------|----------------------------------|
 | Qt           | >= 5.2.0                         |
-| C++ compiler | supporting C++11 (i.e. gcc 4.7+) |
+| C++ compiler | supporting C++11 (i.e. gcc 4.6+) |
 | toxcore      | most recent                      |
 
 ###Unix-like (Linux, Unix, OS X):
