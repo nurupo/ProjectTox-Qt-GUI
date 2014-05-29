@@ -206,7 +206,6 @@ ChatLine *ChatScene::chatLine(MsgId msgId, bool matchExact, bool ignoreDayChange
 //!\brief Convert current selection to human-readable string.
 QString ChatScene::selection() const
 {
-    //TODO Make selection format configurable!
     if (hasGlobalSelection()) {
         int start = qMin(_selectionStartRow, _selectionEndRow);
         int end = qMax(_selectionStartRow, _selectionEndRow);
@@ -327,6 +326,11 @@ void ChatScene::layout(int start, int end, qreal width)
     emit layoutChanged();
 }
 
+void ChatScene::setMarkerLineValid(bool valid)
+{
+    _markerLineValid = valid;
+}
+
 void ChatScene::setMarkerLineVisible(bool visible)
 {
     _markerLineVisible = visible;
@@ -338,18 +342,13 @@ void ChatScene::setMarkerLineVisible(bool visible)
 
 void ChatScene::setMarkerLine(ChatLine *line)
 {
-    if(!line && _markerLineValid)
+    if(!line)
         line = markerLine()->chatLine();
 
     if (line) {
         markerLine()->setChatLine(line);
         markerLine()->setPos(line->pos());
-        _markerLineValid = true;
-        return;
     }
-
-    _markerLineValid = false;
-    setMarkerLineVisible(false);
 }
 
 void ChatScene::setSelectingItem(ChatItem *item)
@@ -664,7 +663,8 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
     }
 
     // now show and move the marker line if necessary
-    if (!_markerLineVisible && atBottom && (!chatView()->isVisible() || !chatView()->isActiveWindow())) {
+    if (!_markerLineValid && atBottom && (!chatView()->isVisible() || !chatView()->isActiveWindow())) {
+        setMarkerLineValid(true);
         setMarkerLine(firstBottomLine);
         setMarkerLineVisible(true);
     }

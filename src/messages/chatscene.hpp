@@ -99,6 +99,7 @@ public slots:
     void setWidth(qreal width);
     void layout(int start, int end, qreal width);
 
+    void setMarkerLineValid(bool valid = true);
     void setMarkerLineVisible(bool visible = true);
     void setMarkerLine(ChatLine *line = nullptr);
 

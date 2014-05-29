@@ -74,6 +74,9 @@ ChatView::ChatView(MessageFilter *model, QWidget *parent) :
     hideDaychange = new QAction(tr("Day changes"), this);
     hideDaychange->setCheckable(true);
     connect(hideDaychange, &QAction::toggled, model, &MessageFilter::filterDaychange);
+
+    // Notify if window comes active, and so on...
+    connect(qApp, &QApplication::applicationStateChanged, this, &ChatView::onApplicationStateChanged);
 }
 
 MsgId ChatView::lastMsgId() const
@@ -180,11 +183,6 @@ void ChatView::clearCache()
     }
 }
 
-void ChatView::setMarkerLineVisible(bool visible)
-{
-    scene()->setMarkerLineVisible(visible);
-}
-
 void ChatView::setTypingNotificationVisible(const QString &name, bool visible)
 {
     scene()->setTypingNotificationVisible(name, visible);
@@ -250,9 +248,15 @@ void ChatView::scrollContentsBy(int dx, int dy)
     checkChatLineCaches();
 }
 
+void ChatView::showEvent(QShowEvent *event)
+{
+    scene()->setMarkerLineValid(false);
+    QGraphicsView::showEvent(event);
+}
+
 void ChatView::hideEvent(QHideEvent *event)
 {
-    setMarkerLineVisible(false);
+    scene()->setMarkerLineVisible(false);
     QGraphicsView::hideEvent(event);
 }
 
@@ -341,5 +345,12 @@ void ChatView::scrollTimerTimeout()
         vbar->setValue(qMax(vbar->value() + _scrollOffset, 0));
     else if (_scrollOffset > 0 && vbar->value() < vbar->maximum())
         vbar->setValue(qMin(vbar->value() + _scrollOffset, vbar->maximum()));
+}
+
+void ChatView::onApplicationStateChanged(Qt::ApplicationState state)
+{
+    if (isVisible() && state == Qt::ApplicationActive) {
+        scene()->setMarkerLineValid(false);
+    }
 }
 

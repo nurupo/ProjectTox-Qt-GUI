@@ -118,8 +118,8 @@ Clickable ClickableList::atCursorPos(int idx)
 // ============================================================================
 
 Highlight::Highlight(Highlight::Type type, ChatItem *item, quint16 start, quint16 length) :
-    _type(type),
+    mType(type),
     mItem(item),
-    _start(start),
-    _length(length)
+    mStart(start),
+    mLength(length)
 {}

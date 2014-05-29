@@ -69,26 +69,26 @@ public:
 
     explicit Highlight(Type type = Invalid, ChatItem *item = nullptr, quint16 start = 0, quint16 length = 0);
 
-    inline Type type() const { return _type; }
-    inline quint16 start() const { return _start; }
-    inline void setStart(quint16 s) { _start = s; }
-    inline quint16 length() const { return _length; }
-    inline void setLength(quint16 l) { _length = l; }
+    inline Type type() const { return mType; }
+    inline quint16 start() const { return mStart; }
+    inline void setStart(quint16 s) { mStart = s; }
+    inline quint16 length() const { return mLength; }
+    inline void setLength(quint16 l) { mLength = l; }
 
-    inline bool isValid() const { return _type != Invalid; }
+    inline bool isValid() const { return mType != Invalid; }
 
-    inline void setCurrent(bool c = true) { if(c) _type = Current; else _type = Found; }
-    inline void unsetCurrent() { _type = Found; }
+    inline void setCurrent(bool c = true) { if(c) mType = Current; else mType = Found; }
+    inline void unsetCurrent() { mType = Found; }
 
 
     inline ChatItem *item() { return mItem; }
     inline void setItem(ChatItem *value) { mItem = value; }
 
 private:
-    Type    _type;
-    quint16 _start;
-    quint16 _length;
+    Type      mType;
     ChatItem *mItem;
+    quint16   mStart;
+    quint16   mLength;
 };
 
 #endif // CLICKABLE_HPP

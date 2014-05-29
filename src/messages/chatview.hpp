@@ -21,6 +21,7 @@
 #include <QGraphicsView>
 #include <QTimer>
 #include <QMenu>
+#include <QApplication>
 #include "id.hpp"
 
 class ChatLine;
@@ -67,7 +68,6 @@ public slots:
     void clearCache();
     inline virtual void clear() {}
 
-    void setMarkerLineVisible(bool visible = true);
     void setTypingNotificationVisible(const QString &name, bool visible = true);
     void scrollTo(const QPointF &position);
 
@@ -75,7 +75,8 @@ protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
     void scrollContentsBy(int dx, int dy);
-    void hideEvent(QHideEvent * event);
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
 
 protected slots:
     virtual void verticalScrollbarChanged(int newPos);
@@ -86,6 +87,7 @@ private slots:
     void checkChatLineCaches();
     void mouseMoveWhileSelecting(const QPointF &scenePos);
     void scrollTimerTimeout();
+    void onApplicationStateChanged(Qt::ApplicationState state);
 
 private:
     ChatScene *_scene;
