@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
-                  2013 by Martin Kröll <technikschlumpf@web.de>
+                  2013-2014 by Martin Kröll <technikschlumpf@web.de>
     
     This file is part of Tox Qt GUI.
     
@@ -30,6 +30,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent* event);
+    void focusOutEvent(QFocusEvent * event);
 
 signals:
     void sendMessage(const QString& message);
@@ -42,6 +43,7 @@ private slots:
     void pastePlainText();
     void cutPlainText();
     void endTyping();
+    void startTyping();
 
 private:
     QString desmile(QString htmlText);

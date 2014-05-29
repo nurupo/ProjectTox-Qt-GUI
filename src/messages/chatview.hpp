@@ -68,15 +68,14 @@ public slots:
     inline virtual void clear() {}
 
     void setMarkerLineVisible(bool visible = true);
-    void setMarkerLine(MsgId msgId);
     void setTypingNotificationVisible(const QString &name, bool visible = true);
-    void jumpToMarkerLine();
     void scrollTo(const QPointF &position);
 
 protected:
-    virtual bool event(QEvent *event);
-    virtual void resizeEvent(QResizeEvent *event);
-    virtual void scrollContentsBy(int dx, int dy);
+    bool event(QEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    void scrollContentsBy(int dx, int dy);
+    void hideEvent(QHideEvent * event);
 
 protected slots:
     virtual void verticalScrollbarChanged(int newPos);
@@ -87,7 +86,6 @@ private slots:
     void checkChatLineCaches();
     void mouseMoveWhileSelecting(const QPointF &scenePos);
     void scrollTimerTimeout();
-    void markerLineSet(MsgId msg);
 
 private:
     ChatScene *_scene;

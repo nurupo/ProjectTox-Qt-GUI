@@ -100,8 +100,7 @@ public slots:
     void layout(int start, int end, qreal width);
 
     void setMarkerLineVisible(bool visible = true);
-    void setMarkerLine(MsgId msgId = MsgId());
-    void jumpToMarkerLine();
+    void setMarkerLine(ChatLine *line = nullptr);
 
     void setTypingNotificationVisible(const QString &name, bool visible = true);
 
@@ -154,7 +153,6 @@ private:
     MarkerLineItem *_markerLine;
     bool _markerLineVisible;
     bool _markerLineValid;
-    bool _markerLineJumpPending;
 
     ColumnHandleItem *_firstColHandle;
     ColumnHandleItem *_secondColHandle;

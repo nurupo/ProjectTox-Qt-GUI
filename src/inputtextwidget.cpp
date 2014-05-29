@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
-                  2013 by Martin Kröll <technikschlumpf@web.de>
+                  2013-2014 by Martin Kröll <technikschlumpf@web.de>
 
     This file is part of Tox Qt GUI.
 
@@ -81,17 +81,11 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
 /*! Handle keyboard events. */
 void InputTextWidget::keyPressEvent(QKeyEvent* event)
 {
-    const Settings &settings = Settings::getInstance();
     // Send message on Return
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
             && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
 
-        mTypingTimer.stop();
-        if(mTyping) {
-            mTyping = false;
-            if(settings.isTypingNotificationEnabled())
-                emit sendTyping(false);
-        }
+        endTyping();
 
         // Prevents empty messages
         if (toPlainText().trimmed().isEmpty()) {
@@ -117,15 +111,15 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
 
     // Normal text writing
     } else {
-        if(!mTyping) {
-            mTyping = true;
-            if(settings.isTypingNotificationEnabled())
-                emit sendTyping(true);
-        }
-        mTypingTimer.start(2000);
-
+        startTyping();
         QTextEdit::keyPressEvent(event);
     }
+}
+
+void InputTextWidget::focusOutEvent(QFocusEvent *event)
+{
+    endTyping();
+    QTextEdit::focusOutEvent(event);
 }
 
 QSize InputTextWidget::sizeHint() const
@@ -163,13 +157,22 @@ void InputTextWidget::cutPlainText()
 
 void InputTextWidget::endTyping()
 {
-    const Settings &settings = Settings::getInstance();
-
+    mTypingTimer.stop();
     if (mTyping) {
         mTyping = false;
-        if(settings.isTypingNotificationEnabled())
+        if(Settings::getInstance().isTypingNotificationEnabled())
             emit sendTyping(false);
     }
+}
+
+void InputTextWidget::startTyping()
+{
+    if(!mTyping) {
+        mTyping = true;
+        if(Settings::getInstance().isTypingNotificationEnabled())
+            emit sendTyping(true);
+    }
+    mTypingTimer.start(2000);
 }
 
 void InputTextWidget::showContextMenu(const QPoint &pos)

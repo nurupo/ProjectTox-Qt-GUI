@@ -87,8 +87,6 @@ void ChatViewSearchWidget::setScene(ChatScene *scene)
     const Settings &s = Settings::getInstance();
 
     connect(mScene, SIGNAL(destroyed()), this, SLOT(sceneDestroyed()));
-
-    // TODO MKO search only if widget is visible
     connect(mScene, SIGNAL(rowsInserted()), this, SLOT(updateHighlights()));
     connect(&s, &Settings::smileyPackChanged, this, &ChatViewSearchWidget::updateExistingHighlights);
     // TODO MKO Backlog

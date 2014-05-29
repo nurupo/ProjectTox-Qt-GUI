@@ -185,20 +185,9 @@ void ChatView::setMarkerLineVisible(bool visible)
     scene()->setMarkerLineVisible(visible);
 }
 
-void ChatView::setMarkerLine(MsgId msgId)
-{
-    Q_UNUSED(msgId)
-    // TODO MKO Markerline
-}
-
 void ChatView::setTypingNotificationVisible(const QString &name, bool visible)
 {
     scene()->setTypingNotificationVisible(name, visible);
-}
-
-void ChatView::jumpToMarkerLine()
-{
-    scene()->jumpToMarkerLine();
 }
 
 void ChatView::scrollTo(const QPointF &position)
@@ -259,6 +248,12 @@ void ChatView::scrollContentsBy(int dx, int dy)
 {
     QGraphicsView::scrollContentsBy(dx, dy);
     checkChatLineCaches();
+}
+
+void ChatView::hideEvent(QHideEvent *event)
+{
+    setMarkerLineVisible(false);
+    QGraphicsView::hideEvent(event);
 }
 
 void ChatView::verticalScrollbarChanged(int newPos)
@@ -346,11 +341,5 @@ void ChatView::scrollTimerTimeout()
         vbar->setValue(qMax(vbar->value() + _scrollOffset, 0));
     else if (_scrollOffset > 0 && vbar->value() < vbar->maximum())
         vbar->setValue(qMin(vbar->value() + _scrollOffset, vbar->maximum()));
-}
-
-void ChatView::markerLineSet(MsgId msg)
-{
-    scene()->setMarkerLine(msg);
-    scene()->setMarkerLineVisible(true);
 }
 

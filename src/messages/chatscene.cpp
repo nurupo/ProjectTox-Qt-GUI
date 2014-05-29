@@ -45,7 +45,6 @@ ChatScene::ChatScene(QAbstractItemModel *model, qreal width, ChatView *parent) :
     _markerLine(new MarkerLineItem(width)),
     _markerLineVisible(false),
     _markerLineValid(false),
-    _markerLineJumpPending(false),
     _selectingItem(0),
     _selectionStartRow(-1),
     _isSelecting(false),
@@ -337,47 +336,20 @@ void ChatScene::setMarkerLineVisible(bool visible)
         markerLine()->setVisible(false);
 }
 
-void ChatScene::setMarkerLine(MsgId msgId)
+void ChatScene::setMarkerLine(ChatLine *line)
 {
-    // TODO MKO markerline
-    /*
-    if (!msgId.isValid())
-        msgId = Client::markerLine(singleBufferId());
-    */
+    if(!line && _markerLineValid)
+        line = markerLine()->chatLine();
 
-    //if (msgId.isValid()) {
-        ChatLine *line = chatLine(msgId, false, true);
-        if (line) {
-            markerLine()->setChatLine(line);
-            // if this was the last line, we won't see it because it's outside the sceneRect
-            // .. which is exactly what we want :)
-            markerLine()->setPos(line->pos() + QPointF(0, line->height()));
-
-            // DayChange messages might have been hidden outside the scene rect, don't make the markerline visible then!
-            if (markerLine()->pos().y() >= sceneRect().y()) {
-                _markerLineValid = true;
-                if (_markerLineVisible)
-                    markerLine()->setVisible(true);
-                if (_markerLineJumpPending) {
-                    _markerLineJumpPending = false;
-                    if (markerLine()->isVisible()) {
-                        markerLine()->ensureVisible(QRectF(), 50, 50);
-                    }
-                }
-                return;
-            }
-        }
-    //}
-    _markerLineValid = false;
-    markerLine()->setVisible(false);
-}
-
-void ChatScene::jumpToMarkerLine()
-{
-    if (markerLine()->isVisible()) {
-        markerLine()->ensureVisible(QRectF(), 50, 50);
+    if (line) {
+        markerLine()->setChatLine(line);
+        markerLine()->setPos(line->pos());
+        _markerLineValid = true;
         return;
     }
+
+    _markerLineValid = false;
+    setMarkerLineVisible(false);
 }
 
 void ChatScene::setSelectingItem(ChatItem *item)
@@ -604,6 +576,8 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
     QPointF contentsPos(secondColumnHandle()->sceneRight(), 0);
     QPointF senderPos(firstColumnHandle()->sceneRight(), 0);
 
+    ChatLine *firstBottomLine = nullptr;
+
     if (atTop) {
         for (int i = end; i >= start; i--) {
             ChatLine *line = new ChatLine(i, model(),
@@ -626,6 +600,10 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
             h += line->height();
             _lines.insert(i, line);
             addItem(line);
+
+            // Get the first added lines
+            if(i==start && atBottom)
+                firstBottomLine = line;
         }
     }
 
@@ -685,9 +663,14 @@ void ChatScene::rowsInserted(const QModelIndex &index, int start, int end)
         emit lastLineChanged(_lines.last(), h);
     }
 
-    // now move the marker line if necessary. we don't need to do anything if we appended lines though...
-    if (!_markerLineValid)
+    // now show and move the marker line if necessary
+    if (!_markerLineVisible && atBottom && (!chatView()->isVisible() || !chatView()->isActiveWindow())) {
+        setMarkerLine(firstBottomLine);
+        setMarkerLineVisible(true);
+    }
+    else {
         setMarkerLine();
+    }
 
     emit rowsInserted();
 }
@@ -714,7 +697,7 @@ void ChatScene::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int e
     int lineCount = start;
     while (lineIter != _lines.end() && lineCount <= end) {
         if ((*lineIter) == markerLine()->chatLine())
-            markerLine()->setChatLine(0);
+            markerLine()->setChatLine(nullptr);
         h += (*lineIter)->height();
         delete *lineIter;
         lineIter = _lines.erase(lineIter);
@@ -823,6 +806,7 @@ void ChatScene::firstHandlePositionChanged(qreal xpos)
 
     updateSceneRect();
     setHandleXLimits();
+    setMarkerLine();
     emit layoutChanged();
 }
 
@@ -835,6 +819,7 @@ void ChatScene::secondHandlePositionChanged(qreal xpos)
 
     updateSceneRect();
     setHandleXLimits();
+    setMarkerLine();
     emit layoutChanged();
 }
 

@@ -51,12 +51,9 @@ void MarkerLineItem::sceneRectChanged(const QRectF &rect)
 
 void MarkerLineItem::styleChanged()
 {
-    _brush = QBrush(Qt::red);
+    _brush = QBrush(QColor(QStringLiteral("#6BC25F")));
+    qreal height = 1.0;
 
-       // if this is a solid color, we assume 1px because wesurely  don't surely don't want to fill the entire chatline.
-       // else, use the height of a single line of text to play around with gradients etc.
-       qreal height = 1.;
-
-       prepareGeometryChange();
-       _boundingRect = QRectF(0, 0, scene() ? scene()->width() : 100, height);
+    prepareGeometryChange();
+    _boundingRect = QRectF(0, 0, scene() ? scene()->width() : 100, height);
 }
