@@ -35,8 +35,8 @@ public:
     bool showToolTipOnElide();
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
-    bool event(QEvent *e) override;
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    bool event(QEvent *e) Q_DECL_OVERRIDE;
     
 private:
     bool _textElide;

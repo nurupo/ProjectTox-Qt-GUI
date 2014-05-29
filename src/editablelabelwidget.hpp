@@ -30,7 +30,7 @@ public:
     explicit ClickableCopyableElideLabel(QWidget* parent = 0);
 
 protected:
-    bool event(QEvent* event) override;
+    bool event(QEvent* event) Q_DECL_OVERRIDE;
 
 signals:
     void clicked();

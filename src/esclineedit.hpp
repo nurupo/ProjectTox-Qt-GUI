@@ -26,7 +26,7 @@ public:
     explicit EscLineEdit(QWidget* parent);
 
 protected:
-    void keyPressEvent(QKeyEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) Q_DECL_OVERRIDE;
 
 signals:
     void escPressed();

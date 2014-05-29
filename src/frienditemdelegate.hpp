@@ -31,8 +31,8 @@ public:
     static QString getUsername(const QModelIndex& index);
 
 protected:
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    QSize sizeHint(const QStyleOptionViewItem&  option, const QModelIndex& index) const override;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    QSize sizeHint(const QStyleOptionViewItem&  option, const QModelIndex& index) const Q_DECL_OVERRIDE;
 
 };
 
