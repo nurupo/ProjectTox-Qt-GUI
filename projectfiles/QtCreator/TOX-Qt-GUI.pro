@@ -40,7 +40,7 @@ win32:INCLUDEPATH += ../../libs/include/
 macx:INCLUDEPATH += /usr/local/include/
 
 win32 {
-    LIBS += ../../libs/lib/libtoxcore.a -lWS2_32 ../../libs/lib/libsodium.a
+    LIBS += ../../libs/lib/libtoxcore.a -lws2_32 ../../libs/lib/libsodium.a
 } else {
     macx {
         LIBS += -L/usr/local/lib -ltoxcore -lsodium
