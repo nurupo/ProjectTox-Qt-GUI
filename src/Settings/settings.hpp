@@ -92,8 +92,22 @@ public:
     int getEmojiFontPointSize() const;
     void setEmojiFontPointSize(int value);
 
+    // ChatView
+    int getFirstColumnHandlePos() const;
+    void setFirstColumnHandlePos(const int pos);
+
+    int getSecondColumnHandlePosFromRight() const;
+    void setSecondColumnHandlePosFromRight(const int pos);
+
+    const QString &getTimestampFormat() const;
+    void setTimestampFormat(const QString &format);
+
     bool isMinimizeOnCloseEnabled() const;
     void setMinimizeOnClose(bool newValue);
+
+    // Privacy
+    bool isTypingNotificationEnabled() const;
+    void setTypingNotification(bool enabled);
 
 private:
     Settings();
@@ -129,12 +143,21 @@ private:
     int     emojiFontPointSize;
     bool minimizeOnClose;
 
+    // ChatView
+    int firstColumnHandlePos;
+    int secondColumnHandlePosFromRight;
+    QString timestampFormat;
+
+    // Privacy
+    bool typingNotification;
+
 signals:
     //void dataChanged();
     void dhtServerListChanged();
     void logStorageOptsChanged();
     void smileyPackChanged();
     void emojiFontChanged();
+    void timestampFormatChanged();
 };
 
 #endif // SETTINGS_HPP

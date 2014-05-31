@@ -29,6 +29,8 @@
 #include <QSplitter>
 #include <QSystemTrayIcon>
 
+class PagesWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -46,6 +48,7 @@ private:
     FriendsWidget* friendsWidget;
     OurUserItemWidget* ourUserItem;
     QSplitter* splitterWidget;
+    PagesWidget *pages;
     QSystemTrayIcon* trayIcon;
     QAction* settingsAction;
     QAction* trayMenuShowHideAction;
@@ -61,6 +64,7 @@ private slots:
     void onFailedToStartCore();
     void onSettingsActionTriggered();
     void onAboutAppActionTriggered();
+    void onSearchActionTriggered();
     void onTrayMenuStatusActionTriggered();
     void onTrayMenuQuitApplicationActionTriggered();
     void onShowHideWindow();

@@ -33,13 +33,16 @@ private:
 private slots:
     void onMessageSent(const QString& message);
     void onActionToSend(const QString& action);
+    void onTypingToSend(bool typing);
 
 public slots:
     void addPage(int friendId, const QString& username);
     void removePage(int friendId);
     void activatePage(int friendId);
     void statusChanged(int friendId, Status status);
-    void usernameChanged(int friendId, const QString& username);
+    void onFriendusernameChanged(int friendId, const QString& username);
+    void onOurUsernameChanged(const QString& username);
+    void onFriendTypingChanged(int friendId, bool isTyping);
     void statusMessageChanged(int friendId, const QString& statusMessage);
     void messageReceived(int friendId, const QString& message);
     void actionReceived(int friendId, const QString& message);
@@ -50,6 +53,7 @@ public slots:
 signals:
     void sendMessage(int friendId, const QString& message);
     void sendAction(int friendId, const QString& action);
+    void sendTyping(int friendId, bool typing);
 
 };
 

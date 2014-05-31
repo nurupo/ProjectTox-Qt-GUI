@@ -81,8 +81,6 @@ SOURCES += \
     ../../src/Settings/loggingsettingspage.cpp \
     ../../src/aboutdialog.cpp \
     ../../src/emoticonmenu.cpp \
-    ../../src/messagelabel.cpp \
-    ../../src/messagedisplaywidget.cpp \
     ../../src/opacitywidget.cpp \
     ../../src/customhintwidget.cpp \
     ../../src/Settings/guisettingspage.cpp \
@@ -92,7 +90,23 @@ SOURCES += \
     ../../src/frienditemdelegate.cpp \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
-    ../../src/copyableelidelabel.cpp
+    ../../src/copyableelidelabel.cpp \
+    ../../src/messages/messagemodel.cpp \
+    ../../src/messages/message.cpp \
+    ../../src/messages/messagemodelitem.cpp \
+    ../../src/messages/chatscene.cpp \
+    ../../src/messages/chatitem.cpp \
+    ../../src/messages/chatline.cpp \
+    ../../src/messages/chatview.cpp \
+    ../../src/messages/clickable.cpp \
+    ../../src/messages/markerlineitem.cpp \
+    ../../src/messages/columnhandleitem.cpp \
+    ../../src/messages/smileytextobject.cpp \
+    ../../src/messages/smiley.cpp \
+    ../../src/messages/messagefilter.cpp \
+    ../../src/messages/chatviewsearchwidget.cpp \
+    ../../src/Settings/privacysettingspage.cpp \
+    ../../src/messages/typingitem.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -123,9 +137,7 @@ HEADERS  += \
     ../../src/Settings/loggingsettingspage.hpp \
     ../../src/aboutdialog.hpp \
     ../../src/appinfo.hpp \
-    ../../src/messagelabel.hpp \
     ../../src/emoticonmenu.hpp \
-    ../../src/messagedisplaywidget.hpp \
     ../../src/opacitywidget.hpp \
     ../../src/customhintwidget.hpp \
     ../../src/Settings/guisettingspage.hpp \
@@ -135,7 +147,24 @@ HEADERS  += \
     ../../src/frienditemdelegate.hpp \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
-    ../../src/copyableelidelabel.hpp
+    ../../src/copyableelidelabel.hpp \
+    ../../src/messages/id.hpp \
+    ../../src/messages/messagemodel.hpp \
+    ../../src/messages/message.hpp \
+    ../../src/messages/messagemodelitem.hpp \
+    ../../src/messages/chatscene.hpp \
+    ../../src/messages/chatitem.hpp \
+    ../../src/messages/chatline.hpp \
+    ../../src/messages/chatview.hpp \
+    ../../src/messages/clickable.hpp \
+    ../../src/messages/markerlineitem.hpp \
+    ../../src/messages/columnhandleitem.hpp \
+    ../../src/messages/smileytextobject.hpp \
+    ../../src/messages/smiley.hpp \
+    ../../src/messages/messagefilter.hpp \
+    ../../src/messages/chatviewsearchwidget.hpp \
+    ../../src/Settings/privacysettingspage.hpp \
+    ../../src/messages/typingitem.hpp
 
 RESOURCES += \
     ../../resources/resources.qrc

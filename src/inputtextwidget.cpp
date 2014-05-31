@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
-                  2013 by Martin Kröll <technikschlumpf@web.de>
+                  2013-2014 by Martin Kröll <technikschlumpf@web.de>
 
     This file is part of Tox Qt GUI.
 
@@ -72,6 +72,10 @@ InputTextWidget::InputTextWidget(QWidget* parent) :
         actionCut->setEnabled(enabled);
         actionCopy->setEnabled(enabled);
     });
+
+    mTyping = false;
+    mTypingTimer.setSingleShot(true);
+    connect(&mTypingTimer, &QTimer::timeout, this, &InputTextWidget::endTyping);
 }
 
 /*! Handle keyboard events. */
@@ -80,6 +84,9 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
     // Send message on Return
     if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
             && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)) {
+
+        endTyping();
+
         // Prevents empty messages
         if (toPlainText().trimmed().isEmpty()) {
             return;
@@ -104,8 +111,15 @@ void InputTextWidget::keyPressEvent(QKeyEvent* event)
 
     // Normal text writing
     } else {
+        startTyping();
         QTextEdit::keyPressEvent(event);
     }
+}
+
+void InputTextWidget::focusOutEvent(QFocusEvent *event)
+{
+    endTyping();
+    QTextEdit::focusOutEvent(event);
 }
 
 QSize InputTextWidget::sizeHint() const
@@ -139,6 +153,26 @@ void InputTextWidget::cutPlainText()
         clipboard->setText(Smileypack::desmilify(selection.toHtml()));
         textCursor().removeSelectedText();
     }
+}
+
+void InputTextWidget::endTyping()
+{
+    mTypingTimer.stop();
+    if (mTyping) {
+        mTyping = false;
+        if(Settings::getInstance().isTypingNotificationEnabled())
+            emit sendTyping(false);
+    }
+}
+
+void InputTextWidget::startTyping()
+{
+    if(!mTyping) {
+        mTyping = true;
+        if(Settings::getInstance().isTypingNotificationEnabled())
+            emit sendTyping(true);
+    }
+    mTypingTimer.start(2000);
 }
 
 void InputTextWidget::showContextMenu(const QPoint &pos)

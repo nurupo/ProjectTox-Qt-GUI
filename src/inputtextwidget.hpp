@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
-                  2013 by Martin Kröll <technikschlumpf@web.de>
+                  2013-2014 by Martin Kröll <technikschlumpf@web.de>
     
     This file is part of Tox Qt GUI.
     
@@ -19,6 +19,7 @@
 #define INPUTTEXTWIDGET_HPP
 
 #include <QTextEdit>
+#include <QTimer>
 
 class InputTextWidget : public QTextEdit
 {
@@ -29,16 +30,20 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent* event);
+    void focusOutEvent(QFocusEvent * event);
 
 signals:
     void sendMessage(const QString& message);
     void sendAction(const QString& action);
+    void sendTyping(bool typing);
 
 private slots:
     void showContextMenu(const QPoint &pos);
     void copyPlainText();
     void pastePlainText();
     void cutPlainText();
+    void endTyping();
+    void startTyping();
 
 private:
     QString desmile(QString htmlText);
@@ -48,6 +53,9 @@ private:
     QAction *actionCut;
     QAction *actionCopy;
     QAction *actionPaste;
+
+    bool mTyping;
+    QTimer mTypingTimer;
 };
 
 #endif // INPUTTEXTWIDGET_HPP

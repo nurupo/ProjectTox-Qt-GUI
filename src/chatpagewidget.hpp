@@ -24,8 +24,11 @@
 #include <QTextEdit>
 #include <QWidget>
 
-class MessageDisplayWidget;
+class MessageModel;
+class MessageFilter;
+class ChatView;
 class QToolButton;
+class ChatViewSearchWidget;
 
 class ChatPageWidget : public QWidget
 {
@@ -39,7 +42,11 @@ public:
 
 private:
     FriendItemWidget* friendItem;
-    MessageDisplayWidget *display;
+
+    MessageModel *model;
+    MessageFilter *filterModel;
+    ChatView *chatview;
+    ChatViewSearchWidget *searchWidget;
 
     InputTextWidget* input;
     QToolButton *emoticonButton;
@@ -54,10 +61,16 @@ public slots:
     void actionReceived(const QString& message);
     void actionSentResult(const QString& message);
 
+    void onFriendUsernameChanged(const QString &newUsername);
+    void onOurUsernameChanged(const QString &newUsername);
+    void onFriendTypingChanged(bool isTyping);
+
+    void showSearchBar();
+
 signals:
     void sendMessage(const QString& message);
     void sendAction(const QString& action);
-
+    void sendTyping(bool typing);
 };
 
 #endif // CHATPAGEWIDGET_HPP

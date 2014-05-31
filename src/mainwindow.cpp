@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget* parent)
     menuButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *menu = new QMenu(menuButton);
     settingsAction = menu->addAction(QIcon(":/icons/setting_tools.png"), tr("Settings"), this, SLOT(onSettingsActionTriggered()));
+    menu->addAction(QIcon(":/icons/find.png"), tr("Find"), this, SLOT(onSearchActionTriggered()), QKeySequence::Find);
     menu->addSeparator();
     menu->addAction(tr("About %1").arg(AppInfo::name), this, SLOT(onAboutAppActionTriggered()));
     menu->addAction(tr("About Qt"), qApp, SLOT(aboutQt()));
@@ -99,7 +100,7 @@ MainWindow::MainWindow(QWidget* parent)
     layout->addWidget(friendsWidget);
     layout->addWidget(toolBar);
 
-    PagesWidget* pages = new PagesWidget(this);
+    pages = new PagesWidget(this);
     connect(friendsWidget, &FriendsWidget::friendAdded, pages, &PagesWidget::addPage);
     connect(friendsWidget, &FriendsWidget::friendSelectionChanged, pages, &PagesWidget::activatePage);
 
@@ -122,7 +123,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
-    connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::usernameChanged);
+    connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::onFriendusernameChanged);
+    connect(core, &Core::friendTypingChanged, pages, &PagesWidget::onFriendTypingChanged);
     connect(core, &Core::friendRemoved, friendsWidget, &FriendsWidget::removeFriend);
     connect(core, &Core::friendRemoved, pages, &PagesWidget::removePage);
     connect(core, &Core::failedToRemoveFriend, this, &MainWindow::onFailedToRemoveFriend);
@@ -147,6 +149,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(ourUserItem, &OurUserItemWidget::usernameChanged, core, &Core::setUsername);
     connect(core, &Core::usernameSet, ourUserItem, &OurUserItemWidget::setUsername);
+    connect(core, &Core::usernameSet, pages, &PagesWidget::onOurUsernameChanged);
 
     connect(ourUserItem, &OurUserItemWidget::statusMessageChanged, core, &Core::setStatusMessage);
     connect(core, &Core::statusMessageSet, ourUserItem, &OurUserItemWidget::setStatusMessage);
@@ -156,6 +159,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(pages, &PagesWidget::sendMessage, core, &Core::sendMessage);
     connect(pages, &PagesWidget::sendAction,  core, &Core::sendAction);
+    connect(pages, &PagesWidget::sendTyping,  core, &Core::sendTyping);
 
     connect(friendsWidget, &FriendsWidget::friendRemoved, core, &Core::removeFriend);
 
@@ -280,6 +284,13 @@ void MainWindow::onTrayMenuQuitApplicationActionTriggered()
 {
     CloseApplicationDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::onSearchActionTriggered()
+{
+    ChatPageWidget *chatpage = qobject_cast<ChatPageWidget*>(pages->currentWidget());
+    if(chatpage)
+        chatpage->showSearchBar();
 }
 
 void MainWindow::onShowHideWindow()

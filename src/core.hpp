@@ -36,6 +36,7 @@ private:
     static void onFriendRequest(Tox* tox, uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
+    static void onFriendTypingChange(Tox* tox, int friendId, uint8_t isTyping, void* core);
     static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onUserStatusChanged(Tox* tox, int friendId, uint8_t userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
@@ -127,6 +128,7 @@ public slots:
 
     void sendMessage(int friendId, const QString& message);
     void sendAction(int friendId, const QString& action);
+    void sendTyping(int friendId, bool typing);
 
     void setUsername(const QString& username);
     void setStatusMessage(const QString& message);
@@ -148,6 +150,7 @@ signals:
     void friendStatusChanged(int friendId, Status status);
     void friendStatusMessageChanged(int friendId, const QString& message);
     void friendUsernameChanged(int friendId, const QString& username);
+    void friendTypingChanged(int friendId, bool isTyping);
 
     void friendAddressGenerated(const QString& friendAddress);
 
@@ -167,6 +170,7 @@ signals:
     void failedToSetUsername(const QString& username);
     void failedToSetStatusMessage(const QString& message);
     void failedToSetStatus(Status status);
+    void failedToSetTyping(bool typing);
 
     void actionReceived(int friendId, const QString& acionMessage);
 

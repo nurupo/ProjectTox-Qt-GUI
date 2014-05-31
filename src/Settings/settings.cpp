@@ -98,7 +98,14 @@ void Settings::load()
         customEmojiFont = s.value("customEmojiFont", true).toBool();
         emojiFontFamily = s.value("emojiFontFamily", "DejaVu Sans").toString();
         emojiFontPointSize = s.value("emojiFontPointSize", QApplication::font().pointSize()).toInt();
+        firstColumnHandlePos = s.value("firstColumnHandlePos", 50).toInt();
+        secondColumnHandlePosFromRight = s.value("secondColumnHandlePosFromRight", 50).toInt();
+        timestampFormat = s.value("timestampFormat", "hh:mm").toString();
         minimizeOnClose = s.value("minimizeOnClose", true).toBool();
+    s.endGroup();
+
+    s.beginGroup("Privacy");
+        typingNotification = s.value("typingNotification", false).toBool();
     s.endGroup();
 
     loaded = true;
@@ -150,7 +157,14 @@ void Settings::save()
         s.setValue("customEmojiFont", customEmojiFont);
         s.setValue("emojiFontFamily", emojiFontFamily);
         s.setValue("emojiFontPointSize", emojiFontPointSize);
+        s.setValue("firstColumnHandlePos", firstColumnHandlePos);
+        s.setValue("secondColumnHandlePosFromRight", secondColumnHandlePosFromRight);
+        s.setValue("timestampFormat", timestampFormat);
         s.setValue("minimizeOnClose", minimizeOnClose);
+    s.endGroup();
+
+    s.beginGroup("Privacy");
+        s.setValue("typingNotification", typingNotification);
     s.endGroup();
 }
 
@@ -276,6 +290,37 @@ void Settings::setEmojiFontPointSize(int value)
     emit emojiFontChanged();
 }
 
+int Settings::getFirstColumnHandlePos() const
+{
+    return firstColumnHandlePos;
+}
+
+void Settings::setFirstColumnHandlePos(const int pos)
+{
+    firstColumnHandlePos = pos;
+}
+
+int Settings::getSecondColumnHandlePosFromRight() const
+{
+    return secondColumnHandlePosFromRight;
+}
+
+void Settings::setSecondColumnHandlePosFromRight(const int pos)
+{
+    secondColumnHandlePosFromRight = pos;
+}
+
+const QString &Settings::getTimestampFormat() const
+{
+    return timestampFormat;
+}
+
+void Settings::setTimestampFormat(const QString &format)
+{
+    timestampFormat = format;
+    emit timestampFormatChanged();
+}
+
 QString Settings::getEmojiFontFamily() const
 {
     return emojiFontFamily;
@@ -295,4 +340,14 @@ bool Settings::isMinimizeOnCloseEnabled() const
 void Settings::setMinimizeOnClose(bool newValue)
 {
     minimizeOnClose = newValue;
+}
+
+bool Settings::isTypingNotificationEnabled() const
+{
+    return typingNotification;
+}
+
+void Settings::setTypingNotification(bool enabled)
+{
+    typingNotification = enabled;
 }
