@@ -152,6 +152,9 @@ signals:
     void friendUsernameChanged(int friendId, const QString& username);
     void friendTypingChanged(int friendId, bool isTyping);
 
+    void friendStatusMessageLoaded(int friendId, const QString& message);
+    void friendUsernameLoaded(int friendId, const QString& username);
+
     void friendAddressGenerated(const QString& friendAddress);
 
     void friendRemoved(int friendId);

@@ -101,7 +101,6 @@ MainWindow::MainWindow(QWidget* parent)
     layout->addWidget(toolBar);
 
     pages = new PagesWidget(this);
-    connect(friendsWidget, &FriendsWidget::friendAdded, pages, &PagesWidget::addPage);
     connect(friendsWidget, &FriendsWidget::friendSelectionChanged, pages, &PagesWidget::activatePage);
 
     //FIXME: start core in a separate function
@@ -119,11 +118,14 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
     connect(core, SIGNAL(friendStatusChanged(int, Status)), friendsWidget, SLOT(setStatus(int, Status)));
     connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
+    connect(core, &Core::friendAdded, pages, &PagesWidget::addPage);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
+    connect(core, &Core::friendUsernameLoaded,  friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameChanged, pages, &PagesWidget::onFriendUsernameChanged);
+    connect(core, &Core::friendUsernameLoaded,  pages, &PagesWidget::onFriendUsernameLoaded);
     connect(core, &Core::friendTypingChanged, pages, &PagesWidget::onFriendTypingChanged);
     connect(core, &Core::friendRemoved, friendsWidget, &FriendsWidget::removeFriend);
     connect(core, &Core::friendRemoved, pages, &PagesWidget::removePage);
@@ -132,7 +134,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::messageSentResult, pages, &PagesWidget::messageSentResult);
     connect(core, &Core::actionSentResult, pages, &PagesWidget::actionResult);
     connect(core, &Core::friendStatusMessageChanged, friendsWidget, &FriendsWidget::setStatusMessage);
-    connect(core, &Core::friendStatusMessageChanged, pages, &PagesWidget::statusMessageChanged);
+    connect(core, &Core::friendStatusMessageLoaded,  friendsWidget, &FriendsWidget::setStatusMessage);
+    connect(core, &Core::friendStatusMessageChanged, pages, &PagesWidget::onFriendStatusMessageChanged);
+    connect(core, &Core::friendStatusMessageLoaded,  pages, &PagesWidget::onFriendStatusMessageLoaded);
 
     connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
 

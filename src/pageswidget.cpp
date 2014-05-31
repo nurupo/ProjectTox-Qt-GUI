@@ -37,10 +37,10 @@ ChatPageWidget* PagesWidget::widget(int friendId) const
     return nullptr;
 }
 
-void PagesWidget::addPage(int friendId, const QString& username)
+void PagesWidget::addPage(int friendId, const QString& userId)
 {
     ChatPageWidget* chatPage = new ChatPageWidget(friendId, this);
-    chatPage->setUsername(username);
+    chatPage->setUsername(userId);
     connect(chatPage, &ChatPageWidget::sendMessage, this, &PagesWidget::onMessageSent);
     connect(chatPage, &ChatPageWidget::sendAction,  this, &PagesWidget::onActionToSend);
     connect(chatPage, &ChatPageWidget::sendTyping,  this, &PagesWidget::onTypingToSend);
@@ -64,6 +64,11 @@ void PagesWidget::onFriendUsernameChanged(int friendId, const QString& username)
     widget(friendId)->onFriendUsernameChanged(username);
 }
 
+void PagesWidget::onFriendUsernameLoaded(int friendId, const QString& username)
+{
+    widget(friendId)->setUsername(username);
+}
+
 void PagesWidget::onOurUsernameChanged(const QString &username)
 {
     for (int i = 0; i < count(); i++) {
@@ -84,7 +89,14 @@ void PagesWidget::statusChanged(int friendId, Status status)
     widget(friendId)->setStatus(status);
 }
 
-void PagesWidget::statusMessageChanged(int friendId, const QString& statusMessage)
+void PagesWidget::onFriendStatusMessageChanged(int friendId, const QString& statusMessage)
+{
+    // TODO: change status instead of setting (should also print message in the message view)
+    // just like onOurUsernameChanged does. also, do the same with the regular status (online, away, busy, offline)
+    widget(friendId)->setStatusMessage(statusMessage);
+}
+
+void PagesWidget::onFriendStatusMessageLoaded(int friendId, const QString& statusMessage)
 {
     widget(friendId)->setStatusMessage(statusMessage);
 }

@@ -129,6 +129,10 @@ void ChatPageWidget::actionSentResult(const QString &message)
 
 void ChatPageWidget::onFriendUsernameChanged(const QString &newUsername)
 {
+    if (username.compare(newUsername) == 0) {
+        return;
+    }
+
     model->insertNewMessage(newUsername, username, Message::Nick);
     setUsername(newUsername);
 }

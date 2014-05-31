@@ -36,14 +36,16 @@ private slots:
     void onTypingToSend(bool typing);
 
 public slots:
-    void addPage(int friendId, const QString& username);
+    void addPage(int friendId, const QString& userId);
     void removePage(int friendId);
     void activatePage(int friendId);
     void statusChanged(int friendId, Status status);
     void onFriendUsernameChanged(int friendId, const QString& username);
+    void onFriendUsernameLoaded(int friendId, const QString& username);
     void onOurUsernameChanged(const QString& username);
     void onFriendTypingChanged(int friendId, bool isTyping);
-    void statusMessageChanged(int friendId, const QString& statusMessage);
+    void onFriendStatusMessageChanged(int friendId, const QString& statusMessage);
+    void onFriendStatusMessageLoaded(int friendId, const QString& statusMessage);
     void messageReceived(int friendId, const QString& message);
     void actionReceived(int friendId, const QString& message);
 
