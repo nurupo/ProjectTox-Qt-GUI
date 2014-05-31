@@ -101,7 +101,7 @@ void Settings::load()
         firstColumnHandlePos = s.value("firstColumnHandlePos", 50).toInt();
         secondColumnHandlePosFromRight = s.value("secondColumnHandlePosFromRight", 50).toInt();
         timestampFormat = s.value("timestampFormat", "hh:mm").toString();
-        minimizeOnClose = s.value("minimizeOnClose", true).toBool();
+        minimizeOnClose = s.value("minimizeOnClose", false).toBool();
     s.endGroup();
 
     s.beginGroup("Privacy");

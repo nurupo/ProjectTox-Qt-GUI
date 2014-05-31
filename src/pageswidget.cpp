@@ -59,7 +59,7 @@ void PagesWidget::removePage(int friendId)
     delete chatPage;
 }
 
-void PagesWidget::onFriendusernameChanged(int friendId, const QString& username)
+void PagesWidget::onFriendUsernameChanged(int friendId, const QString& username)
 {
     widget(friendId)->onFriendUsernameChanged(username);
 }
