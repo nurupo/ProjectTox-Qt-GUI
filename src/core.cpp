@@ -285,11 +285,11 @@ void Core::saveConfiguration()
 
     uint32_t fileSize = tox_size(tox);
     if (fileSize > 0 && fileSize <= INT32_MAX) {
-        uint8_t* data = new uint8_t[fileSize];
+        uint8_t *data = new uint8_t[fileSize];
         tox_save(tox, data);
         configurationFile.write(reinterpret_cast<char *>(data), fileSize);
         configurationFile.commit();
-        delete data;
+        delete[] data;
     }
 }
 
@@ -298,7 +298,7 @@ void Core::loadFriends()
     const uint32_t friendCount = tox_count_friendlist(tox);
     if (friendCount > 0) {
         // assuming there are not that many friends to fill up the whole stack
-        int32_t ids[friendCount];
+        int32_t *ids = new int32_t[friendCount];
         tox_get_friendlist(tox, ids, friendCount);
         uint8_t clientId[TOX_CLIENT_ID_SIZE];
         for (int32_t i = 0; i < static_cast<int32_t>(friendCount); ++i) {
@@ -307,23 +307,27 @@ void Core::loadFriends()
 
                 const int nameSize = tox_get_name_size(tox, ids[i]);
                 if (nameSize > 0) {
-                    uint8_t name[nameSize];
+                    uint8_t *name = new uint8_t[nameSize];
                     if (tox_get_name(tox, ids[i], name) == nameSize) {
                         emit friendUsernameLoaded(ids[i], CString::toString(name, nameSize));
                     }
+                    delete[] name;
                 }
 
                 const int statusMessageSize = tox_get_status_message_size(tox, ids[i]);
                 if (statusMessageSize > 0) {
-                    uint8_t statusMessage[statusMessageSize];
+                    uint8_t *statusMessage = new uint8_t[statusMessageSize];
                     if (tox_get_status_message(tox, ids[i], statusMessage, statusMessageSize) == statusMessageSize) {
                         emit friendStatusMessageLoaded(ids[i], CString::toString(statusMessage, statusMessageSize));
                     }
+                    delete[] statusMessage;
                 }
 
                 checkLastOnline(ids[i]);
             }
+
         }
+        delete[] ids;
     }
 }
 
