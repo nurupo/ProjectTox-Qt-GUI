@@ -115,12 +115,12 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(core, &Core::connected, this, &MainWindow::onConnected);
     connect(core, &Core::disconnected, this, &MainWindow::onDisconnected);
-    connect(core, &Core::friendRequestRecieved, this, &MainWindow::onFriendRequestRecieved);
+    connect(core, &Core::friendRequestReceived, this, &MainWindow::onFriendRequestReceived);
     connect(core, SIGNAL(friendStatusChanged(int, Status)), friendsWidget, SLOT(setStatus(int, Status)));
     connect(core, &Core::friendAddressGenerated, ourUserItem, &OurUserItemWidget::setFriendAddress);
     connect(core, &Core::friendAdded, pages, &PagesWidget::addPage);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
-    connect(core, &Core::friendMessageRecieved, pages, &PagesWidget::messageReceived);
+    connect(core, &Core::friendMessageReceived, pages, &PagesWidget::messageReceived);
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameLoaded,  friendsWidget, &FriendsWidget::setUsername);
@@ -140,7 +140,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(core, &Core::failedToStart, this, &MainWindow::onFailedToStartCore);
 
-    connect(core, &Core::friendStatusChanged, pages, &PagesWidget::statusChanged);
+    connect(core, &Core::friendStatusChanged, pages, &PagesWidget::onFriendStatusChanged);
 
     connect(this, &MainWindow::statusSet, core, &Core::setStatus);
     connect(core, &Core::statusSet, this, &MainWindow::onStatusSet);
@@ -220,7 +220,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void MainWindow::onFriendRequestRecieved(const QString& userId, const QString& message)
+void MainWindow::onFriendRequestReceived(const QString& userId, const QString& message)
 {
     FriendRequestDialog dialog(this, userId, message);
 

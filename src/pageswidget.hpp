@@ -31,7 +31,7 @@ private:
     ChatPageWidget* widget(int friendId) const;
 
 private slots:
-    void onMessageSent(const QString& message);
+    void onMessageToSend(const QString& message);
     void onActionToSend(const QString& action);
     void onTypingToSend(bool typing);
 
@@ -39,7 +39,7 @@ public slots:
     void addPage(int friendId, const QString& userId);
     void removePage(int friendId);
     void activatePage(int friendId);
-    void statusChanged(int friendId, Status status);
+    void onFriendStatusChanged(int friendId, Status status);
     void onFriendUsernameChanged(int friendId, const QString& username);
     void onFriendUsernameLoaded(int friendId, const QString& username);
     void onOurUsernameChanged(const QString& username);

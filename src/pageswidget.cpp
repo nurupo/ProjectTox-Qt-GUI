@@ -41,7 +41,7 @@ void PagesWidget::addPage(int friendId, const QString& userId)
 {
     ChatPageWidget* chatPage = new ChatPageWidget(friendId, this);
     chatPage->setUsername(userId);
-    connect(chatPage, &ChatPageWidget::sendMessage, this, &PagesWidget::onMessageSent);
+    connect(chatPage, &ChatPageWidget::sendMessage, this, &PagesWidget::onMessageToSend);
     connect(chatPage, &ChatPageWidget::sendAction,  this, &PagesWidget::onActionToSend);
     connect(chatPage, &ChatPageWidget::sendTyping,  this, &PagesWidget::onTypingToSend);
     addWidget(chatPage);
@@ -84,7 +84,7 @@ void PagesWidget::onFriendTypingChanged(int friendId, bool isTyping)
     widget(friendId)->onFriendTypingChanged(isTyping);
 }
 
-void PagesWidget::statusChanged(int friendId, Status status)
+void PagesWidget::onFriendStatusChanged(int friendId, Status status)
 {
     widget(friendId)->setStatus(status);
 }
@@ -101,7 +101,7 @@ void PagesWidget::onFriendStatusMessageLoaded(int friendId, const QString& statu
     widget(friendId)->setStatusMessage(statusMessage);
 }
 
-void PagesWidget::onMessageSent(const QString& message)
+void PagesWidget::onMessageToSend(const QString& message)
 {
     ChatPageWidget* chatPage = static_cast<ChatPageWidget*>(sender());
     emit sendMessage(chatPage->getFriendId(), message);

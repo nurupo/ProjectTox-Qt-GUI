@@ -142,8 +142,8 @@ signals:
     void connected();
     void disconnected();
 
-    void friendRequestRecieved(const QString& userId, const QString& message);
-    void friendMessageRecieved(int friendId, const QString& message);
+    void friendRequestReceived(const QString& userId, const QString& message);
+    void friendMessageReceived(int friendId, const QString& message);
 
     void friendAdded(int friendId, const QString& userId);
 
