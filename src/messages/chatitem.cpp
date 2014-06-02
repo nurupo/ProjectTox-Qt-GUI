@@ -696,8 +696,4 @@ void TimestampChatItem::initDocument(QTextDocument *doc)
     o.setAlignment(Qt::AlignRight);
     o.setWrapMode(QTextOption::NoWrap);
     doc->setDefaultTextOption(o);
-
-    QFont f;
-    f.setPointSize(f.pointSize()-2);
-    doc->setDefaultFont(f);
 }
