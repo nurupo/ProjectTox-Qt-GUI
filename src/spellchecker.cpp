@@ -115,7 +115,7 @@ int Spellchecker::toPositionInBlock(int position)
     QStringListIterator it(tokens);
     int start = 0;
 
-    while (it.hasNext() && start < mappedPosition) {
+    while (it.hasNext() && start <= mappedPosition) {
         start += it.next().length() + 1; // skip the non-word character
         counter++;
     }
