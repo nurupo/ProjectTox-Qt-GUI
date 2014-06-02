@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QSaveFile>
 #include <QStandardPaths>
+#include <QtEndian>
 #include <QThread>
 
 const QString Core::CONFIG_FILE_NAME = "data.tox";
@@ -211,7 +212,7 @@ void Core::bootstrapDht()
     QList<Settings::DhtServer> dhtServerList = s.getDhtServerList();
 
     for (const Settings::DhtServer& dhtServer : dhtServerList) {
-       tox_bootstrap_from_address(tox, dhtServer.address.toLatin1().data(), 0, htons(dhtServer.port), CUserId(dhtServer.userId).data());
+       tox_bootstrap_from_address(tox, dhtServer.address.toLatin1().data(), 0, qToBigEndian(dhtServer.port), CUserId(dhtServer.userId).data());
     }
 }
 
