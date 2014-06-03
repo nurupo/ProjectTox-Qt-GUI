@@ -436,15 +436,19 @@ QString ContentsChatItem::selection() const
     if (selectionMode() == PartialSelection) {
         int start = qMin(selectionStart(), selectionEnd());
         int end   = start + qAbs(selectionStart() - selectionEnd());
-        int offset = 0;
+        int endOffset = 0;
+        int startOffset = 0;
 
         for (const Smiley &s : privateData()->smileys) {
-            if(s.smileyfiedStart() >= start && s.smileyfiedStart()+1 <= end) {
-                offset += s.text().count() - ((s.type() == Smiley::Emoji) ? s.graphics().count() : 1);
+            if (start > s.smileyfiedStart()) {
+                startOffset += s.text().count() - ((s.type() == Smiley::Emoji) ? s.graphics().count() : 1);
+            }
+            if (s.smileyfiedStart() >= start && s.smileyfiedStart()+1 <= end) {
+                endOffset += s.text().count() - ((s.type() == Smiley::Emoji) ? s.graphics().count() : 1);
             }
         }
 
-        return data(MessageModel::DisplayRole).toString().mid(start, end-start+offset);;
+        return data(MessageModel::DisplayRole).toString().mid(start+startOffset, end-start+endOffset);
     }
     return QString();
 }
