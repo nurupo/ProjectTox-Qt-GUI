@@ -91,7 +91,7 @@ SOURCES += \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
     ../../src/copyableelidelabel.cpp \
-    ../../src/spellchecker.cpp
+    ../../src/spellchecker.cpp \
     ../../src/messages/messagemodel.cpp \
     ../../src/messages/message.cpp \
     ../../src/messages/messagemodelitem.cpp \
@@ -149,7 +149,7 @@ HEADERS  += \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
     ../../src/copyableelidelabel.hpp \
-    ../../src/spellchecker.hpp
+    ../../src/spellchecker.hpp \
     ../../src/messages/id.hpp \
     ../../src/messages/messagemodel.hpp \
     ../../src/messages/message.hpp \
