@@ -40,12 +40,12 @@ win32:INCLUDEPATH += ../../libs/include/
 macx:INCLUDEPATH += /usr/local/include/
 
 win32 {
-    LIBS += ../../libs/lib/libtoxcore.a -lws2_32 ../../libs/lib/libsodium.a
+    LIBS += ../../libs/lib/libtoxcore.a -lws2_32 ../../libs/lib/libsodium.a ../../libs/lib/libhunspell.a
 } else {
     macx {
-        LIBS += -L/usr/local/lib -ltoxcore -lsodium
+        LIBS += -L/usr/local/lib -ltoxcore -lsodium -lhunspell
     } else {
-        LIBS += -ltoxcore -lsodium
+        LIBS += -ltoxcore -lsodium -lhunspell
     }
 }
 
@@ -91,6 +91,7 @@ SOURCES += \
     ../../src/editablelabelwidget.cpp \
     ../../src/esclineedit.cpp \
     ../../src/copyableelidelabel.cpp \
+    ../../src/spellchecker.cpp
     ../../src/messages/messagemodel.cpp \
     ../../src/messages/message.cpp \
     ../../src/messages/messagemodelitem.cpp \
@@ -148,6 +149,7 @@ HEADERS  += \
     ../../src/editablelabelwidget.hpp \
     ../../src/esclineedit.hpp \
     ../../src/copyableelidelabel.hpp \
+    ../../src/spellchecker.hpp
     ../../src/messages/id.hpp \
     ../../src/messages/messagemodel.hpp \
     ../../src/messages/message.hpp \
