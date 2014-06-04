@@ -115,3 +115,13 @@ SmileyList SmileyList::fromText(QString text)
 
     return result;
 }
+
+
+QDebug operator<<(QDebug dbg, const Smiley &smiley)
+{
+    dbg.nospace() << qPrintable(QString("%1 [%2-%3] %4").arg(smiley.text(), 3)
+                                                        .arg(smiley.start(), 3)
+                                                        .arg(smiley.start()+smiley.textLength()-1, 3)
+                                                        .arg(smiley.graphics()));
+    return dbg;
+}

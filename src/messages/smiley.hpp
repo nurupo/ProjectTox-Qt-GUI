@@ -62,4 +62,6 @@ public:
     static SmileyList fromText(QString text);
 };
 
+QDebug operator<<(QDebug dbg, const Smiley &smiley);
+
 #endif // SMILEY_H
