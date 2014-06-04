@@ -33,6 +33,7 @@ Core::Core() :
     tox(nullptr)
 {
     timer = new QTimer(this);
+    timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, this, &Core::process);
     connect(&Settings::getInstance(), &Settings::dhtServerListChanged, this, &Core::bootstrapDht);
 }
@@ -224,6 +225,7 @@ void Core::process()
     fflush(stdout);
 #endif
     checkConnection();
+    timer->start(tox_do_interval(tox));
 }
 
 void Core::checkConnection()
@@ -372,8 +374,7 @@ void Core::start()
 
     bootstrapDht();
 
-    timer->setInterval(45);
-    timer->start();
+    timer->start(tox_do_interval(tox));
 }
 
 
