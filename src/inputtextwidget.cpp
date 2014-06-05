@@ -193,8 +193,7 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     // substract selectedWord.length() to get the start position
     if (!spellchecker.skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
         !spellchecker.isCorrect(selectedWord)) {
-        QStringList suggestions;
-        spellchecker.suggest(selectedWord, suggestions);
+        QStringList suggestions = spellchecker.suggest(selectedWord);
 
         if (!suggestions.isEmpty()) {
             QStringListIterator it(suggestions);

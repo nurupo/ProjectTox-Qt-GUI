@@ -23,6 +23,7 @@
 #include <QStringListIterator>
 #include <QTextCharFormat>
 #include <QTextEdit>
+#include <QDebug>
 
 #include <hunspell/hunspell.hxx>
 
@@ -31,8 +32,8 @@ Spellchecker::Spellchecker(QTextEdit* parent)
       textEdit(parent),
       regEx("\\W"),                 /* any non-word character. */
       format(),
-      skippedPosition(NO_SKIPPING), /* skipping should be disabled by default. */
-      contentChanged(false)
+      skipPosition(NO_SKIPPING),
+      cursorChangedByEditing(false)
 {
     QString basePath;
 #ifdef Q_OS_WIN
@@ -55,7 +56,6 @@ Spellchecker::Spellchecker(QTextEdit* parent)
     // this is a simple hack to ensure that the connected slot above
     // will be triggered before the highlighting will be applied.
     setDocument(textEdit->document());
-
 }
 
 Spellchecker::~Spellchecker()
@@ -90,24 +90,29 @@ bool Spellchecker::isCorrect(const QString& word)
     return hunspell->spell(word.toLocal8Bit().constData()) != 0;
 }
 
-void Spellchecker::suggest(const QString& word, QStringList& suggestions)
+QStringList Spellchecker::suggest(const QString& word)
 {
+    QStringList suggestions;
+
     char** slst;
     const int numberOfSuggestions = hunspell->suggest(&slst, word.toLocal8Bit().constData());
     for (int i = 0; i < numberOfSuggestions; i++) {
         suggestions << slst[i];
     }
+    hunspell->free_list(&slst, numberOfSuggestions);
+
+    return suggestions;
 }
 
 bool Spellchecker::skipRange(int start, int end)
 {
-    return skippedPosition >= start && skippedPosition <= end;
+    return start <= skipPosition && end >= skipPosition;
 }
 
-int Spellchecker::toPositionInBlock(int position)
+// returns index number of the token in the block pointed by the given position or -1 if no such token found
+int Spellchecker::tokenIndexInBlock(int position, const QTextBlock& block)
 {
     int counter = 0;
-    const QTextBlock block = textEdit->document()->findBlock(position);
     const QString text = block.text();
     const int mappedPosition = position - block.position();
     const QStringList tokens = text.split(regEx);
@@ -123,29 +128,44 @@ int Spellchecker::toPositionInBlock(int position)
     return start <= mappedPosition ? -1 : counter;
 }
 
-void Spellchecker::contentsChanged(int position, int charsRemoved, int charsAdded)
+// sets some variables for Spellchecker::cursorPositionChanged and Spellchecker::highlightBlock, which are called right after this function
+void Spellchecker::contentsChanged(int /*position*/, int /*charsRemoved*/, int /*charsAdded*/)
 {
-    contentChanged = true;
-    skippedPosition = textEdit->textCursor().position();
+    cursorChangedByEditing = true;
+    skipPosition = textEdit->textCursor().position();
 }
 
 void Spellchecker::cursorPositionChanged()
 {
-    // block signal if content was changed because
-    // skipping was already handled by slot Spellchecker::contentsChanged();
-    if (!contentChanged && skippedPosition >= 0) {
-        const int pos     = textEdit->textCursor().position();
-        const int current = toPositionInBlock(skippedPosition);
-        const int moved   = toPositionInBlock(pos);
+    // when cursor position is changed by editing (i.e. Spellchecker::contentsChanged), the parent class rehighlights everything automatically.
+    // but if the cursor position is changed not by editing the text but by simply moving the cursor, we should check and possibly highlight
+    // the token our cursor was at before the cursor position changed, since we don't check tokens that we currently have the cursor in.
+    // we also need to update currentCursorPosition in case it was changed not by editing.
+    if (!cursorChangedByEditing && skipPosition != NO_SKIPPING) {
 
-        if (current >= 0 && moved >= 0 && current == moved) {
-            skippedPosition = pos;
-        } else {
-            skippedPosition = NO_SKIPPING;
+        const int previousPosition = skipPosition;
+        const int currentPosition = textEdit->textCursor().position();
+
+        const QTextBlock previousBlock = textEdit->document()->findBlock(previousPosition);
+        const QTextBlock currentBlock  = textEdit->document()->findBlock(currentPosition);
+
+        const int previousTokenIndex = tokenIndexInBlock(previousPosition, previousBlock);
+        const int currentTokenIndex  = tokenIndexInBlock(currentPosition,  currentBlock);
+
+        // this should not happen
+        if (previousTokenIndex == -1 || currentTokenIndex == -1) {
+            qWarning("Wrong token positions (\"%s\" in \"%s:%d\")", Q_FUNC_INFO, __FILE__, __LINE__);
         }
 
-        rehighlight();
+        // if we moved outside token's boundaries -- rehighlight text in the previous position
+        if ((previousTokenIndex != currentTokenIndex) || (previousBlock != currentBlock)) {
+            skipPosition = NO_SKIPPING;
+            rehighlightBlock(textEdit->document()->findBlock(previousPosition));
+        } else {
+            skipPosition = currentPosition;
+        }
     }
-
-    contentChanged = false;
+    // assume next cursor change won't be done by editing.
+    // if it will be actually done by editing, then contentsChanged would set this to true anyway
+    cursorChangedByEditing = false;
 }

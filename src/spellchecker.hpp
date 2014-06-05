@@ -28,19 +28,19 @@ class Spellchecker : public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
-    static const int NO_SKIPPING = -1;
-
     Spellchecker(QTextEdit*);
     ~Spellchecker();
 
     bool isCorrect(const QString&);
-    void suggest(const QString&, QStringList&);
+    QStringList suggest(const QString&);
     bool skipRange(int /*inclusive*/, int /*inclusive*/);
 
 protected:
     void highlightBlock(const QString& text);
 
 private:
+    static const int NO_SKIPPING = -1;
+
     /* the view to highlight */
     QTextEdit* textEdit;
 
@@ -55,19 +55,20 @@ private:
 
     /* the spell checker will ignore the word which
      * has at least one character at this position (absolute) */
-    int skippedPosition;
+    int skipPosition;
 
     /* indicates whether the content was changed or not
      * do not use until you know what you are doing */
-    bool contentChanged;
+    bool cursorChangedByEditing;
 
     /* maps the given absolute position of a character in the document
-     * to the relative position of its words inside its block */
-    int toPositionInBlock(int);
+     * to the reltive index number of the token it belongs to inside its block */
+    int tokenIndexInBlock(int, const QTextBlock &block);
 
 private slots:
     void contentsChanged(int, int, int);
     void cursorPositionChanged();
+
 };
 
 #endif // SPELLCHECKER_HPP
