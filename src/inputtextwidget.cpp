@@ -22,9 +22,10 @@
 #include <QClipboard>
 #include <QIcon>
 #include <QKeyEvent>
-#include <QMenu>
-#include <QTextDocumentFragment>
 #include <QList>
+#include <QMenu>
+#include <QRegularExpression>
+#include <QTextDocumentFragment>
 
 #include "smileypack.hpp"
 #include "Settings/settings.hpp"
@@ -176,6 +177,106 @@ void InputTextWidget::startTyping()
     mTypingTimer.start(2000);
 }
 
+int InputTextWidget::getLeftWordBoundary(QTextCursor cursor, QRegularExpression &re, int maxLookup)
+{
+    QTextCursor textSelectingCursor(cursor);
+    textSelectingCursor.select(QTextCursor::WordUnderCursor);
+    QString word = textSelectingCursor.selectedText();
+
+    // after selecting a word, the cursor automatically moves to word's end
+    int nextWordStartPosition = textSelectingCursor.position() - word.length();
+
+    if (re.match(QString(word[0])).hasMatch()) {
+        // we return -1 because if at least one char matches this, the word we are processing consists fully of puncuation symbols
+        // which we don't highlight when checkspelling, so there is no point in looking up spelling of those
+        return -1;
+    }
+    cursor.movePosition(QTextCursor::StartOfWord);
+
+    for (int i = 0; i < maxLookup; i ++) {
+        // if there is no previous word or we reached the start of block
+        // (previous word acts a bit strange, it gives us current word if we are not at the beggining of it, so we check if we at the beginning of the block too)
+        if (!cursor.movePosition(QTextCursor::PreviousWord) || (cursor.block().position() == nextWordStartPosition)) {
+            break;
+        }
+
+        // a hack to get current word without messing up the cursor
+        // TODO: maybe try maing it work with just one cursor?
+        textSelectingCursor = QTextCursor(cursor);
+        textSelectingCursor.select(QTextCursor::WordUnderCursor);
+        word = textSelectingCursor.selectedText();
+
+        int currentWordStartPosition = cursor.position();
+        int currentWordEndPosition = currentWordStartPosition + word.length();
+
+        // if there was a non-word character between two words (likely a space character)
+        if (nextWordStartPosition - currentWordEndPosition != 0) {
+            break;
+        }
+
+        if (re.match(QString(word[0])).hasMatch()) {
+            break;
+        }
+        nextWordStartPosition = currentWordStartPosition;
+    }
+
+    return nextWordStartPosition;
+}
+
+int InputTextWidget::getRightWordBoundary(QTextCursor cursor, QRegularExpression &re, int maxLookup)
+{
+    QTextCursor textSelectingCursor(cursor);
+    textSelectingCursor.select(QTextCursor::WordUnderCursor);
+    QString word = textSelectingCursor.selectedText();
+
+    // after selecting a word, the cursor automatically moves to word's end
+    int previousWordEndPosition = textSelectingCursor.position();
+
+    if (re.match(QString(word[0])).hasMatch()) {
+        // we return -1 because if at least one char matches this, the word we are processing consists fully of puncuation symbols
+        // which we don't highlight when checkspelling, so there is no point in looking up spelling of those
+        return -1;
+    }
+
+    for (int i = 0; i < maxLookup; i ++) {
+        // if there is no next word or we reached the end of block
+        // (next word acts a bit strange, it gives us current word if we are not in the end of it, so we check if we at the end of the block too)
+        // (previousWordEndPosition - cursor.block().position()) gives us in-block position
+        if (!cursor.movePosition(QTextCursor::NextWord) || (previousWordEndPosition - cursor.block().position()) - (cursor.block().length() - 1) == 0) {
+            break;
+        }
+
+        // a hack to get current word without messing up the cursor
+        // TODO: maybe try maing it work with just one cursor?
+        textSelectingCursor = QTextCursor(cursor);
+        textSelectingCursor.select(QTextCursor::WordUnderCursor);
+        word = textSelectingCursor.selectedText();
+
+        int currentWordStartPosition = cursor.position();
+
+        // if there was a non-word character between two words (likely a space character)
+        if (previousWordEndPosition - currentWordStartPosition != 0) {
+            break;
+        }
+
+        if (re.match(QString(word[0])).hasMatch()) {
+            break;
+        }
+        previousWordEndPosition = currentWordStartPosition + word.length();
+    }
+
+    return previousWordEndPosition;
+}
+
+void InputTextWidget::getWordBoundaries(const QTextCursor& cursor, int* left, int* right)
+{
+    QRegularExpression re("(?![-\'])[\\pP|\\pZ|\\pC]");
+    const static int MAX_LOOKUP = 10;
+
+    (*left) = getLeftWordBoundary(cursor, re, MAX_LOOKUP);
+    (*right) = getRightWordBoundary(cursor, re, MAX_LOOKUP);
+}
+
 void InputTextWidget::showContextMenu(const QPoint &pos)
 {
     const QPoint globalPos = mapToGlobal(pos);
@@ -187,24 +288,29 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     // the execution of the context menu
     QList<QAction*> actions;
     QTextCursor cursor = cursorForPosition(pos);
-    cursor.select(QTextCursor::WordUnderCursor);
-    const QString selectedWord = cursor.selectedText();
-    // cursor.position() points to the end of the selected word
-    // substract selectedWord.length() to get the start position
-    if (!spellchecker.skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
-        !spellchecker.isCorrect(selectedWord)) {
-        QStringList suggestions = spellchecker.suggest(selectedWord);
+    int left, right;
+    getWordBoundaries(cursor, &left, &right);
+    if (left != -1 && right != -1) {
+        cursor.setPosition(left);
+        cursor.setPosition(right, QTextCursor::KeepAnchor);
+        QString selectedWord = cursor.selectedText();
+        // cursor.position() points to the end of the selected word
+        // substract selectedWord.length() to get the start position
+        if (!spellchecker.skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
+            !spellchecker.isCorrect(selectedWord)) {
+            QStringList suggestions = spellchecker.suggest(selectedWord);
 
-        if (!suggestions.isEmpty()) {
-            QStringListIterator it(suggestions);
-            for (int i = 0; i < maxSuggestions && it.hasNext(); i++) {
-                QString suggestion = it.next();
-                QAction* action = new QAction(suggestion, this);
-                action->setData(suggestion);
-                contextMenu.addAction(action);
-                actions.append(action);
+            if (!suggestions.isEmpty()) {
+                QStringListIterator it(suggestions);
+                for (int i = 0; i < maxSuggestions && it.hasNext(); i++) {
+                    QString suggestion = it.next();
+                    QAction* action = new QAction(suggestion, this);
+                    action->setData(suggestion);
+                    contextMenu.addAction(action);
+                    actions.append(action);
+                }
+                contextMenu.addSeparator();
             }
-            contextMenu.addSeparator();
         }
     }
 
@@ -218,8 +324,9 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     actionPaste->setDisabled(QApplication::clipboard()->text().isEmpty());
 
     QAction* selected = contextMenu.exec(globalPos);
-    if (actions.contains(selected)) {
+    if ((left != -1 && right != -1) && actions.contains(selected)) {
         cursor.insertText(selected->data().toString());
+        qDeleteAll(actions);
     }
-    qDeleteAll(actions);
+
 }
