@@ -49,10 +49,6 @@ private slots:
 private:
     QString desmile(QString htmlText);
 
-    void getWordBoundaries(const QTextCursor& cursor, int* left, int* right);
-    int getRightWordBoundary(QTextCursor cursor, QRegularExpression &re, int maxLookup);
-    int getLeftWordBoundary(QTextCursor cursor, QRegularExpression &re, int maxLookup);
-
     Spellchecker spellchecker;
     const int maxSuggestions;
 

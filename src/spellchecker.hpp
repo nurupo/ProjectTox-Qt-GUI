@@ -21,6 +21,7 @@
 #include <QSyntaxHighlighter>
 
 class Hunspell;
+class QAction;
 class QTextCharFormat;
 class QTextEdit;
 
@@ -31,14 +32,43 @@ public:
     Spellchecker(QTextEdit*);
     ~Spellchecker();
 
-    bool isCorrect(const QString&);
-    QStringList suggest(const QString&);
-    bool skipRange(int /*inclusive*/, int /*inclusive*/);
+    bool isCorrect(const QString&) const;
+    QStringList suggest(const QString&) const;
+    bool skipRange(int /*inclusive*/, int /*inclusive*/) const;
+
+    /** Looks up a word under the cursor and returns its starting and ending positions in
+     *  the underlying QTextDocument.
+     *  It uses Spellchecker's definition of a word rather than Qt's. Qt interprets
+     *  "it's" as three different words: "it", "'" and "s", which is bad for checkspelling.
+     *  Currently this function treats words with ' and - in them as a single word, this might
+     *  change though if the regEx regular expression will get changed.
+     *  If the word under the cursor is not what Spellchecker considers to be a word, it returns
+     *  -1 for either startingPosition, endingPosition or both.
+     */
+    void getWordBoundaries(const QTextCursor& cursor, int* startingPosition, int* endingPosition) const;
+
+    /** A convinient method that looks up what word under the cursor is, checks if it's inrrect, and:
+     *  if the word is incorrect, it returns a QList of pointers to QActions that have text of suggested
+     *  corrections. Note that QList might be empty if there were no suggestions for the word found.
+     *  if the word is correct, it returns an empty QList.
+     *
+     *  It uses Spellchecker's definition of a word.
+     *
+     *  The returned QActions should be deleted by the caller (see qDeleteAll()) after actions are used.
+     *
+     *  When one of QActions is triggered, it will replace the word under the cursor with the correction that is QAction's text.
+     *
+     *  This function assumes that the document that the cursor belongs to will not be changed between the call to this function and triggering of QActions.
+     */
+    QList<QAction*> getContextMenuActions(QTextCursor cursor) const;
 
 protected:
     void highlightBlock(const QString& text);
 
 private:
+    int getWordStartingPosition(QTextCursor cursor, int maxLookup) const;
+    int getWordEndingPosition(QTextCursor cursor, int maxLookup) const;
+
     static const int NO_SKIPPING = -1;
 
     /* the view to highlight */
@@ -63,7 +93,7 @@ private:
 
     /* maps the given absolute position of a character in the document
      * to the reltive index number of the token it belongs to inside its block */
-    int tokenIndexInBlock(int, const QTextBlock &block);
+    int tokenIndexInBlock(int, const QTextBlock &block) const;
 
 private slots:
     void contentsChanged(int, int, int);
