@@ -32,7 +32,7 @@
 Spellchecker::Spellchecker(QTextEdit* parent)
     : QSyntaxHighlighter(parent),
       textEdit(parent),
-      regEx("(?![-\'])[\\pP|\\pZ|\\pC]"), /* any punctuation character except ' and -, any space character and any "other" character */
+      regEx("(?![-\'])[\\pP\\pZ\\pC\\pS]"), /* any punctuation character except ' and -, any space character and any "other" character and any symbol character */
       format(),
       skipPosition(NO_SKIPPING),
       cursorChangedByEditing(false)
