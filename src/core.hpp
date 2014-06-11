@@ -33,7 +33,7 @@ public:
     ~Core();
 
 private:
-    static void onFriendRequest(Tox* tox, uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendRequest(Tox* tox, const uint8_t* cUserId, const uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
     static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
     static void onFriendTypingChange(Tox* tox, int friendId, uint8_t isTyping, void* core);
@@ -65,7 +65,7 @@ private:
         explicit CData(const QString& data, uint16_t byteSize);
         virtual ~CData();
 
-        static QString toString(uint8_t* cData, uint16_t cDataSize);
+        static QString toString(const uint8_t* cData, const uint16_t cDataSize);
 
     private:
         uint8_t* cData;
@@ -79,7 +79,7 @@ private:
     public:
         explicit CUserId(const QString& userId);
 
-        static QString toString(uint8_t* cUserId);
+        static QString toString(const uint8_t *cUserId);
 
     private:
         static const uint16_t SIZE = TOX_CLIENT_ID_SIZE;
@@ -91,7 +91,7 @@ private:
     public:
         explicit CFriendAddress(const QString& friendAddress);
 
-        static QString toString(uint8_t* cFriendAddress);
+        static QString toString(const uint8_t* cFriendAddress);
 
     private:
         static const uint16_t SIZE = TOX_FRIEND_ADDRESS_SIZE;
@@ -107,7 +107,7 @@ private:
         uint8_t* data();
         uint16_t size();
 
-        static QString toString(uint8_t* cMessage, uint16_t cMessageSize);
+        static QString toString(const uint8_t* cMessage, const uint16_t cMessageSize);
 
     private:
         const static int MAX_SIZE_OF_UTF8_ENCODED_CHARACTER = 4;

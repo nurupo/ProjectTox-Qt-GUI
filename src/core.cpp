@@ -46,7 +46,7 @@ Core::~Core()
     }
 }
 
-void Core::onFriendRequest(Tox*/* tox*/, uint8_t* cUserId, uint8_t* cMessage, uint16_t cMessageSize, void* core)
+void Core::onFriendRequest(Tox*/* tox*/, const uint8_t* cUserId, const uint8_t* cMessage, uint16_t cMessageSize, void* core)
 {
     emit static_cast<Core*>(core)->friendRequestReceived(CUserId::toString(cUserId), CString::toString(cMessage, cMessageSize));
 }
@@ -401,9 +401,9 @@ uint16_t Core::CData::size()
     return cDataSize;
 }
 
-QString Core::CData::toString(uint8_t* cData, uint16_t cDataSize)
+QString Core::CData::toString(const uint8_t *cData, const uint16_t cDataSize)
 {
-    return QString(QByteArray(reinterpret_cast<char*>(cData), cDataSize).toHex()).toUpper();
+    return QString(QByteArray(reinterpret_cast<const char*>(cData), cDataSize).toHex()).toUpper();
 }
 
 uint16_t Core::CData::fromString(const QString& data, uint8_t* cData)
@@ -422,7 +422,7 @@ Core::CUserId::CUserId(const QString &userId) :
     // intentionally left empty
 }
 
-QString Core::CUserId::toString(uint8_t* cUserId)
+QString Core::CUserId::toString(const uint8_t* cUserId)
 {
     return CData::toString(cUserId, SIZE);
 }
@@ -436,7 +436,7 @@ Core::CFriendAddress::CFriendAddress(const QString &friendAddress) :
     // intentionally left empty
 }
 
-QString Core::CFriendAddress::toString(uint8_t* cFriendAddress)
+QString Core::CFriendAddress::toString(const uint8_t *cFriendAddress)
 {
     return CData::toString(cFriendAddress, SIZE);
 }
@@ -465,9 +465,9 @@ uint16_t Core::CString::size()
     return cStringSize;
 }
 
-QString Core::CString::toString(uint8_t* cString, uint16_t cStringSize)
+QString Core::CString::toString(const uint8_t* cString, uint16_t cStringSize)
 {
-    return QString::fromUtf8(reinterpret_cast<char*>(cString), cStringSize);
+    return QString::fromUtf8(reinterpret_cast<const char*>(cString), cStringSize);
 }
 
 uint16_t Core::CString::fromString(const QString& string, uint8_t* cString)
