@@ -264,10 +264,17 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
     // after selecting a word, the cursor automatically moves to word's end
     int previousWordEndPosition = textSelectingCursor.position();
 
-    if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
-        // we return -1 because if at least one char matches this, the word we are processing consists fully of puncuation symbols
-        // which we don't highlight when checkspelling, so there is no point in looking up spelling of those
+    int capturedStart = wordDelimiterRegEx.match(word).capturedStart();
+
+    if (capturedStart == 0) {
+        // no word
         return -1;
+    } else if (capturedStart != -1) {
+        // there are some symbols that we consider as word delimeters at the end of the word, so
+        // just subtract those to get word end position and return
+        previousWordEndPosition -= word.length() - capturedStart;
+
+        return previousWordEndPosition;
     }
 
     for (int i = 0; i < maxLookup; i ++) {
@@ -291,9 +298,18 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
             break;
         }
 
-        if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
+        capturedStart = wordDelimiterRegEx.match(word).capturedStart();
+
+        if (capturedStart == 0) {
+            break;
+        } else if (capturedStart != -1) {
+            // there are some symbols that we consider as word delimeters at the end of the word, so
+            // just count till those
+            previousWordEndPosition = currentWordStartPosition + capturedStart;
+
             break;
         }
+
         previousWordEndPosition = currentWordStartPosition + word.length();
     }
 
