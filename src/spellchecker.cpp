@@ -32,7 +32,8 @@
 Spellchecker::Spellchecker(QTextEdit* parent)
     : QSyntaxHighlighter(parent),
       textEdit(parent),
-      regEx("(?![-\'])[\\pP\\pZ\\pC\\pS]"), /* any punctuation character except ' and -, any space character and any "other" character and any symbol character */
+      wordDelimiterRegEx("(?![-\'])[\\pP\\pZ\\pC\\pS]"), /* any punctuation character except ' and -, any space character and any "other" character and any symbol character */
+      exceptionWordDelimiterRegEx("[-\']"),
       format(),
       skipPosition(NO_SKIPPING),
       cursorChangedByEditing(false)
@@ -67,7 +68,7 @@ Spellchecker::~Spellchecker()
 
 void Spellchecker::highlightBlock(const QString& text)
 {
-    const QStringList tokens = text.split(regEx);
+    const QStringList tokens = text.split(wordDelimiterRegEx);
     QStringListIterator it(tokens);
     const int offset = currentBlock().position();
     int start, length, end;
@@ -77,8 +78,9 @@ void Spellchecker::highlightBlock(const QString& text)
         const QString& token  = it.next();
         length = token.length();
         end    = start + length;
-        if (!skipRange(offset + start, offset + end) &&
-            !isCorrect(token)) {
+        if (token.count(exceptionWordDelimiterRegEx) != token.length() &&
+                !skipRange(offset + start, offset + end) &&
+                !isCorrect(token)) {
             setFormat(start, length, format);
         }
 
@@ -116,7 +118,7 @@ int Spellchecker::tokenIndexInBlock(int position, const QTextBlock& block) const
     int counter = 0;
     const QString text = block.text();
     const int mappedPosition = position - block.position();
-    const QStringList tokens = text.split(regEx);
+    const QStringList tokens = text.split(wordDelimiterRegEx);
 
     QStringListIterator it(tokens);
     int start = 0;
@@ -188,8 +190,9 @@ QList<QAction*> Spellchecker::getContextMenuActions(QTextCursor cursor) const
 
     // cursor.position() points to the end of the selected word
     // substract selectedWord.length() to get the start position
-    if (!skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
-        !isCorrect(selectedWord)) {
+    if (selectedWord.count(exceptionWordDelimiterRegEx) != selectedWord.length() &&
+            !skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
+            !isCorrect(selectedWord)) {
         QStringList suggestions = suggest(selectedWord);
 
         if (!suggestions.isEmpty()) {
@@ -215,7 +218,7 @@ int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup) con
     // after selecting a word, the cursor automatically moves to word's end
     int nextWordStartPosition = textSelectingCursor.position() - word.length();
 
-    if (regEx.match(QString(word[0])).hasMatch()) {
+    if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
         // we return -1 because if at least one char matches this, the word we are processing consists fully of puncuation symbols
         // which we don't highlight when checkspelling, so there is no point in looking up spelling of those
         return -1;
@@ -243,7 +246,7 @@ int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup) con
             break;
         }
 
-        if (regEx.match(QString(word[0])).hasMatch()) {
+        if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
             break;
         }
         nextWordStartPosition = currentWordStartPosition;
@@ -261,7 +264,7 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
     // after selecting a word, the cursor automatically moves to word's end
     int previousWordEndPosition = textSelectingCursor.position();
 
-    if (regEx.match(QString(word[0])).hasMatch()) {
+    if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
         // we return -1 because if at least one char matches this, the word we are processing consists fully of puncuation symbols
         // which we don't highlight when checkspelling, so there is no point in looking up spelling of those
         return -1;
@@ -288,7 +291,7 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
             break;
         }
 
-        if (regEx.match(QString(word[0])).hasMatch()) {
+        if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
             break;
         }
         previousWordEndPosition = currentWordStartPosition + word.length();

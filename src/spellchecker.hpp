@@ -78,7 +78,9 @@ private:
     Hunspell* hunspell;
 
     /* the regular expression to use for tokenizing each line */
-    const QRegularExpression regEx;
+    const QRegularExpression wordDelimiterRegEx;
+
+    const QRegularExpression exceptionWordDelimiterRegEx;
 
     /* the format to apply to misspelled words */
     QTextCharFormat format;
