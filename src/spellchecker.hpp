@@ -33,6 +33,7 @@ public:
     ~Spellchecker();
 
     bool isCorrect(const QString&) const;
+    bool isCorrect(const QStringRef&) const;
     QStringList suggest(const QString&) const;
     bool skipRange(int /*inclusive*/, int /*inclusive*/) const;
 

@@ -69,26 +69,89 @@ Spellchecker::~Spellchecker()
 void Spellchecker::highlightBlock(const QString& text)
 {
     const QStringList tokens = text.split(wordDelimiterRegEx);
-    QStringListIterator it(tokens);
-    const int offset = currentBlock().position();
-    int start, length, end;
-    start = length = end = 0;
+    QStringListIterator tokensIterator(tokens);
 
-    while (it.hasNext()) {
-        const QString& token  = it.next();
-        length = token.length();
-        end    = start + length;
-        if (token.count(exceptionWordDelimiterRegEx) != token.length() &&
-                !skipRange(offset + start, offset + end) &&
-                !isCorrect(token)) {
-            setFormat(start, length, format);
+    const int offset = currentBlock().position();
+
+    int start, length;
+    start = length = 0;
+
+    while (tokensIterator.hasNext()) {
+        const QString& token = tokensIterator.next();
+
+        // split on two consecutive exceptionWordDelimiterRegEx
+        QList<QStringRef> subtokens;
+
+        if (token.length() > 0) {
+            int previousMatchEnd = -1;
+            int previousSplitPos = 0;
+            QRegularExpressionMatchIterator exceptionWordDelimiterMatchIterator = exceptionWordDelimiterRegEx.globalMatch(token);
+            while (exceptionWordDelimiterMatchIterator.hasNext()) {
+                QRegularExpressionMatch match = exceptionWordDelimiterMatchIterator.next();
+                if (previousMatchEnd + 1 == match.capturedEnd()) {
+                    subtokens << token.midRef(previousSplitPos, match.capturedEnd() - previousSplitPos);
+                    previousSplitPos = match.capturedEnd();
+                }
+                previousMatchEnd = match.capturedEnd();
+            }
+            if (previousSplitPos != token.length()) {
+                subtokens << token.midRef(previousSplitPos);
+            }
+        } else {
+            subtokens << token.midRef(0);
         }
 
-        start += length + 1; // skip the non-word character
+        for (const QStringRef& subtoken : subtokens) {
+
+            length = subtoken.length();
+
+            // trim any exceptionWordDelimiterRegEx
+            QStringRef trimmedSubtoken = subtoken;
+
+            // trim front
+            int trimmedSubtokenStartOffset = 0;
+
+            for (int i = 0; i < trimmedSubtoken.length(); i ++) {
+                if (exceptionWordDelimiterRegEx.match(QString(trimmedSubtoken.at(i))).hasMatch()) {
+                    trimmedSubtokenStartOffset ++;
+                    length --;
+                } else {
+                    break;
+                }
+            }
+
+            trimmedSubtoken = trimmedSubtoken.mid(trimmedSubtokenStartOffset);
+
+            // trim back
+            for (int i = trimmedSubtoken.length() - 1; i >= 0; i --) {
+                if (exceptionWordDelimiterRegEx.match(QString(trimmedSubtoken.at(i))).hasMatch()) {
+                    length --;
+                } else {
+                    break;
+                }
+            }
+
+            trimmedSubtoken = trimmedSubtoken.mid(0, length);
+
+            if (trimmedSubtoken.length() != 0 &&
+                    !skipRange(offset + start + trimmedSubtokenStartOffset, offset + start + trimmedSubtokenStartOffset + trimmedSubtoken.length()) &&
+                    !isCorrect(trimmedSubtoken)) {
+                setFormat(start + trimmedSubtokenStartOffset, length, format);
+            }
+
+            start += subtoken.length();
+        }
+
+        start += 1; // skip the non-word character
     }
 }
 
 bool Spellchecker::isCorrect(const QString& word) const
+{
+    return hunspell->spell(word.toLocal8Bit().constData()) != 0;
+}
+
+bool Spellchecker::isCorrect(const QStringRef& word) const
 {
     return hunspell->spell(word.toLocal8Bit().constData()) != 0;
 }
@@ -218,11 +281,21 @@ int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup) con
     // after selecting a word, the cursor automatically moves to word's end
     int nextWordStartPosition = textSelectingCursor.position() - word.length();
 
-    if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
+    QString firstChar = QString(word[0]);
+
+    if (wordDelimiterRegEx.match(firstChar).hasMatch()) {
         // we return -1 because if at least one char matches this, the word we are processing consists fully of puncuation symbols
         // which we don't highlight when checkspelling, so there is no point in looking up spelling of those
         return -1;
     }
+
+    if (word.count(exceptionWordDelimiterRegEx) >= 2) {
+        return -1;
+    }
+
+    bool firstWord = true;
+    bool broke = true;
+
     cursor.movePosition(QTextCursor::StartOfWord);
 
     for (int i = 0; i < maxLookup; i ++) {
@@ -231,6 +304,8 @@ int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup) con
         if (!cursor.movePosition(QTextCursor::PreviousWord) || (cursor.block().position() == nextWordStartPosition)) {
             break;
         }
+
+        broke = true;
 
         // a hack to get current word without messing up the cursor
         // TODO: maybe try maing it work with just one cursor?
@@ -246,10 +321,24 @@ int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup) con
             break;
         }
 
-        if (wordDelimiterRegEx.match(QString(word[0])).hasMatch()) {
+        firstChar = QString(word[0]);
+        if (wordDelimiterRegEx.match(firstChar).hasMatch()) {
             break;
         }
+
+        if (word.count(exceptionWordDelimiterRegEx) >= 2) {
+            break;
+        }
+
+        firstWord = false;
+        broke = false;
+
         nextWordStartPosition = currentWordStartPosition;
+    }
+
+    // if a word starts with one of exceptionWordDelimiterRegEx chars, then remove it from selection
+    if (exceptionWordDelimiterRegEx.match(word).capturedEnd() == 1 && !firstWord && !broke) {
+        nextWordStartPosition += 1;
     }
 
     return nextWordStartPosition;
@@ -277,6 +366,13 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
         return previousWordEndPosition;
     }
 
+    if (word.count(exceptionWordDelimiterRegEx) >= 2) {
+        return -1;
+    }
+
+    bool firstWord = true;
+    bool broke = true;
+
     for (int i = 0; i < maxLookup; i ++) {
         // if there is no next word or we reached the end of block
         // (next word acts a bit strange, it gives us current word if we are not in the end of it, so we check if we at the end of the block too)
@@ -284,6 +380,8 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
         if (!cursor.movePosition(QTextCursor::NextWord) || (previousWordEndPosition - cursor.block().position()) - (cursor.block().length() - 1) == 0) {
             break;
         }
+
+        broke = true;
 
         // a hack to get current word without messing up the cursor
         // TODO: maybe try maing it work with just one cursor?
@@ -295,6 +393,10 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
 
         // if there was a non-word character between two words (likely a space character)
         if (previousWordEndPosition - currentWordStartPosition != 0) {
+            break;
+        }
+
+        if (word.count(exceptionWordDelimiterRegEx) >= 2) {
             break;
         }
 
@@ -310,7 +412,15 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
             break;
         }
 
+        firstWord = false;
+        broke = false;
+
         previousWordEndPosition = currentWordStartPosition + word.length();
+    }
+
+    // if a word ends with one of exceptionWordDelimiterRegEx chars, then remove it from selection
+    if (exceptionWordDelimiterRegEx.match(word).capturedEnd() == 1 && !firstWord && !broke) {
+        previousWordEndPosition -= 1;
     }
 
     return previousWordEndPosition;
