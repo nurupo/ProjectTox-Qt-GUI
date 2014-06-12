@@ -32,7 +32,7 @@
 Spellchecker::Spellchecker(QTextEdit* parent)
     : QSyntaxHighlighter(parent),
       textEdit(parent),
-      wordDelimiterRegEx("(?![-\'])[\\pP\\pZ\\pC\\pS]"), /* any punctuation character except ' and -, any space character and any "other" character and any symbol character */
+      wordDelimiterRegEx("(?![-\'])[\\pP\\pZ\\pC\\p{Sm}\\p{Sc}\\p{Sk}\\p{Hiragana}\\p{Katakana}\\p{Han}]"), /* any punctuation character except ' and -, any space character and any "other" character, some of symbol character and Hiragana/Katakana/Kanji */
       exceptionWordDelimiterRegEx("[-\']"),
       format(),
       skipPosition(NO_SKIPPING),
