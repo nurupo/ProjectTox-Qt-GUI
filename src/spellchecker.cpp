@@ -19,6 +19,7 @@
 #include <QAction>
 #include <QDebug>
 #include <QFileInfo>
+#include <QPlainTextEdit>
 #include <QStandardPaths>
 #include <QString>
 #include <QStringList>
@@ -29,15 +30,50 @@
 
 #include <hunspell/hunspell.hxx>
 
+// any punctuation character except ' and -, any space character and any "other" character, some of symbol character and Hiragana/Katakana/Kanji */
+#define WORD_DELIMITER_REGEX "[\\pP\\pZ\\pC\\p{Sm}\\p{Sc}\\p{Sk}\\p{Hiragana}\\p{Katakana}\\p{Han}]"
+// except - and '
+#define EXCEPTION_WORD_DELIMITER_REGEX "[-\']"
+
+const QRegularExpression Spellchecker::wordDelimiterRegEx = QRegularExpression("(?!" EXCEPTION_WORD_DELIMITER_REGEX ")" WORD_DELIMITER_REGEX);
+const QRegularExpression Spellchecker::exceptionWordDelimiterRegEx = QRegularExpression(EXCEPTION_WORD_DELIMITER_REGEX);
+
+QTextCharFormat Spellchecker::format = []() -> QTextCharFormat
+{
+    QTextCharFormat format;
+    format.setUnderlineColor(QColor(Qt::red));
+    format.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
+    return format;
+}();
+
 Spellchecker::Spellchecker(QTextEdit* parent)
     : QSyntaxHighlighter(parent),
-      textEdit(parent),
-      wordDelimiterRegEx("(?![-\'])[\\pP\\pZ\\pC\\p{Sm}\\p{Sc}\\p{Sk}\\p{Hiragana}\\p{Katakana}\\p{Han}]"), /* any punctuation character except ' and -, any space character and any "other" character, some of symbol character and Hiragana/Katakana/Kanji */
-      exceptionWordDelimiterRegEx("[-\']"),
-      format(),
       skipPosition(NO_SKIPPING),
       cursorChangedByEditing(false)
 {
+    // we can't use QTextDocument's cursorPositionChanged because it doesn't get invoked when the cursor is changed by mouse interaction
+    connect(parent, &QTextEdit::cursorPositionChanged, this, &Spellchecker::cursorPositionChanged);
+    textEdit = parent;
+    plainTextEdit = nullptr;
+    init(parent->document());
+}
+
+Spellchecker::Spellchecker(QPlainTextEdit* parent)
+    : QSyntaxHighlighter(parent),
+      skipPosition(NO_SKIPPING),
+      cursorChangedByEditing(false)
+{
+    // we can't use QTextDocument's cursorPositionChanged because it doesn't get invoked when the cursor is changed by mouse interaction
+    connect(parent, &QPlainTextEdit::cursorPositionChanged, this, &Spellchecker::cursorPositionChanged);
+    textEdit = nullptr;
+    plainTextEdit = parent;
+    init(parent->document());
+}
+
+void Spellchecker::init(QTextDocument* document)
+{
+    this->document = document;
+
     QString basePath;
 #ifdef Q_OS_WIN
     basePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + "hunspell" + '/';
@@ -51,14 +87,10 @@ Spellchecker::Spellchecker(QTextEdit* parent)
         dic.absoluteFilePath().toLocal8Bit().constData()
     );
 
-    format.setUnderlineColor(QColor(255,0,0));
-    format.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
-
-    connect(textEdit, &QTextEdit::cursorPositionChanged, this, &Spellchecker::cursorPositionChanged);
-    connect(textEdit->document(), &QTextDocument::contentsChange, this, &Spellchecker::contentsChanged);
+    connect(document, &QTextDocument::contentsChange, this, &Spellchecker::contentsChange);
     // this is a simple hack to ensure that the connected slot above
     // will be triggered before the highlighting will be applied.
-    setDocument(textEdit->document());
+    setDocument(document);
 }
 
 Spellchecker::~Spellchecker()
@@ -195,10 +227,10 @@ int Spellchecker::tokenIndexInBlock(int position, const QTextBlock& block) const
 }
 
 // sets some variables for Spellchecker::cursorPositionChanged and Spellchecker::highlightBlock, which are called right after this function
-void Spellchecker::contentsChanged(int /*position*/, int /*charsRemoved*/, int /*charsAdded*/)
+void Spellchecker::contentsChange(int position, int charsRemoved, int charsAdded)
 {
     cursorChangedByEditing = true;
-    skipPosition = textEdit->textCursor().position();
+    skipPosition = position + charsAdded - charsRemoved;
 }
 
 void Spellchecker::cursorPositionChanged()
@@ -210,10 +242,10 @@ void Spellchecker::cursorPositionChanged()
     if (!cursorChangedByEditing && skipPosition != NO_SKIPPING) {
 
         const int previousPosition = skipPosition;
-        const int currentPosition = textEdit->textCursor().position();
+        const int currentPosition = plainTextEdit == nullptr ? textEdit->textCursor().position() : plainTextEdit->textCursor().position();
 
-        const QTextBlock previousBlock = textEdit->document()->findBlock(previousPosition);
-        const QTextBlock currentBlock  = textEdit->document()->findBlock(currentPosition);
+        const QTextBlock previousBlock = document->findBlock(previousPosition);
+        const QTextBlock currentBlock  = document->findBlock(currentPosition);
 
         const int previousTokenIndex = tokenIndexInBlock(previousPosition, previousBlock);
         const int currentTokenIndex  = tokenIndexInBlock(currentPosition,  currentBlock);
@@ -226,7 +258,7 @@ void Spellchecker::cursorPositionChanged()
         // if we moved outside token's boundaries -- rehighlight text in the previous position
         if ((previousTokenIndex != currentTokenIndex) || (previousBlock != currentBlock)) {
             skipPosition = NO_SKIPPING;
-            rehighlightBlock(textEdit->document()->findBlock(previousPosition));
+            rehighlightBlock(document->findBlock(previousPosition));
         } else {
             skipPosition = currentPosition;
         }

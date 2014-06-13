@@ -22,6 +22,7 @@
 
 class Hunspell;
 class QAction;
+class QPlainTextEdit;
 class QTextCharFormat;
 class QTextEdit;
 
@@ -30,6 +31,7 @@ class Spellchecker : public QSyntaxHighlighter
     Q_OBJECT
 public:
     Spellchecker(QTextEdit*);
+    Spellchecker(QPlainTextEdit*);
     ~Spellchecker();
 
     bool isCorrect(const QString&) const;
@@ -67,24 +69,29 @@ protected:
     void highlightBlock(const QString& text);
 
 private:
+    void init(QTextDocument* document);
+
     int getWordStartingPosition(QTextCursor cursor, int maxLookup) const;
     int getWordEndingPosition(QTextCursor cursor, int maxLookup) const;
 
     static const int NO_SKIPPING = -1;
 
-    /* the view to highlight */
     QTextEdit* textEdit;
+    QPlainTextEdit* plainTextEdit;
+
+    /* the document to highlight */
+    QTextDocument* document;
 
     /* the current used dictionary */
     Hunspell* hunspell;
 
     /* the regular expression to use for tokenizing each line */
-    const QRegularExpression wordDelimiterRegEx;
+    static const QRegularExpression wordDelimiterRegEx;
 
-    const QRegularExpression exceptionWordDelimiterRegEx;
+    static const QRegularExpression exceptionWordDelimiterRegEx;
 
     /* the format to apply to misspelled words */
-    QTextCharFormat format;
+    static QTextCharFormat format;
 
     /* the spell checker will ignore the word which
      * has at least one character at this position (absolute) */
@@ -99,7 +106,7 @@ private:
     int tokenIndexInBlock(int, const QTextBlock &block) const;
 
 private slots:
-    void contentsChanged(int, int, int);
+    void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChanged();
 
 };
