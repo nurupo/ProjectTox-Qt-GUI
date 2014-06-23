@@ -14,6 +14,21 @@ before_install:
   - tar -xJf Qt5.2.0.tar.xz -C ~/Qt5.2.0
   - sudo chmod -R 777 ~/Qt5.2.0/
   - ln -s ~/Qt5.2.0/5.2.0/gcc_64/mkspecs/linux-g++ ~/Qt5.2.0/5.2.0/gcc_64/mkspecs/linux-gcc
+  - wget http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz
+  - tar -xf opus-1.1.tar.gz
+  - cd opus-1.1
+  - ./configure --disable-extra-programs --disable-doc
+  - make -j$(nproc)
+  - sudo make install
+  - cd ..
+  - git clone http://git.chromium.org/webm/libvpx.git
+  - cd libvpx
+  - git checkout tags/v1.3.0
+  - sudo apt-get install yasm -y
+  - ./configure --disable-examples --disable-unit-tests --enable-shared --enable-static
+  - make -j$(nproc)
+  - sudo make install
+  - cd ..
   - git clone git://github.com/jedisct1/libsodium.git
   - cd libsodium
   - git checkout tags/0.5.0
