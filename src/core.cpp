@@ -131,10 +131,63 @@ void Core::requestFriendship(const QString& friendAddress, const QString& messag
 
 void Core::sendMessage(int friendId, const QString& message)
 {
-    CString cMessage(message);
+    QByteArray byteArray= message.toUtf8();
 
-    int messageId = tox_send_message(tox, friendId, cMessage.data(), cMessage.size());
-    emit messageSentResult(friendId, message, messageId);
+    int messageOffset = 0;
+    int absoluteMaxLength = TOX_MAX_MESSAGE_LENGTH + messageOffset;
+    // keep splitting message while it's too big
+    while (byteArray.size() > absoluteMaxLength) {
+        int absoluteMaxPosition = absoluteMaxLength - 1;
+
+        static const char multibyteCodepoint = 1 << 7; // 1xxxxxxx mask
+        static const char multibyteCodepointStart = 1 << 6; // x1xxxxxx mask
+        int lastCodepointStart = -1;
+        // find a codepoint start position
+        // UTF-8 codepoints are maximum of 4 bytes in length
+        for (int i = absoluteMaxPosition; i > absoluteMaxPosition - 4; i --) {
+            // if we are at multibyte codepoint but not at its start yet -- keep moving back
+            if ((byteArray[i] & multibyteCodepoint) && !(byteArray[i] & multibyteCodepointStart)) {
+                continue;
+            }
+            // we are either at a single-byte codepoint or at the beginning of a multibyte one -- split the message
+            lastCodepointStart = i;
+            break;
+        }
+
+        // try to split on whitespace or punctuation instead of just cutting off at a codepoint
+        static const char *splitOn = " .,-";
+        int splitPosition = -1;
+        for (int i = lastCodepointStart; i > absoluteMaxPosition - TOX_MAX_MESSAGE_LENGTH / 4; i --) {
+            // if we are at multibyte codepoint -- keep moving back
+            if (byteArray[i] & multibyteCodepoint) {
+                continue;
+            }
+            // we are at single-byte codepoint, check if it matches any of splitOn characters
+            for (const char *splitChar = splitOn; *splitChar != 0; splitChar ++) {
+                if (byteArray[i] == *splitChar) {
+                    // keep split char on old line
+                    splitPosition = i + 1;
+                    goto found;
+                }
+            }
+        }
+found:
+        if (splitPosition <= messageOffset || splitPosition > absoluteMaxLength) {
+            splitPosition = lastCodepointStart;
+        }
+
+        int messageId = tox_send_message(tox, friendId, reinterpret_cast<uint8_t*>(byteArray.data() + messageOffset), splitPosition - messageOffset);
+        emit messageSentResult(friendId, QString::fromUtf8(byteArray.data() + messageOffset, splitPosition - messageOffset), messageId);
+
+        messageOffset = splitPosition;
+        absoluteMaxLength = TOX_MAX_MESSAGE_LENGTH + messageOffset;
+    }
+
+    if (byteArray.size() - messageOffset > 0) {
+        int messageId = tox_send_message(tox, friendId, reinterpret_cast<uint8_t*>(byteArray.data() + messageOffset), byteArray.size() - messageOffset);
+        emit messageSentResult(friendId, QString::fromUtf8(byteArray.data() + messageOffset, byteArray.size() - messageOffset), messageId);
+    }
+
 }
 
 void Core::sendAction(int friendId, const QString &action)
