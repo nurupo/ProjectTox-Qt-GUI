@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2013 by retuxx <github@retux.de>
+    Copyright (C) 2014 by retuxx <github@retux.de>
+                  2014 by Maxim Biro <nurupo.contributions@gmail.com>
 
     This file is part of Tox Qt GUI.
 
@@ -17,8 +18,12 @@
 #include "spellchecker.hpp"
 
 #include <QAction>
+#include <QApplication>
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
+#include <QLocale>
 #include <QPlainTextEdit>
 #include <QStandardPaths>
 #include <QString>
@@ -27,10 +32,11 @@
 #include <QTextCharFormat>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <QTimer>
 
 #include <hunspell/hunspell.hxx>
 
-// any punctuation character except ' and -, any space character and any "other" character, some of symbol character and Hiragana/Katakana/Kanji */
+// any punctuation character except ' and -, any space character and any "other" character, some of symbol character and Hiragana/Katakana/Kanji
 #define WORD_DELIMITER_REGEX "[\\pP\\pZ\\pC\\p{Sm}\\p{Sc}\\p{Sk}\\p{Hiragana}\\p{Katakana}\\p{Han}]"
 // except - and '
 #define EXCEPTION_WORD_DELIMITER_REGEX "[-\']"
@@ -45,6 +51,149 @@ QTextCharFormat Spellchecker::format = []() -> QTextCharFormat
     format.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
     return format;
 }();
+
+bool Spellchecker::enabled = true;
+Hunspell* Spellchecker::hunspell = nullptr;
+QMap<QString, QString> Spellchecker::dictionaries;
+QString Spellchecker::dictionaryDirPath;
+QString Spellchecker::dictionaryName;
+QList<Spellchecker*> Spellchecker::instances;
+
+void Spellchecker::setDictionaryName(const QString &dictName)
+{
+    if (hunspell != nullptr) {
+        delete hunspell;
+    }
+    hunspell = getHunspellForDictionary(dictName);
+    // only disable. don't enable here, user should manually do so
+    if (hunspell == nullptr) {
+        enabled = false;
+    }
+    dictionaryName = dictName;
+    rehighlightAll();
+}
+
+void Spellchecker::setDictionaryDirPath(const QString &dictDirPath)
+{
+    static const int dictionaryDirWatcherTimerTimeout = 1000;
+
+    static QTimer* dictionaryDirWatcherTimer = []() -> QTimer*
+    {
+        QTimer* timer = new QTimer();
+        timer->setSingleShot(true);
+        connect(timer, &QTimer::timeout, &Spellchecker::updateDictionaries);
+        return timer;
+    }();
+
+    static QFileSystemWatcher* dictionaryDirWatcher = [](QTimer* dictionaryDirWatcherTimer, int dictionaryDirWatcherTimerTimeout) -> QFileSystemWatcher*
+    {
+        QFileSystemWatcher* watcher = new QFileSystemWatcher();
+        connect(watcher, &QFileSystemWatcher::directoryChanged, [dictionaryDirWatcherTimer, dictionaryDirWatcherTimerTimeout]() {dictionaryDirWatcherTimer->start(dictionaryDirWatcherTimerTimeout);} );
+        return watcher;
+    }(dictionaryDirWatcherTimer, dictionaryDirWatcherTimerTimeout);
+
+    const QStringList watchedDirectories = dictionaryDirWatcher->directories();
+    if (watchedDirectories.size() != 0) {
+        dictionaryDirWatcher->removePaths(watchedDirectories);
+    }
+    dictionaryDirPath = dictDirPath;
+    updateDictionaries();
+    dictionaryDirWatcher->addPath(dictionaryDirPath);
+}
+
+Hunspell* Spellchecker::getHunspellForDictionary(const QString &dictName)
+{
+    QString affPath(dictionaryDirPath + dictName + ".aff");
+    QString dicPath(dictionaryDirPath + dictName + ".dic");
+    qDebug() << Q_FUNC_INFO << dicPath << QFileInfo::exists(affPath) << QFileInfo::exists(dicPath);
+    QFileInfo affFileInfo(affPath);
+    QFileInfo dicFileInfo(dicPath);
+    if (affFileInfo.exists() && affFileInfo.isFile() &&
+        dicFileInfo.exists() && dicFileInfo.isFile()) {
+
+        return new Hunspell(
+            affPath.toLocal8Bit().constData(),
+            dicPath.toLocal8Bit().constData()
+        );
+    }
+    return nullptr;
+}
+
+void Spellchecker::updateDictionaries()
+{
+    QDir hunspellDir(dictionaryDirPath);
+    QStringList affList = hunspellDir.entryList(QStringList() << "*.aff", QDir::Files, QDir::Name);
+    QStringList dicList = hunspellDir.entryList(QStringList() << "*.dic", QDir::Files, QDir::Name);
+
+    dictionaries.clear();
+
+    for (int i = 0, j = 0, min = qMin(affList.size(), dicList.size()); i < min && j < min; ) {
+        const QStringRef affFilename = affList[i].leftRef(affList[i].length() - 4);
+        const QStringRef dicFilename = dicList[i].leftRef(dicList[i].length() - 4);
+        const int compare = affFilename.compare(dicFilename);
+        if (compare < 0) {
+            i ++;
+        } else if (compare > 0) {
+            j ++;
+        } else {
+            // found matching .aff and .dic
+            i ++;
+            j ++;
+            QString hunspellDictionaryName(affFilename.toString());
+            QString humanReadableDictionaryName = getLanguageName(hunspellDictionaryName);
+
+            dictionaries[humanReadableDictionaryName] = hunspellDictionaryName;
+            qDebug() << Q_FUNC_INFO << humanReadableDictionaryName << hunspellDictionaryName;
+        }
+    }
+
+    // if current language dict is removed (not on the list), it would be weird that we are using it
+    // so try to reload the dict.
+    if (!dictionaryName.isEmpty()) {
+        setDictionaryName(dictionaryName);
+    }
+}
+
+QString Spellchecker::getLanguageName(const QString &dictionaryName)
+{
+    QLocale locale(dictionaryName);
+
+    QString languageEnumName = locale.languageToString(locale.language());
+    QString countryEnumName = locale.countryToString(locale.country());
+    auto addSpaces = [](QString& str) {
+        for (int i = 0; i < str.length() - 1; i ++) {
+            const QCharRef c1 = str[i];
+            const QCharRef c2 = str[i+1];
+            if (c1.isLetter() && c2.isLetter() && c1.isLower() && c2.isUpper()) {
+                str.insert(i+1, " ");
+                i ++;
+            }
+        }
+    };
+    addSpaces(languageEnumName);
+    addSpaces(countryEnumName);
+
+    QString nativeLanguageName(locale.nativeLanguageName());
+    QString nativeCountryName(locale.nativeCountryName());
+    auto capitalizeFirstLetter = [](QString& str) {
+        const QCharRef c = str[0];
+        if (c.isLower()) {
+            str[0] = c.toUpper();
+        }
+    };
+    capitalizeFirstLetter(nativeLanguageName);
+    capitalizeFirstLetter(nativeCountryName);
+
+    return QString("%1 (%2) / %3 (%4)").arg(languageEnumName, countryEnumName,
+                                            nativeLanguageName, nativeCountryName);
+}
+
+void Spellchecker::rehighlightAll()
+{
+    for (Spellchecker* i : instances) {
+        i->rehighlight();
+    }
+}
 
 Spellchecker::Spellchecker(QTextEdit* parent)
     : QSyntaxHighlighter(parent),
@@ -72,20 +221,9 @@ Spellchecker::Spellchecker(QPlainTextEdit* parent)
 
 void Spellchecker::init(QTextDocument* document)
 {
-    this->document = document;
+    instances << this;
 
-    QString basePath;
-#ifdef Q_OS_WIN
-    basePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + "hunspell" + '/';
-#else
-    basePath = "/usr/share/hunspell/";
-#endif
-    QFileInfo aff(basePath + "en_US.aff");
-    QFileInfo dic(basePath + "en_US.dic");
-    hunspell = new Hunspell(
-        aff.absoluteFilePath().toLocal8Bit().constData(),
-        dic.absoluteFilePath().toLocal8Bit().constData()
-    );
+    this->document = document;
 
     connect(document, &QTextDocument::contentsChange, this, &Spellchecker::contentsChange);
     // this is a simple hack to ensure that the connected slot above
@@ -95,11 +233,15 @@ void Spellchecker::init(QTextDocument* document)
 
 Spellchecker::~Spellchecker()
 {
-    delete hunspell;
+    instances.removeOne(this);
 }
 
 void Spellchecker::highlightBlock(const QString& text)
 {
+    if (!isEnabled() || !hasDictionarySet()) {
+        return;
+    }
+
     const QStringList tokens = text.split(wordDelimiterRegEx);
     QStringListIterator tokensIterator(tokens);
 
@@ -178,19 +320,31 @@ void Spellchecker::highlightBlock(const QString& text)
     }
 }
 
-bool Spellchecker::isCorrect(const QString& word) const
+bool Spellchecker::isCorrect(const QString& word)
 {
+    if (!hasDictionarySet()) {
+        return false;
+    }
+
     return hunspell->spell(word.toLocal8Bit().constData()) != 0;
 }
 
-bool Spellchecker::isCorrect(const QStringRef& word) const
+bool Spellchecker::isCorrect(const QStringRef& word)
 {
+    if (!hasDictionarySet()) {
+        return false;
+    }
+
     return hunspell->spell(word.toLocal8Bit().constData()) != 0;
 }
 
-QStringList Spellchecker::suggest(const QString& word) const
+QStringList Spellchecker::suggest(const QString& word)
 {
     QStringList suggestions;
+
+    if (!hasDictionarySet()) {
+        return suggestions;
+    }
 
     char** slst;
     const int numberOfSuggestions = hunspell->suggest(&slst, word.toLocal8Bit().constData());
@@ -208,7 +362,7 @@ bool Spellchecker::skipRange(int start, int end) const
 }
 
 // returns index number of the token in the block pointed by the given position or -1 if no such token found
-int Spellchecker::tokenIndexInBlock(int position, const QTextBlock& block) const
+int Spellchecker::tokenIndexInBlock(int position, const QTextBlock& block)
 {
     int counter = 0;
     const QString text = block.text();
@@ -227,14 +381,22 @@ int Spellchecker::tokenIndexInBlock(int position, const QTextBlock& block) const
 }
 
 // sets some variables for Spellchecker::cursorPositionChanged and Spellchecker::highlightBlock, which are called right after this function
-void Spellchecker::contentsChange(int position, int charsRemoved, int charsAdded)
+void Spellchecker::contentsChange(int position, int /*charsRemoved*/, int charsAdded)
 {
+    if (!isEnabled() || !hasDictionarySet()) {
+        return;
+    }
+
     cursorChangedByEditing = true;
-    skipPosition = position + charsAdded - charsRemoved;
+    skipPosition = position + charsAdded;
 }
 
 void Spellchecker::cursorPositionChanged()
 {
+    if (!isEnabled() || !hasDictionarySet()) {
+        return;
+    }
+
     // when cursor position is changed by editing (i.e. Spellchecker::contentsChanged), the parent class rehighlights everything automatically.
     // but if the cursor position is changed not by editing the text but by simply moving the cursor, we should check and possibly highlight
     // the token our cursor was at before the cursor position changed, since we don't check tokens that we currently have the cursor in.
@@ -268,43 +430,7 @@ void Spellchecker::cursorPositionChanged()
     cursorChangedByEditing = false;
 }
 
-QList<QAction*> Spellchecker::getContextMenuActions(QTextCursor cursor) const
-{
-    QList<QAction*> actions;
-
-    int left, right;
-    getWordBoundaries(cursor, &left, &right);
-
-    if (left == -1 || right == -1) {
-        return actions;
-    }
-
-    cursor.setPosition(left);
-    cursor.setPosition(right, QTextCursor::KeepAnchor);
-    QString selectedWord = cursor.selectedText();
-
-    // cursor.position() points to the end of the selected word
-    // substract selectedWord.length() to get the start position
-    if (selectedWord.count(exceptionWordDelimiterRegEx) != selectedWord.length() &&
-            !skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
-            !isCorrect(selectedWord)) {
-        QStringList suggestions = suggest(selectedWord);
-
-        if (!suggestions.isEmpty()) {
-            QStringListIterator it(suggestions);
-            for (int i = 0; i < 4 && it.hasNext(); i++) {
-                QString suggestion = it.next();
-                QAction* action = new QAction(suggestion, nullptr);
-                connect(action, &QAction::triggered, [cursor, action]() mutable { cursor.insertText(action->text()); });
-                actions << action;
-            }
-        }
-    }
-
-    return actions;
-}
-
-int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup) const
+int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup)
 {
     QTextCursor textSelectingCursor(cursor);
     textSelectingCursor.select(QTextCursor::WordUnderCursor);
@@ -376,7 +502,7 @@ int Spellchecker::getWordStartingPosition(QTextCursor cursor, int maxLookup) con
     return nextWordStartPosition;
 }
 
-int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
+int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup)
 {
     QTextCursor textSelectingCursor(cursor);
     textSelectingCursor.select(QTextCursor::WordUnderCursor);
@@ -458,10 +584,82 @@ int Spellchecker::getWordEndingPosition(QTextCursor cursor, int maxLookup) const
     return previousWordEndPosition;
 }
 
-void Spellchecker::getWordBoundaries(const QTextCursor& cursor, int* startingPosition, int* endingPosition) const
+void Spellchecker::getWordBoundaries(const QTextCursor& cursor, int* startingPosition, int* endingPosition)
 {
     const static int MAX_LOOKUP = 10;
 
     (*startingPosition) = getWordStartingPosition(cursor, MAX_LOOKUP);
     (*endingPosition) = getWordEndingPosition(cursor, MAX_LOOKUP);
+}
+
+QList<QAction*> ContextMenuEnabledSpellchecker::getContextMenuSuggestions(QTextCursor cursor) const
+{
+    QList<QAction*> actions;
+
+    if (!isEnabled() || !hasDictionarySet()) {
+        return actions;
+    }
+
+    int left, right;
+    getWordBoundaries(cursor, &left, &right);
+
+    if (left == -1 || right == -1) {
+        return actions;
+    }
+
+    cursor.setPosition(left);
+    cursor.setPosition(right, QTextCursor::KeepAnchor);
+    QString selectedWord = cursor.selectedText();
+
+    // cursor.position() points to the end of the selected word
+    // substract selectedWord.length() to get the start position
+    if (selectedWord.count(exceptionWordDelimiterRegEx) != selectedWord.length() &&
+            !skipRange(cursor.position() - selectedWord.length(), cursor.position()) &&
+            !isCorrect(selectedWord)) {
+        QStringList suggestions = suggest(selectedWord);
+
+        if (!suggestions.isEmpty()) {
+            QStringListIterator it(suggestions);
+            for (int i = 0; i < 4 && it.hasNext(); i++) {
+                QString suggestion = it.next();
+                QAction* action = new QAction(suggestion, nullptr);
+                connect(action, &QAction::triggered, [cursor, action]() mutable { cursor.insertText(action->text()); });
+                actions << action;
+            }
+        }
+    }
+
+    return actions;
+}
+
+QActionGroup* ContextMenuEnabledSpellchecker::getContextMenuLanguages()
+{
+    QActionGroup* languageActions = new QActionGroup(nullptr);
+    languageActions->setExclusive(true);
+
+    const QList<QString> languages = getAvailableLanguages();
+
+    const QString currentLanguage = getLanguage();
+
+    for (const QString l : languages) {
+        QAction* action = new QAction(l, languageActions);
+        action->setCheckable(true);
+
+        if (l == currentLanguage) {
+            action->setChecked(true);
+        }
+    }
+    connect(languageActions, &QActionGroup::triggered, [](QAction *a) {setLanguage(a->text());});
+
+    return languageActions;
+}
+
+QAction* ContextMenuEnabledSpellchecker::getContextMenuEnableSpellchecking()
+{
+    QAction* action = new QAction(nullptr);
+    action->setCheckable(true);
+    action->setChecked(isEnabled());
+    connect(action, &QAction::triggered, &ContextMenuEnabledSpellchecker::setEnabled);
+
+    return action;
 }

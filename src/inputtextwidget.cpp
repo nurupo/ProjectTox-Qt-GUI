@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
+    Copyright (C) 2013-2014 by Maxim Biro <nurupo.contributions@gmail.com>
                   2013-2014 by Martin Kröll <technikschlumpf@web.de>
 
     This file is part of Tox Qt GUI.
@@ -182,20 +182,36 @@ void InputTextWidget::showContextMenu(const QPoint &pos)
     const QPoint globalPos = mapToGlobal(pos);
     QMenu contextMenu;
 
-    QList<QAction*> actions = spellchecker.getContextMenuActions(cursorForPosition(pos));
+    QList<QAction*> actions = spellchecker.getContextMenuSuggestions(cursorForPosition(pos));
 
-    contextMenu.addActions(actions);
-    contextMenu.addSeparator();
+    QActionGroup* languagesGroup = spellchecker.getContextMenuLanguages();
+    QList<QAction*> languageActions = languagesGroup->actions();
+
+    QAction* checkSpelling = spellchecker.getContextMenuEnableSpellchecking();
+    checkSpelling->setText("Check spelling");
+
+    if (actions.size() != 0) {
+        contextMenu.addActions(actions);
+        contextMenu.addSeparator();
+    }
     contextMenu.addAction(actionUndo);
     contextMenu.addAction(actionRedo);
     contextMenu.addSeparator();
     contextMenu.addAction(actionCut);
     contextMenu.addAction(actionCopy);
     contextMenu.addAction(actionPaste);
+    if (languageActions.size() != 0) {
+        contextMenu.addSeparator();
+        contextMenu.addAction(checkSpelling);
+        QMenu* languagesMenu = contextMenu.addMenu("Languages");
+        languagesMenu->addActions(languageActions);
+    }
 
     actionPaste->setDisabled(QApplication::clipboard()->text().isEmpty());
 
     contextMenu.exec(globalPos);
 
     qDeleteAll(actions);
+    delete languagesGroup;
+    delete checkSpelling;
 }

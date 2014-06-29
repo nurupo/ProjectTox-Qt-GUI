@@ -17,6 +17,7 @@
 #include "settings.hpp"
 #include "settingsdialog.hpp"
 #include "smileypack.hpp"
+#include "spellchecker.hpp"
 
 #include <QApplication>
 #include <QDir>
@@ -107,6 +108,17 @@ void Settings::load()
     s.beginGroup("Privacy");
         typingNotification = s.value("typingNotification", false).toBool();
     s.endGroup();
+
+    QString dictionaryDirPath;
+#ifdef Q_OS_WIN
+    dictionaryDirPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + '/' + "hunspell" + '/';
+#else
+    dictionaryDirPath = "/usr/share/hunspell/";
+#endif
+    //FIXME: get it from settings
+    QString dictName = QLocale::system().name();
+    Spellchecker::setDictionaryDirPath(dictionaryDirPath);
+    Spellchecker::setDictionaryName(dictName);
 
     loaded = true;
 }

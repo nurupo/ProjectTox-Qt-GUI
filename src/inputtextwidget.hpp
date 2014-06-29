@@ -49,7 +49,7 @@ private slots:
 private:
     QString desmile(QString htmlText);
 
-    Spellchecker spellchecker;
+    ContextMenuEnabledSpellchecker spellchecker;
     const int maxSuggestions;
 
     QAction *actionUndo;
