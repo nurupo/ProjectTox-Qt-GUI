@@ -34,13 +34,13 @@ public:
 
 private:
     static void onFriendRequest(Tox* tox, const uint8_t* cUserId, const uint8_t* cMessage, uint16_t cMessageSize, void* core);
-    static void onFriendMessage(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
-    static void onFriendNameChange(Tox* tox, int friendId, uint8_t* cName, uint16_t cNameSize, void* core);
+    static void onFriendMessage(Tox* tox, int friendId, const uint8_t *cMessage, uint16_t cMessageSize, void* core);
+    static void onFriendNameChange(Tox* tox, int friendId, const uint8_t *cName, uint16_t cNameSize, void* core);
     static void onFriendTypingChange(Tox* tox, int friendId, uint8_t isTyping, void* core);
-    static void onStatusMessageChanged(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onStatusMessageChanged(Tox* tox, int friendId, const uint8_t *cMessage, uint16_t cMessageSize, void* core);
     static void onUserStatusChanged(Tox* tox, int friendId, uint8_t userstatus, void* core);
     static void onConnectionStatusChanged(Tox* tox, int friendId, uint8_t status, void* core);
-    static void onAction(Tox* tox, int friendId, uint8_t* cMessage, uint16_t cMessageSize, void* core);
+    static void onAction(Tox* tox, int friendId, const uint8_t *cMessage, uint16_t cMessageSize, void* core);
 
     void checkConnection();
 
