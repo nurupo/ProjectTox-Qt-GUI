@@ -16,11 +16,12 @@
 | C++ compiler | supporting C++11 (i.e. gcc 4.6+) |
 | toxcore      | most recent                      |
 
+
 ###Unix-like (Linux, Unix, OS X):
 
-Grab and install Qt 5.2.0+ from [qt-project website](http://qt-project.org/downloads) (alternatively you could get it from your distro's package repository).
+Grab and install Qt 5.2.0+ from [qt-project website](http://qt-project.org/downloads). Alternatively you could get it from your distro's package repository (`qtbase5-dev` on Debian Jessie).
 
-Then install toxcore following [this instructions](https://github.com/irungentoo/ProjectTox-Core/blob/master/INSTALL.md).
+Then install toxcore following [these instructions](https://github.com/irungentoo/ProjectTox-Core/blob/master/INSTALL.md).
 
 Clone this repo and build it with Qt's qmake:
 ```bash
@@ -34,15 +35,17 @@ On success, this will produce a `TOX-Qt-GUI` executable.
 
 See [building using Qt Creator](#building-using-qt-creator) if you want to build the project by using Qt Creator IDE, rather than shell commands.
 
+
 ####Troubleshooting
 
-- On OS X you may get a warning while running qmake: "WARNING: Could not resolve Info.plist: 'Info.plist.app'. Check if QMAKE_INFO_PLIST points to a valid file", just disregard it and run make.
-
-- If Qt complains about missing GL library, install `libgl-dev` package. The exact package name might differ from distribution to distribution, but you get the idea of what you should look for.
-
 - Note that `qmake` might not be found by bash or it might be found, but from Qt4 installation. In the case of qmake not working, make sure you use the right qmake.
-If you have installed Qt5 from the qt-project website, you should specify the full path to Qt's qmake, since it's not added to /user/bin/.
-For example, in my case I used `/home/nurupo/Qt5.2.0/5.2.0/gcc_64/bin/qmake`.
+  - If you have installed Qt5 from the qt-project website, you should specify the full path to Qt's qmake, since it's not added to /user/bin/.
+    For example, in my case I used `/home/nurupo/Qt5.2.0/5.2.0/gcc_64/bin/qmake`.
+  - If you use qmake from your distro's package repository, you might need to pass `-qt=5` option to it.
+
+- If Qt complains about missing GL library, install `libgl-dev` package (`libgl1-mesa-dev` on Debian). The exact package name might differ from distribution to distribution, but you get the idea of what you should look for.
+
+- On OS X you may get a warning while running qmake: "WARNING: Could not resolve Info.plist: 'Info.plist.app'. Check if QMAKE_INFO_PLIST points to a valid file". It should be safe to ignore it.
 
 
 ###Windows
@@ -50,7 +53,7 @@ For example, in my case I used `/home/nurupo/Qt5.2.0/5.2.0/gcc_64/bin/qmake`.
 Grab and install MinGW version of Qt 5.2.0+ from [qt-project website](http://qt-project.org/downloads).
 The MinGW version includes MinGW compiler, so you don't have to bother with installing one manually.
 
-[Download and extract a ZIP archive of this repo's master branch](https://github.com/nurupo/ProjectTox-Qt-GUI/archive/master.zip), or, if you have git, clone it:
+[Download and extract a ZIP archive of this repo's master branch](https://github.com/nurupo/ProjectTox-Qt-GUI/archive/master.zip), or, if you have git, clone the repository:
 ```cmd
 git clone https://github.com/nurupo/ProjectTox-Qt-GUI.git
 ```
@@ -69,7 +72,7 @@ C:\wherever\is\your\Qt\installed\Tools\mingw48_32\bin\mingw32-make.exe
 ```
 On success, this will produce a `TOX-Qt-GUI.exe` binary. If you used Qt from qt-project webite, your binary would be dynamically linked to Qt's libraries, i.e. the executable would require Qt's dlls from `C:\wherever\is\your\Qt\installed\5.2.0\mingw48_32\bin\` in order to run.
 
-See [building using Qt Creator](#building-using-qt-creator) if you want to build the project by using Qt Creator IDE, rather than shell commands.
+See [building using Qt Creator](#building-using-qt-creator) if you want to build the project by using Qt Creator IDE, rather than command prompt.
 
 
 ##Building using Qt Creator
