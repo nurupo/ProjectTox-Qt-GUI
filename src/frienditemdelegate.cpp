@@ -90,11 +90,22 @@ void FriendItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
     switch (getStatus(index)) {
     case Status::Away:
-    case Status::Busy:
         painter->setPen(Qt::NoPen);
         painter->setBrush(QColor("#CEBE44"));
         painter->drawChord(dotPos.x()-4, dotPos.y()-4, 8, 8, 2880, 2880);
         painter->setPen(QPen(QColor("#CEBE44"), 2));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawEllipse(dotPos, 4, 4);
+        if (getUnreadMessages(index)) {
+            painter->setPen(QPen(QColor("#CEBE44"), 1.5));
+            painter->drawEllipse(dotPos, 7, 7);
+        }
+        break;
+    case Status::Busy:
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(QColor("#C74F50"));
+        painter->drawChord(dotPos.x()-4, dotPos.y()-4, 8, 8, -1440, 2880);
+        painter->setPen(QPen(QColor("#C74F50"), 2));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(dotPos, 4, 4);
         if (getUnreadMessages(index)) {
