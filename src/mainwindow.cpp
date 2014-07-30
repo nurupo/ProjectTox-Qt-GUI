@@ -121,6 +121,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendAdded, pages, &PagesWidget::addPage);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageReceived, pages, &PagesWidget::messageReceived);
+    connect(core, &Core::friendMessageReceived,friendsWidget, &FriendsWidget::setUnreadMessage);
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameLoaded,  friendsWidget, &FriendsWidget::setUsername);

@@ -25,10 +25,19 @@ class FriendItemDelegate : public QStyledItemDelegate
 public:
     FriendItemDelegate(QObject *parent = 0);
 
-    enum {UsernameRole = Qt::UserRole, StatusRole, StatusMessageRole, UserIdRole, FriendIdRole, LastSeenRole};
+    enum {
+        UsernameRole = Qt::UserRole,
+        StatusRole,
+        StatusMessageRole,
+        UserIdRole,
+        FriendIdRole,
+        LastSeenRole,
+        UnreadMessagesRole,
+    };
 
     static Status getStatus(const QModelIndex& index);
     static QString getUsername(const QModelIndex& index);
+    static bool getUnreadMessages(const QModelIndex& index);
 
 protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;

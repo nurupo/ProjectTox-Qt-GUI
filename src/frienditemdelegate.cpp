@@ -64,9 +64,10 @@ void FriendItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
     static const int USERNAME_X_OFFSET = 2;
     static const int USERNAME_Y_OFFSET = -3;
+    static const int STATUSDOT_SPACE = 24;
 
     painter->setFont(usernameFont);
-    QString elidedUsername = painter->fontMetrics().elidedText(username, Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET));
+    QString elidedUsername = painter->fontMetrics().elidedText(username, Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET + STATUSDOT_SPACE));
     painter->drawText(ICON_X_OFFSET + statusIconSize.width() + USERNAME_X_OFFSET, option.rect.top() + hint.height()/2 + ((statusMessageIsVisible ? 0 : painter->fontMetrics().ascent()) - painter->fontMetrics().descent())/2 + (statusMessageIsVisible ? USERNAME_Y_OFFSET : 0), elidedUsername);
 
     if (statusMessageIsVisible) {
@@ -78,8 +79,48 @@ void FriendItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
         static const int STATUSMESSAGE_X_OFFSET = USERNAME_X_OFFSET;
 
         painter->setFont(statusMessageFont);
-        QString elidedStatuseMessage = painter->fontMetrics().elidedText(statusMessage, Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET));
+        QString elidedStatuseMessage = painter->fontMetrics().elidedText(statusMessage, Qt::ElideRight, option.rect.right() - (ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET + STATUSDOT_SPACE));
         painter->drawText(ICON_X_OFFSET + statusIconSize.width() + STATUSMESSAGE_X_OFFSET, option.rect.top() + hint.height()/2 + painter->fontMetrics().ascent(), elidedStatuseMessage);
+    }
+
+    // Status dot
+    QPoint dotPos = option.rect.center();
+    dotPos.setX(option.rect.right()-STATUSDOT_SPACE/2);
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    switch (getStatus(index)) {
+    case Status::Away:
+    case Status::Busy:
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(QColor("#CEBE44"));
+        painter->drawChord(dotPos.x()-4, dotPos.y()-4, 8, 8, 2880, 2880);
+        painter->setPen(QPen(QColor("#CEBE44"), 2));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawEllipse(dotPos, 4, 4);
+        if (getUnreadMessages(index)) {
+            painter->setPen(QPen(QColor("#CEBE44"), 1.5));
+            painter->drawEllipse(dotPos, 7, 7);
+        }
+        break;
+    case Status::Offline:
+        painter->setPen(QPen(QColor("#C74F50"), 2));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawEllipse(dotPos, 4, 4);
+        if (getUnreadMessages(index)) {
+            painter->setPen(QPen(QColor("#C74F50"), 1.5));
+            painter->drawEllipse(dotPos, 7, 7);
+        }
+        break;
+    case Status::Online:
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(QColor("#6BC160"));
+        painter->drawEllipse(dotPos, 5, 5);
+        if (getUnreadMessages(index)) {
+            painter->setPen(QPen(QColor("#6BC160"),1.5));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawEllipse(dotPos, 7, 7);
+        }
+        break;
     }
 
     painter->restore();
@@ -98,4 +139,9 @@ Status FriendItemDelegate::getStatus(const QModelIndex& index)
 QString FriendItemDelegate::getUsername(const QModelIndex& index)
 {
     return index.data(UsernameRole).toString();
+}
+
+bool FriendItemDelegate::getUnreadMessages(const QModelIndex &index)
+{
+    return index.data(UnreadMessagesRole).toBool();
 }
