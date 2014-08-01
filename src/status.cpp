@@ -18,10 +18,10 @@
 
 const QList<StatusHelper::Info> StatusHelper::info =
 {
-    {"Online", ":/icons/status_online.png"},
-    {"Away", ":/icons/status_away.png"},
-    {"Busy", ":/icons/status_busy.png"},
-    {"Offline", ":/icons/status_offline.png"}
+    {"Online", ":/icons/status/online_small.png", ":/icons/status/online_small_active.png"},
+    {"Away", ":/icons/status/away_small.png", ":/icons/status/away_small_active.png"},
+    {"Busy", ":/icons/status/busy_small.png", ":/icons/status/busy_small_active.png"},
+    {"Offline", ":/icons/status/offline_small.png", ":/icons/status/offline_small_active.png"}
 };
 
 StatusHelper::Info StatusHelper::getInfo(int status)

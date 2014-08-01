@@ -29,7 +29,8 @@ public:
 
     struct Info {
         QString name;
-        QString iconPath;
+        QString iconPathSmall;
+        QString iconPathSmallActive;
     };
 
     static Info getInfo(int status);

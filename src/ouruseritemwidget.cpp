@@ -27,7 +27,7 @@
 OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     QWidget(parent)
 {
-    statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Offline).iconPath), QSize(24, 24), "Change Status");
+    statusButton = createToolButton(QIcon(StatusHelper::getInfo(Status::Offline).iconPathSmall), QSize(24, 24), "Change Status");
     statusButton->setPopupMode(QToolButton::InstantPopup);
     QHBoxLayout* statusButtonLayout = new QHBoxLayout();
     statusButtonLayout->setContentsMargins(0, 1, 0, 0);
@@ -43,7 +43,7 @@ OurUserItemWidget::OurUserItemWidget(QWidget* parent) :
     QList<QAction*> statusActions;
     for (int i = 0; i <= StatusHelper::MAX_STATUS; i ++) {
         StatusHelper::Info statusInfo = StatusHelper::getInfo(i);
-        QAction* statusAction = new QAction(QIcon(statusInfo.iconPath), statusInfo.name, statusMenu);
+        QAction* statusAction = new QAction(QIcon(statusInfo.iconPathSmall), statusInfo.name, statusMenu);
         statusAction->setData(i);
         connect(statusAction, &QAction::triggered, this, &OurUserItemWidget::onStatusActionTriggered);
         statusActions << statusAction;
@@ -156,5 +156,5 @@ void OurUserItemWidget::setFriendAddress(const QString &friendAddress)
 
 void OurUserItemWidget::setStatus(Status status)
 {
-    statusButton->setIcon(QIcon(StatusHelper::getInfo(status).iconPath));
+    statusButton->setIcon(QIcon(StatusHelper::getInfo(status).iconPathSmall));
 }

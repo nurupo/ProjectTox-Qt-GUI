@@ -185,7 +185,7 @@ MainWindow::MainWindow(QWidget* parent)
     trayMenu->addSeparator();
     for (int i = 0; i <= StatusHelper::MAX_STATUS; i ++) {
         StatusHelper::Info statusInfo = StatusHelper::getInfo(i);
-        QAction* statusAction = new QAction(QIcon(statusInfo.iconPath), statusInfo.name, trayMenu);
+        QAction* statusAction = new QAction(QIcon(statusInfo.iconPathSmall), statusInfo.name, trayMenu);
         statusAction->setData(i);
         connect(statusAction, &QAction::triggered, this, &MainWindow::onTrayMenuStatusActionTriggered);
         trayMenuStatusActions << statusAction;
