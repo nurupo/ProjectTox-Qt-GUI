@@ -121,6 +121,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(core, &Core::friendAdded, pages, &PagesWidget::addPage);
     connect(core, &Core::friendAdded, friendsWidget, &FriendsWidget::addFriend);
     connect(core, &Core::friendMessageReceived, pages, &PagesWidget::messageReceived);
+    connect(core, &Core::friendMessageReceived,friendsWidget, &FriendsWidget::setUnreadMessage);
     connect(core, &Core::actionReceived, pages, &PagesWidget::actionReceived);
     connect(core, &Core::friendUsernameChanged, friendsWidget, &FriendsWidget::setUsername);
     connect(core, &Core::friendUsernameLoaded,  friendsWidget, &FriendsWidget::setUsername);
@@ -184,7 +185,7 @@ MainWindow::MainWindow(QWidget* parent)
     trayMenu->addSeparator();
     for (int i = 0; i <= StatusHelper::MAX_STATUS; i ++) {
         StatusHelper::Info statusInfo = StatusHelper::getInfo(i);
-        QAction* statusAction = new QAction(QIcon(statusInfo.iconPath), statusInfo.name, trayMenu);
+        QAction* statusAction = new QAction(QIcon(statusInfo.iconPathSmall), statusInfo.name, trayMenu);
         statusAction->setData(i);
         connect(statusAction, &QAction::triggered, this, &MainWindow::onTrayMenuStatusActionTriggered);
         trayMenuStatusActions << statusAction;

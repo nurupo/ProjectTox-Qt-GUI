@@ -78,6 +78,7 @@ void FriendsWidget::addFriend(int friendId, const QString& userId)
     item->setData(userId, FriendItemDelegate::UserIdRole);
     item->setData(friendId, FriendItemDelegate::FriendIdRole);
     item->setData(QVariant::fromValue(Status::Offline), FriendItemDelegate::StatusRole);
+    item->setData(false, FriendItemDelegate::UnreadMessagesRole);
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 
     friendModel->appendRow(item);
@@ -175,6 +176,7 @@ void FriendsWidget::onFriendSelectionChanged(const QModelIndex& current, const Q
     QStandardItem* item = friendModel->itemFromIndex(friendProxyModel->mapToSource(current));
     if (item != nullptr) {
         emit friendSelectionChanged(item->data(FriendItemDelegate::FriendIdRole).toInt());
+        item->setData(false, FriendItemDelegate::UnreadMessagesRole);
     }
 }
 
@@ -199,6 +201,22 @@ void FriendsWidget::setLastSeen(int friendId, const QDateTime &dateTime) {
     friendItem->setData(dateTime, FriendItemDelegate::LastSeenRole);
 
     updateToolTip(friendItem);
+}
+
+void FriendsWidget::setUnreadMessage(int friendId, const QString &message)
+{
+    Q_UNUSED(message)
+
+    if (friendView->currentIndex().data(FriendItemDelegate::FriendIdRole) == friendId) {
+        return;
+    }
+
+    QStandardItem* friendItem = findFriendItem(friendId);
+    if (friendItem == nullptr) {
+        return;
+    }
+
+    friendItem->setData(true, FriendItemDelegate::UnreadMessagesRole);
 }
 
 void FriendsWidget::updateToolTip(QStandardItem* friendItem) const

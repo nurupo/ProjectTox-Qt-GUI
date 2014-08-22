@@ -1,8 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>icons/user_add.png</file>
-        <file>icons/status_offline.png</file>
-        <file>icons/status_online.png</file>
         <file>icons/page_copy.png</file>
         <file>icons/textfield_rename.png</file>
         <file>icons/user_delete.png</file>
@@ -28,8 +26,6 @@
         <file>icons/emoticons/emotion_doubt.png</file>
         <file>icons/emoticons/emotion_evilgrin.png</file>
         <file>icons/error.png</file>
-        <file>icons/status_away.png</file>
-        <file>icons/status_busy.png</file>
         <file>icons/application_side_list.png</file>
         <file>icons/cut.png</file>
         <file>icons/paste_plain.png</file>
@@ -44,5 +40,14 @@
         <file>icons/find.png</file>
         <file>icons/text_uppercase.png</file>
         <file>icons/eye.png</file>
+        <file>icons/buddy.png</file>
+        <file>icons/status/offline_small.png</file>
+        <file>icons/status/offline_small_active.png</file>
+        <file>icons/status/online_small_active.png</file>
+        <file>icons/status/online_small.png</file>
+        <file>icons/status/away_small_active.png</file>
+        <file>icons/status/away_small.png</file>
+        <file>icons/status/busy_small_active.png</file>
+        <file>icons/status/busy_small.png</file>
     </qresource>
 </RCC>

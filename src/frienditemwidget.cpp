@@ -24,7 +24,7 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
 {
     statusLabel = new QLabel(this);
     statusLabel->setScaledContents(true);
-    statusLabel->setFixedSize(24, 24);
+    statusLabel->setFixedSize(16, 16);
     setStatus(Status::Offline);
 
     usernameLabel = new CopyableElideLabel(this);
@@ -63,7 +63,7 @@ FriendItemWidget::FriendItemWidget(QWidget* parent) :
 
 void FriendItemWidget::setStatus(Status status)
 {
-    statusLabel->setPixmap(QPixmap(StatusHelper::getInfo(status).iconPath));
+    statusLabel->setPixmap(QPixmap(StatusHelper::getInfo(status).iconPathSmall));
 }
 
 void FriendItemWidget::setUsername(const QString& username)

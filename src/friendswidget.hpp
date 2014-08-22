@@ -59,6 +59,7 @@ public slots:
     void setStatus(int friendId, Status status);
     void setStatusMessage(int friendId, const QString& statusMessage);
     void setLastSeen(int friendId, const QDateTime& dateTime);
+    void setUnreadMessage(int friendId, const QString &message);
 
 signals:
     void friendAdded(int friendId, const QString& userId);
