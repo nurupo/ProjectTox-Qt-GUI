@@ -98,6 +98,7 @@ void ChatViewSearchWidget::enableSearch(bool enable)
 {
     mSearchEnabled = enable;
     updateHighlights();
+    mSearchLineEdit->setFocus();
 }
 
 void ChatViewSearchWidget::setSearchString(const QString &searchString)
