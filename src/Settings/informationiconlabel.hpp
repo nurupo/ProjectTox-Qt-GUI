@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
+    Copyright (C) 2014 by Maxim Biro <nurupo.contributions@gmail.com>
 
     This file is part of Tox Qt GUI.
 
@@ -14,29 +14,17 @@
     See the COPYING file for more details.
 */
 
-#ifndef LOGGINGSETTINGSPAGE_HPP
-#define LOGGINGSETTINGSPAGE_HPP
+#ifndef INFORMATIONICONLABEL_HPP
+#define INFORMATIONICONLABEL_HPP
 
-#include "abstractsettingspage.hpp"
+#include <QLabel>
 
-#include <QCheckBox>
-#include <QGroupBox>
-
-class LoggingSettingsPage : public AbstractSettingsPage
+class InformationIconLabel : public QLabel
 {
+    Q_OBJECT
 public:
-    LoggingSettingsPage(QWidget* parent);
-
-    void applyChanges();
-    void buildGui();
-    void setGui();
-
-private:
-    QGroupBox* buildLoggingGroup();
-
-    QGroupBox* loggingGroup;
-    QCheckBox* encryptLogsCheckBox;
+    explicit InformationIconLabel(QWidget *parent = 0);
 
 };
 
-#endif // LOGGINGSETTINGSPAGE_HPP
+#endif // INFORMATIONICONLABEL_HPP

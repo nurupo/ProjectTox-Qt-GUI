@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
+    Copyright (C) 2014 by Maxim Biro <nurupo.contributions@gmail.com>
 
     This file is part of Tox Qt GUI.
 
@@ -14,29 +14,31 @@
     See the COPYING file for more details.
 */
 
-#ifndef LOGGINGSETTINGSPAGE_HPP
-#define LOGGINGSETTINGSPAGE_HPP
+#ifndef NETWORKSETTINGSPAGE_HPP
+#define NETWORKSETTINGSPAGE_HPP
 
 #include "abstractsettingspage.hpp"
 
-#include <QCheckBox>
-#include <QGroupBox>
+class QGroupBox;
+class QCheckBox;
 
-class LoggingSettingsPage : public AbstractSettingsPage
+class NetworkSettingsPage : public AbstractSettingsPage
 {
 public:
-    LoggingSettingsPage(QWidget* parent);
+    NetworkSettingsPage(QWidget *parent);
 
     void applyChanges();
     void buildGui();
     void setGui();
 
 private:
-    QGroupBox* buildLoggingGroup();
+    QGroupBox *buildNetworkGroup();
 
-    QGroupBox* loggingGroup;
-    QCheckBox* encryptLogsCheckBox;
+    QCheckBox *enableIPv6CheckBox;
+    QCheckBox *enableIPv4FallbackCheckBox;
 
+private slots:
+    void IPv6CheckBoxStateChanged(int state);
 };
 
-#endif // LOGGINGSETTINGSPAGE_HPP
+#endif // NETWORKSETTINGSPAGE_HPP

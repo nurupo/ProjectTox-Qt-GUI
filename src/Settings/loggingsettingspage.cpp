@@ -14,8 +14,10 @@
     See the COPYING file for more details.
 */
 
-#include "settings.hpp"
 #include "loggingsettingspage.hpp"
+
+#include "informationiconlabel.hpp"
+#include "settings.hpp"
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -43,9 +45,7 @@ QGroupBox* LoggingSettingsPage::buildLoggingGroup()
 
     encryptLogsCheckBox = new QCheckBox("Encrypt logs", group);
 
-    QLabel* encryptLogsInfoLabel = new QLabel(group);
-    encryptLogsInfoLabel->setPixmap(QPixmap(":/icons/information.png"));
-    encryptLogsInfoLabel->setFixedSize(16, 16);
+    InformationIconLabel* encryptLogsInfoLabel = new InformationIconLabel(group);
     encryptLogsInfoLabel->setToolTip(QString("%1\n%2").arg("It is highly recommended that you encrypt logs as a countermeasure to logs being stolen.", "Don't disable this option unless you have really good reasons for doing so."));
 
     QHBoxLayout* encryptLogsLayout = new QHBoxLayout();

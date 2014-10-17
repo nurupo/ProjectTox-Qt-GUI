@@ -79,6 +79,7 @@ SOURCES += \
     ../../src/Settings/dhtserverdialog.cpp \
     ../../src/Settings/customhintlistwidget.cpp \
     ../../src/Settings/loggingsettingspage.cpp \
+    ../../src/Settings/networksettingspage.cpp \
     ../../src/aboutdialog.cpp \
     ../../src/emoticonmenu.cpp \
     ../../src/opacitywidget.cpp \
@@ -106,7 +107,8 @@ SOURCES += \
     ../../src/messages/messagefilter.cpp \
     ../../src/messages/chatviewsearchwidget.cpp \
     ../../src/Settings/privacysettingspage.cpp \
-    ../../src/messages/typingitem.cpp
+    ../../src/messages/typingitem.cpp \
+    ../../src/Settings/informationiconlabel.cpp
 
 HEADERS  += \
     ../../src/mainwindow.hpp \
@@ -135,6 +137,7 @@ HEADERS  += \
     ../../src/Settings/dhtserverdialog.hpp \
     ../../src/Settings/customhintlistwidget.hpp \
     ../../src/Settings/loggingsettingspage.hpp \
+    ../../src/Settings/networksettingspage.hpp \
     ../../src/aboutdialog.hpp \
     ../../src/appinfo.hpp \
     ../../src/emoticonmenu.hpp \
@@ -164,7 +167,8 @@ HEADERS  += \
     ../../src/messages/messagefilter.hpp \
     ../../src/messages/chatviewsearchwidget.hpp \
     ../../src/Settings/privacysettingspage.hpp \
-    ../../src/messages/typingitem.hpp
+    ../../src/messages/typingitem.hpp \
+    ../../src/Settings/informationiconlabel.hpp
 
 RESOURCES += \
     ../../resources/resources.qrc

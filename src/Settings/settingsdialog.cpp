@@ -14,10 +14,12 @@
     See the COPYING file for more details.
 */
 
-#include "dhtbootstrapsettingspage.hpp"
-#include "loggingsettingspage.hpp"
 #include "settingsdialog.hpp"
+
+#include "dhtbootstrapsettingspage.hpp"
 #include "guisettingspage.hpp"
+#include "loggingsettingspage.hpp"
+#include "networksettingspage.hpp"
 #include "privacysettingspage.hpp"
 
 SettingsDialog::SettingsDialog(QWidget* parent) :
@@ -30,12 +32,14 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
     //addPage(":/icons/database.png", "Logging", new LoggingSettingsPage(this));
     addPage(":/icons/application_side_list.png", tr("GUI"), new GuiSettingsPage(this));
     addPage(":/icons/eye.png", tr("Privacy"), new PrivacySettingsPage(this));
+    addPage(":/icons/globe_network.png", tr("Network"), new NetworkSettingsPage(this));
 
     listWidget->setCurrentRow(0);
     listWidget->setMinimumWidth(130);
     setMinimumSize(450, 325);
 }
 
+// we should have only a single settings dialog at a time
 int SettingsDialog::showDialog(QWidget* parent)
 {
     static SettingsDialog* dialog = nullptr;

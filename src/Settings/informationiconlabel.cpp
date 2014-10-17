@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 by Maxim Biro <nurupo.contributions@gmail.com>
+    Copyright (C) 2014 by Maxim Biro <nurupo.contributions@gmail.com>
 
     This file is part of Tox Qt GUI.
 
@@ -14,29 +14,22 @@
     See the COPYING file for more details.
 */
 
-#ifndef LOGGINGSETTINGSPAGE_HPP
-#define LOGGINGSETTINGSPAGE_HPP
+#include "informationiconlabel.hpp"
 
-#include "abstractsettingspage.hpp"
+#include <QPainter>
 
-#include <QCheckBox>
-#include <QGroupBox>
-
-class LoggingSettingsPage : public AbstractSettingsPage
+InformationIconLabel::InformationIconLabel(QWidget *parent) :
+    QLabel(parent)
 {
-public:
-    LoggingSettingsPage(QWidget* parent);
+    QImage image(":/icons/information.png");
 
-    void applyChanges();
-    void buildGui();
-    void setGui();
+    // set alpha to 175
+    QPainter p;
+    p.begin(&image);
+    p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    p.fillRect(image.rect(), QColor(0, 0, 0, 175));
+    p.end();
 
-private:
-    QGroupBox* buildLoggingGroup();
-
-    QGroupBox* loggingGroup;
-    QCheckBox* encryptLogsCheckBox;
-
-};
-
-#endif // LOGGINGSETTINGSPAGE_HPP
+    setPixmap(QPixmap::fromImage(image));
+    setFixedSize(16, 16);
+}

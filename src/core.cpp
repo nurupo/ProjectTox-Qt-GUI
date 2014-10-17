@@ -131,7 +131,7 @@ void Core::requestFriendship(const QString& friendAddress, const QString& messag
 
 void Core::sendMessage(int friendId, const QString& message)
 {
-    QByteArray byteArray= message.toUtf8();
+    QByteArray byteArray = message.toUtf8();
 
     int messageOffset = 0;
     int absoluteMaxLength = TOX_MAX_MESSAGE_LENGTH + messageOffset;
@@ -396,8 +396,22 @@ void Core::checkLastOnline(int friendId) {
 
 void Core::start()
 {
-    tox = tox_new(0);
+    const Settings &settings = Settings::getInstance();
 
+    Tox_Options options;
+    options.ipv6enabled = settings.isIPv6Enabled();
+    options.proxy_enabled = 0;
+    options.udp_disabled = 0;
+
+    tox = tox_new(&options);
+
+    // if failed to initialize -- try to fallback to ipv4
+    if (tox == nullptr && settings.isIPv6Enabled() && settings.isIPv4FallbackEnabled()) {
+          options.ipv6enabled = 0;
+          tox = tox_new(&options);
+    }
+
+    // if still didn't manage to initialize -- throw an error
     if (tox == nullptr) {
         emit failedToStart();
         return;
@@ -419,10 +433,10 @@ void Core::start()
 
     emit friendAddressGenerated(CFriendAddress::toString(friendAddress));
 
-    CString cUsername(Settings::getInstance().getUsername());
+    CString cUsername(settings.getUsername());
     tox_set_name(tox, cUsername.data(), cUsername.size());
 
-    CString cStatusMessage(Settings::getInstance().getStatusMessage());
+    CString cStatusMessage(settings.getStatusMessage());
     tox_set_status_message(tox, cStatusMessage.data(), cStatusMessage.size());
 
     bootstrapDht();

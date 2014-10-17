@@ -109,6 +109,13 @@ public:
     bool isTypingNotificationEnabled() const;
     void setTypingNotification(bool enabled);
 
+    // Network
+    bool isIPv6Enabled() const;
+    void setIPv6Enabled(bool enabled);
+
+    bool isIPv4FallbackEnabled() const;
+    void setIPv4FallbackEnabled(bool enabled);
+
 private:
     Settings();
     Settings(Settings &settings) = delete;
@@ -150,6 +157,10 @@ private:
 
     // Privacy
     bool typingNotification;
+
+    // Network
+    bool enableIPv6;
+    bool enableIPv4Fallback;
 
 signals:
     //void dataChanged();

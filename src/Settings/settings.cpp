@@ -108,6 +108,11 @@ void Settings::load()
         typingNotification = s.value("typingNotification", false).toBool();
     s.endGroup();
 
+    s.beginGroup("Network");
+        enableIPv6 = s.value("enableIPv6", true).toBool();
+        enableIPv4Fallback = s.value("enableIPv4Fallback", true).toBool();
+    s.endGroup();
+
     loaded = true;
 }
 
@@ -165,6 +170,11 @@ void Settings::save()
 
     s.beginGroup("Privacy");
         s.setValue("typingNotification", typingNotification);
+    s.endGroup();
+
+    s.beginGroup("Network");
+        s.setValue("enableIPv6", enableIPv6);
+        s.setValue("enableIPv4Fallback", enableIPv4Fallback);
     s.endGroup();
 }
 
@@ -350,4 +360,24 @@ bool Settings::isTypingNotificationEnabled() const
 void Settings::setTypingNotification(bool enabled)
 {
     typingNotification = enabled;
+}
+
+bool Settings::isIPv6Enabled() const
+{
+    return enableIPv6;
+}
+
+void Settings::setIPv6Enabled(bool enabled)
+{
+    enableIPv6 = enabled;
+}
+
+bool Settings::isIPv4FallbackEnabled() const
+{
+    return enableIPv4Fallback;
+}
+
+void Settings::setIPv4FallbackEnabled(bool enabled)
+{
+    enableIPv4Fallback = enabled;
 }
