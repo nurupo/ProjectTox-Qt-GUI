@@ -400,7 +400,7 @@ void Core::start()
 
     Tox_Options options;
     options.ipv6enabled = settings.isIPv6Enabled();
-    options.proxy_enabled = 0;
+    options.proxy_type = TOX_PROXY_NONE;
     options.udp_disabled = 0;
 
     tox = tox_new(&options);
