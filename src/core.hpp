@@ -82,7 +82,7 @@ private:
         static QString toString(const uint8_t *cUserId);
 
     private:
-        static const uint16_t SIZE = TOX_CLIENT_ID_SIZE;
+        static const uint16_t SIZE = TOX_PUBLIC_KEY_SIZE;
 
     };
 

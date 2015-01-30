@@ -106,7 +106,7 @@ void DhtServerDialog::accept()
         warning.setText("Please fill all the fields in.");
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
-    } else if (trimmedUserId.length() != (TOX_CLIENT_ID_SIZE * 2) || !trimmedUserId.contains(hexRegExp)) {
+    } else if (trimmedUserId.length() != (TOX_PUBLIC_KEY_SIZE * 2) || !trimmedUserId.contains(hexRegExp)) {
         QMessageBox warning(this);
         warning.setText("Please enter a valid User ID.");
         warning.setIcon(QMessageBox::Warning);

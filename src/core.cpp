@@ -120,7 +120,7 @@ void Core::requestFriendship(const QString& friendAddress, const QString& messag
     CString cMessage(message);
 
     int friendId = tox_add_friend(tox, CFriendAddress(friendAddress).data(), cMessage.data(), cMessage.size());
-    const QString userId = friendAddress.mid(0, TOX_CLIENT_ID_SIZE * 2);
+    const QString userId = friendAddress.mid(0, TOX_PUBLIC_KEY_SIZE * 2);
     // TODO: better error handling
     if (friendId < 0) {
         emit failedToAddFriend(userId);
@@ -356,7 +356,7 @@ void Core::loadFriends()
         // assuming there are not that many friends to fill up the whole stack
         int32_t *ids = new int32_t[friendCount];
         tox_get_friendlist(tox, ids, friendCount);
-        uint8_t clientId[TOX_CLIENT_ID_SIZE];
+        uint8_t clientId[TOX_PUBLIC_KEY_SIZE];
         for (int32_t i = 0; i < static_cast<int32_t>(friendCount); ++i) {
             if (tox_get_client_id(tox, ids[i], clientId) == 0) {
                 emit friendAdded(ids[i], CUserId::toString(clientId));
