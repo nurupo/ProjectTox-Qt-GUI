@@ -174,6 +174,7 @@ void Core::sendMessage(int friendId, const QString& message)
 found:
         if (splitPosition <= messageOffset || splitPosition > absoluteMaxLength) {
             splitPosition = lastCodepointStart;
+            qWarning() << "Message splitting sanity check failed";
         }
 
         int messageId = tox_send_message(tox, friendId, reinterpret_cast<uint8_t*>(byteArray.data() + messageOffset), splitPosition - messageOffset);
@@ -353,7 +354,6 @@ void Core::loadFriends()
 {
     const uint32_t friendCount = tox_count_friendlist(tox);
     if (friendCount > 0) {
-        // assuming there are not that many friends to fill up the whole stack
         int32_t *ids = new int32_t[friendCount];
         tox_get_friendlist(tox, ids, friendCount);
         uint8_t clientId[TOX_PUBLIC_KEY_SIZE];
