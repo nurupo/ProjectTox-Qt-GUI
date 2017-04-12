@@ -6,6 +6,8 @@ A cross-platform front end for [ProjectTox Core](https://github.com/irungentoo/P
 
 Please note that development is very early on and the project is not ready to use yet.
 
+Development on the project has stopped due to not having enough time for it.
+
 ## Screenshots
 
 ![Hi There](http://i.imgur.com/UJFsjgD.png "Current master branch running on Windows 7")

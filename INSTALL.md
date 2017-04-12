@@ -1,14 +1,12 @@
-##Installation
+## Installation
 - [Dependencies](#dependencies)
-<br>
 - [Unix-like](#unix-like-linux-unix-os-x)
   - [Troubleshooting](#troubleshooting)
 - [Windows](#windows)
-<br>
 - [Building using Qt Creator](#building-using-qt-creator)
 
 
-###Dependencies
+### Dependencies
 
 | Name         | Version                          |
 |--------------|----------------------------------|
@@ -17,7 +15,7 @@
 | toxcore      | most recent                      |
 
 
-###Unix-like (Linux, Unix, OS X):
+### Unix-like (Linux, Unix, OS X):
 
 Grab and install Qt 5.2.0+ from [qt-project website](http://qt-project.org/downloads). Alternatively you could get it from your distro's package repository (`qtbase5-dev` on Debian Jessie).
 
@@ -36,7 +34,7 @@ On success, this will produce a `TOX-Qt-GUI` executable.
 See [building using Qt Creator](#building-using-qt-creator) if you want to build the project by using Qt Creator IDE, rather than shell commands.
 
 
-####Troubleshooting
+#### Troubleshooting
 
 - Note that `qmake` might not be found by bash or it might be found, but from Qt4 installation. In the case of qmake not working, make sure you use the right qmake.
   - If you have installed Qt5 from the qt-project website, you should specify the full path to Qt's qmake, since it's not added to /user/bin/.
@@ -48,7 +46,7 @@ See [building using Qt Creator](#building-using-qt-creator) if you want to build
 - On OS X you may get a warning while running qmake: "WARNING: Could not resolve Info.plist: 'Info.plist.app'. Check if QMAKE_INFO_PLIST points to a valid file". It should be safe to ignore it.
 
 
-###Windows
+### Windows
 
 Grab and install MinGW version of Qt 5.2.0+ from [qt-project website](http://qt-project.org/downloads).
 The MinGW version includes MinGW compiler, so you don't have to bother with installing one manually.
@@ -75,7 +73,7 @@ On success, this will produce a `TOX-Qt-GUI.exe` binary. If you used Qt from qt-
 See [building using Qt Creator](#building-using-qt-creator) if you want to build the project by using Qt Creator IDE, rather than command prompt.
 
 
-##Building using Qt Creator
+## Building using Qt Creator
 
 Qt Creator is cross-platform, so the next instructions should be valid for all platforms.
 
@@ -98,4 +96,4 @@ To build the project with Qt Creator:
 8. Wait for it to be built.
 9. You should have a binary in whenever `Project` (on the left) `-> Build directory` points to.
 
-Here is a screen capture of the process:  [Building-using-Qt-Creator.webm](https://dl.dropboxusercontent.com/u/20447449/Building-using-Qt-Creator.webm).
+Here is a screen capture of the process:  [Building-using-Qt-Creator.webm](https://www.dropbox.com/s/hp8a39l5ga63c15/Building-using-Qt-Creator.webm).
