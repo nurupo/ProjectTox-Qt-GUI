@@ -37,8 +37,14 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     QAction* removeFriendAction = new QAction(QIcon(":/icons/user_delete.png"), "Remove", this);
     connect(removeFriendAction, &QAction::triggered, this, &FriendsWidget::onRemoveFriendActionTriggered);
 
+    QAction* removeFriendsAction = new QAction(QIcon(":/icons/user_delete.png"), "Remove", this);
+    connect(removeFriendsAction, &QAction::triggered, this, &FriendsWidget::onRemoveFriendActionTriggered);
+
     friendContextMenu = new QMenu(this);
     friendContextMenu->addActions(QList<QAction*>() << copyUserIdAction << removeFriendAction);
+
+    friendMultiSelectContextMenu = new QMenu(this);
+    friendMultiSelectContextMenu->addActions(QList<QAction*>() << removeFriendsAction);
 
     friendView = new QTreeView(this);
     friendView->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
@@ -49,6 +55,7 @@ FriendsWidget::FriendsWidget(QWidget* parent) :
     friendView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     friendView->setItemDelegateForColumn(0, new FriendItemDelegate(this));
     friendView->setContextMenuPolicy(Qt::CustomContextMenu);
+    friendView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(friendView, &QTreeView::customContextMenuRequested, this, &FriendsWidget::onFriendContextMenuRequested);
 
     friendModel = new QStandardItemModel(this);
@@ -137,10 +144,13 @@ void FriendsWidget::onFriendContextMenuRequested(const QPoint& pos)
     QPoint globalPos = friendView->viewport()->mapToGlobal(pos);
     globalPos.setX(globalPos.x() + 1);
     QModelIndexList selectedIndexes = friendView->selectionModel()->selectedIndexes();
-    if (selectedIndexes.size() != 1) {
+    if (selectedIndexes.size() == 1) {
+        friendContextMenu->exec(globalPos);
+    } else if (selectedIndexes.size() > 1 ) {
+        friendMultiSelectContextMenu->exec(globalPos);
+    } else {
         return;
     }
-    friendContextMenu->exec(globalPos);
 }
 
 void FriendsWidget::onCopyUserIdActionTriggered()
@@ -152,11 +162,17 @@ void FriendsWidget::onCopyUserIdActionTriggered()
 
 void FriendsWidget::onRemoveFriendActionTriggered()
 {
-    QModelIndex selectedIndex = friendView->selectionModel()->selectedIndexes().at(0);
-
-    int friendId = friendProxyModel->mapToSource(selectedIndex).data(FriendItemDelegate::FriendIdRole).toInt();
-
-    emit friendRemoved(friendId);
+    int friendId;
+    QStandardItem *friendItem;
+    for (const QModelIndex& selectedIndex : friendView->selectionModel()->selectedIndexes()) {
+        friendId = friendProxyModel->mapToSource(selectedIndex).data(FriendItemDelegate::FriendIdRole).toInt();
+        friendItem = findFriendItem(friendId);
+        if (friendItem == nullptr) {
+            continue;
+        } else {
+            emit friendRemoved(friendId);
+        }
+    }
 }
 
 void FriendsWidget::removeFriend(int friendId)

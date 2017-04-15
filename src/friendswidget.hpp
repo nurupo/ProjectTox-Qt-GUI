@@ -42,6 +42,7 @@ private:
     QStandardItemModel* friendModel;
     FriendProxyModel* friendProxyModel;
     QMenu* friendContextMenu;
+    QMenu* friendMultiSelectContextMenu;
 
     QStandardItem* findFriendItem(int friendId) const;
     void updateToolTip(QStandardItem *friendItem) const;
